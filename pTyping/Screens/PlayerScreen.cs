@@ -5,7 +5,7 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Primatives;
+using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using ManagedBass;
@@ -49,7 +49,7 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._comboDrawable);
 
 			Vector2 recepticlePos = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			this._recepticle = new CirclePrimativeDrawable(40f, 1f, Color.White) {
+			this._recepticle = new CirclePrimitiveDrawable(40f, 1f, Color.White) {
 				Position = recepticlePos,
 				Sides    = 20
 			};
