@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping", "pTyping\pTyping.csproj", "{EDA7E7C5-AFF3-4DC7-8B94-E34C994DBF22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Engine", "..\Furball\Furball.Engine\Furball.Engine.csproj", "{1D48205E-B076-47D5-AC8D-2190CF6E6F60}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EDA7E7C5-AFF3-4DC7-8B94-E34C994DBF22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDA7E7C5-AFF3-4DC7-8B94-E34C994DBF22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDA7E7C5-AFF3-4DC7-8B94-E34C994DBF22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDA7E7C5-AFF3-4DC7-8B94-E34C994DBF22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D48205E-B076-47D5-AC8D-2190CF6E6F60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D48205E-B076-47D5-AC8D-2190CF6E6F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D48205E-B076-47D5-AC8D-2190CF6E6F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D48205E-B076-47D5-AC8D-2190CF6E6F60}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
