@@ -30,16 +30,13 @@ namespace pTyping.Drawables {
 		}
 
 		public void Hit() {
+			this.Visible  = false;
 			this.Note.Hit = HitResult.Hit;
-			
-			this.Visible = false;
-			Console.WriteLine($"{this.Note.Time} ({this.Note.TextToShow}): Is hit!");
 		}
 
 		public void Miss() {
 			this.Visible  = false;
 			this.Note.Hit = HitResult.Miss;
-			Console.WriteLine($"{this.Note.Time} ({this.Note.TextToShow}): Missed!");
 		}
 		
 		public override void Draw(GameTime time, SpriteBatch batch, DrawableManagerArgs args) {

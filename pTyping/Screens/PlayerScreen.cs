@@ -33,13 +33,13 @@ namespace pTyping.Screens {
 		public PlayerScreen(Song song) {
 			this.Song = song;
 
-			this._scoreDrawable    = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Score:00000000}", 30) {
+			this._scoreDrawable    = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Score:00000000}", 60) {
 				Position = new Vector2(5, 5)
 			};
-			this._accuracyDrawable = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Accuracy * 100:0.00}%", 30) {
+			this._accuracyDrawable = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Accuracy * 100:0.00}%", 60) {
 				Position = new Vector2(5, 5 + this._scoreDrawable.Size.Y)
 			};
-			this._comboDrawable = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Combo}x", 30) {
+			this._comboDrawable = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Combo}x", 70) {
 				Position = new Vector2(5, FurballGame.DEFAULT_WINDOW_HEIGHT - 5),
 				OriginType = OriginType.BottomLeft
 			};
