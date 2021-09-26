@@ -49,22 +49,20 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._comboDrawable);
 
 			Vector2 recepticlePos = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			this._recepticle = new CirclePrimitiveDrawable(40f, 1f, Color.White) {
-				Position = recepticlePos,
-				Sides    = 20
-			};
+			this._recepticle = new CirclePrimitiveDrawable(recepticlePos, 40f, 1f, Color.White);
 			
 			this.Manager.Add(this._recepticle);
 
 			Vector2 noteStartPos = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 			foreach (Note note in this.Song.Notes) {
-				NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, note.TextToShow, 30) {
+				NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
 					Position   = noteStartPos,
 					TimeSource = this.MusicTrack,
 					ColorOverride = Color.Red
 				};
+				noteDrawable.LabelTextDrawable.Text = $"{note.TextToShow}\n({note.TextToType})";
 
-				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, noteStartPos, recepticlePos, note.Time - Config.ApproachTime, note.Time));
+				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, noteStartPos, recepticlePos, (int)(note.Time - Config.ApproachTime), (int)note.Time));
 				
 				this.Manager.Add(noteDrawable);
 
@@ -76,6 +74,16 @@ namespace pTyping.Screens {
 
 			FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
+		}
+
+		protected override void Dispose(bool disposing) {
+			this.MusicTrack.Stop();
+			this.MusicTrack.Free();
+			
+			FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
+			FurballGame.Instance.Window.TextInput -= this.OnCharacterTyped;
+			
+			base.Dispose(disposing);
 		}
 
 		public void OnKeyPress(object sender, Keys key) {

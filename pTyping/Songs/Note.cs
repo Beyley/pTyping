@@ -13,7 +13,7 @@ namespace pTyping.Songs {
 		[JsonProperty]
 		public string TextToShow;
 		[JsonProperty]
-		public int Time;
+		public double Time;
 
 		/// <summary>
 		/// Whether or not the note has been hit

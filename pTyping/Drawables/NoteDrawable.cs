@@ -1,4 +1,3 @@
-using System;
 using Furball.Engine;
 using MonoGame.Extended;
 using Microsoft.Xna.Framework;
@@ -10,12 +9,14 @@ using SpriteFontPlus;
 
 namespace pTyping.Drawables {
 	public class NoteDrawable : ManagedDrawable {
-		public TextDrawable TextDrawable;
+		public TextDrawable LabelTextDrawable;
 
 		public Note Note;
 
-		public NoteDrawable(byte[] font, string text, float size, CharacterRange[] range = null) {
-			this.TextDrawable = new TextDrawable(font, text, size, range);
+		public NoteDrawable(byte[] font, float size, CharacterRange[] range = null) {
+			this.LabelTextDrawable = new TextDrawable(font, "", size, range);
+			this.CircleRadius      = 40f;
+			this.Circular          = true;
 		}
 
 		public bool Type() {
@@ -40,15 +41,15 @@ namespace pTyping.Drawables {
 		}
 		
 		public override void Draw(GameTime time, SpriteBatch batch, DrawableManagerArgs args) {
-			batch.DrawCircle(args.Position, 40f, 10, args.Color, 1f, args.LayerDepth);
+			batch.DrawCircle(args.Position, 40f, 40, args.Color, 1f, args.LayerDepth);
 			
 			// FIXME: this is a bit of a hack, it should definitely be done differently
 			DrawableManagerArgs tempArgs = args;
-			tempArgs.Position   -= this.TextDrawable.Size / 2f;
+			tempArgs.Position   -= this.LabelTextDrawable.Size / 2f;
 			tempArgs.Position.Y += 80f;
-			tempArgs.Color      =  this.TextDrawable.ColorOverride;
+			tempArgs.Color      =  this.LabelTextDrawable.ColorOverride;
 			tempArgs.Scale      /= FurballGame.VerticalRatio;
-			this.TextDrawable.Draw(time, batch, tempArgs);
+			this.LabelTextDrawable.Draw(time, batch, tempArgs);
 		}
 	}
 }

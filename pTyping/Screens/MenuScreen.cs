@@ -8,7 +8,7 @@ using pTyping.Songs;
 namespace pTyping.Screens {
 	public class MenuScreen : Screen {
 		public override void Initialize() {
-			TextDrawable menuScreen = new(FurballGame.DEFAULT_FONT, "pTyping", 75) {
+			TextDrawable titleText = new(FurballGame.DEFAULT_FONT, "pTyping", 75) {
 				Position = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
 				OriginType = OriginType.Center
 			};
@@ -18,18 +18,27 @@ namespace pTyping.Screens {
 				OriginType = OriginType.Center
 			};
 			
-			UiButtonDrawable optionsButton = new("Options", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
+			UiButtonDrawable editButton = new("Edit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
 				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.55f),
 				OriginType = OriginType.Center
 			};
 			
-			UiButtonDrawable exitButton = new("Exit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
+			UiButtonDrawable optionsButton = new("Options", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
 				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.65f),
+				OriginType = OriginType.Center
+			};
+			
+			UiButtonDrawable exitButton = new("Exit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
+				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f),
 				OriginType = OriginType.Center
 			};
 
 			playButton.OnClick += delegate {
-				((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen());
+				((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(false));
+			};
+			
+			editButton.OnClick += delegate {
+				((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(true));
 			};
 			
 			exitButton.OnClick += delegate {
@@ -40,9 +49,10 @@ namespace pTyping.Screens {
 				((FurballGame)FurballGame.Instance).ChangeScreen(new OptionsScreen());
 			};
 
-			this.Manager.Add(menuScreen);
+			this.Manager.Add(titleText);
 
 			this.Manager.Add(playButton);
+			this.Manager.Add(editButton);
 			this.Manager.Add(optionsButton);
 			this.Manager.Add(exitButton);
 			
