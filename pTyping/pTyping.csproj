@@ -10,6 +10,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <MonoGameContentReference Include="Content\Content.mgcb">
+            <Link>Content/%(RecursiveDir)%(Filename)%(Extension)</Link>
+        </MonoGameContentReference>
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
       <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
       <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />

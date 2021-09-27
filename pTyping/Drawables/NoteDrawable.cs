@@ -1,7 +1,6 @@
 using Furball.Engine;
-using MonoGame.Extended;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using pTyping.Songs;
@@ -40,8 +39,8 @@ namespace pTyping.Drawables {
 			this.Note.Hit = HitResult.Miss;
 		}
 		
-		public override void Draw(GameTime time, SpriteBatch batch, DrawableManagerArgs args) {
-			batch.DrawCircle(args.Position, 40f, 40, args.Color, 1f, args.LayerDepth);
+		public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+			batch.ShapeBatch.DrawCircle(args.Position, 40f, Color.Transparent, args.Color, 1f);
 			
 			// FIXME: this is a bit of a hack, it should definitely be done differently
 			DrawableManagerArgs tempArgs = args;
