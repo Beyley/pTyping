@@ -33,14 +33,11 @@ namespace pTyping.Screens {
 		public PlayerScreen(Song song) {
 			this.Song = song;
 
-			this._scoreDrawable    = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Score:00000000}", 60) {
-				Position = new Vector2(5, 5)
+			this._scoreDrawable    = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score:00000000}", 60) {
 			};
-			this._accuracyDrawable = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Accuracy * 100:0.00}%", 60) {
-				Position = new Vector2(5, 5 + this._scoreDrawable.Size.Y)
+			this._accuracyDrawable = new TextDrawable(new Vector2(5, 5 + this._scoreDrawable.Size.Y), FurballGame.DEFAULT_FONT, $"{this.Accuracy * 100:0.00}%", 60) {
 			};
-			this._comboDrawable = new TextDrawable(FurballGame.DEFAULT_FONT, $"{this.Combo}x", 70) {
-				Position = new Vector2(5, FurballGame.DEFAULT_WINDOW_HEIGHT - 5),
+			this._comboDrawable = new TextDrawable(new Vector2(5, FurballGame.DEFAULT_WINDOW_HEIGHT - 5), FurballGame.DEFAULT_FONT, $"{this.Combo}x", 70) {
 				OriginType = OriginType.BottomLeft
 			};
 			
@@ -48,8 +45,8 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._accuracyDrawable);
 			this.Manager.Add(this._comboDrawable);
 
-			Vector2 recepticlePos = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			this._recepticle = new CirclePrimitiveDrawable(recepticlePos, 40f, 1f, Color.White);
+			Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+			this._recepticle = new CirclePrimitiveDrawable(recepticlePos, 40f, 1f, Color.White, Color.Transparent);
 			
 			this.Manager.Add(this._recepticle);
 

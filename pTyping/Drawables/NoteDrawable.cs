@@ -13,7 +13,7 @@ namespace pTyping.Drawables {
 		public Note Note;
 
 		public NoteDrawable(byte[] font, float size, CharacterRange[] range = null) {
-			this.LabelTextDrawable = new TextDrawable(font, "", size, range);
+			this.LabelTextDrawable = new TextDrawable(Vector2.Zero, font, "", size, range);
 			this.CircleRadius      = 40f;
 			this.Circular          = true;
 		}
@@ -40,14 +40,19 @@ namespace pTyping.Drawables {
 		}
 		
 		public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
-			batch.ShapeBatch.DrawCircle(args.Position, 40f, Color.Transparent, args.Color, 1f);
+			batch.ShapeBatch.DrawCircle(
+				args.Position * FurballGame.VerticalRatio, 
+				40f * FurballGame.VerticalRatio, 
+				Color.Transparent, 
+				args.Color, 
+				1f * FurballGame.VerticalRatio
+			);
 			
 			// FIXME: this is a bit of a hack, it should definitely be done differently
 			DrawableManagerArgs tempArgs = args;
 			tempArgs.Position   -= this.LabelTextDrawable.Size / 2f;
 			tempArgs.Position.Y += 80f;
 			tempArgs.Color      =  this.LabelTextDrawable.ColorOverride;
-			tempArgs.Scale      /= FurballGame.VerticalRatio;
 			this.LabelTextDrawable.Draw(time, batch, tempArgs);
 		}
 	}

@@ -35,6 +35,19 @@ namespace pTyping.Screens {
 		private RectanglePrimitiveDrawable _selectionRect;
 		private UiProgressBarDrawable      _progressBar;
 		private LinePrimitiveDrawable      _createLine;
+		
+		private UiTextBoxDrawable _textToTypeInput;
+		private TextDrawable      _textToTypeInputInvalid;
+		private UiTextBoxDrawable _textToShowInput;
+		private TextDrawable      _textToShowInputInvalid;
+		private UiTextBoxDrawable _colorRInput;
+		private TextDrawable      _colorRInputInvalid;
+		private UiTextBoxDrawable _colorGInput;
+		private TextDrawable      _colorGInputInvalid;
+		private UiTextBoxDrawable _colorBInput;
+		private TextDrawable      _colorBInputInvalid;
+		private UiTextBoxDrawable _colorAInput;
+		private TextDrawable      _colorAInputInvalid;
 
 		private UiButtonDrawable _editorToolSelect;
 		private UiButtonDrawable _editorToolCreateNote;
@@ -45,7 +58,7 @@ namespace pTyping.Screens {
 		public AudioStream MusicTrack;
 		public EditorTool  CurrentTool = EditorTool.None;
 
-		private readonly Vector2 _recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f);
+		private readonly Vector2 _recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f);
 		
 		public EditorScreen(Song song) {
 			this.Song = song;
@@ -53,22 +66,20 @@ namespace pTyping.Screens {
 			this.MusicTrack = new();
 			this.LoadAudio();
 
-			this._currentTimeDrawable    = new TextDrawable(FurballGame.DEFAULT_FONT, "", 60) {
-				Position = new Vector2(5, 5)
-			};
+			this._currentTimeDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, "", 60);
 			
 			this.Manager.Add(this._currentTimeDrawable);
 
-			this._recepticle = new CirclePrimitiveDrawable(this._recepticlePos, 40f, 1f, Color.White);
+			this._recepticle = new CirclePrimitiveDrawable(this._recepticlePos, 40f, 1f, Color.White, Color.Transparent);
 			
 			this.Manager.Add(this._recepticle);
 
 			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
 			foreach (Note note in this.Song.Notes) {
 				NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
-					Position      = noteStartPos,
+					Position      = new Vector2(noteStartPos.X, noteStartPos.Y + note.YOffset),
 					TimeSource    = this.MusicTrack,
-					ColorOverride = Color.Red,
+					ColorOverride = note.Color,
 					Note          = note,
 					LabelTextDrawable = {
 						Text = $"{note.TextToShow}\n({note.TextToType})"
@@ -79,7 +90,7 @@ namespace pTyping.Screens {
 					this.OnNoteClick(noteDrawable);
 				};
 
-				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, noteStartPos, this._recepticlePos, (int)(note.Time - Config.ApproachTime), (int)note.Time));
+				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), this._recepticlePos, (int)(note.Time - Config.ApproachTime), (int)note.Time));
 				
 				this.Manager.Add(noteDrawable);
 				this._notes.Add(noteDrawable);
@@ -102,8 +113,7 @@ namespace pTyping.Screens {
 			
 			this.Manager.Add(this._createLine);
 			
-			this._progressBar = new UiProgressBarDrawable(FurballGame.DEFAULT_FONT, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40), Color.Gray, Color.DarkGray, Color.White) {
-				Position = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT),
+			this._progressBar = new UiProgressBarDrawable(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), FurballGame.DEFAULT_FONT, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40), Color.Gray, Color.DarkGray, Color.White) {
 				OriginType = OriginType.BottomLeft
 			};
 
@@ -127,22 +137,28 @@ namespace pTyping.Screens {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
+
+			playButton.OnClick += delegate {
+				this.MusicTrack.Play();
+			};
+			
+			pauseButton.OnClick += delegate {
+				this.Pause();
+			};
 			
 			this.Manager.Add(playButton);
 			this.Manager.Add(pauseButton);
 			this.Manager.Add(leftButton);
 			this.Manager.Add(rightButton);
 			
-			this._editorToolSelect = new("Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
-				Position = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f)
+			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
 			};
 
 			this._editorToolSelect.OnClick += delegate {
 				this.ChangeTool(EditorTool.Select);
 			};
 			
-			this._editorToolCreateNote = new("Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
-				Position = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f)
+			this._editorToolCreateNote = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
 			};
 			
 			this._editorToolCreateNote.OnClick += delegate {
@@ -151,6 +167,23 @@ namespace pTyping.Screens {
 
 			this.Manager.Add(this._editorToolSelect);
 			this.Manager.Add(this._editorToolCreateNote);
+			
+			this._textToTypeInput = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), FurballGame.DEFAULT_FONT, "select note", 25, 150f) {
+				OriginType = OriginType.Center,
+				Visible = false
+			};
+			this._textToTypeInput.OnLetterTyped += this.UpdateTextInputs;
+			this._textToTypeInput.OnLetterRemoved += this.UpdateTextInputs;
+				
+			this._textToShowInput = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.75f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), FurballGame.DEFAULT_FONT, "select note", 25, 150f) {
+				OriginType = OriginType.Center,
+				Visible    = false
+			};
+			this._textToShowInput.OnLetterTyped   += this.UpdateTextInputs;
+			this._textToShowInput.OnLetterRemoved += this.UpdateTextInputs;
+
+			this.Manager.Add(this._textToTypeInput);
+			this.Manager.Add(this._textToShowInput);
 			
 			this.ChangeTool(EditorTool.Select);
 			
@@ -161,6 +194,14 @@ namespace pTyping.Screens {
 			FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
 		}
 
+		private void UpdateTextInputs(object sender, char _) {
+			if (this._selectedNote == null)
+				return;
+				
+			this._selectedNote.Note.TextToType = this._textToTypeInput.Text;
+			this.Song.Notes.Find(findNote => findNote == this._selectedNote.Note);
+		}
+
 		public void ChangeTool(EditorTool tool) {
 			if (this.CurrentTool == tool) return;
 			
@@ -168,9 +209,15 @@ namespace pTyping.Screens {
 			this.CurrentTool = tool;
 
 			if (tool == EditorTool.Select) {
+				this._textToShowInput.Visible = true;
+				this._textToTypeInput.Visible = true;
+				
 				this._editorToolSelect.ButtonColor = Color.Red;
 				this._editorToolSelect.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolSelect.ColorOverride, Color.Red, this._editorToolSelect.TimeSource.GetCurrentTime(), this._editorToolSelect.TimeSource.GetCurrentTime() + 150));
 			} else {
+				this._textToShowInput.Visible = false; 
+				this._textToTypeInput.Visible = false;
+								
 				this._editorToolSelect.ButtonColor = Color.Blue;
 				this._editorToolSelect.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolSelect.ColorOverride, Color.Blue, this._editorToolSelect.TimeSource.GetCurrentTime(), this._editorToolSelect.TimeSource.GetCurrentTime() + 150));
 			}
@@ -232,7 +279,7 @@ namespace pTyping.Screens {
 					Time = this._mouseTime
 				};
 
-				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].State.Position;
+				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
 				if (y < this._recepticlePos.Y + 40f && y > this._recepticlePos.Y - 40f) {
 					NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
 						Position      = noteStartPos,
@@ -263,6 +310,9 @@ namespace pTyping.Screens {
 			this._selectionRect.Visible    = true;
 			this._selectionRect.TimeSource = noteDrawable.TimeSource;
 			this._selectionRect.Tweens     = noteDrawable.Tweens.Where(tween => tween.TweenType == TweenType.Movement && tween is VectorTween).ToList();
+
+			this._textToShowInput.Text = this._selectedNote.Note.TextToShow;
+			this._textToTypeInput.Text = this._selectedNote.Note.TextToType;
 		}
 
 		public void DeselectNote(bool delete = false) {
@@ -334,10 +384,17 @@ namespace pTyping.Screens {
 					break;
 				}
 				case Keys.Escape:
+					// Exit the editor
 					((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(true));
 					break;
 				case Keys.Delete: {
+					// Delete the current note
 					this.DeselectNote(true);
+					break;
+				}
+				case Keys.S: {
+					// Save the song if ctrl+s is pressed
+					if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) this.Song.Save();
 					break;
 				}
 			}

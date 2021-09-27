@@ -14,8 +14,7 @@ namespace pTyping.Screens {
 			this._editor = editor;
 		}
 		public override void Initialize() {
-			UiButtonDrawable backButton = new("Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
-				Position   = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT),
+			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
 				OriginType = OriginType.BottomLeft
 			};
 			
@@ -29,8 +28,7 @@ namespace pTyping.Screens {
 
 			float tempY = 50;
 			foreach (Song song in SongManager.Songs) {
-				UiButtonDrawable drawable = new($"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 35, Color.Aqua, Color.Black, Color.Black, 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
-					Position = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY),
+				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 35, Color.Aqua, Color.Black, Color.Black, 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
 					OriginType = OriginType.TopRight
 				};
 

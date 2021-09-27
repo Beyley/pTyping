@@ -8,28 +8,23 @@ using pTyping.Songs;
 namespace pTyping.Screens {
 	public class MenuScreen : Screen {
 		public override void Initialize() {
-			TextDrawable titleText = new(FurballGame.DEFAULT_FONT, "pTyping", 75) {
-				Position = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
+			TextDrawable titleText = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), FurballGame.DEFAULT_FONT, "pTyping", 75) {
 				OriginType = OriginType.Center
 			};
 
-			UiButtonDrawable playButton = new("Play", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.45f),
+			UiButtonDrawable playButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.45f), "Play", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
 				OriginType = OriginType.Center
 			};
 			
-			UiButtonDrawable editButton = new("Edit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.55f),
+			UiButtonDrawable editButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.55f), "Edit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
 				OriginType = OriginType.Center
 			};
 			
-			UiButtonDrawable optionsButton = new("Options", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.65f),
+			UiButtonDrawable optionsButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.65f), "Options", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
 				OriginType = OriginType.Center
 			};
 			
-			UiButtonDrawable exitButton = new("Exit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f),
+			UiButtonDrawable exitButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), "Exit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
 				OriginType = OriginType.Center
 			};
 

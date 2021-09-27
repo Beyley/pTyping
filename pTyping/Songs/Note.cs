@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
 namespace pTyping.Songs {
@@ -14,6 +15,10 @@ namespace pTyping.Songs {
 		public string TextToShow;
 		[JsonProperty]
 		public double Time;
+		[JsonProperty]
+		public Color Color = Color.Red;
+		[JsonProperty]
+		public float YOffset;
 
 		/// <summary>
 		/// Whether or not the note has been hit
