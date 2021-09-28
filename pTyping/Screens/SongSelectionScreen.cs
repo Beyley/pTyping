@@ -107,7 +107,7 @@ namespace pTyping.Screens {
 		}
 
 		public void PlaySelectedMap() {
-			FurballGame.Instance.ChangeScreen(new PlayerScreen(this.SelectedSong));
+			FurballGame.Instance.ChangeScreen(this._editor ? new EditorScreen(this.SelectedSong) : new PlayerScreen(this.SelectedSong));
 		}
 
 		public void UpdateSelectedSong() {

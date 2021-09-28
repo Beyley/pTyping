@@ -19,7 +19,7 @@ namespace pTyping.Drawables {
 		}
 
 		public bool Type() {
-			this.Note.Typed += this.Note.TextToShow[this.Note.Typed.Length];
+			this.Note.Typed += this.Note.TextToType[this.Note.Typed.Length];
 
 			if (string.Equals(this.Note.Typed, this.Note.TextToType)) {
 				this.Hit();
