@@ -1,8 +1,9 @@
 using Furball.Engine;
 using Furball.Engine.Engine;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using pTyping.Songs;
 
 namespace pTyping.Screens {
@@ -17,20 +18,25 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Buttons
-			UiButtonDrawable playButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.45f), "Play", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				OriginType = OriginType.Center
+			Texture2D menuButtonsTexture = ContentReader.LoadMonogameAsset<Texture2D>("menubuttons", ContentSource.User);
+
+			float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
+
+			TexturedDrawable playButton    = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), new Rectangle(0, 0, 300, 100)) {
+				OriginType = OriginType.Center,
+				Scale = new(0.75f)
 			};
-			
-			UiButtonDrawable editButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.55f), "Edit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				OriginType = OriginType.Center
+			TexturedDrawable editButton    = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += playButton.Size.Y + 10), new Rectangle(0, 100, 300, 100)) {
+				OriginType = OriginType.Center,
+				Scale      = new(0.75f)
 			};
-			
-			UiButtonDrawable optionsButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.65f), "Options", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				OriginType = OriginType.Center
+			TexturedDrawable optionsButton = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += editButton.Size.Y + 10), new Rectangle(0, 200, 300, 100)) {
+				OriginType = OriginType.Center,
+				Scale = new(0.75f)
 			};
-			
-			UiButtonDrawable exitButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), "Exit", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White) {
-				OriginType = OriginType.Center
+			TexturedDrawable exitButton    = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += optionsButton.Size.Y + 10), new Rectangle(0, 300, 300, 100)) {
+				OriginType = OriginType.Center,
+				Scale      = new(0.75f)
 			};
 
 			playButton.OnClick += delegate {
