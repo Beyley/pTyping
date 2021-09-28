@@ -65,5 +65,7 @@ namespace pTyping.Songs {
 			writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
 			writer.Flush();
 		}
+
+		public bool AllNotesHit() => this.Notes.All(note => note.Hit != HitResult.Unknown);
 	}
 }

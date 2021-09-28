@@ -399,6 +399,11 @@ namespace pTyping.Screens {
 					break;
 				}
 				case Keys.Escape:
+					if (this._selectedNote != null) {
+						this.DeselectNote();
+						return;
+					}
+					
 					// Exit the editor
 					((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(true));
 					break;
