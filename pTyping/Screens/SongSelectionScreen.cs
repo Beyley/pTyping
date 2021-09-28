@@ -22,8 +22,11 @@ namespace pTyping.Screens {
 			SongManager.UpdateSongs();
 			
 			#region Back button
-			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero) {
-				OriginType = OriginType.BottomLeft
+			pTypingGame.LoadBackButtonTexture();
+			
+			TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+				OriginType = OriginType.BottomLeft,
+				Scale      = new (0.4f, 0.4f)
 			};
 			
 			backButton.OnClick += delegate {
@@ -51,7 +54,10 @@ namespace pTyping.Screens {
 			float tempY = 50;
 			foreach (Song song in SongManager.Songs) {
 				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 30, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
-					OriginType = OriginType.TopRight
+					OriginType = OriginType.TopRight,
+					TextDrawable = {
+						OriginType = OriginType.RightCenter
+					}
 				};
 
 				drawable.OnClick += delegate {

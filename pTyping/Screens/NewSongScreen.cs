@@ -15,8 +15,11 @@ namespace pTyping.Screens {
 		
 		public override void Initialize() {
 			#region Back button to song select screen
-			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero) {
-				OriginType = OriginType.BottomLeft
+			pTypingGame.LoadBackButtonTexture();
+			
+			TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+				OriginType = OriginType.BottomLeft,
+				Scale      = new (0.4f, 0.4f)
 			};
 			
 			backButton.OnClick += delegate {
