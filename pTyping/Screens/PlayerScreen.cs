@@ -84,7 +84,7 @@ namespace pTyping.Screens {
 		
 		protected override void Dispose(bool disposing) {
 			this.MusicTrack.Stop();
-			this.MusicTrack.Free();
+			// this.MusicTrack.Free();
 			
 			FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput -= this.OnCharacterTyped;
@@ -164,7 +164,7 @@ namespace pTyping.Screens {
 		}
 
 		public void EndScore() {
-			
+			FurballGame.Instance.ChangeScreen(new ScoreResultsScreen(this.Score, this.Song));
 		}
 
 		public void Play() {

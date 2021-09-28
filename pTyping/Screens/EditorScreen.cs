@@ -405,7 +405,7 @@ namespace pTyping.Screens {
 					}
 					
 					// Exit the editor
-					((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(true));
+					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
 					break;
 				case Keys.Delete: {
 					// Delete the current note

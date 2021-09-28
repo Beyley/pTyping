@@ -12,7 +12,7 @@ namespace pTyping.Screens {
 			};
 			
 			backButton.OnClick += delegate {
-				((FurballGame)FurballGame.Instance).ChangeScreen(new MenuScreen());
+				FurballGame.Instance.ChangeScreen(new MenuScreen());
 			};
 			
 			this.Manager.Add(backButton);

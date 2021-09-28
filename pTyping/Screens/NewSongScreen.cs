@@ -20,7 +20,7 @@ namespace pTyping.Screens {
 			};
 			
 			backButton.OnClick += delegate {
-				((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(true));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
 			};
 			
 			this.Manager.Add(backButton);
@@ -80,7 +80,7 @@ namespace pTyping.Screens {
 			song.Save(stream);
 			stream.Close();
 			
-			((FurballGame)FurballGame.Instance).ChangeScreen(new SongSelectionScreen(true));
+			FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
 		}
 	}
 }
