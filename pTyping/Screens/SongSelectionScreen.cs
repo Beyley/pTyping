@@ -1,10 +1,13 @@
+using System.IO;
+using ManagedBass;
+using pTyping.Songs;
+using SpriteFontPlus;
 using Furball.Engine;
 using Furball.Engine.Engine;
+using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
-using pTyping.Songs;
-using SpriteFontPlus;
 
 namespace pTyping.Screens {
 	public class SongSelectionScreen : Screen {
@@ -12,10 +15,21 @@ namespace pTyping.Screens {
 
 		private TextDrawable _songInfo;
 
-		public Song SelectedSong;
+		private Song _selectedSong;
+		public Song SelectedSong {
+			get => this._selectedSong;
+			set {
+				this._selectedSong = value;
+				
+				this.UpdateSelectedSong();
+			}
+		}
+
+		private AudioStream _musicTrack;
 		
 		public SongSelectionScreen(bool editor, Song selectedSong) {
-			this._editor = editor;
+			this._editor      = editor;
+			this._selectedSong = selectedSong;
 		}
 		
 		public override void Initialize() {
@@ -61,13 +75,12 @@ namespace pTyping.Screens {
 				};
 
 				drawable.OnClick += delegate {
-					if (this._editor) {
-						pTypingGame.EditorInstance = new(song);
-						
-						FurballGame.Instance.ChangeScreen(pTypingGame.EditorInstance);
+					if (this._selectedSong == song) {
+						this.PlaySelectedMap();
+						return;
 					}
-					else
-						((FurballGame) FurballGame.Instance).ChangeScreen(new PlayerScreen(song));
+
+					this.SelectedSong = song;
 				};
 
 				this.Manager.Add(drawable);
@@ -75,8 +88,49 @@ namespace pTyping.Screens {
 				tempY += 60;
 			}
 			#endregion
+
+			#region Song info
+			this._songInfo = new TextDrawable(new Vector2(10, 10), FurballGame.DEFAULT_FONT, "", 35);
+			
+			this.Manager.Add(this._songInfo);
+			#endregion
+
+			this._musicTrack = new();
+			
+			if (this.SelectedSong == null && SongManager.Songs.Count > 0) {
+				this.SelectedSong = SongManager.Songs[0];
+			} else if (this.SelectedSong != null) {
+				this.UpdateSelectedSong();
+			}
 			
 			base.Initialize();
+		}
+
+		public void PlaySelectedMap() {
+			FurballGame.Instance.ChangeScreen(new PlayerScreen(this.SelectedSong));
+		}
+
+		public void UpdateSelectedSong() {
+			this._songInfo.Text = $"{this.SelectedSong.Artist} - {this.SelectedSong.Name} [{this.SelectedSong.Difficulty}]\nCreated by {this.SelectedSong.Creator}";
+
+			if (this._musicTrack.IsValidHandle && this._musicTrack.PlaybackState == PlaybackState.Playing) {
+				this._musicTrack.Stop();
+				this._musicTrack.Free();
+			}
+			
+			string qualifiedAudioPath = Path.Combine(this.SelectedSong.FileInfo.DirectoryName ?? string.Empty, this.SelectedSong.AudioPath);
+			
+			this._musicTrack.Load(File.ReadAllBytes(qualifiedAudioPath));
+			this._musicTrack.Volume = Config.Volume;
+			this._musicTrack.Play();
+		}
+
+		protected override void Dispose(bool disposing) {
+			if (this._musicTrack.IsValidHandle) {
+				this._musicTrack.Free();
+			}
+			
+			base.Dispose(disposing);
 		}
 	}
 }
