@@ -26,6 +26,19 @@ namespace pTyping.Screens {
 			
 			SongManager.UpdateSongs();
 
+
+			if(this._editor) {
+				UiButtonDrawable createNewSongButton = new(new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT), "Create Song", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
+					OriginType = OriginType.BottomLeft
+				};
+				
+				createNewSongButton.OnClick += delegate {
+					((FurballGame)FurballGame.Instance).ChangeScreen(new NewSongScreen());
+				};
+
+				this.Manager.Add(createNewSongButton);
+			}
+			
 			float tempY = 50;
 			foreach (Song song in SongManager.Songs) {
 				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 35, Color.Aqua, Color.Black, Color.Black, 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {

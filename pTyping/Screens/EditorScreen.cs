@@ -37,17 +37,17 @@ namespace pTyping.Screens {
 		private LinePrimitiveDrawable      _createLine;
 		
 		private UiTextBoxDrawable _textToTypeInput;
-		private TextDrawable      _textToTypeInputInvalid;
+		private TextDrawable      _textToTypeInputLabel;
 		private UiTextBoxDrawable _textToShowInput;
-		private TextDrawable      _textToShowInputInvalid;
+		private TextDrawable      _textToShowInputLabel;
 		private UiTextBoxDrawable _colorRInput;
-		private TextDrawable      _colorRInputInvalid;
+		private TextDrawable      _colorRInputLabel;
 		private UiTextBoxDrawable _colorGInput;
-		private TextDrawable      _colorGInputInvalid;
+		private TextDrawable      _colorGInputLabel;
 		private UiTextBoxDrawable _colorBInput;
-		private TextDrawable      _colorBInputInvalid;
+		private TextDrawable      _colorBInputLabel;
 		private UiTextBoxDrawable _colorAInput;
-		private TextDrawable      _colorAInputInvalid;
+		private TextDrawable      _colorAInputLabel;
 
 		private UiButtonDrawable _editorToolSelect;
 		private UiButtonDrawable _editorToolCreateNote;
@@ -151,16 +151,12 @@ namespace pTyping.Screens {
 			this.Manager.Add(leftButton);
 			this.Manager.Add(rightButton);
 			
-			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
-			};
-
+			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White);
 			this._editorToolSelect.OnClick += delegate {
 				this.ChangeTool(EditorTool.Select);
 			};
 			
-			this._editorToolCreateNote = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
-			};
-			
+			this._editorToolCreateNote = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White);
 			this._editorToolCreateNote.OnClick += delegate {
 				this.ChangeTool(EditorTool.CreateNote);
 			};
@@ -168,13 +164,21 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._editorToolSelect);
 			this.Manager.Add(this._editorToolCreateNote);
 			
+			this._textToTypeInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text To Type", 25) {
+				OriginType = OriginType.Center,
+				Visible    = false
+			};
 			this._textToTypeInput = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), FurballGame.DEFAULT_FONT, "select note", 25, 150f) {
 				OriginType = OriginType.Center,
-				Visible = false
+				Visible    = false
 			};
 			this._textToTypeInput.OnLetterTyped += this.UpdateTextInputs;
 			this._textToTypeInput.OnLetterRemoved += this.UpdateTextInputs;
 				
+			this._textToShowInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.75f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text To Show", 25) {
+				OriginType = OriginType.Center,
+				Visible    = false
+			};
 			this._textToShowInput = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.75f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), FurballGame.DEFAULT_FONT, "select note", 25, 150f) {
 				OriginType = OriginType.Center,
 				Visible    = false
@@ -183,7 +187,9 @@ namespace pTyping.Screens {
 			this._textToShowInput.OnLetterRemoved += this.UpdateTextInputs;
 
 			this.Manager.Add(this._textToTypeInput);
+			this.Manager.Add(this._textToTypeInputLabel);
 			this.Manager.Add(this._textToShowInput);
+			this.Manager.Add(this._textToShowInputLabel);
 			
 			this.ChangeTool(EditorTool.Select);
 			
@@ -199,7 +205,9 @@ namespace pTyping.Screens {
 				return;
 				
 			this._selectedNote.Note.TextToType = this._textToTypeInput.Text;
-			this.Song.Notes.Find(findNote => findNote == this._selectedNote.Note);
+			this._selectedNote.Note.TextToShow = this._textToShowInput.Text;
+
+			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.TextToShow}\n({this._selectedNote.Note.TextToType})";
 		}
 
 		public void ChangeTool(EditorTool tool) {
@@ -209,14 +217,18 @@ namespace pTyping.Screens {
 			this.CurrentTool = tool;
 
 			if (tool == EditorTool.Select) {
-				this._textToShowInput.Visible = true;
-				this._textToTypeInput.Visible = true;
+				this._textToShowInput.Visible      = true;
+				this._textToShowInputLabel.Visible = true;
+				this._textToTypeInput.Visible      = true;
+				this._textToTypeInputLabel.Visible = true;
 				
 				this._editorToolSelect.ButtonColor = Color.Red;
 				this._editorToolSelect.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolSelect.ColorOverride, Color.Red, this._editorToolSelect.TimeSource.GetCurrentTime(), this._editorToolSelect.TimeSource.GetCurrentTime() + 150));
 			} else {
-				this._textToShowInput.Visible = false; 
-				this._textToTypeInput.Visible = false;
+				this._textToShowInput.Visible      = false; 
+				this._textToShowInputLabel.Visible = false; 
+				this._textToTypeInput.Visible      = false;
+				this._textToTypeInputLabel.Visible = false;
 								
 				this._editorToolSelect.ButtonColor = Color.Blue;
 				this._editorToolSelect.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolSelect.ColorOverride, Color.Blue, this._editorToolSelect.TimeSource.GetCurrentTime(), this._editorToolSelect.TimeSource.GetCurrentTime() + 150));
@@ -228,6 +240,8 @@ namespace pTyping.Screens {
 			} else {
 				this._editorToolCreateNote.ButtonColor = Color.Blue;
 				this._editorToolCreateNote.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolCreateNote.ColorOverride, Color.Blue, this._editorToolCreateNote.TimeSource.GetCurrentTime(), this._editorToolCreateNote.TimeSource.GetCurrentTime() + 150));
+				
+				this._createLine.Visible = false;
 			}
 		}
 
@@ -274,8 +288,8 @@ namespace pTyping.Screens {
 			if (this.CurrentTool == EditorTool.CreateNote) {
 				Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
 				Note    note     = new() {
-					TextToShow = "suc", 
-					TextToType =  "suc",
+					TextToShow = "changeme", 
+					TextToType =  "changeme",
 					Time = this._mouseTime
 				};
 
@@ -299,6 +313,7 @@ namespace pTyping.Screens {
 				
 					this.Manager.Add(noteDrawable);
 					this._notes.Add(noteDrawable);
+					this.Song.Notes.Add(noteDrawable.Note);
 				}
 			}
 		}
@@ -395,6 +410,14 @@ namespace pTyping.Screens {
 				case Keys.S: {
 					// Save the song if ctrl+s is pressed
 					if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) this.Song.Save();
+					break;
+				}
+				case Keys.D1: {
+					this.ChangeTool(EditorTool.Select);
+					break;
+				}
+				case Keys.D2: {
+					this.ChangeTool(EditorTool.CreateNote);
 					break;
 				}
 			}

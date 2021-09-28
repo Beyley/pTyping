@@ -21,7 +21,7 @@ namespace pTyping.Songs {
 		/// A dictionary of all timing points, the key is the time and the value is the tempo
 		/// </summary>
 		[JsonProperty]
-		public List<TimingPoint> TimingPoints { get; set; }
+		public List<TimingPoint> TimingPoints { get; set; } = new();
 
 		[JsonProperty]
 		public string AudioPath { get; set; }
@@ -58,5 +58,12 @@ namespace pTyping.Songs {
 		}
 
 		public void Save() => File.WriteAllText(this.FileInfo.FullName, JsonConvert.SerializeObject(this, Formatting.Indented));
+
+		public void Save(FileStream stream) {
+			StreamWriter writer = new(stream);
+			
+			writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
+			writer.Flush();
+		}
 	}
 }
