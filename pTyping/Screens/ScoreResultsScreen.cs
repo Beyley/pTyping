@@ -40,12 +40,12 @@ namespace pTyping.Screens {
 			#endregion
 
 			#region Buttons
-			UiButtonDrawable exitButton = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f), "Exit", FurballGame.DEFAULT_FONT, 40, Color.Red, Color.White, Color.White) {
+			UiButtonDrawable exitButton = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f), "Exit", FurballGame.DEFAULT_FONT, 40, Color.Red, Color.White, Color.White, Vector2.Zero) {
 				OriginType = OriginType.BottomRight
 			};
 			
 			exitButton.OnClick += delegate {
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, this.Song));
 			};
 
 			this.Manager.Add(exitButton);

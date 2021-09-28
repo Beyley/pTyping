@@ -15,12 +15,12 @@ namespace pTyping.Screens {
 		
 		public override void Initialize() {
 			#region Back button to song select screen
-			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
+			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero) {
 				OriginType = OriginType.BottomLeft
 			};
 			
 			backButton.OnClick += delegate {
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, null));
 			};
 			
 			this.Manager.Add(backButton);
@@ -33,7 +33,7 @@ namespace pTyping.Screens {
 			foreach (string songPath in songs) {
 				FileInfo songInfo = new(songPath);
 
-				UiButtonDrawable buttonForSong = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), songInfo.Name, FurballGame.DEFAULT_FONT, 25, Color.Blue, Color.White, Color.White) {
+				UiButtonDrawable buttonForSong = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), songInfo.Name, FurballGame.DEFAULT_FONT, 25, Color.Blue, Color.White, Color.White, Vector2.Zero) {
 					OriginType = OriginType.TopRight
 				};
 
@@ -80,7 +80,9 @@ namespace pTyping.Screens {
 			song.Save(stream);
 			stream.Close();
 			
-			FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
+			SongManager.UpdateSongs();
+			
+			FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, song));
 		}
 	}
 }

@@ -11,15 +11,18 @@ namespace pTyping.Screens {
 		private bool _editor;
 
 		private TextDrawable _songInfo;
+
+		public Song SelectedSong;
 		
-		public SongSelectionScreen(bool editor) {
+		public SongSelectionScreen(bool editor, Song selectedSong) {
 			this._editor = editor;
 		}
+		
 		public override void Initialize() {
 			SongManager.UpdateSongs();
 			
 			#region Back button
-			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
+			UiButtonDrawable backButton = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), "Back", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero) {
 				OriginType = OriginType.BottomLeft
 			};
 			
@@ -32,7 +35,7 @@ namespace pTyping.Screens {
 
 			#region Create new song button
 			if(this._editor) {
-				UiButtonDrawable createNewSongButton = new(new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT), "Create Song", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White) {
+				UiButtonDrawable createNewSongButton = new(new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT), "Create Song", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero) {
 					OriginType = OriginType.BottomLeft
 				};
 				
@@ -47,7 +50,7 @@ namespace pTyping.Screens {
 			#region Create new buttons for each song
 			float tempY = 50;
 			foreach (Song song in SongManager.Songs) {
-				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 35, Color.Aqua, Color.Black, Color.Black, 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
+				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 30, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
 					OriginType = OriginType.TopRight
 				};
 
@@ -63,7 +66,7 @@ namespace pTyping.Screens {
 
 				this.Manager.Add(drawable);
 
-				tempY += 50;
+				tempY += 60;
 			}
 			#endregion
 			

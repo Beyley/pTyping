@@ -121,19 +121,19 @@ namespace pTyping.Screens {
 
 			Texture2D editorButtonsTexture2D = ContentReader.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
 
-			TexturedDrawable playButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200 + 50, FurballGame.DEFAULT_WINDOW_HEIGHT), new Rectangle(0, 0, 80, 80)) {
+			TexturedDrawable playButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 150, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_PLAY) {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
-			TexturedDrawable pauseButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200+100, FurballGame.DEFAULT_WINDOW_HEIGHT), new Rectangle(80, 0, 80, 80)) {
+			TexturedDrawable pauseButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 100, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_PAUSE) {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
-			TexturedDrawable leftButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200+150, FurballGame.DEFAULT_WINDOW_HEIGHT), new Rectangle(160, 0, 80, 80)) {
+			TexturedDrawable leftButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_LEFT) {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
-			TexturedDrawable rightButton = new (editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), new Rectangle(240, 0, 80, 80)) {
+			TexturedDrawable rightButton = new (editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_RIGHT) {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
@@ -151,12 +151,12 @@ namespace pTyping.Screens {
 			this.Manager.Add(leftButton);
 			this.Manager.Add(rightButton);
 			
-			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White);
+			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 			this._editorToolSelect.OnClick += delegate {
 				this.ChangeTool(EditorTool.Select);
 			};
 			
-			this._editorToolCreateNote = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White);
+			this._editorToolCreateNote = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 			this._editorToolCreateNote.OnClick += delegate {
 				this.ChangeTool(EditorTool.CreateNote);
 			};
@@ -405,7 +405,7 @@ namespace pTyping.Screens {
 					}
 					
 					// Exit the editor
-					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
+					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this.Song));
 					break;
 				case Keys.Delete: {
 					// Delete the current note
