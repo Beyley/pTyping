@@ -70,7 +70,7 @@ namespace pTyping.Screens {
 			
 			this.Manager.Add(this._currentTimeDrawable);
 
-			this._recepticle = new CirclePrimitiveDrawable(this._recepticlePos, 40f, 1f, Color.White, Color.Transparent);
+			this._recepticle = new CirclePrimitiveDrawable(this._recepticlePos, 40f, Color.White);
 			
 			this.Manager.Add(this._recepticle);
 
@@ -107,7 +107,7 @@ namespace pTyping.Screens {
 
 			this.Manager.Add(this._selectionRect);
 
-			this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), new Vector2(0, 40), 1f) {
+			this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI) {
 				Visible = false
 			};
 			
@@ -276,7 +276,6 @@ namespace pTyping.Screens {
 					double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
 					
 					this._createLine.Position = new Vector2((float)newX, this._recepticlePos.Y - 40);
-					this._createLine.EndPoint = new Vector2((float)newX, this._recepticlePos.Y + 40);
 				}
 				else {
 					this._createLine.Visible = false;

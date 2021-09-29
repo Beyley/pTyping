@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using pTyping.Songs;
 using SpriteFontPlus;
+using Xssp.MonoGame.Primitives2D;
 
 namespace pTyping.Drawables {
 	public class NoteDrawable : ManagedDrawable {
@@ -40,12 +41,13 @@ namespace pTyping.Drawables {
 		}
 		
 		public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
-			batch.ShapeBatch.DrawCircle(
-				args.Position * FurballGame.VerticalRatio, 
-				40f * FurballGame.VerticalRatio, 
-				Color.Transparent, 
-				args.Color, 
-				1f * FurballGame.VerticalRatio
+			batch.SpriteBatch.DrawCircle(
+				args.Position     * FurballGame.VerticalRatio, 
+				this.CircleRadius * FurballGame.VerticalRatio,
+				25,
+				args.Color,
+				1f * FurballGame.VerticalRatio,
+				args.LayerDepth
 			);
 			
 			// FIXME: this is a bit of a hack, it should definitely be done differently

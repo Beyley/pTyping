@@ -10,6 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using ManagedBass;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Drawables;
 using pTyping.Player;
@@ -20,18 +21,22 @@ namespace pTyping.Screens {
 		public PlayerScore Score = new();
 		public Song        Song;
 
-		private TextDrawable _scoreDrawable;
-		private TextDrawable _accuracyDrawable;
-		private TextDrawable _comboDrawable;
-		private BaseDrawable _recepticle;
+		private TextDrawable     _scoreDrawable;
+		private TextDrawable     _accuracyDrawable;
+		private TextDrawable     _comboDrawable;
+		private BaseDrawable     _recepticle;
+		private TexturedDrawable _backgroundImageDrawable;
+		private Texture2D        _backgroundImage;
 		
 		public AudioStream MusicTrack = new();
 
 		private List<NoteDrawable> _notes = new();
+		
 
 		public PlayerScreen(Song song) {
 			this.Song = song;
 
+			#region UI
 			this._scoreDrawable    = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score.Score:00000000}", 60) {};
 			this._accuracyDrawable = new TextDrawable(new Vector2(5, 5 + this._scoreDrawable.Size.Y), FurballGame.DEFAULT_FONT, $"{this.Score.Accuracy * 100:0.00}%", 60) {};
 			this._comboDrawable = new TextDrawable(new Vector2(5, FurballGame.DEFAULT_WINDOW_HEIGHT - 5), FurballGame.DEFAULT_FONT, $"{this.Score.Combo}x", 70) {
@@ -41,12 +46,16 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._scoreDrawable);
 			this.Manager.Add(this._accuracyDrawable);
 			this.Manager.Add(this._comboDrawable);
-
+			#endregion
+			
+			#region Recepticle
 			Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			this._recepticle = new CirclePrimitiveDrawable(recepticlePos, 40f, 1f, Color.White, Color.Transparent);
+			this._recepticle = new CirclePrimitiveDrawable(recepticlePos, 40f, Color.White);
 
 			this.Manager.Add(this._recepticle);
-
+			#endregion
+			
+			#region Notes
 			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 			foreach (Note note in this.Song.Notes) {
 				NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
@@ -65,16 +74,28 @@ namespace pTyping.Screens {
 				noteDrawable.Note = note;
 				this._notes.Add(noteDrawable);
 			}
+			#endregion
 
-			LinePrimitiveDrawable playfieldTopLine    = new(new Vector2(1, recepticlePos.Y - 50), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y - 50), 10f) {
+			#region Playfield decorations
+			LinePrimitiveDrawable playfieldTopLine    = new(new Vector2(1, recepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
 				ColorOverride = Color.Gray
 			};
-			LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y + 50), 10f) {
+			LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
 				ColorOverride = Color.Gray
 			};
-			
 			this.Manager.Add(playfieldTopLine);
 			this.Manager.Add(playfieldBottomLine);
+			
+			string qualifiedBackgroundPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.BackgroundPath);
+			this._backgroundImage = Texture2D.FromFile(FurballGame.Instance.GraphicsDevice, qualifiedBackgroundPath);
+
+			this._backgroundImageDrawable = new(this._backgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
+				Depth = 1f,
+				OriginType = OriginType.Center
+			};
+			
+			this.Manager.Add(this._backgroundImageDrawable);
+			#endregion
 
 			this.Play();
 

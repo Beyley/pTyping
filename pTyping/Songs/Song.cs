@@ -25,6 +25,8 @@ namespace pTyping.Songs {
 
 		[JsonProperty]
 		public string AudioPath { get; set; }
+		[JsonProperty]
+		public string BackgroundPath { get; set; }
 
 		[JsonProperty]
 		public int    TimeSignature = 4;
@@ -57,11 +59,19 @@ namespace pTyping.Songs {
 			return timingPoint.Tempo / this.TimeSignature;
 		}
 
-		public void Save() => File.WriteAllText(this.FileInfo.FullName, JsonConvert.SerializeObject(this, Formatting.Indented));
+		public void Save() {
+			this.Notes.Sort((x,        y) => (int)(x.Time - y.Time));
+			this.TimingPoints.Sort((x, y) => (int)(x.Time - y.Time));
+			
+			File.WriteAllText(this.FileInfo.FullName, JsonConvert.SerializeObject(this, Formatting.Indented));
+		}
 
 		public void Save(FileStream stream) {
+			this.Notes.Sort((x,        y) => (int)(x.Time - y.Time));
+			this.TimingPoints.Sort((x, y) => (int)(x.Time - y.Time));
+
 			StreamWriter writer = new(stream);
-			
+
 			writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
 			writer.Flush();
 		}
