@@ -333,14 +333,14 @@ namespace pTyping.Screens {
 		public void DeselectNote(bool delete = false) {
 			if (this._selectedNote == null)
 				return;
-			
-			
+
 			this._selectionRect.Visible = false;
 			
 			if(delete) {
 				this.Song.Notes.Remove(this._selectedNote.Note);
 				this._notes.Remove(this._selectedNote);
 				this._selectedNote.Visible = false;
+				this._selectedNote.ClearEvents();
 			}
 						
 			this._selectedNote = null;
