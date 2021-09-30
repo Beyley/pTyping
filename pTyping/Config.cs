@@ -7,7 +7,7 @@ namespace pTyping {
 		/// <summary>
 		/// The time it takes the notes to go from the right side of the screen to the left 
 		/// </summary>
-		public static int ApproachTime = 2000;
+		public static readonly int BaseApproachTime = 2000;
 
 		public static int HitWindow = 200;
 	}

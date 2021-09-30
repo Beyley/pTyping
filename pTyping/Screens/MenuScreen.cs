@@ -26,7 +26,7 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Main buttons
-			Texture2D menuButtonsTexture = ContentReader.LoadMonogameAsset<Texture2D>("menubuttons", ContentSource.User);
+			Texture2D menuButtonsTexture = ContentManager.LoadMonogameAsset<Texture2D>("menubuttons", ContentSource.User);
 
 			float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
@@ -76,7 +76,7 @@ namespace pTyping.Screens {
 				OriginType = OriginType.TopRight
 			};
 
-			Texture2D editorButtonsTexture2D = ContentReader.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
+			Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
 
 			TexturedDrawable musicPlayButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._musicTitle.Size.Y + 10), TexturePositions.EDITOR_PLAY) {
 				Scale      = new (0.5f, 0.5f),
@@ -138,7 +138,7 @@ namespace pTyping.Screens {
 				this._musicTrack.Free();
 			}
 			
-			this._musicTrack.Load(File.ReadAllBytes(qualifiedAudioPath));
+			this._musicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
 			this._musicTrack.Volume = Config.Volume;
 			this._musicTrack.Play();
 

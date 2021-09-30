@@ -33,24 +33,10 @@ namespace pTyping.Screens {
 			this.Manager.Add(volumeInput);
 			#endregion
 			
-			#region Approach time
-			TextDrawable      approachTimeInputLabel = new(new Vector2(100, 150), FurballGame.DEFAULT_FONT, "Approach Time:", 30);
-			UiTextBoxDrawable approachTimeInput      = new(new Vector2(110 + approachTimeInputLabel.Size.X, 150), FurballGame.DEFAULT_FONT, Config.ApproachTime.ToString(CultureInfo.InvariantCulture), 30, 200);
-
-			volumeInput.OnCommit += this.ApproachTimeInputOnCommit;
-			
-			this.Manager.Add(approachTimeInputLabel);
-			this.Manager.Add(approachTimeInput);
-			#endregion
-			
 			base.Initialize();
 		}
 		private void VolumeInputOnCommit(object sender, string e) {
 			Config.Volume = float.Parse(e);
-		}
-		
-		private void ApproachTimeInputOnCommit(object sender, string e) {
-			Config.ApproachTime = int.Parse(e);
 		}
 	}
 }

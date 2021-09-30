@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using ManagedBass;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using pTyping.Drawables;
-using pTyping.Player;
+using Microsoft.Xna.Framework.Graphics;
 using pTyping.Songs;
+using pTyping.Player;
+using pTyping.Drawables;
 
 namespace pTyping.Screens {
 	public class PlayerScreen : Screen {
@@ -35,6 +36,11 @@ namespace pTyping.Screens {
 
 		public PlayerScreen(Song song) {
 			this.Song = song;
+
+			if (this.Song.Notes.Count == 0) {
+				//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, song));
+			}
 
 			#region UI
 			this._scoreDrawable    = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score.Score:00000000}", 60) {};
@@ -67,7 +73,7 @@ namespace pTyping.Screens {
 					}
 				};
 
-				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), recepticlePos, (int)(note.Time - Config.ApproachTime), (int)note.Time));
+				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
 
 				this.Manager.Add(noteDrawable);
 
@@ -86,15 +92,24 @@ namespace pTyping.Screens {
 			this.Manager.Add(playfieldTopLine);
 			this.Manager.Add(playfieldBottomLine);
 			
-			string qualifiedBackgroundPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.BackgroundPath);
-			this._backgroundImage = Texture2D.FromFile(FurballGame.Instance.GraphicsDevice, qualifiedBackgroundPath);
+			#region background image
+			if(this.Song.BackgroundPath != null) {
+				string qualifiedBackgroundPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.BackgroundPath);
 
-			this._backgroundImageDrawable = new(this._backgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
-				Depth = 1f,
-				OriginType = OriginType.Center
-			};
-			
-			this.Manager.Add(this._backgroundImageDrawable);
+				if (File.Exists(qualifiedBackgroundPath)) {
+					this._backgroundImage = Texture2D.FromStream(FurballGame.Instance.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External)));
+
+					this._backgroundImageDrawable = new(this._backgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
+						Depth      = 1f,
+						OriginType = OriginType.Center
+					};
+
+					this.Manager.Add(this._backgroundImageDrawable);
+				} else {
+					//TODO: once we have a notification manager, we'll tell them something is wrong here
+				}
+			}
+			#endregion
 			#endregion
 
 			this.Play();
@@ -191,7 +206,7 @@ namespace pTyping.Screens {
 		public void Play() {
 			string qualifiedAudioPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.AudioPath);
 			
-			this.MusicTrack.Load(File.ReadAllBytes(qualifiedAudioPath));
+			this.MusicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
 			this.MusicTrack.Volume    =  Config.Volume;
 			this.MusicTrack.Play();
 		}

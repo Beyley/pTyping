@@ -90,7 +90,7 @@ namespace pTyping.Screens {
 					this.OnNoteClick(noteDrawable);
 				};
 
-				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), this._recepticlePos, (int)(note.Time - Config.ApproachTime), (int)note.Time));
+				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), this._recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
 				
 				this.Manager.Add(noteDrawable);
 				this._notes.Add(noteDrawable);
@@ -119,7 +119,7 @@ namespace pTyping.Screens {
 
 			this.Manager.Add(this._progressBar);
 
-			Texture2D editorButtonsTexture2D = ContentReader.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
+			Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
 
 			TexturedDrawable playButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 150, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_PLAY) {
 				Scale      = new (0.5f, 0.5f),
@@ -259,7 +259,7 @@ namespace pTyping.Screens {
 					
 					double distanceToReticule = x - reticulePos;
 
-					double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * Config.ApproachTime;
+					double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * Config.BaseApproachTime;
 
 					double timeAtCursor = currentTime + timeToReticule;
 
@@ -270,7 +270,7 @@ namespace pTyping.Screens {
 
 					double distanceInTime = snappedTimeAtCursor - currentTime;
 
-					double scaleTime = distanceInTime     / Config.ApproachTime;
+					double scaleTime = distanceInTime     / Config.BaseApproachTime;
 					double scaleRaw  = distanceToReticule / (noteStartPos - reticulePos);
 					
 					double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
@@ -308,7 +308,7 @@ namespace pTyping.Screens {
 						this.OnNoteClick(noteDrawable);
 					};
 
-					noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, noteStartPos, this._recepticlePos, (int)(note.Time - Config.ApproachTime), (int)note.Time));
+					noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, noteStartPos, this._recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
 				
 					this.Manager.Add(noteDrawable);
 					this._notes.Add(noteDrawable);
@@ -453,7 +453,7 @@ namespace pTyping.Screens {
 		public void LoadAudio() {
 			string qualifiedAudioPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.AudioPath);
 			
-			this.MusicTrack.Load(File.ReadAllBytes(qualifiedAudioPath));
+			this.MusicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
 			this.MusicTrack.Volume = Config.Volume;
 		}
 

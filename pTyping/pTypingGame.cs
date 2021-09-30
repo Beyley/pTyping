@@ -10,7 +10,7 @@ namespace pTyping {
 		public static Texture2D BackButtonTexture;
 
 		public static void LoadBackButtonTexture() {
-			BackButtonTexture ??= ContentReader.LoadMonogameAsset<Texture2D>("backbutton", ContentSource.User);
+			BackButtonTexture ??= ContentManager.LoadMonogameAsset<Texture2D>("backbutton", ContentSource.User);
 		}
 		
 		public pTypingGame() : base(new MenuScreen()) {

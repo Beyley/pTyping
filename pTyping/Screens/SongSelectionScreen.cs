@@ -5,6 +5,7 @@ using SpriteFontPlus;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
@@ -120,7 +121,7 @@ namespace pTyping.Screens {
 			
 			string qualifiedAudioPath = Path.Combine(this.SelectedSong.FileInfo.DirectoryName ?? string.Empty, this.SelectedSong.AudioPath);
 			
-			this._musicTrack.Load(File.ReadAllBytes(qualifiedAudioPath));
+			this._musicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
 			this._musicTrack.Volume = Config.Volume;
 			this._musicTrack.Play();
 		}
