@@ -25,14 +25,14 @@ namespace pTyping.Screens {
 		private TextDrawable     _scoreDrawable;
 		private TextDrawable     _accuracyDrawable;
 		private TextDrawable     _comboDrawable;
-		private BaseDrawable     _recepticle;
+		private TexturedDrawable _recepticle;
 		private TexturedDrawable _backgroundImageDrawable;
 		private Texture2D        _backgroundImage;
 		
 		public AudioStream MusicTrack = new();
-
-		private List<NoteDrawable> _notes = new();
+		public SoundEffect HitSound   = new();
 		
+		private List<NoteDrawable> _notes = new();
 
 		public PlayerScreen(Song song) {
 			this.Song = song;
@@ -55,8 +55,14 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Recepticle
+
+			Texture2D noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+			
 			Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			this._recepticle = new CirclePrimitiveDrawable(recepticlePos, 40f, Color.White);
+			this._recepticle = new TexturedDrawable(noteTexture, recepticlePos) {
+				Scale = new(0.55f),
+				OriginType = OriginType.Center
+			};
 
 			this.Manager.Add(this._recepticle);
 			#endregion
@@ -64,13 +70,15 @@ namespace pTyping.Screens {
 			#region Notes
 			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 			foreach (Note note in this.Song.Notes) {
-				NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
-					Position      = new(noteStartPos.X, noteStartPos.Y + note.YOffset),
+				NoteDrawable noteDrawable = new(new(noteStartPos.X, noteStartPos.Y + note.YOffset), noteTexture, FurballGame.DEFAULT_FONT, 30) {
 					TimeSource    = this.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
-						Text = $"{note.TextToShow}\n({note.TextToType})"
-					}
+						Text = $"{note.TextToShow}\n({note.TextToType})",
+						Scale = new(1f)
+					},
+					Scale = new(0.55f, 0.55f),
+					OriginType = OriginType.Center
 				};
 
 				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
@@ -123,13 +131,15 @@ namespace pTyping.Screens {
 			}
 			#endregion
 			#endregion
+			
+			this.HitSound.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
 			this.Play();
 
 			FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
 		}
-		
+
 		protected override void Dispose(bool disposing) {
 			this.MusicTrack.Stop();
 			// this.MusicTrack.Free();
@@ -152,7 +162,10 @@ namespace pTyping.Screens {
 
 				if (note.NextToType == args.Character && Math.Abs(this.MusicTrack.CurrentTime * 1000 - note.Time) < Config.HitWindow) {
 					bool result = noteDrawable.Type();
-					if (result) this.NoteUpdate(true);
+					if (result) {
+						this.HitSound.Play(Config.Volume);
+						this.NoteUpdate(true);
+					}
 
 					if (this.Song.AllNotesHit()) {
 						this.EndScore();
@@ -164,21 +177,25 @@ namespace pTyping.Screens {
 
 		private void NoteUpdate(bool wasHit) {
 			int numberHit  = 0;
+			double amountHit  = 0;
 			int numberMiss = 0;
 			foreach (NoteDrawable noteDrawable in this._notes) {
 				switch (noteDrawable.Note.Hit) {
 					case HitResult.Hit:
 						numberHit++;
+						amountHit += noteDrawable.Note.HitAmount;
 						break;
 					case HitResult.Miss:
 						numberMiss++;
+						amountHit += noteDrawable.Note.HitAmount;
 						break;
 				}
 			}
 
 			if (numberHit + numberMiss == 0) this.Score.Accuracy = 1d;
-			else
-				this.Score.Accuracy = (double)numberHit / ((double)numberHit + (double)numberMiss);
+			else {
+				this.Score.Accuracy = amountHit / ((double)numberHit + (double)numberMiss);
+			}
 
 			if (wasHit) {
 				this.Score.Combo++;

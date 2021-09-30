@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace pTyping.Songs {
 	public static class SongManager {
-		public static string SongFolder          = "songs";
+		public static string SongFolder          = "songs/";
 		public static string QualifiedSongFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception(), SongFolder);
 
 		private static List<Song> _Songs = new();
@@ -16,7 +16,7 @@ namespace pTyping.Songs {
 			
 			DirectoryInfo dirInfo = new(QualifiedSongFolder);
 
-			foreach (FileInfo file in dirInfo.GetFiles("*.pts")) {
+			foreach (FileInfo file in dirInfo.GetFiles("*.pts", SearchOption.AllDirectories)) {
 				songs.Add(Song.LoadFromFile(file));
 			}
 			

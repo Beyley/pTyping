@@ -30,7 +30,7 @@ namespace pTyping.Screens {
 		public Song Song;
 
 		private TextDrawable               _currentTimeDrawable;
-		private BaseDrawable               _recepticle;
+		private TexturedDrawable               _recepticle;
 		private NoteDrawable               _selectedNote;
 		private RectanglePrimitiveDrawable _selectionRect;
 		private UiProgressBarDrawable      _progressBar;
@@ -60,6 +60,8 @@ namespace pTyping.Screens {
 
 		private readonly Vector2 _recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f);
 		
+		private Texture2D _noteTexture;
+		
 		public EditorScreen(Song song) {
 			this.Song = song;
 			
@@ -70,14 +72,19 @@ namespace pTyping.Screens {
 			
 			this.Manager.Add(this._currentTimeDrawable);
 
-			this._recepticle = new CirclePrimitiveDrawable(this._recepticlePos, 40f, Color.White);
+			this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+			
+			Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+			this._recepticle = new TexturedDrawable(this._noteTexture, recepticlePos) {
+				Scale      = new(0.55f),
+				OriginType = OriginType.Center
+			};
 			
 			this.Manager.Add(this._recepticle);
 
 			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
 			foreach (Note note in this.Song.Notes) {
-				NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
-					Position      = new Vector2(noteStartPos.X, noteStartPos.Y + note.YOffset),
+				NoteDrawable noteDrawable = new(new Vector2(noteStartPos.X, noteStartPos.Y + note.YOffset), this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
 					TimeSource    = this.MusicTrack,
 					ColorOverride = note.Color,
 					Note          = note,
@@ -294,8 +301,7 @@ namespace pTyping.Screens {
 
 				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
 				if (y < this._recepticlePos.Y + 40f && y > this._recepticlePos.Y - 40f) {
-					NoteDrawable noteDrawable = new(FurballGame.DEFAULT_FONT, 30) {
-						Position      = noteStartPos,
+					NoteDrawable noteDrawable = new(noteStartPos, this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
 						TimeSource    = this.MusicTrack,
 						ColorOverride = Color.Red,
 						Note          = note,
@@ -403,6 +409,8 @@ namespace pTyping.Screens {
 						return;
 					}
 					
+					pTypingGame.MenuClickSound.Play(Config.Volume);
+
 					// Exit the editor
 					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this.Song));
 					break;

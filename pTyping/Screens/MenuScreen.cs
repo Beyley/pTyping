@@ -48,18 +48,22 @@ namespace pTyping.Screens {
 			};
 
 			playButton.OnClick += delegate {
+				pTypingGame.MenuClickSound.Play(Config.Volume);
 				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, this._playingSong));
 			};
 			
 			editButton.OnClick += delegate {
+				pTypingGame.MenuClickSound.Play(Config.Volume);
 				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this._playingSong));
 			};
 			
 			exitButton.OnClick += delegate {
+				pTypingGame.MenuClickSound.Play(Config.Volume);
 				FurballGame.Instance.Exit();
 			};
 
 			optionsButton.OnClick += delegate {
+				pTypingGame.MenuClickSound.Play(Config.Volume);
 				FurballGame.Instance.ChangeScreen(new OptionsScreen());
 			};
 			

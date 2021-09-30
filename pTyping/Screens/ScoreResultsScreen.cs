@@ -45,6 +45,7 @@ namespace pTyping.Screens {
 			};
 			
 			exitButton.OnClick += delegate {
+				pTypingGame.MenuClickSound.Play(Config.Volume);
 				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, this.Song));
 			};
 

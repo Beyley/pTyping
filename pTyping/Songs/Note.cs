@@ -24,6 +24,7 @@ namespace pTyping.Songs {
 		/// Whether or not the note has been hit
 		/// </summary>
 		public HitResult Hit = HitResult.Unknown;
+		public double HitAmount => (double)this.Typed.Length / (double)this.TextToType.Length;
 		/// <summary>
 		/// The currently typed part of the note
 		/// </summary>

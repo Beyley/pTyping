@@ -17,6 +17,7 @@ namespace pTyping.Screens {
 			};
 			
 			backButton.OnClick += delegate {
+				pTypingGame.MenuClickSound.Play(Config.Volume);
 				FurballGame.Instance.ChangeScreen(new MenuScreen());
 			};
 			
