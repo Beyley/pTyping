@@ -33,10 +33,24 @@ namespace pTyping.Screens {
 			this.Manager.Add(volumeInput);
 			#endregion
 			
+			#region Background Dim
+			TextDrawable      backgroundDimInputLabel = new(new Vector2(100, 150), FurballGame.DEFAULT_FONT, "Background Dim:", 30);
+			UiTextBoxDrawable backgroundDimInput      = new(new Vector2(110 + backgroundDimInputLabel.Size.X, 150), FurballGame.DEFAULT_FONT, Config.BackgroundDim.ToString(CultureInfo.InvariantCulture), 30, 200);
+
+			backgroundDimInput.OnCommit += this.BackgroundDimInputOnCommit;
+			
+			this.Manager.Add(backgroundDimInputLabel);
+			this.Manager.Add(backgroundDimInput);
+			#endregion
+			
 			base.Initialize();
 		}
 		private void VolumeInputOnCommit(object sender, string e) {
 			Config.Volume = float.Parse(e);
+		}
+		
+		private void BackgroundDimInputOnCommit(object sender, string e) {
+			Config.BackgroundDim = float.Parse(e);
 		}
 	}
 }

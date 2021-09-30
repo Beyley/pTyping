@@ -4,6 +4,7 @@ namespace pTyping {
 		/// The master volume of the audio
 		/// </summary>
 		public static float Volume = 0.05f;
+		public static float BackgroundDim = 0.5f;
 		/// <summary>
 		/// The time it takes the notes to go from the right side of the screen to the left 
 		/// </summary>

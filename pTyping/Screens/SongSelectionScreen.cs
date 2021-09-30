@@ -9,6 +9,7 @@ using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Screens {
 	public class SongSelectionScreen : Screen {
@@ -25,6 +26,10 @@ namespace pTyping.Screens {
 				this.UpdateSelectedSong();
 			}
 		}
+
+		private Texture2D        _defaultBackgroundImage;
+		private Texture2D        _backgroundImage;
+		private TexturedDrawable _backgroundImageDrawable;
 
 		private AudioStream _musicTrack;
 		
@@ -98,12 +103,24 @@ namespace pTyping.Screens {
 
 			this._musicTrack = new();
 			
+			#region background image
+			this._defaultBackgroundImage = ContentManager.LoadMonogameAsset<Texture2D>("background");
+
+			this._backgroundImageDrawable = new(this._defaultBackgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
+				Depth         = 1f,
+				OriginType    = OriginType.Center,
+				ColorOverride = new(175, 175, 175)
+			};
+			
+			this.Manager.Add(this._backgroundImageDrawable);
+			#endregion
+			
 			if (this.SelectedSong == null && SongManager.Songs.Count > 0) {
 				this.SelectedSong = SongManager.Songs[0];
 			} else if (this.SelectedSong != null) {
 				this.UpdateSelectedSong();
 			}
-			
+
 			base.Initialize();
 		}
 
@@ -124,6 +141,28 @@ namespace pTyping.Screens {
 			this._musicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
 			this._musicTrack.Volume = Config.Volume;
 			this._musicTrack.Play();
+			
+			if(this.SelectedSong?.BackgroundPath != null) {
+				string qualifiedBackgroundPath = Path.Combine(this.SelectedSong.FileInfo.DirectoryName ?? string.Empty, this.SelectedSong.BackgroundPath);
+
+				if (File.Exists(qualifiedBackgroundPath)) {
+					this._backgroundImage = Texture2D.FromStream(FurballGame.Instance.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External)));
+
+					this._backgroundImageDrawable.SetTexture(this._backgroundImage);
+					
+					this._backgroundImageDrawable.Scale = new(1f / ((float)this._backgroundImageDrawable.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
+				} else {
+					this.DefaultBackground();
+				}
+			} else {
+				this.DefaultBackground();
+			}
+		}
+
+		private void DefaultBackground() {
+			this._backgroundImageDrawable.SetTexture(this._defaultBackgroundImage);
+					
+			this._backgroundImageDrawable.Scale = new(1f / ((float)this._backgroundImageDrawable.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
 		}
 
 		protected override void Dispose(bool disposing) {

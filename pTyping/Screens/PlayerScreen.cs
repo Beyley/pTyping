@@ -91,6 +91,12 @@ namespace pTyping.Screens {
 			};
 			this.Manager.Add(playfieldTopLine);
 			this.Manager.Add(playfieldBottomLine);
+
+			RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
+				ColorOverride = new(100, 100, 100, 100),
+				Depth = 0.9f
+			};
+			this.Manager.Add(playfieldBackgroundCover);
 			
 			#region background image
 			if(this.Song.BackgroundPath != null) {
@@ -100,10 +106,16 @@ namespace pTyping.Screens {
 					this._backgroundImage = Texture2D.FromStream(FurballGame.Instance.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External)));
 
 					this._backgroundImageDrawable = new(this._backgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
-						Depth      = 1f,
-						OriginType = OriginType.Center
+						Depth         = 1f,
+						OriginType    = OriginType.Center
 					};
+					
+					this._backgroundImageDrawable.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), this._backgroundImageDrawable.TimeSource.GetCurrentTime(), this._backgroundImageDrawable.TimeSource.GetCurrentTime() + 1000));
 
+					float scaleY = 1f / (this._backgroundImageDrawable.Size.Y / FurballGame.DEFAULT_WINDOW_HEIGHT);
+
+					this._backgroundImageDrawable.Scale = new(scaleY);
+					
 					this.Manager.Add(this._backgroundImageDrawable);
 				} else {
 					//TODO: once we have a notification manager, we'll tell them something is wrong here
