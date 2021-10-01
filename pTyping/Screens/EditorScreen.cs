@@ -132,7 +132,7 @@ namespace pTyping.Screens {
 
 			this.Manager.Add(this._selectionRect);
 
-			this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI) {
+			this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
 				Visible = false
 			};
 			
