@@ -43,6 +43,24 @@ namespace pTyping.Screens {
 			};
 			
 			this.Manager.Add(backButton);
+
+			UiButtonDrawable audioSpeed1 = new(new(backButton.Size.X + 10, FurballGame.DEFAULT_WINDOW_HEIGHT), "0.75x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0));
+			audioSpeed1.OriginType = OriginType.BottomLeft;
+			
+			audioSpeed1.OnClick += delegate {
+				pTypingGame.MusicTrack.Frequency *= 0.75f;
+			};
+			
+			this.Manager.Add(audioSpeed1);
+			
+			UiButtonDrawable audioSpeed2 = new(new(backButton.Size.X + audioSpeed1.Size.X + 20, FurballGame.DEFAULT_WINDOW_HEIGHT), "1.5x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0));
+			audioSpeed2.OriginType = OriginType.BottomLeft;
+			
+			audioSpeed2.OnClick += delegate {
+				pTypingGame.MusicTrack.Frequency *= 1.5f;
+			};
+			
+			this.Manager.Add(audioSpeed2);
 			#endregion
 
 			#region Create new song button
