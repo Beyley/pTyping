@@ -27,6 +27,8 @@ namespace pTyping.Screens {
 		public SoundEffect HitSound   = new();
 		
 		private List<NoteDrawable> _notes = new();
+		
+		public static int ScoreForHit = 100;
 
 		public PlayerScreen() {
 			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
@@ -140,7 +142,7 @@ namespace pTyping.Screens {
 					bool result = noteDrawable.Type();
 					if (result) {
 						this.HitSound.Play();
-						this.NoteUpdate(true);
+						this.NoteUpdate(true, note);
 					}
 
 					if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
@@ -151,7 +153,7 @@ namespace pTyping.Screens {
 			}
 		}
 
-		private void NoteUpdate(bool wasHit) {
+		private void NoteUpdate(bool wasHit, Note note) {
 			int numberHit  = 0;
 			double amountHit  = 0;
 			int numberMiss = 0;
@@ -175,9 +177,10 @@ namespace pTyping.Screens {
 
 			if (wasHit) {
 				this.Score.Combo++;
-				this.Score.Score += 100 * this.Score.Combo;
+				this.Score.Score += ScoreForHit * this.Score.Combo;
 			} else {
-				this.Score.Combo = 0;
+				this.Score.Score += (int)Math.Floor(ScoreForHit * note.HitAmount * this.Score.Combo);
+				this.Score.Combo =  0;
 			}
 		}
 
@@ -189,7 +192,7 @@ namespace pTyping.Screens {
 
 				if (pTypingGame.MusicTrack.CurrentTime * 1000 - noteDrawable.Note.Time > Config.HitWindow) {
 					noteDrawable.Miss();
-					this.NoteUpdate(false);
+					this.NoteUpdate(false, noteDrawable.Note);
 					
 					if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
 						this.EndScore();
