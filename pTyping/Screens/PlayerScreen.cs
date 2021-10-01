@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
@@ -8,6 +9,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Songs;
 using pTyping.Player;
 using pTyping.Drawables;
@@ -23,6 +25,7 @@ namespace pTyping.Screens {
 		private TextDrawable     _accuracyDrawable;
 		private TextDrawable     _comboDrawable;
 		private TexturedDrawable _recepticle;
+		private UiButtonDrawable _skipButton;
 		
 		public SoundEffect HitSound   = new();
 		
@@ -46,6 +49,14 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._scoreDrawable);
 			this.Manager.Add(this._accuracyDrawable);
 			this.Manager.Add(this._comboDrawable);
+
+			this._skipButton            = new UiButtonDrawable(new(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), "Skip Intro", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White, new(0));
+			this._skipButton.OriginType = OriginType.BottomRight;
+			this._skipButton.Visible    = false;
+			
+			this._skipButton.OnClick += this.SkipButtonClick;
+			
+			this.Manager.Add(this._skipButton);
 			#endregion
 			
 			#region Recepticle
@@ -116,6 +127,9 @@ namespace pTyping.Screens {
 
 			FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
+		}
+		private void SkipButtonClick(object sender, Point e) {
+			pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time - 3000);
 		}
 
 		protected override void Dispose(bool disposing) {
@@ -203,7 +217,13 @@ namespace pTyping.Screens {
 			this._scoreDrawable.Text    = $"{this.Score.Score:00000000}";
 			this._accuracyDrawable.Text = $"{this.Score.Accuracy * 100:0.00}%";
 			this._comboDrawable.Text    = $"{this.Score.Combo}x";
-			
+
+			if (pTypingGame.CurrentSong.Value.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000) {
+				this._skipButton.Visible = true;
+			} else {
+				this._skipButton.Visible = false;
+			}
+
 			base.Update(gameTime);
 		}
 
