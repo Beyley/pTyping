@@ -127,7 +127,8 @@ namespace pTyping.Screens {
 				Thickness     = 2f,
 				ColorOverride = Color.Gray,
 				Visible       = false,
-				OriginType = OriginType.Center
+				Clickable     = false,
+				OriginType    = OriginType.Center
 			};
 
 			this.Manager.Add(this._selectionRect);
@@ -377,6 +378,8 @@ namespace pTyping.Screens {
 				this._notes.Remove(this._selectedNote);
 				this._selectedNote.Visible = false;
 				this._selectedNote.ClearEvents();
+				
+				this.Manager.Remove(this._selectedNote);
 			}
 						
 			this._selectedNote = null;

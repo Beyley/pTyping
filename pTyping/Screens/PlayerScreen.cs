@@ -159,11 +159,14 @@ namespace pTyping.Screens {
 						this.NoteUpdate(true, note);
 					}
 
-					if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
+					if (pTypingGame.CurrentSong.Value.AllNotesHit()) 
 						this.EndScore();
-					}
+					
 					break;
 				}
+
+				// This acts as a psuedo notelock, preventing you from typing the next note if the current one still has remaining letters
+				if (note.Hit == HitResult.Unknown) break;
 			}
 		}
 
