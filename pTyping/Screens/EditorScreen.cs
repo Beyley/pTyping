@@ -331,11 +331,14 @@ namespace pTyping.Screens {
 				if (y < this._recepticlePos.Y + 40f && y > this._recepticlePos.Y - 40f) {
 					NoteDrawable noteDrawable = new(noteStartPos, this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
 						TimeSource    = pTypingGame.MusicTrack,
-						ColorOverride = Color.Red,
-						Note          = note,
+						ColorOverride = note.Color,
 						LabelTextDrawable = {
-							Text = $"{note.TextToShow}\n({note.TextToType})"
-						}
+							Text  = $"{note.TextToShow}\n({note.TextToType})",
+							Scale = new(1f)
+						},
+						Scale      = new(0.55f, 0.55f),
+						OriginType = OriginType.Center,
+						Note       = note
 					};
 
 					noteDrawable.OnClick += delegate {
