@@ -239,7 +239,7 @@ namespace pTyping.Screens {
 			if (this._selectedNote == null)
 				return;
 				
-			this._selectedNote.Note.TextToType = this._textToTypeInput.Text.Trim();
+			this._selectedNote.Note.TextToType = pTypingGame.Alphanumeric.Replace(this._textToTypeInput.Text.Trim(), string.Empty);
 			this._selectedNote.Note.TextToShow = this._textToShowInput.Text.Trim();
 
 			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.TextToShow}\n({this._selectedNote.Note.TextToType})";

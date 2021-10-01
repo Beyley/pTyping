@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using ManagedBass;
 using Furball.Engine;
 using Furball.Engine.Engine.Audio;
@@ -26,6 +27,8 @@ namespace pTyping {
 			
 		public static TextDrawable     VolumeSelector;
 		public static TexturedDrawable CurrentSongBackground;
+		
+		public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
 		public static void PlayMusic() {
 			MusicTrack.Play();
