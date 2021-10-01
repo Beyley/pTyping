@@ -2,6 +2,8 @@ using System.Globalization;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
 
@@ -22,6 +24,12 @@ namespace pTyping.Screens {
 			};
 			
 			this.Manager.Add(backButton);
+			#endregion
+
+			#region Background image
+			this.Manager.Add(pTypingGame.CurrentSongBackground);
+			
+			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(100, 100, 100), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
 			#endregion
 			
 			#region Background Dim

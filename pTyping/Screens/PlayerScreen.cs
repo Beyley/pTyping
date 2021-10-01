@@ -26,8 +26,6 @@ namespace pTyping.Screens {
 		private TextDrawable     _accuracyDrawable;
 		private TextDrawable     _comboDrawable;
 		private TexturedDrawable _recepticle;
-		private TexturedDrawable _backgroundImageDrawable;
-		private Texture2D        _backgroundImage;
 		
 		public AudioStream MusicTrack = new();
 		public SoundEffect HitSound   = new();
@@ -107,35 +105,17 @@ namespace pTyping.Screens {
 			this.Manager.Add(playfieldBackgroundCover);
 			
 			#region background image
-			if(this.Song.BackgroundPath != null) {
-				string qualifiedBackgroundPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.BackgroundPath);
-
-				if (File.Exists(qualifiedBackgroundPath)) {
-					this._backgroundImage = Texture2D.FromStream(FurballGame.Instance.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External)));
-
-					this._backgroundImageDrawable = new(this._backgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
-						Depth         = 1f,
-						OriginType    = OriginType.Center
-					};
-					
-					this._backgroundImageDrawable.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), this._backgroundImageDrawable.TimeSource.GetCurrentTime(), this._backgroundImageDrawable.TimeSource.GetCurrentTime() + 1000));
-
-					float scaleY = 1f / (this._backgroundImageDrawable.Size.Y / FurballGame.DEFAULT_WINDOW_HEIGHT);
-
-					this._backgroundImageDrawable.Scale = new(scaleY);
-					
-					this.Manager.Add(this._backgroundImageDrawable);
-				} else {
-					//TODO: once we have a notification manager, we'll tell them something is wrong here
-				}
-			}
+			this.Manager.Add(pTypingGame.CurrentSongBackground);
+			
+			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
+			pTypingGame.LoadBackgroundFromSong(this.Song);
 			#endregion
 			#endregion
 			
 			this.HitSound.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
 			this.HitSound.Volume = Config.Volume;
-			Config.Volume.OnChange += OnVolumeChange;
+			Config.Volume.OnChange += this.OnVolumeChange;
 			
 			this.Play();
 
@@ -153,7 +133,7 @@ namespace pTyping.Screens {
 			FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput -= this.OnCharacterTyped;
 			
-			Config.Volume.OnChange -= OnVolumeChange;
+			Config.Volume.OnChange -= this.OnVolumeChange;
 
 			base.Dispose(disposing);
 		}

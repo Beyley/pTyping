@@ -4,6 +4,8 @@ using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +17,10 @@ namespace pTyping.Screens {
 		private TextDrawable _musicTitle;
 		private AudioStream  _musicTrack;
 		private Song         _playingSong;
+
+		public MenuScreen(Song song = null) {
+			this._playingSong = song;
+		}
 		
 		public override void Initialize() {
 			#region Title
@@ -111,7 +117,7 @@ namespace pTyping.Screens {
 			};
 
 			musicNextButton.OnClick += delegate {
-				this.LoadRandomSong();
+				this.LoadSong(true);
 			};
 			
 			this.Manager.Add(this._musicTitle);
@@ -121,11 +127,26 @@ namespace pTyping.Screens {
 			this.Manager.Add(musicNextButton);
 			#endregion
 
-			this._musicTrack = new();
-			
+			#region Background image
+			this.Manager.Add(pTypingGame.CurrentSongBackground);
+			pTypingGame.CurrentSongBackground.Tweens.Add(
+				new ColorTween(
+					TweenType.Color, 
+					pTypingGame.CurrentSongBackground.ColorOverride, 
+					new Color(175, 175, 175), 
+					pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), 
+					pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
+				)
+			);
+			#endregion
+
+			this._musicTrack       =  new();
 			Config.Volume.OnChange += this.OnVolumeChange;
 			
-			this.LoadRandomSong();
+			if(this._playingSong == null)
+				this.LoadSong(true);
+			else
+				this.LoadSong(false);
 
 			base.Initialize();
 		}
@@ -134,10 +155,12 @@ namespace pTyping.Screens {
 			this._musicTrack.Volume = f;
 		}
 
-		public void LoadRandomSong() {
-			int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
+		public void LoadSong(bool chooseNewOne) {
+			if(chooseNewOne) {
+				int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
 
-			this._playingSong = SongManager.Songs[songToChoose];
+				this._playingSong = SongManager.Songs[songToChoose];
+			}
 			
 			string qualifiedAudioPath = Path.Combine(this._playingSong.FileInfo.DirectoryName ?? string.Empty, this._playingSong.AudioPath);
 
@@ -152,6 +175,8 @@ namespace pTyping.Screens {
 			this._musicTrack.Volume = Config.Volume;
 			this._musicTrack.Play();
 
+			pTypingGame.LoadBackgroundFromSong(this._playingSong);
+			
 			this._musicTitle.Text = $"{this._playingSong.Artist} - {this._playingSong.Name}";
 		}
 

@@ -1,26 +1,52 @@
 using System;
+using System.IO;
 using Furball.Engine;
 using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Microsoft.Xna.Framework;
 using pTyping.Screens;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using pTyping.Songs;
 
 namespace pTyping {
 	public class pTypingGame : FurballGame {
-		public static EditorScreen EditorInstance;
-
 		public static Texture2D BackButtonTexture;
+		public static Texture2D DefaultBackground;
 
+		public static readonly AudioStream MusicTrack     = new();
 		public static readonly SoundEffect MenuClickSound = new();
 
-		public static TextDrawable VolumeSelector;
+		public static TextDrawable     VolumeSelector;
+		public static TexturedDrawable CurrentSongBackground;
+
 
 		public static void LoadBackButtonTexture() {
 			BackButtonTexture ??= ContentManager.LoadMonogameAsset<Texture2D>("backbutton", ContentSource.User);
+		}
+
+		public static void SetBackgroundTexture(Texture2D tex) {
+			CurrentSongBackground.SetTexture(tex);
+					
+			CurrentSongBackground.Scale = new(1f / ((float)CurrentSongBackground.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
+		}
+
+		public static void LoadBackgroundFromSong(Song song) {
+			Texture2D backgroundTex;
+			if (song.BackgroundPath == null)
+				backgroundTex = DefaultBackground;
+			else {
+				string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
+				if(File.Exists(qualifiedBackgroundPath))
+					backgroundTex = Texture2D.FromStream(Instance.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External)));
+				else
+					backgroundTex = DefaultBackground;
+			}
+
+			SetBackgroundTexture(backgroundTex);
 		}
 		
 		public pTypingGame() : base(new MenuScreen()) {
@@ -40,6 +66,8 @@ namespace pTyping {
 				if(VolumeSelector is not null)
 					VolumeSelector.Text = $"Volume: {Config.Volume.Value * 100f:00.##}";
 			};
+			
+			DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
 		}
 
 		public static void ChangeGlobalVolume(int mouseScroll) {
@@ -55,6 +83,11 @@ namespace pTyping {
 		}
 		
 		protected override void Initialize() {
+			CurrentSongBackground = new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+				Depth      = 1f,
+				OriginType = OriginType.Center
+			};
+			
 			base.Initialize();
 			
 			VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {Config.Volume.Value}", 50) {
@@ -69,7 +102,7 @@ namespace pTyping {
 					ChangeGlobalVolume(eventArgs.Item1);
 			};
 			
-			FurballGame.DrawableManager.Add(VolumeSelector);
+			DrawableManager.Add(VolumeSelector);
 		}
 	}
 }

@@ -7,6 +7,8 @@ using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,7 +53,7 @@ namespace pTyping.Screens {
 			
 			backButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new MenuScreen());
+				FurballGame.Instance.ChangeScreen(new MenuScreen(this._selectedSong));
 			};
 			
 			this.Manager.Add(backButton);
@@ -108,15 +110,16 @@ namespace pTyping.Screens {
 			Config.Volume.OnChange += this.OnVolumeChange;
 
 			#region background image
-			this._defaultBackgroundImage = ContentManager.LoadMonogameAsset<Texture2D>("background");
-
-			this._backgroundImageDrawable = new(this._defaultBackgroundImage, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)) {
-				Depth         = 1f,
-				OriginType    = OriginType.Center,
-				ColorOverride = new(175, 175, 175)
-			};
-			
-			this.Manager.Add(this._backgroundImageDrawable);
+			this.Manager.Add(pTypingGame.CurrentSongBackground);
+			pTypingGame.CurrentSongBackground.Tweens.Add(
+				new ColorTween(
+						TweenType.Color, 
+						pTypingGame.CurrentSongBackground.ColorOverride, 
+						new Color(175, 175, 175), 
+						pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), 
+						pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
+					)
+			);
 			#endregion
 			
 			if (this.SelectedSong == null && SongManager.Songs.Count > 0) {
@@ -151,27 +154,7 @@ namespace pTyping.Screens {
 			this._musicTrack.Volume = Config.Volume;
 			this._musicTrack.Play();
 			
-			if(this.SelectedSong?.BackgroundPath != null) {
-				string qualifiedBackgroundPath = Path.Combine(this.SelectedSong.FileInfo.DirectoryName ?? string.Empty, this.SelectedSong.BackgroundPath);
-
-				if (File.Exists(qualifiedBackgroundPath)) {
-					this._backgroundImage = Texture2D.FromStream(FurballGame.Instance.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External)));
-
-					this._backgroundImageDrawable.SetTexture(this._backgroundImage);
-					
-					this._backgroundImageDrawable.Scale = new(1f / ((float)this._backgroundImageDrawable.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
-				} else {
-					this.DefaultBackground();
-				}
-			} else {
-				this.DefaultBackground();
-			}
-		}
-
-		private void DefaultBackground() {
-			this._backgroundImageDrawable.SetTexture(this._defaultBackgroundImage);
-					
-			this._backgroundImageDrawable.Scale = new(1f / ((float)this._backgroundImageDrawable.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
+			pTypingGame.LoadBackgroundFromSong(this.SelectedSong);
 		}
 
 		protected override void Dispose(bool disposing) {
