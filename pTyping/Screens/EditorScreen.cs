@@ -239,8 +239,8 @@ namespace pTyping.Screens {
 			if (this._selectedNote == null)
 				return;
 				
-			this._selectedNote.Note.TextToType = this._textToTypeInput.Text;
-			this._selectedNote.Note.TextToShow = this._textToShowInput.Text;
+			this._selectedNote.Note.TextToType = this._textToTypeInput.Text.Trim();
+			this._selectedNote.Note.TextToShow = this._textToShowInput.Text.Trim();
 
 			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.TextToShow}\n({this._selectedNote.Note.TextToType})";
 		}
