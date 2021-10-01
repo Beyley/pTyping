@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -9,39 +8,34 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using pTyping.Songs;
 using pTyping.Player;
 using pTyping.Drawables;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Screens {
 	public class PlayerScreen : Screen {
 		public PlayerScore Score = new();
-		public Song        Song;
 
 		private TextDrawable     _scoreDrawable;
 		private TextDrawable     _accuracyDrawable;
 		private TextDrawable     _comboDrawable;
 		private TexturedDrawable _recepticle;
 		
-		public AudioStream MusicTrack = new();
 		public SoundEffect HitSound   = new();
 		
 		private List<NoteDrawable> _notes = new();
 
-		public PlayerScreen(Song song) {
-			this.Song = song;
-
-			if (this.Song.Notes.Count == 0) {
+		public PlayerScreen() {
+			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
 				//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, song));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false));
 			}
 
 			#region UI
-			this._scoreDrawable    = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score.Score:00000000}", 60) {};
+			this._scoreDrawable    = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score.Score:00000000}", 60);
 			this._accuracyDrawable = new TextDrawable(new Vector2(5, 5 + this._scoreDrawable.Size.Y), FurballGame.DEFAULT_FONT, $"{this.Score.Accuracy * 100:0.00}%", 60) {};
 			this._comboDrawable = new TextDrawable(new Vector2(5, FurballGame.DEFAULT_WINDOW_HEIGHT - 5), FurballGame.DEFAULT_FONT, $"{this.Score.Combo}x", 70) {
 				OriginType = OriginType.BottomLeft
@@ -67,9 +61,9 @@ namespace pTyping.Screens {
 			
 			#region Notes
 			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			foreach (Note note in this.Song.Notes) {
+			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
 				NoteDrawable noteDrawable = new(new(noteStartPos.X, noteStartPos.Y + note.YOffset), noteTexture, FurballGame.DEFAULT_FONT, 30) {
-					TimeSource    = this.MusicTrack,
+					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
 						Text = $"{note.TextToShow}\n({note.TextToType})",
@@ -107,40 +101,34 @@ namespace pTyping.Screens {
 			#region background image
 			this.Manager.Add(pTypingGame.CurrentSongBackground);
 			
-			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
-			pTypingGame.LoadBackgroundFromSong(this.Song);
+			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
+			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
 			#endregion
 			
 			this.HitSound.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
 			this.HitSound.Volume = Config.Volume;
-			Config.Volume.OnChange += this.OnVolumeChange;
 			
 			this.Play();
 
 			FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
 		}
-		private void OnVolumeChange(object _, float newVolume) {
-			this.HitSound.Volume = newVolume;
-		}
 
 		protected override void Dispose(bool disposing) {
-			this.MusicTrack.Stop();
-			// this.MusicTrack.Free();
+			pTypingGame.MusicTrack.Stop();
+			// pTypingGame.MusicTrack.Free();
 			
 			FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput -= this.OnCharacterTyped;
-			
-			Config.Volume.OnChange -= this.OnVolumeChange;
 
 			base.Dispose(disposing);
 		}
 
 		public void OnKeyPress(object sender, Keys key) {
 			if (key == Keys.Escape)
-				this.Pause();
+				pTypingGame.PauseResumeMusic();
 		}
 
 		public void OnCharacterTyped(object sender, TextInputEventArgs args) {
@@ -148,14 +136,14 @@ namespace pTyping.Screens {
 				Note note = noteDrawable.Note;
 				if (note.Hit != HitResult.Unknown) continue;
 
-				if (note.NextToType == args.Character && Math.Abs(this.MusicTrack.CurrentTime * 1000 - note.Time) < Config.HitWindow) {
+				if (note.NextToType == args.Character && Math.Abs(pTypingGame.MusicTrack.CurrentTime * 1000 - note.Time) < Config.HitWindow) {
 					bool result = noteDrawable.Type();
 					if (result) {
 						this.HitSound.Play();
 						this.NoteUpdate(true);
 					}
 
-					if (this.Song.AllNotesHit()) {
+					if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
 						this.EndScore();
 					}
 					break;
@@ -199,11 +187,11 @@ namespace pTyping.Screens {
 
 				NoteDrawable noteDrawable = this._notes[i];
 
-				if (this.MusicTrack.CurrentTime * 1000 - noteDrawable.Note.Time > Config.HitWindow) {
+				if (pTypingGame.MusicTrack.CurrentTime * 1000 - noteDrawable.Note.Time > Config.HitWindow) {
 					noteDrawable.Miss();
 					this.NoteUpdate(false);
 					
-					if (this.Song.AllNotesHit()) {
+					if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
 						this.EndScore();
 					}
 				}
@@ -217,20 +205,14 @@ namespace pTyping.Screens {
 		}
 
 		public void EndScore() {
-			FurballGame.Instance.ChangeScreen(new ScoreResultsScreen(this.Score, this.Song));
+			FurballGame.Instance.ChangeScreen(new ScoreResultsScreen(this.Score));
 		}
 
 		public void Play() {
-			string qualifiedAudioPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.AudioPath);
+			// string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
 			
-			this.MusicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-			this.MusicTrack.Volume    =  Config.Volume;
-			this.MusicTrack.Play();
-		}
-
-		public void Pause() {
-			if(this.MusicTrack.PlaybackState       == PlaybackState.Playing) this.MusicTrack.Pause();
-			else if (this.MusicTrack.PlaybackState == PlaybackState.Paused) this.MusicTrack.Resume();
+			// pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+			pTypingGame.PlayMusic();
 		}
 	}
 }

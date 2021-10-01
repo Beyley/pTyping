@@ -4,7 +4,6 @@ using pTyping.Songs;
 using SpriteFontPlus;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
@@ -19,25 +18,12 @@ namespace pTyping.Screens {
 
 		private TextDrawable _songInfo;
 
-		private Song _selectedSong;
-		public Song SelectedSong {
-			get => this._selectedSong;
-			set {
-				this._selectedSong = value;
-				
-				this.UpdateSelectedSong();
-			}
-		}
-
 		private Texture2D        _defaultBackgroundImage;
 		private Texture2D        _backgroundImage;
 		private TexturedDrawable _backgroundImageDrawable;
 
-		private AudioStream _musicTrack;
-		
-		public SongSelectionScreen(bool editor, Song selectedSong) {
+		public SongSelectionScreen(bool editor) {
 			this._editor      = editor;
-			this._selectedSong = selectedSong;
 		}
 		
 		public override void Initialize() {
@@ -53,7 +39,7 @@ namespace pTyping.Screens {
 			
 			backButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new MenuScreen(this._selectedSong));
+				FurballGame.Instance.ChangeScreen(new MenuScreen());
 			};
 			
 			this.Manager.Add(backButton);
@@ -85,12 +71,12 @@ namespace pTyping.Screens {
 				};
 
 				drawable.OnClick += delegate {
-					if (this._selectedSong == song) {
+					if (pTypingGame.CurrentSong.Value == song) {
 						this.PlaySelectedMap();
 						return;
 					}
 
-					this.SelectedSong = song;
+					pTypingGame.CurrentSong.Value = song;
 				};
 
 				this.Manager.Add(drawable);
@@ -105,10 +91,6 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._songInfo);
 			#endregion
 
-			this._musicTrack = new();
-			
-			Config.Volume.OnChange += this.OnVolumeChange;
-
 			#region background image
 			this.Manager.Add(pTypingGame.CurrentSongBackground);
 			pTypingGame.CurrentSongBackground.Tweens.Add(
@@ -122,48 +104,42 @@ namespace pTyping.Screens {
 			);
 			#endregion
 			
-			if (this.SelectedSong == null && SongManager.Songs.Count > 0) {
-				this.SelectedSong = SongManager.Songs[0];
-			} else if (this.SelectedSong != null) {
-				this.UpdateSelectedSong();
+			if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0) {
+				pTypingGame.CurrentSong.Value = SongManager.Songs[0];
+			} else if (pTypingGame.CurrentSong.Value != null) {
+				this.UpdateSelectedSong(true);
 			}
+			
+			pTypingGame.CurrentSong.OnChange += this.OnSongChange;
 
 			base.Initialize();
 		}
 		
-		private void OnVolumeChange(object _, float f) {
-			this._musicTrack.Volume = f;
+		private void OnSongChange(object sender, Song e) {
+			this.UpdateSelectedSong();
 		}
 
 		public void PlaySelectedMap() {
 			pTypingGame.MenuClickSound.Play();
-			FurballGame.Instance.ChangeScreen(this._editor ? new EditorScreen(this.SelectedSong) : new PlayerScreen(this.SelectedSong));
+			FurballGame.Instance.ChangeScreen(this._editor ? new EditorScreen() : new PlayerScreen());
 		}
 
-		public void UpdateSelectedSong() {
-			this._songInfo.Text = $"{this.SelectedSong.Artist} - {this.SelectedSong.Name} [{this.SelectedSong.Difficulty}]\nCreated by {this.SelectedSong.Creator}";
+		public void UpdateSelectedSong(bool fromPrevScreen = false) {
+			this._songInfo.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]\nCreated by {pTypingGame.CurrentSong.Value.Creator}";
 
-			if (this._musicTrack.IsValidHandle && this._musicTrack.PlaybackState == PlaybackState.Playing) {
-				this._musicTrack.Stop();
-				this._musicTrack.Free();
+			string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
+			
+			if(!fromPrevScreen) {
+				pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+				pTypingGame.PlayMusic();
+			} else if (pTypingGame.MusicTrack.PlaybackState is PlaybackState.Paused or PlaybackState.Stopped) {
+				pTypingGame.PlayMusic();
 			}
 			
-			string qualifiedAudioPath = Path.Combine(this.SelectedSong.FileInfo.DirectoryName ?? string.Empty, this.SelectedSong.AudioPath);
-			
-			this._musicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-			this._musicTrack.Volume = Config.Volume;
-			this._musicTrack.Play();
-			
-			pTypingGame.LoadBackgroundFromSong(this.SelectedSong);
+			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 		}
 
 		protected override void Dispose(bool disposing) {
-			Config.Volume.OnChange -= this.OnVolumeChange;
-
-			if (this._musicTrack.IsValidHandle) {
-				this._musicTrack.Free();
-			}
-			
 			base.Dispose(disposing);
 		}
 	}

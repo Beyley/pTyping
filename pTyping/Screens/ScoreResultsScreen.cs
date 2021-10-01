@@ -1,25 +1,24 @@
+using pTyping.Player;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
-using pTyping.Player;
-using pTyping.Songs;
 
 namespace pTyping.Screens {
 	public class ScoreResultsScreen : Screen {
 		public PlayerScore Score;
-		public Song        Song;
 		
-		public ScoreResultsScreen(PlayerScore score, Song song) {
+		public ScoreResultsScreen(PlayerScore score) {
 			this.Score = score;
-			this.Song  = song;
 		}
 		
 		public override void Initialize() {
 			#region Title
-			TextDrawable songTitleText   = new(new(10, 10), FurballGame.DEFAULT_FONT, $"{this.Song.Artist} - {this.Song.Name} [{this.Song.Difficulty}]", 40);
-			TextDrawable songCreatorText = new(new(10, songTitleText.Size.Y + 20), FurballGame.DEFAULT_FONT, $"Created by {this.Song.Creator}", 30);
+			TextDrawable songTitleText   = new(new(10, 10), FurballGame.DEFAULT_FONT, $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]", 40);
+			TextDrawable songCreatorText = new(new(10, songTitleText.Size.Y + 20), FurballGame.DEFAULT_FONT, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
 			
 			this.Manager.Add(songTitleText);
 			this.Manager.Add(songCreatorText);
@@ -46,10 +45,17 @@ namespace pTyping.Screens {
 			
 			exitButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, this.Song));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false));
 			};
 
 			this.Manager.Add(exitButton);
+			#endregion
+			
+			#region background image
+			this.Manager.Add(pTypingGame.CurrentSongBackground);
+			
+			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(0.5f, 0.5f, 0.5f), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
+			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
 			
 			base.Initialize();

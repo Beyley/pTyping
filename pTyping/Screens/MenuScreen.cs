@@ -1,7 +1,6 @@
 using System.IO;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
@@ -15,13 +14,7 @@ using pTyping.Songs;
 namespace pTyping.Screens {
 	public class MenuScreen : Screen {
 		private TextDrawable _musicTitle;
-		private AudioStream  _musicTrack;
-		private Song         _playingSong;
 
-		public MenuScreen(Song song = null) {
-			this._playingSong = song;
-		}
-		
 		public override void Initialize() {
 			#region Title
 			TextDrawable titleText = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), FurballGame.DEFAULT_FONT, "pTyping", 75) {
@@ -55,12 +48,12 @@ namespace pTyping.Screens {
 
 			playButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, this._playingSong));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false));
 			};
 			
 			editButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this._playingSong));
+				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
 			};
 			
 			exitButton.OnClick += delegate {
@@ -102,18 +95,11 @@ namespace pTyping.Screens {
 			};
 
 			musicPlayButton.OnClick += delegate {
-				this._musicTrack.Play();
+				pTypingGame.PlayMusic();
 			};
 
 			musicPauseButton.OnClick += delegate {
-				switch (this._musicTrack.PlaybackState) {
-					case PlaybackState.Playing:
-						this._musicTrack.Pause();
-						break;
-					case PlaybackState.Paused:
-						this._musicTrack.Resume();
-						break;
-				}
+				pTypingGame.PauseResumeMusic();
 			};
 
 			musicNextButton.OnClick += delegate {
@@ -139,11 +125,8 @@ namespace pTyping.Screens {
 				)
 			);
 			#endregion
-
-			this._musicTrack       =  new();
-			Config.Volume.OnChange += this.OnVolumeChange;
 			
-			if(this._playingSong == null)
+			if(pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
 				this.LoadSong(true);
 			else
 				this.LoadSong(false);
@@ -151,41 +134,37 @@ namespace pTyping.Screens {
 			base.Initialize();
 		}
 		
-		private void OnVolumeChange(object _, float f) {
-			this._musicTrack.Volume = f;
-		}
 
 		public void LoadSong(bool chooseNewOne) {
 			if(chooseNewOne) {
 				int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
 
-				this._playingSong = SongManager.Songs[songToChoose];
+				if (pTypingGame.CurrentSong == null) 
+					pTypingGame.CurrentSong = new(SongManager.Songs[songToChoose]);
+				else
+					pTypingGame.CurrentSong.Value = SongManager.Songs[songToChoose];
 			}
 			
-			string qualifiedAudioPath = Path.Combine(this._playingSong.FileInfo.DirectoryName ?? string.Empty, this._playingSong.AudioPath);
+			string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
 
-			if (this._musicTrack.IsValidHandle) {
-				if(this._musicTrack.PlaybackState == PlaybackState.Playing)
-					this._musicTrack.Stop();
+			if (pTypingGame.MusicTrack.IsValidHandle && chooseNewOne) {
+				if(pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
+					pTypingGame.StopMusic();
 				
-				this._musicTrack.Free();
+				pTypingGame.MusicTrack.Free();
 			}
 			
-			this._musicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-			this._musicTrack.Volume = Config.Volume;
-			this._musicTrack.Play();
+			if(chooseNewOne) {
+				pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+				pTypingGame.PlayMusic();
+			}
 
-			pTypingGame.LoadBackgroundFromSong(this._playingSong);
+			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			
-			this._musicTitle.Text = $"{this._playingSong.Artist} - {this._playingSong.Name}";
+			this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
 		}
 
 		protected override void Dispose(bool disposing) {
-			Config.Volume.OnChange -= this.OnVolumeChange;
-			
-			this._musicTrack.Stop();
-			this._musicTrack.Free();
-
 			base.Dispose(disposing);
 		}
 	}

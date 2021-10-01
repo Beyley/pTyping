@@ -1,16 +1,18 @@
 using System;
 using System.IO;
+using ManagedBass;
 using Furball.Engine;
 using Furball.Engine.Engine.Audio;
+using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Microsoft.Xna.Framework;
-using pTyping.Screens;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Songs;
+using pTyping.Screens;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping {
 	public class pTypingGame : FurballGame {
@@ -20,9 +22,34 @@ namespace pTyping {
 		public static readonly AudioStream MusicTrack     = new();
 		public static readonly SoundEffect MenuClickSound = new();
 
+		public static Bindable<Song> CurrentSong;
+			
 		public static TextDrawable     VolumeSelector;
 		public static TexturedDrawable CurrentSongBackground;
 
+		public static void PlayMusic() {
+			MusicTrack.Play();
+			MusicTrack.Volume = Config.Volume;
+		}
+
+		public static void PauseResumeMusic() {
+			if (MusicTrack.PlaybackState == PlaybackState.Playing)
+				MusicTrack.Pause();
+			else
+				MusicTrack.Resume();
+		}
+
+		public static void StopMusic() {
+			MusicTrack.Stop();
+		}
+
+		public static void LoadMusic(byte[] data) {
+			if (MusicTrack.IsValidHandle) {
+				MusicTrack.Stop();
+				MusicTrack.Free();
+			}
+			MusicTrack.Load(data);
+		}
 
 		public static void LoadBackButtonTexture() {
 			BackButtonTexture ??= ContentManager.LoadMonogameAsset<Texture2D>("backbutton", ContentSource.User);
@@ -50,7 +77,7 @@ namespace pTyping {
 		}
 		
 		public pTypingGame() : base(new MenuScreen()) {
-			this.Window.AllowUserResizing = true;
+			// this.Window.AllowUserResizing = true;
 		}
 
 		protected override void LoadContent() {
@@ -60,8 +87,10 @@ namespace pTyping {
 			MenuClickSound.Load(menuClickSoundData);
 
 			MenuClickSound.Volume = Config.Volume;
+			MusicTrack.Volume     = Config.Volume;
 			Config.Volume.OnChange += delegate (object _, float volume) {
 				MenuClickSound.Volume = volume;
+				MusicTrack.Volume = volume;
 				
 				if(VolumeSelector is not null)
 					VolumeSelector.Text = $"Volume: {Config.Volume.Value * 100f:00.##}";

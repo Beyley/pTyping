@@ -1,10 +1,8 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
@@ -12,12 +10,11 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Input;
-using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using pTyping.Drawables;
 using pTyping.Songs;
+using pTyping.Drawables;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Screens {
 	public enum EditorTool {
@@ -27,10 +24,8 @@ namespace pTyping.Screens {
 	}
 	
 	public class EditorScreen : Screen {
-		public Song Song;
-
 		private TextDrawable               _currentTimeDrawable;
-		private TexturedDrawable               _recepticle;
+		private TexturedDrawable           _recepticle;
 		private NoteDrawable               _selectedNote;
 		private RectanglePrimitiveDrawable _selectionRect;
 		private UiProgressBarDrawable      _progressBar;
@@ -55,19 +50,15 @@ namespace pTyping.Screens {
 		private List<NoteDrawable> _notes = new();
 		private List<NoteDrawable> _timelineBars = new();
 
-		public AudioStream MusicTrack;
 		public EditorTool  CurrentTool = EditorTool.None;
 
 		private readonly Vector2 _recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f);
 		
 		private Texture2D _noteTexture;
 		
-		public EditorScreen(Song song) {
-			this.Song = song;
-			
-			this.MusicTrack = new();
-			this.LoadAudio();
-
+		public EditorScreen() {
+			pTypingGame.MusicTrack.Stop();
+		
 			this._currentTimeDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, "", 60);
 			
 			this.Manager.Add(this._currentTimeDrawable);
@@ -83,14 +74,17 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._recepticle);
 
 			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
-			foreach (Note note in this.Song.Notes) {
+			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
 				NoteDrawable noteDrawable = new(new Vector2(noteStartPos.X, noteStartPos.Y + note.YOffset), this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
-					TimeSource    = this.MusicTrack,
+					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
-					Note          = note,
 					LabelTextDrawable = {
-						Text = $"{note.TextToShow}\n({note.TextToType})"
-					}
+						Text  = $"{note.TextToShow}\n({note.TextToType})",
+						Scale = new(1f)
+					},
+					Scale      = new(0.55f, 0.55f),
+					OriginType = OriginType.Center,
+					Note = note
 				};
 
 				noteDrawable.OnClick += delegate {
@@ -102,6 +96,30 @@ namespace pTyping.Screens {
 				this.Manager.Add(noteDrawable);
 				this._notes.Add(noteDrawable);
 			}
+			
+			#region Playfield decorations
+			LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, recepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+				ColorOverride = Color.Gray
+			};
+			LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+				ColorOverride = Color.Gray
+			};
+			this.Manager.Add(playfieldTopLine);
+			this.Manager.Add(playfieldBottomLine);
+
+			RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
+				ColorOverride = new(100, 100, 100, 100),
+				Depth         = 0.9f
+			};
+			this.Manager.Add(playfieldBackgroundCover);
+			
+			#region background image
+			this.Manager.Add(pTypingGame.CurrentSongBackground);
+			
+			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(0.3f , 0.3f, 0.3f), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
+			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
+			#endregion
+			#endregion
 			
 			this._selectionRect = new() {
 				RectSize      = new(100, 100),
@@ -136,27 +154,37 @@ namespace pTyping.Screens {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
-			TexturedDrawable leftButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_LEFT) {
+			TexturedDrawable rightButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_RIGHT) {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
-			TexturedDrawable rightButton = new (editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_RIGHT) {
+			TexturedDrawable leftButton = new (editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_LEFT) {
 				Scale      = new (0.5f, 0.5f),
 				OriginType = OriginType.BottomRight
 			};
 
 			playButton.OnClick += delegate {
-				this.MusicTrack.Play();
+				pTypingGame.PlayMusic();
 			};
 			
 			pauseButton.OnClick += delegate {
-				this.Pause();
+				pTypingGame.PauseResumeMusic();
+			};
+
+			leftButton.OnClick += delegate {
+				if(pTypingGame.CurrentSong.Value.Notes.Count > 0)
+					pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time);
+			};
+			
+			rightButton.OnClick += delegate {
+				if(pTypingGame.CurrentSong.Value.Notes.Count > 0)
+					pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.Last().Time);
 			};
 			
 			this.Manager.Add(playButton);
 			this.Manager.Add(pauseButton);
-			this.Manager.Add(leftButton);
 			this.Manager.Add(rightButton);
+			this.Manager.Add(leftButton);
 			
 			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 			this._editorToolSelect.OnClick += delegate {
@@ -260,7 +288,7 @@ namespace pTyping.Screens {
 					this._createLine.Visible    = true;
 					this._createLine.OriginType = OriginType.Center;
 					
-					double currentTime  = this.MusicTrack.CurrentTime      * 1000;
+					double currentTime  = pTypingGame.MusicTrack.CurrentTime      * 1000;
 					double reticulePos  = FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f;
 					double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 					
@@ -270,9 +298,9 @@ namespace pTyping.Screens {
 
 					double timeAtCursor = currentTime + timeToReticule;
 
-					double noteLength = this.Song.DividedNoteLength(timeAtCursor);
+					double noteLength = pTypingGame.CurrentSong.Value.DividedNoteLength(timeAtCursor);
 					
-					double snappedTimeAtCursor = Math.Round((timeAtCursor - this.Song.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength + this.Song.CurrentTimingPoint(timeAtCursor).Time;
+					double snappedTimeAtCursor = Math.Round((timeAtCursor - pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength + pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
 					this._mouseTime = snappedTimeAtCursor;
 
 					double distanceInTime = snappedTimeAtCursor - currentTime;
@@ -302,7 +330,7 @@ namespace pTyping.Screens {
 				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
 				if (y < this._recepticlePos.Y + 40f && y > this._recepticlePos.Y - 40f) {
 					NoteDrawable noteDrawable = new(noteStartPos, this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
-						TimeSource    = this.MusicTrack,
+						TimeSource    = pTypingGame.MusicTrack,
 						ColorOverride = Color.Red,
 						Note          = note,
 						LabelTextDrawable = {
@@ -318,7 +346,7 @@ namespace pTyping.Screens {
 				
 					this.Manager.Add(noteDrawable);
 					this._notes.Add(noteDrawable);
-					this.Song.Notes.Add(noteDrawable.Note);
+					pTypingGame.CurrentSong.Value.Notes.Add(noteDrawable.Note);
 				}
 			}
 		}
@@ -342,7 +370,7 @@ namespace pTyping.Screens {
 			this._selectionRect.Visible = false;
 			
 			if(delete) {
-				this.Song.Notes.Remove(this._selectedNote.Note);
+				pTypingGame.CurrentSong.Value.Notes.Remove(this._selectedNote.Note);
 				this._notes.Remove(this._selectedNote);
 				this._selectedNote.Visible = false;
 				this._selectedNote.ClearEvents();
@@ -352,9 +380,6 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
-			this.MusicTrack.Stop();
-			this.MusicTrack.Free();
-			
 			FurballGame.Instance.Window.TextInput  -= this.OnCharacterTyped;
 			FurballGame.InputManager.OnKeyDown     -= this.OnKeyPress;
 			FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
@@ -373,25 +398,25 @@ namespace pTyping.Screens {
 		}
 
 		public void TimelineMove(bool right) {
-			double currentTime = this.MusicTrack.CurrentTime * 1000d;
+			double currentTime = pTypingGame.MusicTrack.CurrentTime * 1000d;
 					
-			double noteLength   = this.Song.DividedNoteLength(currentTime);
-			double timeToSeekTo = Math.Round((this.MusicTrack.CurrentTime * 1000d - this.Song.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
+			double noteLength   = pTypingGame.CurrentSong.Value.DividedNoteLength(currentTime);
+			double timeToSeekTo = Math.Round((pTypingGame.MusicTrack.CurrentTime * 1000d - pTypingGame.CurrentSong.Value.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
 					
-			timeToSeekTo += this.Song.CurrentTimingPoint(currentTime).Time;
+			timeToSeekTo += pTypingGame.CurrentSong.Value.CurrentTimingPoint(currentTime).Time;
 
 			if (right)
 				timeToSeekTo += noteLength;
 			else
 				timeToSeekTo -= noteLength;
 
-			this.MusicTrack.SeekTo(Math.Max(timeToSeekTo, 0));
+			pTypingGame.MusicTrack.SeekTo(Math.Max(timeToSeekTo, 0));
 		}
 
 		public void OnKeyPress(object sender, Keys key) {
 			switch (key) {
 				case Keys.Space:
-					this.Pause();
+					pTypingGame.PauseResumeMusic();
 					break;
 				case Keys.Left: {
 					this.TimelineMove(false);
@@ -412,7 +437,7 @@ namespace pTyping.Screens {
 					pTypingGame.MenuClickSound.Play();
 
 					// Exit the editor
-					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this.Song));
+					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
 					break;
 				case Keys.Delete: {
 					// Delete the current note
@@ -421,7 +446,7 @@ namespace pTyping.Screens {
 				}
 				case Keys.S: {
 					// Save the song if ctrl+s is pressed
-					if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) this.Song.Save();
+					if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) pTypingGame.CurrentSong.Value.Save();
 					break;
 				}
 				case Keys.D1: {
@@ -441,42 +466,21 @@ namespace pTyping.Screens {
 
 		public override void Update(GameTime gameTime) {
 			for (int i = 0; i < this._notes.Count; i++) {
-				if (this._notes[i].Note.Hit != HitResult.Unknown) continue;
+				// if (this._notes[i].Note.Hit != HitResult.Unknown) continue;
 
 				NoteDrawable noteDrawable = this._notes[i];
 
-				if (this.MusicTrack.CurrentTime * 1000 > noteDrawable.Note.Time+10) {
+				if (pTypingGame.MusicTrack.CurrentTime * 1000 > noteDrawable.Note.Time+10) {
 					noteDrawable.Visible = false;
 				} else {
 					noteDrawable.Visible = true;
 				}
 			}
 			
-			this._currentTimeDrawable.Text = $"{this.MusicTrack.CurrentTime * 1000}";
-			this._progressBar.Progress     = (float)this.MusicTrack.CurrentTime * 1000f / (float)this.MusicTrack.Length;
+			this._currentTimeDrawable.Text = $"{pTypingGame.MusicTrack.CurrentTime * 1000}";
+			this._progressBar.Progress     = (float)pTypingGame.MusicTrack.CurrentTime * 1000f / (float)pTypingGame.MusicTrack.Length;
 			
 			base.Update(gameTime);
-		}
-
-		public void LoadAudio() {
-			string qualifiedAudioPath = Path.Combine(this.Song.FileInfo.DirectoryName ?? string.Empty, this.Song.AudioPath);
-			
-			this.MusicTrack.Load(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-			this.MusicTrack.Volume = Config.Volume;
-		}
-
-		public void Pause() {
-			switch (this.MusicTrack.PlaybackState) {
-				case PlaybackState.Playing:
-					this.MusicTrack.Pause();
-					break;
-				case PlaybackState.Stopped:
-					this.MusicTrack.Play();
-					break;
-				case PlaybackState.Paused:
-					this.MusicTrack.Resume();
-					break;
-			}
 		}
 	}
 }
