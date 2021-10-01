@@ -322,8 +322,8 @@ namespace pTyping.Screens {
 			if (this.CurrentTool == EditorTool.CreateNote) {
 				Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
 				Note    note     = new() {
-					TextToShow = "changeme", 
-					TextToType =  "changeme",
+					TextToShow = "a", 
+					TextToType =  "a",
 					Time = this._mouseTime
 				};
 
