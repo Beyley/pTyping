@@ -48,22 +48,22 @@ namespace pTyping.Screens {
 			};
 
 			playButton.OnClick += delegate {
-				pTypingGame.MenuClickSound.Play(Config.Volume);
+				pTypingGame.MenuClickSound.Play();
 				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false, this._playingSong));
 			};
 			
 			editButton.OnClick += delegate {
-				pTypingGame.MenuClickSound.Play(Config.Volume);
+				pTypingGame.MenuClickSound.Play();
 				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this._playingSong));
 			};
 			
 			exitButton.OnClick += delegate {
-				pTypingGame.MenuClickSound.Play(Config.Volume);
+				pTypingGame.MenuClickSound.Play();
 				FurballGame.Instance.Exit();
 			};
 
 			optionsButton.OnClick += delegate {
-				pTypingGame.MenuClickSound.Play(Config.Volume);
+				pTypingGame.MenuClickSound.Play();
 				FurballGame.Instance.ChangeScreen(new OptionsScreen());
 			};
 			
@@ -123,9 +123,15 @@ namespace pTyping.Screens {
 
 			this._musicTrack = new();
 			
+			Config.Volume.OnChange += this.OnVolumeChange;
+			
 			this.LoadRandomSong();
 
 			base.Initialize();
+		}
+		
+		private void OnVolumeChange(object _, float f) {
+			this._musicTrack.Volume = f;
 		}
 
 		public void LoadRandomSong() {
@@ -150,9 +156,11 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
+			Config.Volume.OnChange -= this.OnVolumeChange;
+			
 			this._musicTrack.Stop();
 			this._musicTrack.Free();
-			
+
 			base.Dispose(disposing);
 		}
 	}

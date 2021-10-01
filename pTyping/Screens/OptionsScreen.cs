@@ -17,21 +17,11 @@ namespace pTyping.Screens {
 			};
 			
 			backButton.OnClick += delegate {
-				pTypingGame.MenuClickSound.Play(Config.Volume);
+				pTypingGame.MenuClickSound.Play();
 				FurballGame.Instance.ChangeScreen(new MenuScreen());
 			};
 			
 			this.Manager.Add(backButton);
-			#endregion
-
-			#region Volume
-			TextDrawable      volumeInputLabel = new(new Vector2(100, 100), FurballGame.DEFAULT_FONT, "Volume:", 30);
-			UiTextBoxDrawable volumeInput      = new(new Vector2(110 + volumeInputLabel.Size.X, 100), FurballGame.DEFAULT_FONT, Config.Volume.ToString(CultureInfo.InvariantCulture), 30, 200);
-
-			volumeInput.OnCommit += this.VolumeInputOnCommit;
-			
-			this.Manager.Add(volumeInputLabel);
-			this.Manager.Add(volumeInput);
 			#endregion
 			
 			#region Background Dim
@@ -45,9 +35,6 @@ namespace pTyping.Screens {
 			#endregion
 			
 			base.Initialize();
-		}
-		private void VolumeInputOnCommit(object sender, string e) {
-			Config.Volume = float.Parse(e);
 		}
 		
 		private void BackgroundDimInputOnCommit(object sender, string e) {

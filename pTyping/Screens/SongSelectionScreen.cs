@@ -50,7 +50,7 @@ namespace pTyping.Screens {
 			};
 			
 			backButton.OnClick += delegate {
-				pTypingGame.MenuClickSound.Play(Config.Volume);
+				pTypingGame.MenuClickSound.Play();
 				FurballGame.Instance.ChangeScreen(new MenuScreen());
 			};
 			
@@ -64,7 +64,7 @@ namespace pTyping.Screens {
 				};
 				
 				createNewSongButton.OnClick += delegate {
-					pTypingGame.MenuClickSound.Play(Config.Volume);
+					pTypingGame.MenuClickSound.Play();
 					FurballGame.Instance.ChangeScreen(new NewSongScreen());
 				};
 
@@ -105,6 +105,8 @@ namespace pTyping.Screens {
 
 			this._musicTrack = new();
 			
+			Config.Volume.OnChange += this.OnVolumeChange;
+
 			#region background image
 			this._defaultBackgroundImage = ContentManager.LoadMonogameAsset<Texture2D>("background");
 
@@ -125,9 +127,13 @@ namespace pTyping.Screens {
 
 			base.Initialize();
 		}
+		
+		private void OnVolumeChange(object _, float f) {
+			this._musicTrack.Volume = f;
+		}
 
 		public void PlaySelectedMap() {
-			pTypingGame.MenuClickSound.Play(Config.Volume);
+			pTypingGame.MenuClickSound.Play();
 			FurballGame.Instance.ChangeScreen(this._editor ? new EditorScreen(this.SelectedSong) : new PlayerScreen(this.SelectedSong));
 		}
 
@@ -169,6 +175,8 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
+			Config.Volume.OnChange -= this.OnVolumeChange;
+
 			if (this._musicTrack.IsValidHandle) {
 				this._musicTrack.Free();
 			}

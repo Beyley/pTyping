@@ -409,7 +409,7 @@ namespace pTyping.Screens {
 						return;
 					}
 					
-					pTypingGame.MenuClickSound.Play(Config.Volume);
+					pTypingGame.MenuClickSound.Play();
 
 					// Exit the editor
 					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true, this.Song));

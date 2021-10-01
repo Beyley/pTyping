@@ -134,10 +134,16 @@ namespace pTyping.Screens {
 			
 			this.HitSound.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
+			this.HitSound.Volume = Config.Volume;
+			Config.Volume.OnChange += OnVolumeChange;
+			
 			this.Play();
 
 			FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
+		}
+		private void OnVolumeChange(object _, float newVolume) {
+			this.HitSound.Volume = newVolume;
 		}
 
 		protected override void Dispose(bool disposing) {
@@ -147,6 +153,8 @@ namespace pTyping.Screens {
 			FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput -= this.OnCharacterTyped;
 			
+			Config.Volume.OnChange -= OnVolumeChange;
+
 			base.Dispose(disposing);
 		}
 
@@ -163,7 +171,7 @@ namespace pTyping.Screens {
 				if (note.NextToType == args.Character && Math.Abs(this.MusicTrack.CurrentTime * 1000 - note.Time) < Config.HitWindow) {
 					bool result = noteDrawable.Type();
 					if (result) {
-						this.HitSound.Play(Config.Volume);
+						this.HitSound.Play();
 						this.NoteUpdate(true);
 					}
 
