@@ -7,7 +7,7 @@ namespace pTyping {
 		/// </summary>
 		public static Bindable<float> Volume = new(0.05f);
 		public static float         BackgroundDim   = 0.5f;
-		public static Bindable<int> TargetFrameTime = new(1);
+		public static Bindable<int> TargetFPS = new(1000);
 		/// <summary>
 		/// The time it takes the notes to go from the right side of the screen to the left 
 		/// </summary>

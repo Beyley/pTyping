@@ -42,14 +42,14 @@ namespace pTyping.Screens {
 			this.Manager.Add(backgroundDimInput);
 			#endregion
 			
-			#region Background Dim
-			TextDrawable      targetFrameTimeInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target Frame Time:", 30);
-			UiTextBoxDrawable targetFrameTimeInput      = new(new Vector2(110 + targetFrameTimeInputLabel.Size.X, 200), FurballGame.DEFAULT_FONT, Config.TargetFrameTime.Value.ToString(CultureInfo.InvariantCulture), 30, 200);
+			#region Target FPS
+			TextDrawable      targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
+			UiTextBoxDrawable targetFPSInput      = new(new Vector2(110 + targetFPSInputLabel.Size.X, 200), FurballGame.DEFAULT_FONT, Config.TargetFPS.Value.ToString(CultureInfo.InvariantCulture), 30, 200);
 
-			targetFrameTimeInput.OnCommit += this.TargetFrameTimeInputOnCommit;
+			targetFPSInput.OnCommit += this.TargetFpsInputOnCommit;
 			
-			this.Manager.Add(targetFrameTimeInputLabel);
-			this.Manager.Add(targetFrameTimeInput);
+			this.Manager.Add(targetFPSInputLabel);
+			this.Manager.Add(targetFPSInput);
 			#endregion
 			
 			base.Initialize();
@@ -59,8 +59,8 @@ namespace pTyping.Screens {
 			Config.BackgroundDim = float.Parse(e);
 		}
 		
-		private void TargetFrameTimeInputOnCommit(object sender, string e) {
-			Config.TargetFrameTime.Value = int.Parse(e);
+		private void TargetFpsInputOnCommit(object sender, string e) {
+			Config.TargetFPS.Value = int.Parse(e);
 		}
 	}
 }

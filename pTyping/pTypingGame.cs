@@ -117,14 +117,14 @@ namespace pTyping {
 			}
 		}
 
-		public static void ChangeTargetFrameTime(int target) {
+		public static void ChangeTargetFPS(double target) {
 			if (target == 0) {
 				Instance.IsFixedTimeStep   = false;
 				
 				return;
 			}
 			
-			Instance.TargetElapsedTime = new(0, 0, 0, 0, Config.TargetFrameTime);
+			Instance.TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / target);
 			Instance.IsFixedTimeStep   = true;
 		}
 		
@@ -150,10 +150,10 @@ namespace pTyping {
 			
 			DrawableManager.Add(VolumeSelector);
 
-			ChangeTargetFrameTime(Config.TargetFrameTime);
+			ChangeTargetFPS(Config.TargetFPS);
 			
-			Config.TargetFrameTime.OnChange += delegate(object _, int newTarget) {
-				ChangeTargetFrameTime(newTarget);
+			Config.TargetFPS.OnChange += delegate(object _, int newTarget) {
+				ChangeTargetFPS(newTarget);
 			};
 
 			HiraganaConversion.LoadConversion();
