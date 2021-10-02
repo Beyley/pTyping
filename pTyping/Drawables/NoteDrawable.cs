@@ -38,7 +38,8 @@ namespace pTyping.Drawables {
 
 			if (string.Equals(this.Note.TypedRomaji, romaji)) {
 				this.Note.Typed += this.Note.Text[this.Note.Typed.Length];
-				
+				this.Note.TypedRomaji = string.Empty;
+
 				if(string.Equals(this.Note.Typed, this.Note.Text)) {
 					this.Hit();
 					return true;
