@@ -86,7 +86,13 @@ namespace pTyping.Screens {
 					OriginType = OriginType.Center
 				};
 
-				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
+				noteDrawable.Tweens.Add(
+					new VectorTween(
+						TweenType.Movement,
+						new(noteStartPos.X, noteStartPos.Y + note.YOffset),
+						recepticlePos,
+						(int)(note.Time - Config.BaseApproachTime * (1 - pTypingGame.CurrentSong.Value.CurrentTimingPoint(note.Time).Tempo / 500d + 1)),
+						(int)note.Time));
 
 				this.Manager.Add(noteDrawable);
 
