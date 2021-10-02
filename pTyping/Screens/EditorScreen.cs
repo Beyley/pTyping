@@ -10,6 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Helpers;
 using pTyping.Songs;
 using pTyping.Drawables;
 using Microsoft.Xna.Framework;
@@ -35,14 +36,8 @@ namespace pTyping.Screens {
 		private TextDrawable      _textToTypeInputLabel;
 		private UiTextBoxDrawable _textToShowInput;
 		private TextDrawable      _textToShowInputLabel;
-		private UiTextBoxDrawable _colorRInput;
-		private TextDrawable      _colorRInputLabel;
-		private UiTextBoxDrawable _colorGInput;
-		private TextDrawable      _colorGInputLabel;
-		private UiTextBoxDrawable _colorBInput;
-		private TextDrawable      _colorBInputLabel;
-		private UiTextBoxDrawable _colorAInput;
-		private TextDrawable      _colorAInputLabel;
+		private UiTextBoxDrawable _colorInput;
+		private TextDrawable      _colorInputLabel;
 
 		private TexturedDrawable _editorToolSelect;
 		private TexturedDrawable _editorToolCreateNote;
@@ -241,6 +236,7 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Edit note info
+			#region text to type
 			this._textToTypeInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text To Type", 25) {
 				OriginType = OriginType.Center,
 				Visible    = false
@@ -249,9 +245,14 @@ namespace pTyping.Screens {
 				OriginType = OriginType.Center,
 				Visible    = false
 			};
-			this._textToTypeInput.OnLetterTyped += this.UpdateTextInputs;
+			this._textToTypeInput.OnLetterTyped   += this.UpdateTextInputs;
 			this._textToTypeInput.OnLetterRemoved += this.UpdateTextInputs;
+			
+			this.Manager.Add(this._textToTypeInput);
+			this.Manager.Add(this._textToTypeInputLabel);
+			#endregion
 				
+			#region text to show
 			this._textToShowInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.75f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text To Show", 25) {
 				OriginType = OriginType.Center,
 				Visible    = false
@@ -262,11 +263,26 @@ namespace pTyping.Screens {
 			};
 			this._textToShowInput.OnLetterTyped   += this.UpdateTextInputs;
 			this._textToShowInput.OnLetterRemoved += this.UpdateTextInputs;
-
-			this.Manager.Add(this._textToTypeInput);
-			this.Manager.Add(this._textToTypeInputLabel);
+			
 			this.Manager.Add(this._textToShowInput);
 			this.Manager.Add(this._textToShowInputLabel);
+			#endregion
+			
+			#region color input
+			this._colorInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.5f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "HTML Color", 25) {
+				OriginType = OriginType.Center,
+				Visible    = false
+			};
+			this._colorInput = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.5f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), FurballGame.DEFAULT_FONT, "select note", 25, 150f) {
+				OriginType = OriginType.Center,
+				Visible    = false
+			};
+			this._colorInput.OnLetterTyped   += this.UpdateTextInputs;
+			this._colorInput.OnLetterRemoved += this.UpdateTextInputs;
+			
+			this.Manager.Add(this._colorInput);
+			this.Manager.Add(this._colorInputLabel);
+			#endregion
 			#endregion
 			#endregion
 			
@@ -285,8 +301,11 @@ namespace pTyping.Screens {
 				
 			this._selectedNote.Note.TextToType = pTypingGame.Alphanumeric.Replace(this._textToTypeInput.Text.Trim(), string.Empty);
 			this._selectedNote.Note.TextToShow = this._textToShowInput.Text.Trim();
+			if (this._colorInput.Text.Length-1 is 3 or 4 or 6 or 8)
+				this._selectedNote.Note.Color = ColorConverter.FromString(this._colorInput.Text);
 
 			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.TextToShow}\n({this._selectedNote.Note.TextToType})";
+			this._selectedNote.ColorOverride          = this._selectedNote.Note.Color;
 		}
 
 		public void ChangeTool(EditorTool tool) {
@@ -300,6 +319,8 @@ namespace pTyping.Screens {
 				this._textToShowInputLabel.Visible = true;
 				this._textToTypeInput.Visible      = true;
 				this._textToTypeInputLabel.Visible = true;
+				this._colorInput.Visible           = true;
+				this._colorInputLabel.Visible      = true;
 				
 				this._editorToolSelect.Tweens.Add(new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(EDITOR_TOOL_SCALED_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out));
 			} else {
@@ -307,7 +328,9 @@ namespace pTyping.Screens {
 				this._textToShowInputLabel.Visible = false; 
 				this._textToTypeInput.Visible      = false;
 				this._textToTypeInputLabel.Visible = false;
-								
+				this._colorInput.Visible           = false;
+				this._colorInputLabel.Visible      = false;
+				
 				this._editorToolSelect.Tweens.Add(new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(EDITOR_TOOL_BASE_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out));
 			}
 			
@@ -427,6 +450,7 @@ namespace pTyping.Screens {
 
 			this._textToShowInput.Text = this._selectedNote.Note.TextToShow;
 			this._textToTypeInput.Text = this._selectedNote.Note.TextToType;
+			this._colorInput.Text      = ColorConverter.ToHexString(this._selectedNote.Note.Color);
 		}
 
 		public void DeselectNote(bool delete = false) {
