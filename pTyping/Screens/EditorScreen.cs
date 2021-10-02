@@ -57,11 +57,8 @@ namespace pTyping.Screens {
 		
 		public EditorScreen() {
 			pTypingGame.MusicTrack.Stop();
-		
-			this._currentTimeDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, "", 60);
 			
-			this.Manager.Add(this._currentTimeDrawable);
-
+			#region Gameplay preview
 			this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
 			
 			Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
@@ -108,6 +105,7 @@ namespace pTyping.Screens {
 				this.Manager.Add(noteDrawable);
 				this._notes.Add(noteDrawable);
 			}
+			#endregion
 			
 			#region Playfield decorations
 			LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, recepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
@@ -133,6 +131,7 @@ namespace pTyping.Screens {
 			#endregion
 			#endregion
 
+			#region Visualization drawables
 			this._selectionRect = new() {
 				RectSize      = new(100, 100),
 				Filled        = false,
@@ -153,13 +152,24 @@ namespace pTyping.Screens {
 			};
 			
 			this.Manager.Add(this._createLine);
+			#endregion
 			
+			#region UI
+			#region Current time
+			this._currentTimeDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, "", 60);
+			
+			this.Manager.Add(this._currentTimeDrawable);
+			#endregion
+			
+			#region Progress bar
 			this._progressBar = new UiProgressBarDrawable(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), FurballGame.DEFAULT_FONT, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40), Color.Gray, Color.DarkGray, Color.White) {
 				OriginType = OriginType.BottomLeft
 			};
 
 			this.Manager.Add(this._progressBar);
+			#endregion
 
+			#region Playback buttons
 			Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
 
 			TexturedDrawable playButton = new(editorButtonsTexture2D, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 150, FurballGame.DEFAULT_WINDOW_HEIGHT), TexturePositions.EDITOR_PLAY) {
@@ -201,7 +211,9 @@ namespace pTyping.Screens {
 			this.Manager.Add(pauseButton);
 			this.Manager.Add(rightButton);
 			this.Manager.Add(leftButton);
+			#endregion
 			
+			#region Tool selection
 			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 			this._editorToolSelect.OnClick += delegate {
 				this.ChangeTool(EditorTool.Select);
@@ -214,7 +226,9 @@ namespace pTyping.Screens {
 
 			this.Manager.Add(this._editorToolSelect);
 			this.Manager.Add(this._editorToolCreateNote);
+			#endregion
 			
+			#region Edit note info
 			this._textToTypeInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text To Type", 25) {
 				OriginType = OriginType.Center,
 				Visible    = false
@@ -241,6 +255,8 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._textToTypeInputLabel);
 			this.Manager.Add(this._textToShowInput);
 			this.Manager.Add(this._textToShowInputLabel);
+			#endregion
+			#endregion
 			
 			this.ChangeTool(EditorTool.Select);
 			
