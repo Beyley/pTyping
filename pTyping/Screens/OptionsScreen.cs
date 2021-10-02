@@ -42,11 +42,25 @@ namespace pTyping.Screens {
 			this.Manager.Add(backgroundDimInput);
 			#endregion
 			
+			#region Background Dim
+			TextDrawable      targetFrameTimeInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target Frame Time:", 30);
+			UiTextBoxDrawable targetFrameTimeInput      = new(new Vector2(110 + targetFrameTimeInputLabel.Size.X, 200), FurballGame.DEFAULT_FONT, Config.TargetFrameTime.Value.ToString(CultureInfo.InvariantCulture), 30, 200);
+
+			targetFrameTimeInput.OnCommit += this.TargetFrameTimeInputOnCommit;
+			
+			this.Manager.Add(targetFrameTimeInputLabel);
+			this.Manager.Add(targetFrameTimeInput);
+			#endregion
+			
 			base.Initialize();
 		}
 		
 		private void BackgroundDimInputOnCommit(object sender, string e) {
 			Config.BackgroundDim = float.Parse(e);
+		}
+		
+		private void TargetFrameTimeInputOnCommit(object sender, string e) {
+			Config.TargetFrameTime.Value = int.Parse(e);
 		}
 	}
 }

@@ -113,6 +113,17 @@ namespace pTyping {
 				Config.Volume.Value = Math.Clamp(Config.Volume - 0.05f, 0f, 1f);
 			}
 		}
+
+		public static void ChangeTargetFrameTime(int target) {
+			if (target == 0) {
+				Instance.IsFixedTimeStep   = false;
+				
+				return;
+			}
+			
+			Instance.TargetElapsedTime = new(0, 0, 0, 0, Config.TargetFrameTime);
+			Instance.IsFixedTimeStep   = true;
+		}
 		
 		protected override void Initialize() {
 			CurrentSongBackground = new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
@@ -135,6 +146,12 @@ namespace pTyping {
 			};
 			
 			DrawableManager.Add(VolumeSelector);
+
+			ChangeTargetFrameTime(Config.TargetFrameTime);
+			
+			Config.TargetFrameTime.OnChange += delegate(object _, int newTarget) {
+				ChangeTargetFrameTime(newTarget);
+			};
 		}
 	}
 }

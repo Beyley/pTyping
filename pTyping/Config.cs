@@ -6,7 +6,8 @@ namespace pTyping {
 		/// The master volume of the audio
 		/// </summary>
 		public static Bindable<float> Volume = new(0.05f);
-		public static float BackgroundDim = 0.5f;
+		public static float         BackgroundDim   = 0.5f;
+		public static Bindable<int> TargetFrameTime = new(1);
 		/// <summary>
 		/// The time it takes the notes to go from the right side of the screen to the left 
 		/// </summary>
