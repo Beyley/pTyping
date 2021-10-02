@@ -96,11 +96,11 @@ namespace pTyping.Screens {
 				};
 				
 				noteDrawable.OnDragBegin += delegate {
-					_isDragging = true;
+					this._isDragging = true;
 				};
 				
 				noteDrawable.OnDragEnd += delegate {
-					this._isDragging = true;
+					this._isDragging = false;
 				};
 
 				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), PlayerScreen.RecepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
@@ -362,11 +362,11 @@ namespace pTyping.Screens {
 					};
 				
 					noteDrawable.OnDragBegin += delegate {
-						_isDragging = true;
+						this._isDragging = true;
 					};
 				
 					noteDrawable.OnDragEnd += delegate {
-						this._isDragging = true;
+						this._isDragging = false;
 					};
 
 					noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, PlayerScreen.NoteStartPos, PlayerScreen.RecepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
