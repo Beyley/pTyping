@@ -132,7 +132,7 @@ namespace pTyping.Screens {
 			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
 			#endregion
-			
+
 			this._selectionRect = new() {
 				RectSize      = new(100, 100),
 				Filled        = false,
@@ -140,6 +140,9 @@ namespace pTyping.Screens {
 				ColorOverride = Color.Gray,
 				Visible       = false,
 				Clickable     = false,
+				Hoverable     = false,
+				CoverClicks   = false,
+				CoverHovers   = false,
 				OriginType    = OriginType.Center
 			};
 
