@@ -91,3 +91,6 @@
 /processorParam:TextureFormat=Color
 /build:note.png
 
+#begin unifont.ttf
+/copy:unifont.ttf
+

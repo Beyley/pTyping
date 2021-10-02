@@ -1,5 +1,5 @@
-using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Microsoft.Xna.Framework;
 
 namespace pTyping.Songs {
 	public enum HitResult {
@@ -9,10 +9,26 @@ namespace pTyping.Songs {
 	}
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Note {
+		public string TextToType {
+			get {
+				string toType = string.Empty;
+
+				for (int i = 0; i < this.Text.Length; i++) {
+					string currentCharacter = this.Text[i].ToString();
+
+					foreach (Conversion conversion in HiraganaConversion.Conversions) {
+						if (currentCharacter == conversion.Hiragana) {
+							toType += conversion.Romaji;
+							break;
+						}
+					}
+				}
+
+				return toType;
+			}
+		}
 		[JsonProperty]
-		public string TextToType;
-		[JsonProperty]
-		public string TextToShow;
+		public string Text;
 		[JsonProperty]
 		public double Time;
 		[JsonProperty]

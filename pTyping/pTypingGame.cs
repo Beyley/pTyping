@@ -27,6 +27,8 @@ namespace pTyping {
 			
 		public static TextDrawable     VolumeSelector;
 		public static TexturedDrawable CurrentSongBackground;
+
+		public static byte[] UniFont;
 		
 		public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
@@ -100,6 +102,7 @@ namespace pTyping {
 			};
 			
 			DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
+			UniFont           = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
 		}
 
 		public static void ChangeGlobalVolume(int mouseScroll) {
@@ -153,7 +156,7 @@ namespace pTyping {
 				ChangeTargetFrameTime(newTarget);
 			};
 
-			ConversionTables.LoadConversion();
+			HiraganaConversion.LoadConversion();
 		}
 	}
 }

@@ -68,11 +68,11 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._recepticle);
 
 			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
+				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.UniFont, 30) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
-						Text  = $"{note.TextToShow}\n({note.TextToType})",
+						Text  = $"{note.Text}\n{note.TextToType}",
 						Scale = new(1f)
 					},
 					Scale      = new(0.55f, 0.55f),
@@ -299,12 +299,12 @@ namespace pTyping.Screens {
 			if (this._selectedNote == null)
 				return;
 				
-			this._selectedNote.Note.TextToType = pTypingGame.Alphanumeric.Replace(this._textToTypeInput.Text.Trim(), string.Empty);
-			this._selectedNote.Note.TextToShow = this._textToShowInput.Text.Trim();
+			this._selectedNote.Note.Text = this._textToShowInput.Text.Trim();
+			// this._selectedNote.Note.TextToType = pTypingGame.Alphanumeric.Replace(this._textToTypeInput.Text.Trim(), string.Empty);
 			if (this._colorInput.Text.Length-1 is 3 or 4 or 6 or 8)
 				this._selectedNote.Note.Color = ColorConverter.FromString(this._colorInput.Text);
 
-			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.TextToShow}\n({this._selectedNote.Note.TextToType})";
+			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.Text}\n{this._selectedNote.Note.TextToType}";
 			this._selectedNote.ColorOverride          = this._selectedNote.Note.Color;
 		}
 
@@ -382,18 +382,18 @@ namespace pTyping.Screens {
 		private void OnClick(object sender, (MouseButton, string) e) {
 			if (this.CurrentTool == EditorTool.CreateNote) {
 				Note note = new() {
-					TextToShow = "a",
-					TextToType = "a",
+					Text = "a",
+					// TextToType = "a",
 					Time       = this._mouseTime
 				};
 
 				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
 				if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
-					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
+					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, pTypingGame.UniFont, 30) {
 						TimeSource    = pTypingGame.MusicTrack,
 						ColorOverride = note.Color,
 						LabelTextDrawable = {
-							Text  = $"{note.TextToShow}\n({note.TextToType})",
+							Text  = $"{note.Text}\n{note.TextToType}",
 							Scale = new(1f)
 						},
 						Scale      = new(0.55f, 0.55f),
@@ -448,7 +448,7 @@ namespace pTyping.Screens {
 			this._selectionRect.TimeSource = noteDrawable.TimeSource;
 			this._selectionRect.Tweens     = noteDrawable.Tweens.Where(tween => tween.TweenType == TweenType.Movement && tween is VectorTween).ToList();
 
-			this._textToShowInput.Text = this._selectedNote.Note.TextToShow;
+			this._textToShowInput.Text = this._selectedNote.Note.Text;
 			this._textToTypeInput.Text = this._selectedNote.Note.TextToType;
 			this._colorInput.Text      = ColorConverter.ToHexString(this._selectedNote.Note.Color);
 		}

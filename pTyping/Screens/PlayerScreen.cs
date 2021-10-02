@@ -77,11 +77,11 @@ namespace pTyping.Screens {
 			
 			#region Notes
 			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), noteTexture, FurballGame.DEFAULT_FONT, 30) {
+				NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), noteTexture, pTypingGame.UniFont, 30) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
-						Text = $"{note.TextToShow}\n({note.TextToType})",
+						Text = $"{note.Text}\n{note.TextToType}",
 						Scale = new(1f)
 					},
 					Scale = new(0.55f, 0.55f),
