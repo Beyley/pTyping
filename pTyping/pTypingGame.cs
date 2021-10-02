@@ -152,6 +152,8 @@ namespace pTyping {
 			Config.TargetFrameTime.OnChange += delegate(object _, int newTarget) {
 				ChangeTargetFrameTime(newTarget);
 			};
+
+			ConversionTables.LoadConversion();
 		}
 	}
 }
