@@ -19,6 +19,13 @@ namespace pTyping.Songs {
 			foreach (FileInfo file in dirInfo.GetFiles("*.pts", SearchOption.AllDirectories)) {
 				songs.Add(Song.LoadFromFile(file));
 			}
+
+			foreach (FileInfo file in dirInfo.GetFiles("info.txt", SearchOption.AllDirectories)) {
+				Song tempSong = Song.LoadUTypingSong(file);
+				
+				if(tempSong is not null)
+					songs.Add(tempSong);
+			}
 			
 			_Songs = songs;
 		}

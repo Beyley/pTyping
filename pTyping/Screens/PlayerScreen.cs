@@ -160,7 +160,7 @@ namespace pTyping.Screens {
 				Note note = noteDrawable.Note;
 				if (note.Hit != HitResult.Unknown) continue;
 
-				if (note.NextToType == args.Character && Math.Abs(pTypingGame.MusicTrack.CurrentTime * 1000 - note.Time) < Config.HitWindow) {
+				if (note.NextToType == args.Character && Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time) < Config.HitWindow) {
 					bool result = noteDrawable.Type();
 					if (result) {
 						this.HitSound.Play();
@@ -174,7 +174,7 @@ namespace pTyping.Screens {
 				}
 
 				// This acts as a psuedo notelock, preventing you from typing the next note if the current one still has remaining letters
-				if (note.Hit == HitResult.Unknown) break;
+				if (note.Time - pTypingGame.MusicTrack.GetCurrentTime() > 0 ) break;
 			}
 		}
 

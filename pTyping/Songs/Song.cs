@@ -1,7 +1,9 @@
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using Microsoft.Xna.Framework;
+using Portable.Text;
 
 namespace pTyping.Songs {
 	[JsonObject(MemberSerialization.OptIn)]
@@ -39,6 +41,72 @@ namespace pTyping.Songs {
 
 			return song;
 		}
+
+		public static Song LoadUTypingSong(FileInfo fileInfo) {
+			Song song = new() {
+				Name       = "",
+				Artist     = "",
+				Creator    = "",
+				Difficulty = "",
+				FileInfo   = fileInfo,
+				TimingPoints = new() {new(){Tempo = 500}}
+			};
+
+			string infoData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(fileInfo.FullName));
+
+			infoData = infoData.Replace("\r", "");
+			string[] info = infoData.Split("\n");
+
+			song.Name       = info[0];
+			song.Artist     = info[1];
+			song.Difficulty = info[3];
+
+			string dataFilename = info[4];
+
+			string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName, dataFilename)));
+			
+			if (mapData[0] != '@') return null;
+			
+			using StringReader reader = new(mapData);
+			string             line;
+			do
+			{
+				line = reader.ReadLine();
+				
+				if (line == null || line.Trim() == string.Empty)
+					continue;
+
+				string firstChar = line[0].ToString();
+
+				line = line[1..];
+				
+				switch (firstChar) {
+					case "@": {
+						song.AudioPath = line;
+						break;
+					}
+					case "+": {
+						string[] splitLine = line.Split(" ");
+
+						double time = double.Parse(splitLine[0]) * 1000;
+						string text = splitLine[1];
+						
+						song.Notes.Add(new () {
+							Time = time, 
+							Text = text,
+							Color = Color.Red
+						});
+						
+						break;
+					}
+				}
+				
+			} while (line != null);
+			
+			
+			return song;
+		}
+
 
 		public TimingPoint CurrentTimingPoint(double currentTime) {
 			List<TimingPoint> sortedTimingPoints = this.TimingPoints.ToList();

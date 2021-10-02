@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Drawables;
 using pTyping.Songs;
+using SpriteFontPlus;
 
 namespace pTyping.Screens {
 	public class MenuScreen : Screen {
@@ -75,7 +76,7 @@ namespace pTyping.Screens {
 			SongManager.UpdateSongs();
 			
 			#region Menu music
-			this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), FurballGame.DEFAULT_FONT, $"None", 35) {
+			this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.UniFont, $"None", 30, new []{CharacterRange.BasicLatin, CharacterRange.Hiragana, CharacterRange.Katakana, }) {
 				OriginType = OriginType.TopRight
 			};
 

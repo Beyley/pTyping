@@ -81,7 +81,7 @@ namespace pTyping.Screens {
 			#region Create new buttons for each song
 			float tempY = 50;
 			foreach (Song song in SongManager.Songs) {
-				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", FurballGame.DEFAULT_FONT, 30, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), 5f, new []{ CharacterRange.BasicLatin, CharacterRange.CyrillicSupplement, CharacterRange.Latin1Supplement, CharacterRange.LatinExtendedA, CharacterRange.LatinExtendedB, CharacterRange.Cyrillic, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
+				UiButtonDrawable drawable = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", pTypingGame.UniFont, 30, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), 5f, new []{ CharacterRange.BasicLatin, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
 					OriginType = OriginType.TopRight,
 					TextDrawable = {
 						OriginType = OriginType.RightCenter
@@ -104,7 +104,7 @@ namespace pTyping.Screens {
 			#endregion
 
 			#region Song info
-			this._songInfo = new TextDrawable(new Vector2(10, 10), FurballGame.DEFAULT_FONT, "", 35);
+			this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.UniFont, "", 30);
 			
 			this.Manager.Add(this._songInfo);
 			#endregion

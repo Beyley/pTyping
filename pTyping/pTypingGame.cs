@@ -68,8 +68,11 @@ namespace pTyping {
 
 		public static void LoadBackgroundFromSong(Song song) {
 			Texture2D backgroundTex;
-			if (song.BackgroundPath == null)
+			if (song.BackgroundPath == null) {
+				DefaultBackground ??= ContentManager.LoadMonogameAsset<Texture2D>("background");
+
 				backgroundTex = DefaultBackground;
+			}
 			else {
 				string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
 				if(File.Exists(qualifiedBackgroundPath))
@@ -129,6 +132,8 @@ namespace pTyping {
 		}
 		
 		protected override void Initialize() {
+			UniFont ??= ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
+
 			CurrentSongBackground = new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
 				Depth      = 1f,
 				OriginType = OriginType.Center
