@@ -3,13 +3,13 @@ using System.Linq;
 using System.Collections.Generic;
 using Furball.Engine;
 using Furball.Engine.Engine;
+using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Furball.Engine.Engine.Input;
 using pTyping.Songs;
 using pTyping.Drawables;
 using Microsoft.Xna.Framework;
@@ -51,10 +51,9 @@ namespace pTyping.Screens {
 		private List<NoteDrawable> _timelineBars = new();
 
 		public EditorTool  CurrentTool = EditorTool.None;
-
-		private readonly Vector2 _recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f);
 		
 		private Texture2D _noteTexture;
+		private bool      _isDragging = false;
 		
 		public EditorScreen() {
 			pTypingGame.MusicTrack.Stop();
@@ -73,9 +72,8 @@ namespace pTyping.Screens {
 			
 			this.Manager.Add(this._recepticle);
 
-			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
 			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new Vector2(noteStartPos.X, noteStartPos.Y + note.YOffset), this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
+				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
@@ -88,10 +86,24 @@ namespace pTyping.Screens {
 				};
 
 				noteDrawable.OnClick += delegate {
+					if (this._isDragging) return;
+					
 					this.OnNoteClick(noteDrawable);
 				};
+				
+				noteDrawable.OnDrag += delegate(object _, Point point) {
+					this.OnNoteDrag(noteDrawable, point);
+				};
+				
+				noteDrawable.OnDragBegin += delegate {
+					_isDragging = true;
+				};
+				
+				noteDrawable.OnDragEnd += delegate {
+					this._isDragging = true;
+				};
 
-				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(noteStartPos.X, noteStartPos.Y + note.YOffset), this._recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
+				noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), PlayerScreen.RecepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
 				
 				this.Manager.Add(noteDrawable);
 				this._notes.Add(noteDrawable);
@@ -283,54 +295,51 @@ namespace pTyping.Screens {
 
 		private double _mouseTime;
 		private void OnMouseMove(object sender, (Point, string) e) {
-			if(this.CurrentTool == EditorTool.CreateNote) {
-				(int x, int y) = e.Item1;
-				if (y < this._recepticlePos.Y + 40f && y > this._recepticlePos.Y - 40f) {
+			(int x, int y) = e.Item1;
+			if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
+				if(this.CurrentTool == EditorTool.CreateNote)
 					this._createLine.Visible    = true;
-					this._createLine.OriginType = OriginType.Center;
-					
-					double currentTime  = pTypingGame.MusicTrack.CurrentTime      * 1000;
-					double reticulePos  = FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f;
-					double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
-					
-					double distanceToReticule = x - reticulePos;
+				this._createLine.OriginType = OriginType.Center;
+				
+				double currentTime  = pTypingGame.MusicTrack.CurrentTime      * 1000;
+				double reticulePos  = FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f;
+				double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
+				
+				double distanceToReticule = x - reticulePos;
 
-					double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * Config.BaseApproachTime;
+				double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * Config.BaseApproachTime;
 
-					double timeAtCursor = currentTime + timeToReticule;
+				double timeAtCursor = currentTime + timeToReticule;
 
-					double noteLength = pTypingGame.CurrentSong.Value.DividedNoteLength(timeAtCursor);
-					
-					double snappedTimeAtCursor = Math.Round((timeAtCursor - pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength + pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
-					this._mouseTime = snappedTimeAtCursor;
+				double noteLength = pTypingGame.CurrentSong.Value.DividedNoteLength(timeAtCursor);
+				
+				double snappedTimeAtCursor = Math.Round((timeAtCursor - pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength + pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
+				this._mouseTime = snappedTimeAtCursor;
 
-					double distanceInTime = snappedTimeAtCursor - currentTime;
+				double distanceInTime = snappedTimeAtCursor - currentTime;
 
-					double scaleTime = distanceInTime     / Config.BaseApproachTime;
-					double scaleRaw  = distanceToReticule / (noteStartPos - reticulePos);
-					
-					double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
-					
-					this._createLine.Position = new Vector2((float)newX, this._recepticlePos.Y - 40);
-				}
-				else {
-					this._createLine.Visible = false;
-				}
+				double scaleTime = distanceInTime     / Config.BaseApproachTime;
+				double scaleRaw  = distanceToReticule / (noteStartPos - reticulePos);
+				
+				double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
+				
+				this._createLine.Position = new Vector2((float)newX, PlayerScreen.RecepticlePos.Y - 40);
+			} else {
+				this._createLine.Visible = false;
 			}
 		}
 
 		private void OnClick(object sender, (MouseButton, string) e) {
 			if (this.CurrentTool == EditorTool.CreateNote) {
-				Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, this._recepticlePos.Y);
-				Note    note     = new() {
-					TextToShow = "a", 
-					TextToType =  "a",
-					Time = this._mouseTime
+				Note note = new() {
+					TextToShow = "a",
+					TextToType = "a",
+					Time       = this._mouseTime
 				};
 
 				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
-				if (y < this._recepticlePos.Y + 40f && y > this._recepticlePos.Y - 40f) {
-					NoteDrawable noteDrawable = new(noteStartPos, this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
+				if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
+					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, FurballGame.DEFAULT_FONT, 30) {
 						TimeSource    = pTypingGame.MusicTrack,
 						ColorOverride = note.Color,
 						LabelTextDrawable = {
@@ -343,16 +352,42 @@ namespace pTyping.Screens {
 					};
 
 					noteDrawable.OnClick += delegate {
+						if (this._isDragging) return;
+					
 						this.OnNoteClick(noteDrawable);
 					};
+				
+					noteDrawable.OnDrag += delegate(object _, Point point) {
+						this.OnNoteDrag(noteDrawable, point);
+					};
+				
+					noteDrawable.OnDragBegin += delegate {
+						_isDragging = true;
+					};
+				
+					noteDrawable.OnDragEnd += delegate {
+						this._isDragging = true;
+					};
 
-					noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, noteStartPos, this._recepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
+					noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, PlayerScreen.NoteStartPos, PlayerScreen.RecepticlePos, (int)(note.Time - Config.BaseApproachTime), (int)note.Time));
 				
 					this.Manager.Add(noteDrawable);
 					this._notes.Add(noteDrawable);
 					pTypingGame.CurrentSong.Value.Notes.Add(noteDrawable.Note);
 				}
 			}
+		}
+
+		public void OnNoteDrag(NoteDrawable noteDrawable, Point cursorPos) {
+			if (this._selectedNote != noteDrawable) return;
+			
+			noteDrawable.Tweens.Clear();
+			this._selectionRect.Tweens.Clear();
+
+			noteDrawable.Note.Time = this._mouseTime;
+			
+			noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(PlayerScreen.NoteStartPos.X , PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset), PlayerScreen.RecepticlePos, (int)(noteDrawable.Note.Time        - Config.BaseApproachTime), (int)noteDrawable.Note.Time));
+			this._selectionRect.Tweens.Add(new VectorTween(TweenType.Movement, new(PlayerScreen.NoteStartPos.X , PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset), PlayerScreen.RecepticlePos, (int)(noteDrawable.Note.Time - Config.BaseApproachTime), (int)noteDrawable.Note.Time));
 		}
 
 		public void OnNoteClick(NoteDrawable noteDrawable) {

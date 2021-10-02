@@ -32,6 +32,10 @@ namespace pTyping.Screens {
 		private List<NoteDrawable> _notes = new();
 		
 		public static int ScoreForHit = 100;
+		
+		public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+
+		public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
 		public PlayerScreen() {
 			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
@@ -63,8 +67,7 @@ namespace pTyping.Screens {
 
 			Texture2D noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
 			
-			Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-			this._recepticle = new TexturedDrawable(noteTexture, recepticlePos) {
+			this._recepticle = new TexturedDrawable(noteTexture, RecepticlePos) {
 				Scale = new(0.55f),
 				OriginType = OriginType.Center
 			};
@@ -73,9 +76,8 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Notes
-			Vector2 noteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new(noteStartPos.X, noteStartPos.Y + note.YOffset), noteTexture, FurballGame.DEFAULT_FONT, 30) {
+				NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), noteTexture, FurballGame.DEFAULT_FONT, 30) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
@@ -89,8 +91,8 @@ namespace pTyping.Screens {
 				noteDrawable.Tweens.Add(
 					new VectorTween(
 						TweenType.Movement,
-						new(noteStartPos.X, noteStartPos.Y + note.YOffset),
-						recepticlePos,
+						new(NoteStartPos.X, NoteStartPos.Y + note.YOffset),
+						RecepticlePos,
 						(int)(note.Time - Config.BaseApproachTime * (1 - pTypingGame.CurrentSong.Value.CurrentTimingPoint(note.Time).Tempo / 500d + 1)),
 						(int)note.Time));
 
@@ -102,16 +104,16 @@ namespace pTyping.Screens {
 			#endregion
 
 			#region Playfield decorations
-			LinePrimitiveDrawable playfieldTopLine    = new(new Vector2(1, recepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+			LinePrimitiveDrawable playfieldTopLine    = new(new Vector2(1, RecepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
 				ColorOverride = Color.Gray
 			};
-			LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+			LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, RecepticlePos.Y + 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
 				ColorOverride = Color.Gray
 			};
 			this.Manager.Add(playfieldTopLine);
 			this.Manager.Add(playfieldBottomLine);
 
-			RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
+			RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, RecepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
 				ColorOverride = new(100, 100, 100, 100),
 				Depth = 0.9f
 			};
