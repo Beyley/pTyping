@@ -44,8 +44,8 @@ namespace pTyping.Screens {
 		private UiTextBoxDrawable _colorAInput;
 		private TextDrawable      _colorAInputLabel;
 
-		private UiButtonDrawable _editorToolSelect;
-		private UiButtonDrawable _editorToolCreateNote;
+		private TexturedDrawable _editorToolSelect;
+		private TexturedDrawable _editorToolCreateNote;
 
 		private List<NoteDrawable> _notes = new();
 		private List<NoteDrawable> _timelineBars = new();
@@ -54,6 +54,9 @@ namespace pTyping.Screens {
 		
 		private Texture2D _noteTexture;
 		private bool      _isDragging = false;
+
+		private const float EDITOR_TOOL_BASE_SIZE = 0.4f;
+		private const float EDITOR_TOOL_SCALED_SIZE = 0.55f;
 		
 		public EditorScreen() {
 			pTypingGame.MusicTrack.Stop();
@@ -155,18 +158,20 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region UI
-			#region Current time
-			this._currentTimeDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, "", 60);
-			
-			this.Manager.Add(this._currentTimeDrawable);
-			#endregion
-			
 			#region Progress bar
 			this._progressBar = new UiProgressBarDrawable(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT), FurballGame.DEFAULT_FONT, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40), Color.Gray, Color.DarkGray, Color.White) {
 				OriginType = OriginType.BottomLeft
 			};
 
 			this.Manager.Add(this._progressBar);
+			#endregion
+			
+			#region Current time
+			this._currentTimeDrawable = new TextDrawable(new Vector2(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 50), FurballGame.DEFAULT_FONT, "", 30) {
+				OriginType = OriginType.BottomLeft
+			};
+			
+			this.Manager.Add(this._currentTimeDrawable);
 			#endregion
 
 			#region Playback buttons
@@ -214,12 +219,19 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Tool selection
-			this._editorToolSelect = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.1f), "Select", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+
+			Texture2D editorToolButtonsTextures = ContentManager.LoadMonogameAsset<Texture2D>("editortools");
+			
+			this._editorToolSelect = new(editorToolButtonsTextures, new Vector2(10, 10), new Rectangle(0, 0, 240, 240)) {
+				Scale = new(EDITOR_TOOL_BASE_SIZE)
+			};
 			this._editorToolSelect.OnClick += delegate {
 				this.ChangeTool(EditorTool.Select);
 			};
 			
-			this._editorToolCreateNote = new(new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Add Note", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+			this._editorToolCreateNote = new(editorToolButtonsTextures, new Vector2(10, this._editorToolSelect.Size.Y + 20), new Rectangle(0, 240, 240, 240)) {
+				Scale = new(EDITOR_TOOL_BASE_SIZE)
+			};
 			this._editorToolCreateNote.OnClick += delegate {
 				this.ChangeTool(EditorTool.CreateNote);
 			};
@@ -289,25 +301,21 @@ namespace pTyping.Screens {
 				this._textToTypeInput.Visible      = true;
 				this._textToTypeInputLabel.Visible = true;
 				
-				this._editorToolSelect.ButtonColor = Color.Red;
-				this._editorToolSelect.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolSelect.ColorOverride, Color.Red, this._editorToolSelect.TimeSource.GetCurrentTime(), this._editorToolSelect.TimeSource.GetCurrentTime() + 150));
+				this._editorToolSelect.Tweens.Add(new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(EDITOR_TOOL_SCALED_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out));
 			} else {
 				this._textToShowInput.Visible      = false; 
 				this._textToShowInputLabel.Visible = false; 
 				this._textToTypeInput.Visible      = false;
 				this._textToTypeInputLabel.Visible = false;
 								
-				this._editorToolSelect.ButtonColor = Color.Blue;
-				this._editorToolSelect.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolSelect.ColorOverride, Color.Blue, this._editorToolSelect.TimeSource.GetCurrentTime(), this._editorToolSelect.TimeSource.GetCurrentTime() + 150));
+				this._editorToolSelect.Tweens.Add(new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(EDITOR_TOOL_BASE_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out));
 			}
 			
 			if (tool == EditorTool.CreateNote) {
-				this._editorToolCreateNote.ButtonColor = Color.Red;
-				this._editorToolCreateNote.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolCreateNote.ColorOverride, Color.Red, this._editorToolCreateNote.TimeSource.GetCurrentTime(), this._editorToolCreateNote.TimeSource.GetCurrentTime() + 150));
+				this._editorToolCreateNote.Tweens.Add(new VectorTween(TweenType.Scale, this._editorToolCreateNote.Scale, new(EDITOR_TOOL_SCALED_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out));
 			} else {
-				this._editorToolCreateNote.ButtonColor = Color.Blue;
-				this._editorToolCreateNote.Tweens.Add(new ColorTween(TweenType.Color, this._editorToolCreateNote.ColorOverride, Color.Blue, this._editorToolCreateNote.TimeSource.GetCurrentTime(), this._editorToolCreateNote.TimeSource.GetCurrentTime() + 150));
-				
+				this._editorToolCreateNote.Tweens.Add(new VectorTween(TweenType.Scale, this._editorToolCreateNote.Scale, new(EDITOR_TOOL_BASE_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out));
+
 				this._createLine.Visible = false;
 			}
 		}
@@ -536,8 +544,13 @@ namespace pTyping.Screens {
 					noteDrawable.Visible = true;
 				}
 			}
+
+			int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+			int miliseconds = (int)Math.Floor(currentTime         % 1000d);
+			int seconds     = (int)Math.Floor(currentTime / 1000d % 60d);
+			int minutes     = (int)Math.Floor(currentTime         / 1000d / 60d);
 			
-			this._currentTimeDrawable.Text = $"{pTypingGame.MusicTrack.CurrentTime * 1000}";
+			this._currentTimeDrawable.Text = $"Time: {minutes:00}:{seconds:00}:{miliseconds:000}";
 			this._progressBar.Progress     = (float)pTypingGame.MusicTrack.CurrentTime * 1000f / (float)pTypingGame.MusicTrack.Length;
 			
 			base.Update(gameTime);
