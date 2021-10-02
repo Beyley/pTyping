@@ -31,7 +31,7 @@ namespace pTyping.Screens {
 		
 		private List<NoteDrawable> _notes = new();
 		
-		public static int ScoreForHit = 100;
+		public static int ScoreForHit = 1500;
 		
 		public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
@@ -81,7 +81,7 @@ namespace pTyping.Screens {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
-						Text = $"{note.Text}\n{note.TextToType}",
+						Text  = $"{note.Text}\n{string.Join("\n", note.ThisCharacterRomaji)}",
 						Scale = new(1f)
 					},
 					Scale = new(0.55f, 0.55f),
@@ -158,53 +158,76 @@ namespace pTyping.Screens {
 		public void OnCharacterTyped(object sender, TextInputEventArgs args) {
 			foreach (NoteDrawable noteDrawable in this._notes) {
 				Note note = noteDrawable.Note;
+				// checks if the current note is already hit, if so, skip to next note
 				if (note.Hit != HitResult.Unknown) continue;
 
-				if (note.NextToType == args.Character && Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time) < Config.HitWindow) {
-					bool result = noteDrawable.Type();
-					if (result) {
-						this.HitSound.Play();
-						this.NoteUpdate(true, note);
-					}
+				List<string> romajiToType   = note.ThisCharacterRomaji;
+				
+				//list of all the possible romaji "paths" we can take while typing
+				List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
 
-					if (pTypingGame.CurrentSong.Value.AllNotesHit()) 
-						this.EndScore();
-					
-					break;
+				foreach (string romaji in filteredRomaji) {
+					if (romaji[note.TypedRomaji.Length] == args.Character && Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time) < Config.HitWindow) {
+						if (noteDrawable.Type(romaji)) {
+							this.HitSound.Play();
+							this.NoteUpdate(true, note);
+						}
+						break;
+					}
 				}
+				
+				if (pTypingGame.CurrentSong.Value.AllNotesHit()) 
+					this.EndScore();
+
+				this.UpdateNoteText();
+				
+				// if (note.NextToType == args.Character && Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time) < Config.HitWindow) {
+				// 	bool result = noteDrawable.Type();
+				// 	if (result) {
+				// 		this.HitSound.Play();
+				// 		this.NoteUpdate(true, note);
+				// 	}
+				//
+				// 	if (pTypingGame.CurrentSong.Value.AllNotesHit()) 
+				// 		this.EndScore();
+				// 	
+				// 	break;
+				// }
 
 				// This acts as a psuedo notelock, preventing you from typing the next note if the current one still has remaining letters
 				if (note.Time - pTypingGame.MusicTrack.GetCurrentTime() > 0 ) break;
 			}
 		}
 
+		private void UpdateNoteText() {
+			foreach (NoteDrawable noteDrawable in this._notes) {
+				noteDrawable.LabelTextDrawable.Text = $"{noteDrawable.Note.Text}\n{string.Join("\n", noteDrawable.Note.ThisCharacterRomaji)}";
+			}
+		}
+
 		private void NoteUpdate(bool wasHit, Note note) {
 			int numberHit  = 0;
-			double amountHit  = 0;
 			int numberMiss = 0;
 			foreach (NoteDrawable noteDrawable in this._notes) {
 				switch (noteDrawable.Note.Hit) {
 					case HitResult.Hit:
 						numberHit++;
-						amountHit += noteDrawable.Note.HitAmount;
 						break;
 					case HitResult.Miss:
 						numberMiss++;
-						amountHit += noteDrawable.Note.HitAmount;
 						break;
 				}
 			}
 
 			if (numberHit + numberMiss == 0) this.Score.Accuracy = 1d;
 			else {
-				this.Score.Accuracy = amountHit / ((double)numberHit + (double)numberMiss);
+				this.Score.Accuracy = numberHit / ((double)numberHit + (double)numberMiss);
 			}
 
 			if (wasHit) {
+				this.Score.Score += ScoreForHit + (this.Score.Combo - 1) * 10;
 				this.Score.Combo++;
-				this.Score.Score += ScoreForHit * this.Score.Combo;
 			} else {
-				this.Score.Score += (int)Math.Floor(ScoreForHit * note.HitAmount * this.Score.Combo);
 				this.Score.Combo =  0;
 			}
 		}

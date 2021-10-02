@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace pTyping.Songs {
 	public enum HitResult {
@@ -9,24 +10,20 @@ namespace pTyping.Songs {
 	}
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Note {
-		public string TextToType {
+		public List<string> ThisCharacterRomaji {
 			get {
-				string toType = string.Empty;
+				if (this.Hit != HitResult.Unknown) return new() {
+					string.Empty
+				};
+				
+				HiraganaConversion.Conversions.TryGetValue(this.Text[this.Typed.Length].ToString(), out List<string> possible);
 
-				for (int i = 0; i < this.Text.Length; i++) {
-					string currentCharacter = this.Text[i].ToString();
-
-					foreach (Conversion conversion in HiraganaConversion.Conversions) {
-						if (currentCharacter == conversion.Hiragana) {
-							toType += conversion.Romaji;
-							break;
-						}
-					}
-				}
-
-				return toType;
+				possible.Sort((x, y) => x.Length - y.Length);
+				
+				return possible;
 			}
 		}
+		
 		[JsonProperty]
 		public string Text;
 		[JsonProperty]
@@ -40,12 +37,14 @@ namespace pTyping.Songs {
 		/// Whether or not the note has been hit
 		/// </summary>
 		public HitResult Hit = HitResult.Unknown;
-		public double HitAmount => (double)this.Typed.Length / (double)this.TextToType.Length;
+		public double HitAmount => (double)this.Typed.Length / (double)this.Text.Length;
 		/// <summary>
 		/// The currently typed part of the note
 		/// </summary>
 		public string Typed = "";
-
-		public char NextToType => this.TextToType[this.Typed.Length];
+		/// <summary>
+		/// The currently typed part of the current hiragana to type
+		/// </summary>
+		public string TypedRomaji = "";
 	}
 }

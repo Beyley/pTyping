@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Helpers.Logger;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Songs;
 using SpriteFontPlus;
@@ -20,12 +21,17 @@ namespace pTyping.Drawables {
 			this.LabelTextDrawable.Scale = new(1);
 		}
 
-		public bool Type() {
-			this.Note.Typed += this.Note.TextToType[this.Note.Typed.Length];
+		public bool Type(string romaji) {
+			this.Note.TypedRomaji += romaji[this.Note.TypedRomaji.Length];
+			Logger.Log($"typedromaji:{this.Note.TypedRomaji} currentromaji:{romaji}");
 
-			if (string.Equals(this.Note.Typed, this.Note.TextToType)) {
-				this.Hit();
-				return true;
+			if (string.Equals(this.Note.TypedRomaji, romaji)) {
+				this.Note.Typed += this.Note.Text[this.Note.Typed.Length];
+				
+				if(string.Equals(this.Note.Typed, this.Note.Text)) {
+					this.Hit();
+					return true;
+				}
 			} 
 			
 			return false;

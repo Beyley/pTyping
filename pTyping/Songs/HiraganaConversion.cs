@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace pTyping.Songs {
 	public class HiraganaConversion {
-		public static readonly List<Conversion> Conversions = new();
+		public static readonly Dictionary<string, List<string>> Conversions = new();
 		
 		public static void LoadConversion() {
 			#region im sorry
@@ -782,14 +782,21 @@ _	＿
 					continue;
 				
 				string[] splitLine = line.Split("\t");
-				Conversions.Add(new() {Hiragana = splitLine[1], Romaji = splitLine[0]});
+
+				string romaji   = splitLine[0];
+				string hiragana = splitLine[1];
+				
+				if (splitLine.Length > 2) continue;
+
+				if (Conversions.TryGetValue(hiragana, out List<string> currentRomaji)) {
+					currentRomaji.Add(romaji);
+				} else {
+					Conversions.Add(hiragana, new() { romaji });
+				}
+				
+				// Conversions.Add((splitLine[0], splitLine[1]));
 
 			} while (line != null);
 		}
-	}
-
-	public class Conversion {
-		public string Hiragana;
-		public string Romaji;
 	}
 }
