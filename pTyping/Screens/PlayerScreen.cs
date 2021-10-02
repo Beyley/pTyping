@@ -31,7 +31,19 @@ namespace pTyping.Screens {
 		
 		private List<NoteDrawable> _notes = new();
 		
-		public static int ScoreForHit = 1500;
+		public static int ScoreExcellent = 1500;
+		public static int ScoreGood = 1000;
+		public static int ScoreFair = 500;
+		public static int ScorePoor = 0;
+
+		public static int ScorePerCharacter = 500;
+		public static int ScoreCombo        = 10;
+		public static int ScoreComboMax     = 1000;
+		
+		public static int TimingExcellent = 20;
+		public static int TimingGood = 50;
+		public static int TimingFair = 100;
+		public static int TimingPoor = 200;
 		
 		public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
@@ -159,7 +171,9 @@ namespace pTyping.Screens {
 			foreach (NoteDrawable noteDrawable in this._notes) {
 				Note note = noteDrawable.Note;
 				// checks if the current note is already hit, if so, skip to next note
-				if (note.Hit != HitResult.Unknown) continue;
+				if (note.IsHit) continue;
+
+				bool breakOut = false;
 
 				List<string> romajiToType   = note.ThisCharacterRomaji;
 				
@@ -167,11 +181,15 @@ namespace pTyping.Screens {
 				List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
 
 				foreach (string romaji in filteredRomaji) {
-					if (romaji[note.TypedRomaji.Length] == args.Character && Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time) < Config.HitWindow) {
-						if (noteDrawable.Type(romaji)) {
+					double timeDifference = Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time);
+					if (romaji[note.TypedRomaji.Length] == args.Character && timeDifference < TimingPoor) {
+						if (noteDrawable.Type(romaji, timeDifference)) {
 							this.HitSound.Play();
 							this.NoteUpdate(true, note);
+
+							breakOut = true;
 						}
+						
 						break;
 					}
 				}
@@ -196,6 +214,7 @@ namespace pTyping.Screens {
 
 				// This acts as a psuedo notelock, preventing you from typing the next note if the current one still has remaining letters
 				if (note.Time - pTypingGame.MusicTrack.GetCurrentTime() > 0 ) break;
+				if (breakOut) break;
 			}
 		}
 
@@ -209,8 +228,8 @@ namespace pTyping.Screens {
 			int numberHit  = 0;
 			int numberMiss = 0;
 			foreach (NoteDrawable noteDrawable in this._notes) {
-				switch (noteDrawable.Note.Hit) {
-					case HitResult.Hit:
+				switch (noteDrawable.Note.HitResult) {
+					case HitResult.Excellent:
 						numberHit++;
 						break;
 					case HitResult.Miss:
@@ -225,7 +244,7 @@ namespace pTyping.Screens {
 			}
 
 			if (wasHit) {
-				this.Score.Score += ScoreForHit + (this.Score.Combo - 1) * 10;
+				this.Score.Score += ScoreExcellent + (this.Score.Combo - 1) * 10;
 				this.Score.Combo++;
 			} else {
 				this.Score.Combo =  0;
@@ -234,11 +253,11 @@ namespace pTyping.Screens {
 
 		public override void Update(GameTime gameTime) {
 			for (int i = 0; i < this._notes.Count; i++) {
-				if (this._notes[i].Note.Hit != HitResult.Unknown) continue;
+				if (this._notes[i].Note.IsHit) continue;
 
 				NoteDrawable noteDrawable = this._notes[i];
 
-				if (pTypingGame.MusicTrack.CurrentTime * 1000 - noteDrawable.Note.Time > Config.HitWindow) {
+				if (pTypingGame.MusicTrack.CurrentTime * 1000 - noteDrawable.Note.Time > TimingPoor) {
 					noteDrawable.Miss();
 					this.NoteUpdate(false, noteDrawable.Note);
 					

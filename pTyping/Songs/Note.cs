@@ -4,15 +4,19 @@ using System.Collections.Generic;
 
 namespace pTyping.Songs {
 	public enum HitResult {
-		Unknown,
-		Hit,
-		Miss
+		Excellent,
+		Good,
+		Fair,
+		Poor,
+		Miss,
+		NotHit
 	}
+	
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Note {
 		public List<string> ThisCharacterRomaji {
 			get {
-				if (this.Hit != HitResult.Unknown) return new() {
+				if (this.IsHit) return new() {
 					string.Empty
 				};
 				
@@ -33,11 +37,12 @@ namespace pTyping.Songs {
 		[JsonProperty]
 		public float YOffset;
 
+		public bool IsHit => this.Typed == this.Text;
+
 		/// <summary>
 		/// Whether or not the note has been hit
 		/// </summary>
-		public HitResult Hit = HitResult.Unknown;
-		public double HitAmount => (double)this.Typed.Length / (double)this.Text.Length;
+		public HitResult HitResult = HitResult.NotHit;
 		/// <summary>
 		/// The currently typed part of the note
 		/// </summary>

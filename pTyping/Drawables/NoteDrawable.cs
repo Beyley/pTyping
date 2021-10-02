@@ -1,12 +1,12 @@
+using SpriteFontPlus;
 using Furball.Engine;
-using Microsoft.Xna.Framework;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
-using Furball.Engine.Engine.Helpers.Logger;
-using Microsoft.Xna.Framework.Graphics;
 using pTyping.Songs;
-using SpriteFontPlus;
+using pTyping.Screens;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Drawables {
 	public class NoteDrawable : TexturedDrawable {
@@ -21,9 +21,20 @@ namespace pTyping.Drawables {
 			this.LabelTextDrawable.Scale = new(1);
 		}
 
-		public bool Type(string romaji) {
+		public bool Type(string romaji, double timeDifference) {
+			if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
+				if (timeDifference < PlayerScreen.TimingExcellent)
+					this.Note.HitResult = HitResult.Excellent;
+				else if (timeDifference < PlayerScreen.TimingGood)
+					this.Note.HitResult = HitResult.Good;
+				else if (timeDifference < PlayerScreen.TimingFair)
+					this.Note.HitResult = HitResult.Fair;
+				else if (timeDifference < PlayerScreen.TimingPoor)
+					this.Note.HitResult = HitResult.Poor;
+			}
+			
+			
 			this.Note.TypedRomaji += romaji[this.Note.TypedRomaji.Length];
-			Logger.Log($"typedromaji:{this.Note.TypedRomaji} currentromaji:{romaji}");
 
 			if (string.Equals(this.Note.TypedRomaji, romaji)) {
 				this.Note.Typed += this.Note.Text[this.Note.Typed.Length];
@@ -38,13 +49,15 @@ namespace pTyping.Drawables {
 		}
 
 		public void Hit() {
-			this.Visible  = false;
-			this.Note.Hit = HitResult.Hit;
+			this.Visible    = false;
+			this.Note.Typed = this.Note.Text;
+			// this.Note.HitResult = HitResult.Excellent;
 		}
 
 		public void Miss() {
-			this.Visible  = false;
-			this.Note.Hit = HitResult.Miss;
+			this.Visible        = false;
+			this.Note.Typed     = this.Note.Text;
+			this.Note.HitResult = HitResult.Miss;
 		}
 		
 		public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {

@@ -144,6 +144,6 @@ namespace pTyping.Songs {
 			writer.Flush();
 		}
 
-		public bool AllNotesHit() => this.Notes.All(note => note.Hit != HitResult.Unknown);
+		public bool AllNotesHit() => this.Notes.All(note => note.IsHit);
 	}
 }
