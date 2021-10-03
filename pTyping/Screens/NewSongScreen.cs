@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -37,14 +38,14 @@ namespace pTyping.Screens {
 			foreach (string songPath in songs) {
 				FileInfo songInfo = new(songPath);
 
-				UiButtonDrawable buttonForSong = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), songInfo.Name, FurballGame.DEFAULT_FONT, 25, Color.Blue, Color.White, Color.White, Vector2.Zero) {
+				EventHandler<Point> songOnClick = delegate {
+					this.CreateSong(songInfo);
+				};
+
+				UiButtonDrawable buttonForSong = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), songInfo.Name, FurballGame.DEFAULT_FONT, 25, Color.Blue, Color.White, Color.White, Vector2.Zero, songOnClick) {
 					OriginType = OriginType.TopRight
 				};
 
-				buttonForSong.OnClick += delegate {
-					this.CreateSong(songInfo);
-				};
-				
 				this.Manager.Add(buttonForSong);
 				
 				y += buttonForSong.Size.Y + 20f;

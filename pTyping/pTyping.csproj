@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Furball\Furball.Engine\Furball.Engine.csproj" />
+      <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
     </ItemGroup>
 
     <ItemGroup>
