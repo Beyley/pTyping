@@ -32,10 +32,25 @@ namespace pTyping.Screens {
 			TextDrawable accuracy = new(new(100, y), FurballGame.DEFAULT_FONT, $"Accuracy: {this.Score.Accuracy * 100:0.00}%", 35);
 			y += 20 + accuracy.Size.Y;
 			TextDrawable combo = new(new(100, y), FurballGame.DEFAULT_FONT, $"Combo: {this.Score.Combo}x", 35);
+			y += 20 + accuracy.Size.Y;
+			TextDrawable excellent = new(new(100, y), FurballGame.DEFAULT_FONT, $"Excellent: {this.Score.ExcellentHits}x", 35);
+			y += 20 + accuracy.Size.Y;
+			TextDrawable good = new(new(100, y), FurballGame.DEFAULT_FONT, $"Good: {this.Score.GoodHits}x", 35);
+			y += 20 + accuracy.Size.Y;
+			TextDrawable fair = new(new(100, y), FurballGame.DEFAULT_FONT, $"Fair: {this.Score.FairHits}x", 35);
+			y += 20 + accuracy.Size.Y;
+			TextDrawable poor = new(new(100, y), FurballGame.DEFAULT_FONT, $"Poor: {this.Score.PoorHits}x", 35);
+			y += 20 + accuracy.Size.Y;
+			TextDrawable miss = new(new(100, y), FurballGame.DEFAULT_FONT, $"Miss: {this.Score.MissHits}x", 35);
 			
 			this.Manager.Add(score);
 			this.Manager.Add(accuracy);
 			this.Manager.Add(combo);
+			this.Manager.Add(excellent);
+			this.Manager.Add(good);
+			this.Manager.Add(fair);
+			this.Manager.Add(poor);
+			this.Manager.Add(miss);
 			#endregion
 
 			#region Buttons

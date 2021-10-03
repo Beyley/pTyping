@@ -24,6 +24,7 @@ namespace pTyping.Screens {
 		private TextDrawable     _scoreDrawable;
 		private TextDrawable     _accuracyDrawable;
 		private TextDrawable     _comboDrawable;
+		private TextDrawable     _typingIndicator;
 		private TexturedDrawable _recepticle;
 		private UiButtonDrawable _skipButton;
 		
@@ -58,8 +59,8 @@ namespace pTyping.Screens {
 			#region UI
 			this._scoreDrawable    = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score.Score:00000000}", 60);
 			this._accuracyDrawable = new TextDrawable(new Vector2(5, 5 + this._scoreDrawable.Size.Y), FurballGame.DEFAULT_FONT, $"{this.Score.Accuracy * 100:0.00}%", 60) {};
-			this._comboDrawable = new TextDrawable(new Vector2(5, FurballGame.DEFAULT_WINDOW_HEIGHT - 5), FurballGame.DEFAULT_FONT, $"{this.Score.Combo}x", 70) {
-				OriginType = OriginType.BottomLeft
+			this._comboDrawable = new TextDrawable(new Vector2(RecepticlePos.X, RecepticlePos.Y - 70), FurballGame.DEFAULT_FONT, $"{this.Score.Combo}x", 70) {
+				OriginType = OriginType.BottomCenter
 			};
 
 			this.Manager.Add(this._scoreDrawable);
@@ -137,6 +138,13 @@ namespace pTyping.Screens {
 			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
 			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
+			#region typing indicator
+			this._typingIndicator = new(RecepticlePos, pTypingGame.UniFont, "", 50) {
+				OriginType = OriginType.Center
+			};
+			
+			this.Manager.Add(this._typingIndicator);
+			#endregion
 			#endregion
 			
 			this.HitSound.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
@@ -186,9 +194,10 @@ namespace pTyping.Screens {
 						if (noteDrawable.Type(romaji, timeDifference)) {
 							this.HitSound.Play();
 							this.NoteUpdate(true, note);
-
+							
 							breakOut = true;
 						}
+						this.ShowTypingIndicator(args.Character);
 						
 						break;
 					}
@@ -198,24 +207,18 @@ namespace pTyping.Screens {
 					this.EndScore();
 
 				this.UpdateNoteText();
-				
-				// if (note.NextToType == args.Character && Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time) < Config.HitWindow) {
-				// 	bool result = noteDrawable.Type();
-				// 	if (result) {
-				// 		this.HitSound.Play();
-				// 		this.NoteUpdate(true, note);
-				// 	}
-				//
-				// 	if (pTypingGame.CurrentSong.Value.AllNotesHit()) 
-				// 		this.EndScore();
-				// 	
-				// 	break;
-				// }
 
 				// This acts as a psuedo notelock, preventing you from typing the next note if the current one still has remaining letters
 				if (note.Time - pTypingGame.MusicTrack.GetCurrentTime() > 0 ) break;
 				if (breakOut) break;
 			}
+		}
+
+		private void ShowTypingIndicator(char character) {
+			this._typingIndicator.Text = character.ToString();
+			
+			this._typingIndicator.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(255,255,255,0), FurballGame.Time, FurballGame.Time + 400));
+			this._typingIndicator.Tweens.Add(new VectorTween(TweenType.Scale, new(1.5f), new(3), FurballGame.Time, FurballGame.Time              + 400));
 		}
 
 		private void UpdateNoteText() {
@@ -230,6 +233,9 @@ namespace pTyping.Screens {
 			foreach (NoteDrawable noteDrawable in this._notes) {
 				switch (noteDrawable.Note.HitResult) {
 					case HitResult.Excellent:
+					case HitResult.Good:
+					case HitResult.Fair:
+					case HitResult.Poor:
 						numberHit++;
 						break;
 					case HitResult.Miss:
@@ -244,11 +250,57 @@ namespace pTyping.Screens {
 			}
 
 			if (wasHit) {
-				this.Score.Score += ScoreExcellent + (this.Score.Combo - 1) * 10;
+				int scoreToAdd = 0;
+				switch (note.HitResult) {
+					case HitResult.Excellent:
+						scoreToAdd = ScoreExcellent;
+						break;
+					case HitResult.Fair:
+						scoreToAdd = ScoreFair;
+						break;
+					case HitResult.Good:
+						scoreToAdd = ScoreGood;
+						break;
+					case HitResult.Poor:
+						scoreToAdd = ScorePoor;
+						break;
+				}
+				this.Score.Score += scoreToAdd + (this.Score.Combo - 1) * 10;
 				this.Score.Combo++;
 			} else {
 				this.Score.Combo =  0;
 			}
+
+			Color hitColor = Color.Red;
+			switch (note.HitResult) {
+				case HitResult.Excellent: {
+					this.Score.ExcellentHits++;
+					hitColor = Color.Blue;
+					break;
+				}
+				case HitResult.Good: {
+					this.Score.GoodHits++;
+					hitColor = Color.Green;
+					break;
+				}
+				case HitResult.Fair: {
+					this.Score.FairHits++;
+					hitColor = Color.Yellow;
+					break;
+				}
+				case HitResult.Poor: {
+					this.Score.PoorHits++;
+					hitColor = Color.Orange;
+					break;
+				}
+				case HitResult.Miss: {
+					this.Score.MissHits++;
+					hitColor = Color.Red;
+					break;
+				}
+			}
+			this._comboDrawable.Tweens.Add(new ColorTween(TweenType.Color, this._comboDrawable.ColorOverride, hitColor, this._comboDrawable.TimeSource.GetCurrentTime(), this._comboDrawable.TimeSource.GetCurrentTime() + 100));
+			this._comboDrawable.Tweens.Add(new ColorTween(TweenType.Color, hitColor, Color.White, this._comboDrawable.TimeSource.GetCurrentTime() +100, this._comboDrawable.TimeSource.GetCurrentTime() + 1100));
 		}
 
 		public override void Update(GameTime gameTime) {
