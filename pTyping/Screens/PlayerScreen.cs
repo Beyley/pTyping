@@ -67,12 +67,10 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._accuracyDrawable);
 			this.Manager.Add(this._comboDrawable);
 
-			this._skipButton            = new UiButtonDrawable(new(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), "Skip Intro", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White, new(0));
+			this._skipButton            = new UiButtonDrawable(new(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), "Skip Intro", FurballGame.DEFAULT_FONT, 50, Color.Blue, Color.White, Color.White, new(0), this.SkipButtonClick);
 			this._skipButton.OriginType = OriginType.BottomRight;
 			this._skipButton.Visible    = false;
-			
-			this._skipButton.OnClick += this.SkipButtonClick;
-			
+
 			this.Manager.Add(this._skipButton);
 			#endregion
 			

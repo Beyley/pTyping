@@ -1,0 +1,3 @@
+[submodule "Furball"]
+	path = Furball
+	url = https://github.com/Eeveelution/Furball
