@@ -105,7 +105,7 @@ namespace pTyping.Songs {
 						
 						song.Notes.Add(new () {
 							Time = time, 
-							Text = text,
+							Text = text.Trim(),
 							Color = Color.Red
 						});
 						
@@ -121,8 +121,8 @@ namespace pTyping.Songs {
 						string text = splitLine[1];
 						
 						song.Events.Add(new LyricEvent {
-							Lyric = text,
-							Time = time
+							Lyric = text.Trim(),
+							Time  = time
 						});
 						
 						break;

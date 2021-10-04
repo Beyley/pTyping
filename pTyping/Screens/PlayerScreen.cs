@@ -93,6 +93,7 @@ namespace pTyping.Screens {
 			#endregion
 
 			this.AddNotes();
+			this.CreateCutOffIndicators();
 
 			#region Playfield decorations
 			LinePrimitiveDrawable playfieldTopLine    = new(new Vector2(1, RecepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
@@ -144,6 +145,48 @@ namespace pTyping.Screens {
 
 				this.Manager.Add(noteDrawable);
 				this._notes.Add(noteDrawable);
+			}
+		}
+
+		public void CreateCutOffIndicators() {
+			foreach (Event @event in pTypingGame.CurrentSong.Value.Events) {
+				if(@event is not TypingCutoffEvent) continue;
+
+				TexturedDrawable cutoffIndicator = new(this._noteTexture, new(NoteStartPos.X, NoteStartPos.Y)) {
+					TimeSource = pTypingGame.MusicTrack,
+					ColorOverride = Color.LightBlue,
+					Scale = new(0.3f),
+					OriginType = OriginType.Center
+				};
+
+				#region tweens
+				float travelTime = Config.BaseApproachTime;
+			
+				float travelDistance = NoteStartPos.X - RecepticlePos.X;
+				float travelRatio    = travelTime / travelDistance;
+
+				float afterTravelTime = (RecepticlePos.X - NoteEndPos.X) * travelRatio;
+
+				cutoffIndicator.Tweens.Add(
+					new VectorTween(
+						TweenType.Movement,
+						new(NoteStartPos.X, NoteStartPos.Y),
+						RecepticlePos,
+						(int)(@event.Time - travelTime),
+						(int)@event.Time)
+				);
+			
+				cutoffIndicator.Tweens.Add(
+					new VectorTween(
+						TweenType.Movement, 
+						RecepticlePos, 
+						new(NoteEndPos.X, RecepticlePos.Y), 
+						(int)@event.Time, 
+						(int)(@event.Time + afterTravelTime))
+				);
+				#endregion
+				
+				this.Manager.Add(cutoffIndicator);
 			}
 		}
 
@@ -380,6 +423,8 @@ namespace pTyping.Screens {
 			}
 			#endregion
 
+			#region check if the note has changed
+			//If the note has changed and the previous one is not hit, then make the previous one miss
 			if (this._lastNote != null) 
 				if (this._currentNote != this._lastNote) {
 					if (!this._lastNote.Note.IsHit) {
@@ -393,8 +438,7 @@ namespace pTyping.Screens {
 				}
 
 			this._lastNote = this._currentNote;
-			
-			Console.WriteLine(this._currentNote?.Note.Text);
+			#endregion
 			
 			#endregion
 
