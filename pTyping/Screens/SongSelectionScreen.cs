@@ -40,7 +40,7 @@ namespace pTyping.Screens {
 			
 			backButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new MenuScreen());
+				ScreenManager.ChangeScreen(new MenuScreen());
 			};
 			
 			this.Manager.Add(backButton);
@@ -68,7 +68,7 @@ namespace pTyping.Screens {
 			if(this._editor) {
 				EventHandler<Point> newSongOnClick = delegate {
 					pTypingGame.MenuClickSound.Play();
-					FurballGame.Instance.ChangeScreen(new NewSongScreen());
+					ScreenManager.ChangeScreen(new NewSongScreen());
 				};
 
 				UiButtonDrawable createNewSongButton = new(new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT), "Create Song", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero, newSongOnClick) {
@@ -140,7 +140,7 @@ namespace pTyping.Screens {
 
 		public void PlaySelectedMap() {
 			pTypingGame.MenuClickSound.Play();
-			FurballGame.Instance.ChangeScreen(this._editor ? new EditorScreen() : new PlayerScreen());
+			ScreenManager.ChangeScreen(this._editor ? new EditorScreen() : new PlayerScreen());
 		}
 
 		public void UpdateSelectedSong(bool fromPrevScreen = false) {

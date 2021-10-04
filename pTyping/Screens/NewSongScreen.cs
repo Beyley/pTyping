@@ -25,7 +25,7 @@ namespace pTyping.Screens {
 			
 			backButton.OnClick += delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
+				ScreenManager.ChangeScreen(new SongSelectionScreen(true));
 			};
 			
 			this.Manager.Add(backButton);
@@ -88,7 +88,7 @@ namespace pTyping.Screens {
 			SongManager.UpdateSongs();
 			
 			pTypingGame.MenuClickSound.Play();
-			FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
+			ScreenManager.ChangeScreen(new SongSelectionScreen(true));
 		}
 	}
 }

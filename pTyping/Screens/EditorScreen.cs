@@ -529,7 +529,7 @@ namespace pTyping.Screens {
 					pTypingGame.MenuClickSound.Play();
 
 					// Exit the editor
-					FurballGame.Instance.ChangeScreen(new SongSelectionScreen(true));
+					ScreenManager.ChangeScreen(new SongSelectionScreen(true));
 					break;
 				case Keys.Delete: {
 					// Delete the current note

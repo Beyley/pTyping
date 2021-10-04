@@ -58,7 +58,7 @@ namespace pTyping.Screens {
 
 			EventHandler<Point> exitOnClick = delegate {
 				pTypingGame.MenuClickSound.Play();
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false));
+				ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 			};
 
 			UiButtonDrawable exitButton = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f), "Exit", FurballGame.DEFAULT_FONT, 40, Color.Red, Color.White, Color.White, Vector2.Zero, exitOnClick) {

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using ManagedBass;
 using Furball.Engine;
+using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Graphics;
@@ -162,6 +163,8 @@ namespace pTyping {
 			};
 
 			HiraganaConversion.LoadConversion();
+			
+			ScreenManager.SetBlankTransition();
 		}
 	}
 }

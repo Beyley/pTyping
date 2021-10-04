@@ -16,6 +16,7 @@ using pTyping.Drawables;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Songs.Events;
 
 namespace pTyping.Screens {
 	public class PlayerScreen : Screen {
@@ -45,15 +46,21 @@ namespace pTyping.Screens {
 		public static int TimingGood = 50;
 		public static int TimingFair = 100;
 		public static int TimingPoor = 200;
+
+		private Texture2D _noteTexture;
 		
 		public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
 		public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+		public static readonly Vector2 NoteEndPos = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
+		private NoteDrawable _currentNote;
+		private NoteDrawable _lastNote;
+		
 		public PlayerScreen() {
 			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
 				//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
-				FurballGame.Instance.ChangeScreen(new SongSelectionScreen(false));
+				ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 			}
 
 			#region UI
@@ -75,44 +82,17 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Recepticle
-
-			Texture2D noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+			this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
 			
-			this._recepticle = new TexturedDrawable(noteTexture, RecepticlePos) {
+			this._recepticle = new TexturedDrawable(this._noteTexture, RecepticlePos) {
 				Scale = new(0.55f),
 				OriginType = OriginType.Center
 			};
 
 			this.Manager.Add(this._recepticle);
 			#endregion
-			
-			#region Notes
-			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), noteTexture, pTypingGame.UniFont, 30) {
-					TimeSource    = pTypingGame.MusicTrack,
-					ColorOverride = note.Color,
-					LabelTextDrawable = {
-						Text  = $"{note.Text}\n{string.Join("\n", note.ThisCharacterRomaji)}",
-						Scale = new(1f)
-					},
-					Scale = new(0.55f, 0.55f),
-					OriginType = OriginType.Center
-				};
 
-				noteDrawable.Tweens.Add(
-					new VectorTween(
-						TweenType.Movement,
-						new(NoteStartPos.X, NoteStartPos.Y + note.YOffset),
-						RecepticlePos,
-						(int)(note.Time - Config.BaseApproachTime * (1 - pTypingGame.CurrentSong.Value.CurrentTimingPoint(note.Time).Tempo / 500d + 1)),
-						(int)note.Time));
-
-				this.Manager.Add(noteDrawable);
-
-				noteDrawable.Note = note;
-				this._notes.Add(noteDrawable);
-			}
-			#endregion
+			this.AddNotes();
 
 			#region Playfield decorations
 			LinePrimitiveDrawable playfieldTopLine    = new(new Vector2(1, RecepticlePos.Y - 50),FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
@@ -158,6 +138,57 @@ namespace pTyping.Screens {
 			pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time - 3000);
 		}
 
+		public void AddNotes() {
+			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
+				NoteDrawable noteDrawable = this.CreateNote(note);
+
+				this.Manager.Add(noteDrawable);
+				this._notes.Add(noteDrawable);
+			}
+		}
+
+		public NoteDrawable CreateNote(Note note) {
+			NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.UniFont, 30) {
+				TimeSource    = pTypingGame.MusicTrack,
+				ColorOverride = note.Color,
+				LabelTextDrawable = {
+					Text  = $"{note.Text}\n{string.Join("\n", note.ThisCharacterRomaji)}",
+					Scale = new(1f)
+				},
+				Scale      = new(0.55f),
+				OriginType = OriginType.Center
+			};
+
+			float travelTime = Config.BaseApproachTime;
+			
+			float travelDistance = NoteStartPos.X - RecepticlePos.X;
+			float travelRatio    = travelTime / travelDistance;
+
+			float afterTravelTime = (RecepticlePos.X - NoteEndPos.X) * travelRatio;
+
+			noteDrawable.Tweens.Add(
+				new VectorTween(
+					TweenType.Movement,
+					new(NoteStartPos.X, NoteStartPos.Y + note.YOffset),
+					RecepticlePos,
+					(int)(note.Time - travelTime),
+					(int)note.Time)
+				);
+			
+			noteDrawable.Tweens.Add(
+				new VectorTween(
+					TweenType.Movement, 
+					RecepticlePos, 
+					new(NoteEndPos.X, RecepticlePos.Y), 
+					(int)note.Time, 
+					(int)(note.Time + afterTravelTime))
+				);
+			
+			noteDrawable.Note = note;
+
+			return noteDrawable;
+		}
+
 		protected override void Dispose(bool disposing) {
 			pTypingGame.MusicTrack.Stop();
 			// pTypingGame.MusicTrack.Free();
@@ -174,42 +205,32 @@ namespace pTyping.Screens {
 		}
 
 		public void OnCharacterTyped(object sender, TextInputEventArgs args) {
-			foreach (NoteDrawable noteDrawable in this._notes) {
-				Note note = noteDrawable.Note;
-				// checks if the current note is already hit, if so, skip to next note
-				if (note.IsHit) continue;
-
-				bool breakOut = false;
-
-				List<string> romajiToType   = note.ThisCharacterRomaji;
+			if (this._currentNote == null)
+				return;
+			
+			Note note = this._currentNote.Note;
 				
-				//list of all the possible romaji "paths" we can take while typing
-				List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
-
-				foreach (string romaji in filteredRomaji) {
-					double timeDifference = Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time);
-					if (romaji[note.TypedRomaji.Length] == args.Character && timeDifference < TimingPoor) {
-						if (noteDrawable.Type(romaji, timeDifference)) {
-							this.HitSound.Play();
-							this.NoteUpdate(true, note);
-							
-							breakOut = true;
-						}
-						this.ShowTypingIndicator(args.Character);
-						
-						break;
+			List<string> romajiToType = note.ThisCharacterRomaji;
+				
+			//list of all the possible romaji "paths" we can take while typing
+			List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
+				
+			foreach (string romaji in filteredRomaji) {
+				double timeDifference = Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time);
+				if (romaji[note.TypedRomaji.Length] == args.Character) {
+					if (this._currentNote.Type(romaji, timeDifference)) {
+						this.HitSound.Play();
+						this.NoteUpdate(true, note);
 					}
+					this.ShowTypingIndicator(args.Character);
+						
+					break;
 				}
-				
-				if (pTypingGame.CurrentSong.Value.AllNotesHit()) 
-					this.EndScore();
-
-				this.UpdateNoteText();
-
-				// This acts as a psuedo notelock, preventing you from typing the next note if the current one still has remaining letters
-				if (note.Time - pTypingGame.MusicTrack.GetCurrentTime() > 0 ) break;
-				if (breakOut) break;
 			}
+				
+			if (pTypingGame.CurrentSong.Value.AllNotesHit()) this.EndScore();
+				
+			this.UpdateNoteText();
 		}
 
 		private void ShowTypingIndicator(char character) {
@@ -297,41 +318,91 @@ namespace pTyping.Screens {
 					break;
 				}
 			}
+			
 			this._comboDrawable.Tweens.Add(new ColorTween(TweenType.Color, this._comboDrawable.ColorOverride, hitColor, this._comboDrawable.TimeSource.GetCurrentTime(), this._comboDrawable.TimeSource.GetCurrentTime() + 100));
 			this._comboDrawable.Tweens.Add(new ColorTween(TweenType.Color, hitColor, Color.White, this._comboDrawable.TimeSource.GetCurrentTime() +100, this._comboDrawable.TimeSource.GetCurrentTime() + 1100));
 		}
 
 		public override void Update(GameTime gameTime) {
-			for (int i = 0; i < this._notes.Count; i++) {
-				if (this._notes[i].Note.IsHit) continue;
-
-				NoteDrawable noteDrawable = this._notes[i];
-
-				if (pTypingGame.MusicTrack.CurrentTime * 1000 - noteDrawable.Note.Time > TimingPoor) {
-					noteDrawable.Miss();
-					this.NoteUpdate(false, noteDrawable.Note);
-					
-					if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
-						this.EndScore();
-					}
-				}
-			}
+			int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
 			
+			#region update UI
 			this._scoreDrawable.Text    = $"{this.Score.Score:00000000}";
 			this._accuracyDrawable.Text = $"{this.Score.Accuracy * 100:0.00}%";
 			this._comboDrawable.Text    = $"{this.Score.Combo}x";
-
+			#endregion
+			
+			#region skin button visibility
 			if (pTypingGame.CurrentSong.Value.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000) {
 				this._skipButton.Visible = true;
 			} else {
 				this._skipButton.Visible = false;
 			}
+			#endregion
+
+			#region Update current note to type
+
+			#region get the latest note
+			for (int i = 0; i < this._notes.Count; i++) {
+				NoteDrawable noteDrawable = this._notes[i];
+
+				if (i != this._notes.Count - 1 && currentTime > this._notes[i + 1].Note.Time - TimingPoor) continue;
+				
+				if (currentTime > noteDrawable.Note.Time - TimingPoor) {
+					if (noteDrawable.Note.IsHit) {
+						this._currentNote = null;
+
+						break;
+					}
+					
+					if (i == this._notes.Count - 1) {
+						this._currentNote = noteDrawable;
+						break;
+					}
+
+					this._currentNote = noteDrawable;
+					break;
+				}
+
+				this._currentNote = null;
+			}
+			#endregion
+			
+			#region check if we are allowed to type the last note
+			if(this._currentNote != null) {
+				foreach (Event cutOffEvent in pTypingGame.CurrentSong.Value.Events) {
+					if (cutOffEvent is not TypingCutoffEvent) continue;
+					
+					if (cutOffEvent.Time > this._currentNote?.Note.Time && currentTime > cutOffEvent.Time) {
+						this._currentNote = null;
+					}
+				}
+			}
+			#endregion
+
+			if (this._lastNote != null) 
+				if (this._currentNote != this._lastNote) {
+					if (!this._lastNote.Note.IsHit) {
+						this._lastNote.Miss();
+						this.NoteUpdate(false, this._lastNote.Note);
+						
+						if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
+							this.EndScore();
+						}
+					}
+				}
+
+			this._lastNote = this._currentNote;
+			
+			Console.WriteLine(this._currentNote?.Note.Text);
+			
+			#endregion
 
 			base.Update(gameTime);
 		}
 
 		public void EndScore() {
-			FurballGame.Instance.ChangeScreen(new ScoreResultsScreen(this.Score));
+			ScreenManager.ChangeScreen(new ScoreResultsScreen(this.Score));
 		}
 
 		public void Play() {
