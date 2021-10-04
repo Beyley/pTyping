@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Microsoft.Xna.Framework;
 using Portable.Text;
+using pTyping.Songs.Events;
 
 namespace pTyping.Songs {
 	[JsonObject(MemberSerialization.OptIn)]
@@ -20,10 +21,15 @@ namespace pTyping.Songs {
 		[JsonProperty]
 		public string Difficulty { get; set; }
 		/// <summary>
-		/// A dictionary of all timing points, the key is the time and the value is the tempo
+		/// A list of all timing points
 		/// </summary>
 		[JsonProperty]
 		public List<TimingPoint> TimingPoints { get; set; } = new();
+		/// <summary>
+		/// A list of all events that happen in the song
+		/// </summary>
+		[JsonProperty]
+		public List<Event> Events { get; set; } = new();
 
 		[JsonProperty]
 		public string AudioPath { get; set; }
@@ -81,10 +87,16 @@ namespace pTyping.Songs {
 				line = line[1..];
 				
 				switch (firstChar) {
+					//Contains the relative path to the song file in the format of
+					//@path
+					//ex. @animariot.ogg
 					case "@": {
 						song.AudioPath = line;
 						break;
 					}
+					//Contains a note in the format of
+					//TimeInSeconds CharacterToType
+					//ex. +109.041176 だい
 					case "+": {
 						string[] splitLine = line.Split(" ");
 
@@ -99,10 +111,45 @@ namespace pTyping.Songs {
 						
 						break;
 					}
+					//Contains the next set of lyrics in the format of
+					//*TimeInSeconds Lyrics
+					//ex. *16.100000 だいてだいてだいてだいて　もっと
+					case "*": {
+						string[] splitLine = line.Split(" ");
+
+						double time = double.Parse(splitLine[0]) * 1000d;
+						string text = splitLine[1];
+						
+						song.Events.Add(new LyricEvent {
+							Lyric = text,
+							Time = time
+						});
+						
+						break;
+					}
+					//Prevents you from typing the previous note in the format of
+					// /TimeInSeconds
+					//ex. /17.982353
+					case "/": {
+						song.Events.Add(new TypingCutoffEvent {
+							Time = double.Parse(line) * 1000d
+						});
+						
+						break;
+					}
+					//A rest in the song (what this does im still not sure) in the format of
+					//-TimeInSeconds
+					//ex. -17.747059
+					case "-": {
+						song.Events.Add(new RestEvent {
+							Time = double.Parse(line) * 1000d
+						});
+						
+						break;
+					}
 				}
 				
 			} while (line != null);
-			
 			
 			return song;
 		}

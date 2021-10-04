@@ -51,6 +51,26 @@ namespace pTyping.Screens {
 			this.Manager.Add(targetFPSInputLabel);
 			this.Manager.Add(targetFPSInput);
 			#endregion
+
+			#region 1600x900 res button
+			UiButtonDrawable res1600x900button = new(new(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+			
+			res1600x900button.OnClick += delegate {
+				FurballGame.Instance.ChangeScreenSize(1600, 900);
+			};
+			
+			this.Manager.Add(res1600x900button);
+			#endregion
+			
+			#region 1920x1080 res button
+			UiButtonDrawable res1920x1080button = new(new(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+			
+			res1920x1080button.OnClick += delegate {
+				FurballGame.Instance.ChangeScreenSize(1920, 1080);
+			};
+			
+			this.Manager.Add(res1920x1080button);
+			#endregion
 			
 			base.Initialize();
 		}

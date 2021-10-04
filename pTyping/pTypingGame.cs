@@ -121,14 +121,14 @@ namespace pTyping {
 		}
 
 		public static void ChangeTargetFPS(double target) {
-			if (target == 0) {
-				Instance.IsFixedTimeStep   = false;
+			// if (target == 0) {
+				// Instance.IsFixedTimeStep   = false;
 				
-				return;
-			}
+				// return;
+			// }
 			
-			Instance.TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / target);
-			Instance.IsFixedTimeStep   = true;
+			// Instance.TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / target);
+			// Instance.IsFixedTimeStep   = true;
 		}
 		
 		protected override void Initialize() {
