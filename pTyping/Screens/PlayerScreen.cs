@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
@@ -13,10 +13,10 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Songs;
 using pTyping.Player;
 using pTyping.Drawables;
+using pTyping.Songs.Events;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using pTyping.Songs.Events;
 
 namespace pTyping.Screens {
 	public class PlayerScreen : Screen {
@@ -385,33 +385,60 @@ namespace pTyping.Screens {
 
 			#region Update current note to type
 
-			#region get the latest note
+			#region get the latest notes
+			//The latest note without taking timing windows into account
+			NoteDrawable latestNoteRealTime = null;
+			//The latest note taking timing windows into account
+			NoteDrawable latestNoteTimingWindow = null;
+
+			NoteDrawable nextNoteRealTime = null;
+			NoteDrawable nextNoteTimingWindow = null;
+
+			//Whether the latest note (without timing windows) was found
+			bool realTimeFound     = false;
+			//Whether the latest note (with timing windows) was found
+			bool timingWindowFound = false;
+
+			//Iterate through all notes in the map (this is sorted by time on map load)
 			for (int i = 0; i < this._notes.Count; i++) {
-				NoteDrawable noteDrawable = this._notes[i];
-
-				if (i != this._notes.Count - 1 && currentTime > this._notes[i + 1].Note.Time - TimingPoor) continue;
+				//If we have found both notes, break out of the loop
+				if (realTimeFound && timingWindowFound) break;
 				
-				if (currentTime > noteDrawable.Note.Time - TimingPoor) {
-					if (noteDrawable.Note.IsHit) {
-						this._currentNote = null;
-
-						break;
-					}
-					
-					if (i == this._notes.Count - 1) {
-						this._currentNote = noteDrawable;
-						break;
-					}
-
-					this._currentNote = noteDrawable;
-					break;
+				//Get the current NoteDrawable
+				NoteDrawable noteDrawable = this._notes[i];
+				NoteDrawable nextNote     = i != this._notes.Count - 1 ? this._notes[i + 1] : null;
+				
+				if (currentTime > noteDrawable.Note.Time && !realTimeFound && !noteDrawable.Note.IsHit) {
+					latestNoteRealTime = noteDrawable;
+					nextNoteRealTime   = nextNote;
+					realTimeFound      = true;
 				}
 
-				this._currentNote = null;
+				if (currentTime > noteDrawable.Note.Time - TimingPoor && !timingWindowFound && !noteDrawable.Note.IsHit) {
+					latestNoteTimingWindow = noteDrawable;
+					nextNoteTimingWindow   = nextNote;
+					timingWindowFound      = true;
+				}
 			}
 			#endregion
 			
-			#region check if we are allowed to type the last note
+			if(latestNoteRealTime is not null) 
+				//checks if the latest note is hit or not
+				if (!latestNoteRealTime.Note.IsHit) 
+					if (currentTime > nextNoteRealTime?.Note.Time) 
+						this._currentNote = nextNoteRealTime;
+					else
+						this._currentNote = latestNoteRealTime;
+				else 
+					if (latestNoteTimingWindow is not null && !latestNoteTimingWindow.Note.IsHit)
+						if (currentTime > nextNoteTimingWindow?.Note.Time)
+							this._currentNote = nextNoteTimingWindow;
+						else
+							this._currentNote = latestNoteTimingWindow;
+					else
+						this._currentNote = null;
+			
+			#region take cutoff events into account
 			if(this._currentNote != null) {
 				foreach (Event cutOffEvent in pTypingGame.CurrentSong.Value.Events) {
 					if (cutOffEvent is not TypingCutoffEvent) continue;
@@ -439,6 +466,8 @@ namespace pTyping.Screens {
 
 			this._lastNote = this._currentNote;
 			#endregion
+
+			Console.WriteLine(this._currentNote?.Note.Text ?? string.Empty);
 			
 			#endregion
 
