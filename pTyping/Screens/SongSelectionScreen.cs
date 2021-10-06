@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using ManagedBass;
 using pTyping.Songs;
@@ -12,6 +13,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace pTyping.Screens {
 	public class SongSelectionScreen : Screen {
@@ -22,6 +24,10 @@ namespace pTyping.Screens {
 		private Texture2D        _defaultBackgroundImage;
 		private Texture2D        _backgroundImage;
 		private TexturedDrawable _backgroundImageDrawable;
+
+		private List<BaseDrawable> _songButtonList = new();
+
+		private float _movingDirection;
 
 		public SongSelectionScreen(bool editor) {
 			this._editor      = editor;
@@ -102,6 +108,8 @@ namespace pTyping.Screens {
 						OriginType = OriginType.RightCenter
 					}
 				};
+				
+				this._songButtonList.Add(songButton);
 
 				this.Manager.Add(songButton);
 
@@ -136,9 +144,37 @@ namespace pTyping.Screens {
 			
 			pTypingGame.CurrentSong.OnChange += this.OnSongChange;
 
+			FurballGame.InputManager.OnKeyDown += this.OnKeyDown;
+			FurballGame.InputManager.OnKeyUp += this.OnKeyUp;
+			
 			base.Initialize();
 		}
+
+		public override void Update(GameTime gameTime) {
+			if (this._movingDirection != 0f) {
+				foreach (BaseDrawable songButton in this._songButtonList) {
+					songButton.Position += new Vector2(0f, this._movingDirection * (gameTime.ElapsedGameTime.Ticks / 10000f));
+				}
+			}
+			
+			base.Update(gameTime);
+		}
+
+		private void OnKeyDown(object sender, Keys e) {
+			this._movingDirection = e switch {
+				Keys.Up   => 1f,
+				Keys.Down => -1f,
+				_         => this._movingDirection
+			};
+		}
 		
+		private void OnKeyUp(object sender, Keys e) {
+			this._movingDirection = e switch {
+				Keys.Up or Keys.Down => 0f,
+				_                    => this._movingDirection
+			};
+		}
+
 		private void OnSongChange(object sender, Song e) {
 			this.UpdateSelectedSong();
 		}
@@ -164,6 +200,9 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
+			FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
+			FurballGame.InputManager.OnKeyUp -= this.OnKeyUp;
+
 			base.Dispose(disposing);
 		}
 	}
