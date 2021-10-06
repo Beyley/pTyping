@@ -21,7 +21,13 @@ namespace pTyping.Drawables {
 			this.LabelTextDrawable.Scale = new(1);
 		}
 
-		public bool Type(string romaji, double timeDifference) {
+		/// <summary>
+		/// Types a character
+		/// </summary>
+		/// <param name="romaji">The romaji path to take</param>
+		/// <param name="timeDifference">The time difference from now to the note</param>
+		/// <returns>Whether the note has been fully completed</returns>
+		public bool TypeCharacter(string romaji, double timeDifference) {
 			if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
 				if (timeDifference < PlayerScreen.TimingExcellent)
 					this.Note.HitResult = HitResult.Excellent;
@@ -33,13 +39,16 @@ namespace pTyping.Drawables {
 					this.Note.HitResult = HitResult.Poor;
 			}
 			
-			
+			//Types the next character
 			this.Note.TypedRomaji += romaji[this.Note.TypedRomaji.Length];
 
+			//Checks if we have finished typing the current romaji
 			if (string.Equals(this.Note.TypedRomaji, romaji)) {
 				this.Note.Typed += this.Note.Text[this.Note.Typed.Length];
+				//Clear the typed romaji
 				this.Note.TypedRomaji = string.Empty;
 
+				//Checks if we have typed the full note
 				if(string.Equals(this.Note.Typed, this.Note.Text)) {
 					this.Hit();
 					return true;
