@@ -117,7 +117,7 @@ namespace pTyping.Screens {
 			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
 			#region typing indicator
-			this._typingIndicator = new(RecepticlePos, pTypingGame.UniFont, "", 50) {
+			this._typingIndicator = new(RecepticlePos, pTypingGame.JapaneseFont, "", 75) {
 				OriginType = OriginType.Center
 			};
 			
@@ -190,7 +190,7 @@ namespace pTyping.Screens {
 		}
 
 		public NoteDrawable CreateNote(Note note) {
-			NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.UniFont, 30) {
+			NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 60) {
 				TimeSource    = pTypingGame.MusicTrack,
 				ColorOverride = note.Color,
 				LabelTextDrawable = {

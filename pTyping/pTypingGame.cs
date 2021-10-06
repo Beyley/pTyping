@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using FontStashSharp;
 using ManagedBass;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -29,7 +30,13 @@ namespace pTyping {
 		public static TextDrawable     VolumeSelector;
 		public static TexturedDrawable CurrentSongBackground;
 
-		public static byte[] UniFont;
+		public static byte[] JapaneseFontData;
+		public static FontSystem JapaneseFont = new(new FontSystemSettings {
+			FontResolutionFactor = 2f,
+			KernelWidth          = 1,
+			KernelHeight         = 1,
+			Effect               = FontSystemEffect.None
+		});
 		
 		public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
@@ -106,7 +113,8 @@ namespace pTyping {
 			};
 			
 			DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
-			UniFont           = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
+			JapaneseFontData       = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
+			JapaneseFont.AddFont(JapaneseFontData);
 		}
 
 		public static void ChangeGlobalVolume(int mouseScroll) {
@@ -133,7 +141,8 @@ namespace pTyping {
 		}
 		
 		protected override void Initialize() {
-			UniFont ??= ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
+			JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
+			JapaneseFont.AddFont(JapaneseFontData);
 
 			CurrentSongBackground = new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
 				Depth      = 1f,

@@ -66,7 +66,7 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._recepticle);
 
 			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.UniFont, 30) {
+				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 60) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
@@ -389,7 +389,7 @@ namespace pTyping.Screens {
 
 				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
 				if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
-					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, pTypingGame.UniFont, 30) {
+					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, pTypingGame.JapaneseFont, 60) {
 						TimeSource    = pTypingGame.MusicTrack,
 						ColorOverride = note.Color,
 						LabelTextDrawable = {

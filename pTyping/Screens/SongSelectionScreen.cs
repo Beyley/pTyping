@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using ManagedBass;
 using pTyping.Songs;
-using SpriteFontPlus;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -102,7 +101,7 @@ namespace pTyping.Screens {
 					pTypingGame.CurrentSong.Value = song;
 				};
 
-				UiButtonDrawable songButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", pTypingGame.UniFont, 30, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), songButtonOnClick, 5f, new []{ CharacterRange.BasicLatin, CharacterRange.Hiragana, CharacterRange.Katakana, new CharacterRange('★') }) {
+				UiButtonDrawable songButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", pTypingGame.JapaneseFont, 50, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), songButtonOnClick) {
 					OriginType = OriginType.TopRight,
 					TextDrawable = {
 						OriginType = OriginType.RightCenter
@@ -118,7 +117,7 @@ namespace pTyping.Screens {
 			#endregion
 
 			#region Song info
-			this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.UniFont, "", 30);
+			this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, "", 55);
 			
 			this.Manager.Add(this._songInfo);
 			#endregion

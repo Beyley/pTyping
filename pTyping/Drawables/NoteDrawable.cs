@@ -1,4 +1,4 @@
-using SpriteFontPlus;
+using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -14,8 +14,8 @@ namespace pTyping.Drawables {
 
 		public Note Note;
 
-		public NoteDrawable(Vector2 position, Texture2D texture, byte[] font, float size, CharacterRange[] range = null) : base(texture, position) {
-			this.LabelTextDrawable       = new TextDrawable(Vector2.Zero, font, "", size, new []{CharacterRange.BasicLatin, CharacterRange.Hiragana});
+		public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) : base(texture, position) {
+			this.LabelTextDrawable       = new TextDrawable(Vector2.Zero, font, "", size);
 			this.CircleRadius            = 40f;
 			this.Circular                = false;
 			this.LabelTextDrawable.Scale = new(1);
