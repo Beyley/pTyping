@@ -147,7 +147,14 @@ namespace pTyping.Screens {
 			FurballGame.InputManager.OnKeyDown += this.OnKeyDown;
 			FurballGame.InputManager.OnKeyUp += this.OnKeyUp;
 			
+			FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+			
 			base.Initialize();
+		}
+		private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
+			foreach (BaseDrawable songButton in this._songButtonList) {
+				songButton.Position += new Vector2(0f, e.scrollAmount);
+			}
 		}
 
 		public override void Update(GameTime gameTime) {
@@ -200,8 +207,9 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
-			FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
-			FurballGame.InputManager.OnKeyUp -= this.OnKeyUp;
+			FurballGame.InputManager.OnKeyDown     -= this.OnKeyDown;
+			FurballGame.InputManager.OnKeyUp       -= this.OnKeyUp;
+			FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
 
 			base.Dispose(disposing);
 		}
