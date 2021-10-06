@@ -70,24 +70,48 @@ namespace pTyping.Screens {
 			#endregion
 		}
 
-		private void CreateSong(FileInfo songInfo) {
+		private void CreateSong(FileInfo musicFileInfo) {
+			if (musicFileInfo.DirectoryName is null) throw new Exception("Song directory is null? how???? wtf are you doing??????");
+			
 			Song song = new() {
 				Name       = this._songNameTextBox.Text,
 				Artist     = this._songArtistTextBox.Text,
 				Creator    = this._songCreatorTextBox.Text,
 				Difficulty = this._songDifficultyTextBox.Text,
-				AudioPath  = songInfo.Name
+				AudioPath  = musicFileInfo.Name
 			};
 			
+			//Add a default timing point so we dont crash
 			song.TimingPoints.Add(new() {Tempo = 100, Time = 0});
-			FileStream stream = File.Create(Path.ChangeExtension(songInfo.FullName, "pts"));
-			song.FileInfo = new FileInfo(Path.ChangeExtension(songInfo.FullName, "pts"));
+			
+			// Get the new directory for the song
+			string newSongFolder = Path.Combine(musicFileInfo.DirectoryName, $"{song.Artist.Replace(" ", "")}-{song.Name.Replace(" ", "")}-by-{song.Creator.Replace(" ", "")}/");
+
+			if (Directory.Exists(newSongFolder)) {
+				//TODO: Add error message here to tell them that the metadata is too close to an existing song
+				return;
+			}
+			
+			// Create the directory
+			Directory.CreateDirectory(newSongFolder);
+			
+			musicFileInfo.MoveTo(Path.Combine(newSongFolder, Path.GetFileName(musicFileInfo.FullName)));
+			
+			// Open the filestream to the file
+			FileStream stream = File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
+			// Set the fileinfo for the song
+			song.FileInfo = new FileInfo(stream.Name);
+			// Save the template song to the file
 			song.Save(stream);
+			// Close the filestream
 			stream.Close();
 			
+			// Queue a song update
 			SongManager.UpdateSongs();
 			
+			//Play the menu click sound (since we clicked a button)
 			pTypingGame.MenuClickSound.Play();
+			//Change the screen to the song select screen
 			ScreenManager.ChangeScreen(new SongSelectionScreen(true));
 		}
 	}
