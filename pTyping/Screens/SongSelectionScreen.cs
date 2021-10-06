@@ -44,24 +44,29 @@ namespace pTyping.Screens {
 			};
 			
 			this.Manager.Add(backButton);
-
-			EventHandler<Point> audioSpeed1onClick = delegate {
-				pTypingGame.MusicTrack.Frequency *= 0.75f;
-			};
-
-			UiButtonDrawable audioSpeed1 = new(new(backButton.Size.X + 10, FurballGame.DEFAULT_WINDOW_HEIGHT), "0.75x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), audioSpeed1onClick);
-			audioSpeed1.OriginType = OriginType.BottomLeft;
-
-			this.Manager.Add(audioSpeed1);
-
-			EventHandler<Point> audioSpeed2onClick = delegate {
-				pTypingGame.MusicTrack.Frequency *= 1.5f;
-			};
 			
-			UiButtonDrawable audioSpeed2 = new(new(backButton.Size.X + audioSpeed1.Size.X + 20, FurballGame.DEFAULT_WINDOW_HEIGHT), "1.5x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), audioSpeed2onClick);
-			audioSpeed2.OriginType = OriginType.BottomLeft;
+			#endregion
+			
+			#region Song speed buttons
+			if(!this._editor) {
+				EventHandler<Point> audioSpeed1onClick = delegate {
+					pTypingGame.MusicTrack.Frequency *= 0.75f;
+				};
 
-			this.Manager.Add(audioSpeed2);
+				UiButtonDrawable audioSpeed1 = new(new(backButton.Size.X + 10, FurballGame.DEFAULT_WINDOW_HEIGHT), "0.75x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), audioSpeed1onClick);
+				audioSpeed1.OriginType = OriginType.BottomLeft;
+
+				this.Manager.Add(audioSpeed1);
+
+				EventHandler<Point> audioSpeed2onClick = delegate {
+					pTypingGame.MusicTrack.Frequency *= 1.5f;
+				};
+
+				UiButtonDrawable audioSpeed2 = new(new(backButton.Size.X + audioSpeed1.Size.X + 20, FurballGame.DEFAULT_WINDOW_HEIGHT), "1.5x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), audioSpeed2onClick);
+				audioSpeed2.OriginType = OriginType.BottomLeft;
+
+				this.Manager.Add(audioSpeed2);
+			}
 			#endregion
 
 			#region Create new song button
