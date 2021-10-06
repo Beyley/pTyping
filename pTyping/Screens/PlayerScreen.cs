@@ -283,28 +283,6 @@ namespace pTyping.Screens {
 			
 			//Update the text on all notes to show the new Romaji paths
 			this.UpdateNoteText();
-			
-			// List<string> romajiToType = note.ThisCharacterRomaji;
-			// 	
-			// //list of all the possible romaji "paths" we can take while typing
-			// List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
-			// 	
-			// foreach (string romaji in filteredRomaji) {
-			// 	double timeDifference = Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time);
-			// 	if (romaji[note.TypedRomaji.Length] == args.Character) {
-			// 		if (noteDrawable.Type(romaji, timeDifference)) {
-			// 			this.HitSound.Play();
-			// 			this.NoteUpdate(true, note);
-			// 		}
-			// 		this.ShowTypingIndicator(args.Character);
-			// 			
-			// 		break;
-			// 	}
-			// }
-			// 	
-			// if (pTypingGame.CurrentSong.Value.AllNotesHit()) this.EndScore();
-			// 	
-			// this.UpdateNoteText();
 		}
 
 		private void ShowTypingIndicator(char character) {
