@@ -44,6 +44,8 @@ namespace pTyping.Songs {
 		public static Song LoadFromFile(FileInfo fileInfo) {
 			Song song = JsonConvert.DeserializeObject<Song>(File.ReadAllText(fileInfo.FullName));
 			song.FileInfo = fileInfo;
+			
+			song.Notes.Sort((x, y) => (int)((x.Time - y.Time) * 1000));
 
 			return song;
 		}

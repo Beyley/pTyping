@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
@@ -13,10 +13,10 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Songs;
 using pTyping.Player;
 using pTyping.Drawables;
+using pTyping.Songs.Events;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using pTyping.Songs.Events;
 
 namespace pTyping.Screens {
 	public class PlayerScreen : Screen {
@@ -54,8 +54,7 @@ namespace pTyping.Screens {
 		public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 		public static readonly Vector2 NoteEndPos = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
-		private NoteDrawable _currentNote;
-		private NoteDrawable _lastNote;
+		public int NoteToType;
 		
 		public PlayerScreen() {
 			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
@@ -248,32 +247,64 @@ namespace pTyping.Screens {
 		}
 
 		public void OnCharacterTyped(object sender, TextInputEventArgs args) {
-			if (this._currentNote == null)
+			NoteDrawable noteDrawable = this._notes[this.NoteToType];
+
+			Note note = noteDrawable.Note;
+
+			// Makes sure we dont hit an already hit note, which would cause a crash currently
+			// this case *shouldnt* happen but it could so its good to check anyway
+			if (note.IsHit) {
 				return;
-			
-			Note note = this._currentNote.Note;
+			}
+
+			int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+
+			if (currentTime > note.Time - TimingPoor) {
+				List<string> romajiToType = note.ThisCharacterRomaji;
 				
-			List<string> romajiToType = note.ThisCharacterRomaji;
+				List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
 				
-			//list of all the possible romaji "paths" we can take while typing
-			List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
-				
-			foreach (string romaji in filteredRomaji) {
-				double timeDifference = Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time);
-				if (romaji[note.TypedRomaji.Length] == args.Character) {
-					if (this._currentNote.Type(romaji, timeDifference)) {
-						this.HitSound.Play();
-						this.NoteUpdate(true, note);
+				foreach (string romaji in filteredRomaji) {
+					double timeDifference = Math.Abs(currentTime - note.Time);
+					if (romaji[note.TypedRomaji.Length] == args.Character) {
+						//If true, then we finished the note, if false, then we continue
+						if (noteDrawable.TypeCharacter(romaji, timeDifference)) {
+							this.HitSound.Play();
+							this.NoteUpdate(true, note);
+
+							this.NoteToType++;
+						}
+						this.ShowTypingIndicator(args.Character);
+							
+						break;
 					}
-					this.ShowTypingIndicator(args.Character);
-						
-					break;
 				}
 			}
-				
-			if (pTypingGame.CurrentSong.Value.AllNotesHit()) this.EndScore();
-				
+			
+			//Update the text on all notes to show the new Romaji paths
 			this.UpdateNoteText();
+			
+			// List<string> romajiToType = note.ThisCharacterRomaji;
+			// 	
+			// //list of all the possible romaji "paths" we can take while typing
+			// List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
+			// 	
+			// foreach (string romaji in filteredRomaji) {
+			// 	double timeDifference = Math.Abs(pTypingGame.MusicTrack.GetCurrentTime() - note.Time);
+			// 	if (romaji[note.TypedRomaji.Length] == args.Character) {
+			// 		if (noteDrawable.Type(romaji, timeDifference)) {
+			// 			this.HitSound.Play();
+			// 			this.NoteUpdate(true, note);
+			// 		}
+			// 		this.ShowTypingIndicator(args.Character);
+			// 			
+			// 		break;
+			// 	}
+			// }
+			// 	
+			// if (pTypingGame.CurrentSong.Value.AllNotesHit()) this.EndScore();
+			// 	
+			// this.UpdateNoteText();
 		}
 
 		private void ShowTypingIndicator(char character) {
@@ -383,65 +414,47 @@ namespace pTyping.Screens {
 			}
 			#endregion
 
-			#region Update current note to type
+			bool checkNoteHittability = true;
+			
+			if (this.NoteToType == this._notes.Count) {
+				this.EndScore();
+				checkNoteHittability = false;
+			}
 
-			#region get the latest note
-			for (int i = 0; i < this._notes.Count; i++) {
-				NoteDrawable noteDrawable = this._notes[i];
+			if(checkNoteHittability) {
+				NoteDrawable noteToType = this._notes[this.NoteToType];
 
-				if (i != this._notes.Count - 1 && currentTime > this._notes[i + 1].Note.Time - TimingPoor) continue;
-				
-				if (currentTime > noteDrawable.Note.Time - TimingPoor) {
-					if (noteDrawable.Note.IsHit) {
-						this._currentNote = null;
+				//Checks if the current note is not hit
+				if (!noteToType.Note.IsHit && this.NoteToType < this._notes.Count - 1) {
+					NoteDrawable nextNoteToType = this._notes[this.NoteToType + 1];
 
-						break;
+					//If we are within the next note
+					if (currentTime > nextNoteToType.Note.Time) {
+						//Miss the note
+						noteToType.Miss();
+						//Tell the game to update all the info
+						this.NoteUpdate(false, noteToType.Note);
+						//Change us to the next note
+						this.NoteToType++;
 					}
-					
-					if (i == this._notes.Count - 1) {
-						this._currentNote = noteDrawable;
-						break;
-					}
-
-					this._currentNote = noteDrawable;
-					break;
 				}
 
-				this._currentNote = null;
-			}
-			#endregion
-			
-			#region check if we are allowed to type the last note
-			if(this._currentNote != null) {
 				foreach (Event cutOffEvent in pTypingGame.CurrentSong.Value.Events) {
 					if (cutOffEvent is not TypingCutoffEvent) continue;
-					
-					if (cutOffEvent.Time > this._currentNote?.Note.Time && currentTime > cutOffEvent.Time) {
-						this._currentNote = null;
+
+					if (currentTime > cutOffEvent.Time && cutOffEvent.Time > noteToType.Note.Time && !noteToType.Note.IsHit) {
+						//Miss the note
+						noteToType.Miss();
+						//Tell the game to update all the info
+						this.NoteUpdate(false, noteToType.Note);
+						//Change us to the next note
+						this.NoteToType++;
+
+						break;
 					}
 				}
 			}
-			#endregion
-
-			#region check if the note has changed
-			//If the note has changed and the previous one is not hit, then make the previous one miss
-			if (this._lastNote != null) 
-				if (this._currentNote != this._lastNote) {
-					if (!this._lastNote.Note.IsHit) {
-						this._lastNote.Miss();
-						this.NoteUpdate(false, this._lastNote.Note);
-						
-						if (pTypingGame.CurrentSong.Value.AllNotesHit()) {
-							this.EndScore();
-						}
-					}
-				}
-
-			this._lastNote = this._currentNote;
-			#endregion
 			
-			#endregion
-
 			base.Update(gameTime);
 		}
 
