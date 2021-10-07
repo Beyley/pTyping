@@ -14,10 +14,10 @@ namespace pTyping.Drawables {
 
 		public Note Note;
 
+		public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
+
 		public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) : base(texture, position) {
 			this.LabelTextDrawable       = new TextDrawable(Vector2.Zero, font, "", size);
-			this.CircleRadius            = 40f;
-			this.Circular                = false;
 			this.LabelTextDrawable.Scale = new(1);
 		}
 

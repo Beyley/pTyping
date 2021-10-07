@@ -288,7 +288,6 @@ namespace pTyping.Screens {
 			
 			this.ChangeTool(EditorTool.Select);
 			
-			FurballGame.Instance.Window.TextInput  += this.OnCharacterTyped;
 			FurballGame.InputManager.OnKeyDown     += this.OnKeyPress;
 			FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 			FurballGame.InputManager.OnMouseDown   += this.OnClick;
@@ -379,11 +378,14 @@ namespace pTyping.Screens {
 			}
 		}
 
+		public void AddNote(Note note) {
+			
+		}
+		
 		private void OnClick(object sender, (MouseButton, string) e) {
 			if (this.CurrentTool == EditorTool.CreateNote) {
 				Note note = new() {
 					Text = "a",
-					// TextToType = "a",
 					Time       = this._mouseTime
 				};
 
@@ -472,7 +474,6 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
-			FurballGame.Instance.Window.TextInput  -= this.OnCharacterTyped;
 			FurballGame.InputManager.OnKeyDown     -= this.OnKeyPress;
 			FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
 			FurballGame.InputManager.OnMouseDown   -= this.OnClick;
@@ -552,29 +553,26 @@ namespace pTyping.Screens {
 			}
 		}
 
-		public void OnCharacterTyped(object sender, TextInputEventArgs args) {
-			
-		}
-
 		public override void Update(GameTime gameTime) {
 			for (int i = 0; i < this._notes.Count; i++) {
-				// if (this._notes[i].Note.Hit != HitResult.Unknown) continue;
-
 				NoteDrawable noteDrawable = this._notes[i];
 
 				if (pTypingGame.MusicTrack.CurrentTime * 1000 > noteDrawable.Note.Time+10) {
 					noteDrawable.Visible = false;
 				} else {
 					noteDrawable.Visible = true;
+					if (noteDrawable.Tweens.Count == 0) {
+						noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset), PlayerScreen.RecepticlePos, (int)(noteDrawable.Note.Time - Config.BaseApproachTime), (int)noteDrawable.Note.Time));
+					}
 				}
 			}
 
 			int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
-			int miliseconds = (int)Math.Floor(currentTime         % 1000d);
+			int milliseconds = (int)Math.Floor(currentTime         % 1000d);
 			int seconds     = (int)Math.Floor(currentTime / 1000d % 60d);
 			int minutes     = (int)Math.Floor(currentTime         / 1000d / 60d);
 			
-			this._currentTimeDrawable.Text = $"Time: {minutes:00}:{seconds:00}:{miliseconds:000}";
+			this._currentTimeDrawable.Text = $"Time: {minutes:00}:{seconds:00}:{milliseconds:000}";
 			this._progressBar.Progress     = (float)pTypingGame.MusicTrack.CurrentTime * 1000f / (float)pTypingGame.MusicTrack.Length;
 			
 			base.Update(gameTime);

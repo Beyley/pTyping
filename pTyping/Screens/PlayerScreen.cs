@@ -51,7 +51,7 @@ namespace pTyping.Screens {
 		
 		public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
-		public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+		public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 		public static readonly Vector2 NoteEndPos = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
 		public int NoteToType;
