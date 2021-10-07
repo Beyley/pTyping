@@ -16,6 +16,11 @@ namespace pTyping.Songs {
 			
 			DirectoryInfo dirInfo = new(QualifiedSongFolder);
 
+			//Create the songs folder if it does not exist
+			if (!dirInfo.Exists) {
+				dirInfo.Create();
+			}
+			
 			foreach (FileInfo file in dirInfo.GetFiles("*.pts", SearchOption.AllDirectories)) {
 				songs.Add(Song.LoadFromFile(file));
 			}

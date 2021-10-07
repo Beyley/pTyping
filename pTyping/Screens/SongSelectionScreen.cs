@@ -135,9 +135,9 @@ namespace pTyping.Screens {
 			);
 			#endregion
 			
-			if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0) {
+			if (pTypingGame.CurrentSong?.Value == null && SongManager.Songs.Count > 0) {
 				pTypingGame.CurrentSong.Value = SongManager.Songs[0];
-			} else if (pTypingGame.CurrentSong.Value != null) {
+			} else if (pTypingGame.CurrentSong?.Value != null) {
 				this.UpdateSelectedSong(true);
 			}
 			

@@ -25,7 +25,7 @@ namespace pTyping {
 		public static readonly AudioStream MusicTrack     = new();
 		public static readonly SoundEffect MenuClickSound = new();
 
-		public static Bindable<Song> CurrentSong;
+		public static Bindable<Song> CurrentSong = new(null);
 			
 		public static TextDrawable     VolumeSelector;
 		public static TexturedDrawable CurrentSongBackground;
@@ -42,7 +42,8 @@ namespace pTyping {
 
 		public static void PlayMusic() {
 			MusicTrack.Play();
-			MusicTrack.Volume = Config.Volume;
+			if (MusicTrack.IsValidHandle)
+				MusicTrack.Volume = Config.Volume;
 		}
 
 		public static void PauseResumeMusic() {
@@ -103,10 +104,12 @@ namespace pTyping {
 			MenuClickSound.Load(menuClickSoundData);
 
 			MenuClickSound.Volume = Config.Volume;
-			MusicTrack.Volume     = Config.Volume;
+			if (MusicTrack.IsValidHandle)
+				MusicTrack.Volume = Config.Volume;
 			Config.Volume.OnChange += delegate (object _, float volume) {
 				MenuClickSound.Volume = volume;
-				MusicTrack.Volume = volume;
+				if (MusicTrack.IsValidHandle)
+					MusicTrack.Volume = Config.Volume;
 				
 				if(VolumeSelector is not null)
 					VolumeSelector.Text = $"Volume: {Config.Volume.Value * 100f:00.##}";

@@ -136,6 +136,8 @@ namespace pTyping.Screens {
 		
 
 		public void LoadSong(bool chooseNewOne) {
+			if (SongManager.Songs.Count == 0) return;
+			
 			if(chooseNewOne) {
 				int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
 
