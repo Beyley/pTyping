@@ -18,8 +18,8 @@ namespace pTyping.Screens {
 		
 		public override void Initialize() {
 			#region Title
-			TextDrawable songTitleText   = new(new(10, 10), FurballGame.DEFAULT_FONT, $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]", 40);
-			TextDrawable songCreatorText = new(new(10, songTitleText.Size.Y + 20), FurballGame.DEFAULT_FONT, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
+			TextDrawable songTitleText   = new(new(10, 10), pTypingGame.JapaneseFont, $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]", 40);
+			TextDrawable songCreatorText = new(new(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
 			
 			this.Manager.Add(songTitleText);
 			this.Manager.Add(songCreatorText);

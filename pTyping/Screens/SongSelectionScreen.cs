@@ -34,6 +34,10 @@ namespace pTyping.Screens {
 		
 		public override void Initialize() {
 			SongManager.UpdateSongs();
+			if (!this._editor && SongManager.Songs.Count == 0) {
+				ScreenManager.ChangeScreen(new MenuScreen());
+				return;
+			}
 			
 			#region Back button
 			pTypingGame.LoadBackButtonTexture();
@@ -135,7 +139,7 @@ namespace pTyping.Screens {
 			);
 			#endregion
 			
-			if (pTypingGame.CurrentSong?.Value == null && SongManager.Songs.Count > 0) {
+			if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0) {
 				pTypingGame.CurrentSong.Value = SongManager.Songs[0];
 			} else if (pTypingGame.CurrentSong?.Value != null) {
 				this.UpdateSelectedSong(true);
