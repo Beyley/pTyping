@@ -10,6 +10,8 @@ using Microsoft.Xna.Framework;
 namespace pTyping.Screens {
 	public class OptionsScreen : Screen {
 		public override void Initialize() {
+			base.Initialize();
+
 			#region Back button
 			pTypingGame.LoadBackButtonTexture();
 			
@@ -71,8 +73,6 @@ namespace pTyping.Screens {
 			
 			this.Manager.Add(res1920x1080button);
 			#endregion
-			
-			base.Initialize();
 		}
 		
 		private void BackgroundDimInputOnCommit(object sender, string e) {

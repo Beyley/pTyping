@@ -50,8 +50,10 @@ namespace pTyping.Screens {
 
 		private const float EDITOR_TOOL_BASE_SIZE = 0.4f;
 		private const float EDITOR_TOOL_SCALED_SIZE = 0.55f;
-		
-		public EditorScreen() {
+
+		public override void Initialize() {
+			base.Initialize();
+
 			pTypingGame.MusicTrack.Stop();
 			
 			#region Gameplay preview
@@ -66,7 +68,7 @@ namespace pTyping.Screens {
 			this.Manager.Add(this._recepticle);
 
 			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
-				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 60) {
+				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
 					LabelTextDrawable = {
@@ -236,21 +238,6 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region Edit note info
-			#region text to type
-			// this._textToTypeInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text To Type", 25) {
-			// 	OriginType = OriginType.Center,
-			// 	Visible    = false
-			// };
-			// this._textToTypeInput = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.25f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.75f), FurballGame.DEFAULT_FONT, "select note", 25, 150f) {
-			// 	OriginType = OriginType.Center,
-			// 	Visible    = false
-			// };
-			// this._textToTypeInput.OnLetterTyped   += this.UpdateTextInputs;
-			// this._textToTypeInput.OnLetterRemoved += this.UpdateTextInputs;
-			//
-			// this.Manager.Add(this._textToTypeInput);
-			// this.Manager.Add(this._textToTypeInputLabel);
-			#endregion
 				
 			#region text to show
 			this._textInputLabel = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.75f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f), FurballGame.DEFAULT_FONT, "Text", 25) {
@@ -382,16 +369,16 @@ namespace pTyping.Screens {
 			
 		}
 		
-		private void OnClick(object sender, (MouseButton, string) e) {
+		private void OnClick(object? sender, ((MouseButton mouseButton, Point position) args, string cursorName) e) {
 			if (this.CurrentTool == EditorTool.CreateNote) {
 				Note note = new() {
 					Text = "a",
 					Time       = this._mouseTime
 				};
 
-				(int x, int y) = FurballGame.InputManager.CursorStates.Where(state => state.Name == e.Item2).ToList()[0].Position;
+				(int x, int y) = e.args.position;
 				if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
-					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, pTypingGame.JapaneseFont, 60) {
+					NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, pTypingGame.JapaneseFont, 50) {
 						TimeSource    = pTypingGame.MusicTrack,
 						ColorOverride = note.Color,
 						LabelTextDrawable = {

@@ -17,6 +17,8 @@ namespace pTyping.Screens {
 		}
 		
 		public override void Initialize() {
+			base.Initialize();
+
 			#region Title
 			TextDrawable songTitleText   = new(new(10, 10), pTypingGame.JapaneseFont, $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]", 40);
 			TextDrawable songCreatorText = new(new(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
@@ -74,8 +76,6 @@ namespace pTyping.Screens {
 			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(0.5f, 0.5f, 0.5f), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
 			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
-			
-			base.Initialize();
 		}
 	}
 }

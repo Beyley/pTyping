@@ -15,6 +15,8 @@ namespace pTyping.Screens {
 		private UiTextBoxDrawable _songDifficultyTextBox;
 		
 		public override void Initialize() {
+			base.Initialize();
+
 			#region Back button to song select screen
 			pTypingGame.LoadBackButtonTexture();
 			

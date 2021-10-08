@@ -10,6 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using ManagedBass;
 using pTyping.Songs;
 using pTyping.Player;
 using pTyping.Drawables;
@@ -28,6 +29,10 @@ namespace pTyping.Screens {
 		private TextDrawable     _typingIndicator;
 		private TexturedDrawable _recepticle;
 		private UiButtonDrawable _skipButton;
+
+		private UiButtonDrawable _resumeButton;
+		private UiButtonDrawable _restartButton;
+		private UiButtonDrawable _quitButton;
 		
 		public SoundEffect HitSound   = new();
 		
@@ -56,7 +61,11 @@ namespace pTyping.Screens {
 
 		public int NoteToType;
 		
-		public PlayerScreen() {
+		public PlayerScreen() { }
+
+		public override void Initialize() {
+			base.Initialize();
+			
 			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
 				//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
 				ScreenManager.ChangeScreen(new SongSelectionScreen(false));
@@ -78,6 +87,28 @@ namespace pTyping.Screens {
 			this._skipButton.Visible    = false;
 
 			this.Manager.Add(this._skipButton);
+			
+			#region Pause UI
+			Vector2 pauseUiButtonSize = new(170, 50);
+			
+			this._resumeButton = new(new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), "Resume", FurballGame.DEFAULT_FONT, 50, Color.Green, Color.White, Color.White, pauseUiButtonSize) {
+				OriginType = OriginType.Center
+			};
+			this._restartButton = new(new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.3f), "Restart", FurballGame.DEFAULT_FONT, 50, Color.Yellow, Color.White, Color.White, pauseUiButtonSize) {
+				OriginType = OriginType.Center
+			};
+			this._quitButton = new(new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f), "Quit", FurballGame.DEFAULT_FONT, 50, Color.Red, Color.White, Color.White, pauseUiButtonSize) {
+				OriginType = OriginType.Center
+			};
+			
+			this._resumeButton.OnClick += this.ResumeButtonClick;
+			this._restartButton.OnClick += this.RestartButtonClick;
+			this._quitButton.OnClick += this.QuitButtonClick;
+			
+			this.Manager.Add(this._resumeButton);
+			this.Manager.Add(this._restartButton);
+			this.Manager.Add(this._quitButton);
+			#endregion
 			#endregion
 			
 			#region Recepticle
@@ -117,7 +148,7 @@ namespace pTyping.Screens {
 			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 			#endregion
 			#region typing indicator
-			this._typingIndicator = new(RecepticlePos, pTypingGame.JapaneseFont, "", 75) {
+			this._typingIndicator = new(RecepticlePos, pTypingGame.JapaneseFont, "", 60) {
 				OriginType = OriginType.Center
 			};
 			
@@ -134,8 +165,22 @@ namespace pTyping.Screens {
 			FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
 		}
+
+		private void ResumeButtonClick(object sender, Point e) {
+			pTypingGame.PauseResumeMusic();
+		}
+		
+		private void RestartButtonClick(object sender, Point e) {
+			pTypingGame.MusicTrack.SeekTo(0);
+			ScreenManager.ChangeScreen(new PlayerScreen());
+		}
+		
+		private void QuitButtonClick(object sender, Point e) {
+			ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+		}
+		
 		private void SkipButtonClick(object sender, Point e) {
-			pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time - 3000);
+			pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time - 2999);
 		}
 
 		public void AddNotes() {
@@ -190,7 +235,7 @@ namespace pTyping.Screens {
 		}
 
 		public NoteDrawable CreateNote(Note note) {
-			NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 60) {
+			NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
 				TimeSource    = pTypingGame.MusicTrack,
 				ColorOverride = note.Color,
 				LabelTextDrawable = {
@@ -232,9 +277,6 @@ namespace pTyping.Screens {
 		}
 
 		protected override void Dispose(bool disposing) {
-			pTypingGame.MusicTrack.Stop();
-			// pTypingGame.MusicTrack.Free();
-			
 			FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
 			FurballGame.Instance.Window.TextInput -= this.OnCharacterTyped;
 
@@ -382,6 +424,16 @@ namespace pTyping.Screens {
 			this._scoreDrawable.Text    = $"{this.Score.Score:00000000}";
 			this._accuracyDrawable.Text = $"{this.Score.Accuracy * 100:0.00}%";
 			this._comboDrawable.Text    = $"{this.Score.Combo}x";
+
+			bool isPaused = pTypingGame.MusicTrack.PlaybackState == PlaybackState.Paused;
+			
+			this._resumeButton.Visible  = isPaused;
+			this._restartButton.Visible = isPaused;
+			this._quitButton.Visible    = isPaused;
+			
+			this._resumeButton.Clickable  = isPaused;
+			this._restartButton.Clickable = isPaused;
+			this._quitButton.Clickable    = isPaused;
 			#endregion
 			
 			#region skin button visibility
@@ -441,10 +493,9 @@ namespace pTyping.Screens {
 		}
 
 		public void Play() {
-			// string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
-			
-			// pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
 			pTypingGame.PlayMusic();
+			
+			// pTypingGame.MusicTrack.SeekTo(0);
 		}
 	}
 }

@@ -16,6 +16,8 @@ namespace pTyping.Screens {
 		private TextDrawable _musicTitle;
 
 		public override void Initialize() {
+			base.Initialize();
+			
 			#region Title
 			TextDrawable titleText = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f), FurballGame.DEFAULT_FONT, "pTyping", 75) {
 				OriginType = OriginType.Center
@@ -75,7 +77,7 @@ namespace pTyping.Screens {
 			SongManager.UpdateSongs();
 			
 			#region Menu music
-			this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, $"None", 60) {
+			this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, $"None", 40) {
 				OriginType = OriginType.TopRight
 			};
 
@@ -130,8 +132,6 @@ namespace pTyping.Screens {
 				this.LoadSong(true);
 			else
 				this.LoadSong(false);
-
-			base.Initialize();
 		}
 		
 

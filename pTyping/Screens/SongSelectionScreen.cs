@@ -33,6 +33,8 @@ namespace pTyping.Screens {
 		}
 		
 		public override void Initialize() {
+			base.Initialize();
+			
 			SongManager.UpdateSongs();
 			if (!this._editor && SongManager.Songs.Count == 0) {
 				ScreenManager.ChangeScreen(new MenuScreen());
@@ -58,21 +60,15 @@ namespace pTyping.Screens {
 			
 			#region Song speed buttons
 			if(!this._editor) {
-				EventHandler<Point> audioSpeed1onClick = delegate {
-					pTypingGame.MusicTrack.Frequency *= 0.75f;
+				UiButtonDrawable audioSpeed1 = new(new(backButton.Size.X + 10, FurballGame.DEFAULT_WINDOW_HEIGHT), "0.75x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), AudioSpeed1OnClick) {
+					OriginType = OriginType.BottomLeft
 				};
-
-				UiButtonDrawable audioSpeed1 = new(new(backButton.Size.X + 10, FurballGame.DEFAULT_WINDOW_HEIGHT), "0.75x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), audioSpeed1onClick);
-				audioSpeed1.OriginType = OriginType.BottomLeft;
 
 				this.Manager.Add(audioSpeed1);
 
-				EventHandler<Point> audioSpeed2onClick = delegate {
-					pTypingGame.MusicTrack.Frequency *= 1.5f;
+				UiButtonDrawable audioSpeed2 = new(new(backButton.Size.X + audioSpeed1.Size.X + 20, FurballGame.DEFAULT_WINDOW_HEIGHT), "1.5x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), AudioSpeed2OnClick) {
+					OriginType = OriginType.BottomLeft
 				};
-
-				UiButtonDrawable audioSpeed2 = new(new(backButton.Size.X + audioSpeed1.Size.X + 20, FurballGame.DEFAULT_WINDOW_HEIGHT), "1.5x speed", pTypingGame.DEFAULT_FONT, 30, Color.Red, Color.White, Color.White, new(0), audioSpeed2onClick);
-				audioSpeed2.OriginType = OriginType.BottomLeft;
 
 				this.Manager.Add(audioSpeed2);
 			}
@@ -86,7 +82,8 @@ namespace pTyping.Screens {
 				};
 
 				UiButtonDrawable createNewSongButton = new(new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT), "Create Song", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero, newSongOnClick) {
-					OriginType = OriginType.BottomLeft
+					OriginType = OriginType.BottomLeft,
+					Depth = 0.5f
 				};
 
 				this.Manager.Add(createNewSongButton);
@@ -96,20 +93,16 @@ namespace pTyping.Screens {
 			#region Create new buttons for each song
 			float tempY = 50;
 			foreach (Song song in SongManager.Songs) {
-				EventHandler<Point> songButtonOnClick = delegate {
-					if (pTypingGame.CurrentSong.Value == song) {
-						this.PlaySelectedMap();
-						return;
-					}
-
-					pTypingGame.CurrentSong.Value = song;
-				};
-
-				UiButtonDrawable songButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", pTypingGame.JapaneseFont, 50, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50), songButtonOnClick) {
+				UiButtonDrawable songButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY), $"{song.Artist} - {song.Name} [{song.Difficulty}]", pTypingGame.JapaneseFont, 35, Color.Aqua, Color.Black, Color.Black, new Vector2(650, 50)) {
 					OriginType = OriginType.TopRight,
 					TextDrawable = {
 						OriginType = OriginType.RightCenter
-					}
+					},
+					Depth = 0.9f
+				};
+				
+				songButton.OnClick += delegate {
+					pTypingGame.CurrentSong.Value = song;
 				};
 				
 				this._songButtonList.Add(songButton);
@@ -119,9 +112,21 @@ namespace pTyping.Screens {
 				tempY += 60;
 			}
 			#endregion
+			
+			#region Start button
+			UiButtonDrawable startButton = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT), "Start!", FurballGame.DEFAULT_FONT, 60, Color.Red, Color.White, Color.White, new(0)) {
+				OriginType = OriginType.BottomRight
+			};
+
+			startButton.OnClick += delegate {
+				this.PlaySelectedMap();
+			};
+			
+			this.Manager.Add(startButton);
+			#endregion
 
 			#region Song info
-			this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, "", 55);
+			this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, "", 35);
 			
 			this.Manager.Add(this._songInfo);
 			#endregion
@@ -151,9 +156,16 @@ namespace pTyping.Screens {
 			FurballGame.InputManager.OnKeyUp += this.OnKeyUp;
 			
 			FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
-			
-			base.Initialize();
 		}
+		
+		private void AudioSpeed2OnClick(object sender, Point e) {
+			pTypingGame.MusicTrack.Frequency *= 1.5f;
+		}
+		
+		private void AudioSpeed1OnClick(object sender, Point e) {
+			pTypingGame.MusicTrack.Frequency *= 0.75f;
+		}
+		
 		private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
 			foreach (BaseDrawable songButton in this._songButtonList) {
 				songButton.Position += new Vector2(0f, e.scrollAmount);
