@@ -39,19 +39,19 @@ namespace pTyping.Screens {
 
         private List<NoteDrawable> _notes = new();
 
-        public static int ScoreExcellent = 1500;
-        public static int ScoreGood      = 1000;
-        public static int ScoreFair      = 500;
-        public static int ScorePoor      = 0;
+        public static readonly int ScoreExcellent = 1500;
+        public static readonly int ScoreGood      = 1000;
+        public static readonly int ScoreFair      = 500;
+        public static readonly int ScorePoor      = 0;
 
-        public static int ScorePerCharacter = 500;
-        public static int ScoreCombo        = 10;
-        public static int ScoreComboMax     = 1000;
+        public static readonly int ScorePerCharacter = 500;
+        public static readonly int ScoreCombo        = 10;
+        public static readonly int ScoreComboMax     = 1000;
 
-        public static int TimingExcellent = 20;
-        public static int TimingGood      = 50;
-        public static int TimingFair      = 100;
-        public static int TimingPoor      = 200;
+        public static readonly int TimingExcellent = 20;
+        public static readonly int TimingGood      = 50;
+        public static readonly int TimingFair      = 100;
+        public static readonly int TimingPoor      = 200;
 
         private Song _song;
 
@@ -363,6 +363,7 @@ namespace pTyping.Screens {
                             this.NoteToType++;
                         }
                         this.ShowTypingIndicator(args.Character);
+                        this.Score.Score += ScorePerCharacter;
 
                         break;
                     }
@@ -421,7 +422,7 @@ namespace pTyping.Screens {
                         scoreToAdd = ScorePoor;
                         break;
                 }
-                this.Score.Score += scoreToAdd + (this.Score.Combo - 1) * 10;
+                this.Score.Score += scoreToAdd + Math.Min(this.Score.Combo - 1 * ScoreCombo, ScoreComboMax);
                 this.Score.Combo++;
             } else {
                 this.Score.Combo = 0;
