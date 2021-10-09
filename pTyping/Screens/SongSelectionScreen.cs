@@ -35,7 +35,6 @@ namespace pTyping.Screens {
 		public override void Initialize() {
 			base.Initialize();
 			
-			SongManager.UpdateSongs();
 			if (!this._editor && SongManager.Songs.Count == 0) {
 				ScreenManager.ChangeScreen(new MenuScreen());
 				return;
@@ -188,6 +187,11 @@ namespace pTyping.Screens {
 				Keys.Down => -1f,
 				_         => this._movingDirection
 			};
+
+			if (e == Keys.F5) {
+				SongManager.UpdateSongs();
+				ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor));
+			}
 		}
 		
 		private void OnKeyUp(object sender, Keys e) {

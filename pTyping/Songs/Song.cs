@@ -1,10 +1,12 @@
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Microsoft.Xna.Framework;
 using Portable.Text;
+using Newtonsoft.Json;
 using pTyping.Songs.Events;
+using pTyping.LoggingLevels;
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using Furball.Engine.Engine.Helpers.Logger;
 
 namespace pTyping.Songs {
 	[JsonObject(MemberSerialization.OptIn)]
@@ -47,6 +49,8 @@ namespace pTyping.Songs {
 			
 			song.Notes.Sort((x, y) => (int)((x.Time - y.Time) * 1000));
 
+			Logger.Log($"pTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} [{song.Difficulty}] by {song.Creator}", new LoggerLevelSongInfo());
+			
 			return song;
 		}
 
@@ -153,10 +157,11 @@ namespace pTyping.Songs {
 				
 			} while (line != null);
 			
+			Logger.Log($"UTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} diff:{song.Difficulty}", new LoggerLevelSongInfo());
+			
 			return song;
 		}
-
-
+		
 		public TimingPoint CurrentTimingPoint(double currentTime) {
 			List<TimingPoint> sortedTimingPoints = this.TimingPoints.ToList();
 			sortedTimingPoints.Sort((pair, valuePair) => (int)(pair.Time - valuePair.Time));
@@ -181,6 +186,8 @@ namespace pTyping.Songs {
 			this.TimingPoints.Sort((x, y) => (int)(x.Time - y.Time));
 			
 			File.WriteAllText(this.FileInfo.FullName, JsonConvert.SerializeObject(this, Formatting.Indented));
+			
+			Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", new LoggerLevelSongInfo());
 		}
 
 		public void Save(FileStream stream) {
@@ -191,6 +198,8 @@ namespace pTyping.Songs {
 
 			writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
 			writer.Flush();
+			
+			Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", new LoggerLevelSongInfo());
 		}
 
 		public bool AllNotesHit() => this.Notes.All(note => note.IsHit);

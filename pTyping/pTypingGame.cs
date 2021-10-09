@@ -177,6 +177,8 @@ namespace pTyping {
 			HiraganaConversion.LoadConversion();
 			
 			ScreenManager.SetBlankTransition();
+			
+			SongManager.UpdateSongs();
 		}
 	}
 }

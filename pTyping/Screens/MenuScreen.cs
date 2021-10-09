@@ -73,8 +73,6 @@ namespace pTyping.Screens {
 			this.Manager.Add(optionsButton);
 			this.Manager.Add(exitButton);
 			#endregion
-
-			SongManager.UpdateSongs();
 			
 			#region Menu music
 			this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, $"None", 40) {

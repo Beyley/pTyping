@@ -51,9 +51,13 @@ namespace pTyping.Screens {
 		private const float EDITOR_TOOL_BASE_SIZE = 0.4f;
 		private const float EDITOR_TOOL_SCALED_SIZE = 0.55f;
 
+		private Song _song;
+		
 		public override void Initialize() {
 			base.Initialize();
 
+			this._song = pTypingGame.CurrentSong.Value.Copy();
+			
 			pTypingGame.MusicTrack.Stop();
 			
 			#region Gameplay preview
@@ -67,7 +71,7 @@ namespace pTyping.Screens {
 			
 			this.Manager.Add(this._recepticle);
 
-			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
+			foreach (Note note in this._song.Notes) {
 				NoteDrawable noteDrawable = new(new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
 					TimeSource    = pTypingGame.MusicTrack,
 					ColorOverride = note.Color,
@@ -125,7 +129,7 @@ namespace pTyping.Screens {
 			this.Manager.Add(pTypingGame.CurrentSongBackground);
 			
 			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(0.3f , 0.3f, 0.3f), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
-			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
+			pTypingGame.LoadBackgroundFromSong(this._song);
 			#endregion
 			#endregion
 
@@ -198,13 +202,13 @@ namespace pTyping.Screens {
 			};
 
 			leftButton.OnClick += delegate {
-				if(pTypingGame.CurrentSong.Value.Notes.Count > 0)
-					pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time);
+				if(this._song.Notes.Count > 0)
+					pTypingGame.MusicTrack.SeekTo(this._song.Notes.First().Time);
 			};
 			
 			rightButton.OnClick += delegate {
-				if(pTypingGame.CurrentSong.Value.Notes.Count > 0)
-					pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.Last().Time);
+				if(this._song.Notes.Count > 0)
+					pTypingGame.MusicTrack.SeekTo(this._song.Notes.Last().Time);
 			};
 			
 			this.Manager.Add(playButton);
@@ -287,8 +291,8 @@ namespace pTyping.Screens {
 				
 			this._selectedNote.Note.Text = this._textInput.Text.Trim();
 			// this._selectedNote.Note.TextToType = pTypingGame.Alphanumeric.Replace(this._textToTypeInput.Text.Trim(), string.Empty);
-			if (this._colorInput.Text.Length-1 is 3 or 4 or 6 or 8)
-				this._selectedNote.Note.Color = ColorConverter.FromString(this._colorInput.Text);
+			if (this._colorInput.Text.Length - 1 is 3 or 4 or 6 or 8)
+				this._selectedNote.Note.Color.FromHexString(this._colorInput.Text);
 
 			this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.Text}";
 			this._selectedNote.ColorOverride          = this._selectedNote.Note.Color;
@@ -347,9 +351,9 @@ namespace pTyping.Screens {
 
 				double timeAtCursor = currentTime + timeToReticule;
 
-				double noteLength = pTypingGame.CurrentSong.Value.DividedNoteLength(timeAtCursor);
+				double noteLength = this._song.DividedNoteLength(timeAtCursor);
 				
-				double snappedTimeAtCursor = Math.Round((timeAtCursor - pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength + pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
+				double snappedTimeAtCursor = Math.Round((timeAtCursor - this._song.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength + pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
 				this._mouseTime = snappedTimeAtCursor;
 
 				double distanceInTime = snappedTimeAtCursor - currentTime;
@@ -412,7 +416,7 @@ namespace pTyping.Screens {
 				
 					this.Manager.Add(noteDrawable);
 					this._notes.Add(noteDrawable);
-					pTypingGame.CurrentSong.Value.Notes.Add(noteDrawable.Note);
+					this._song.Notes.Add(noteDrawable.Note);
 				}
 			}
 		}
@@ -437,9 +441,8 @@ namespace pTyping.Screens {
 			this._selectionRect.TimeSource = noteDrawable.TimeSource;
 			this._selectionRect.Tweens     = noteDrawable.Tweens.Where(tween => tween.TweenType == TweenType.Movement && tween is VectorTween).ToList();
 
-			this._textInput.Text = this._selectedNote.Note.Text;
-			// this._textToTypeInput.Text = string.Concat(this._selectedNote.Note.ThisCharacterRomaji);
-			this._colorInput.Text      = ColorConverter.ToHexString(this._selectedNote.Note.Color);
+			this._textInput.Text  = this._selectedNote.Note.Text;
+			this._colorInput.Text = this._selectedNote.Note.Color.ToHexString();
 		}
 
 		public void DeselectNote(bool delete = false) {
@@ -449,7 +452,7 @@ namespace pTyping.Screens {
 			this._selectionRect.Visible = false;
 			
 			if(delete) {
-				pTypingGame.CurrentSong.Value.Notes.Remove(this._selectedNote.Note);
+				this._song.Notes.Remove(this._selectedNote.Note);
 				this._notes.Remove(this._selectedNote);
 				this._selectedNote.Visible = false;
 				this._selectedNote.ClearEvents();
@@ -480,10 +483,10 @@ namespace pTyping.Screens {
 		public void TimelineMove(bool right) {
 			double currentTime = pTypingGame.MusicTrack.CurrentTime * 1000d;
 					
-			double noteLength   = pTypingGame.CurrentSong.Value.DividedNoteLength(currentTime);
-			double timeToSeekTo = Math.Round((pTypingGame.MusicTrack.CurrentTime * 1000d - pTypingGame.CurrentSong.Value.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
+			double noteLength   = this._song.DividedNoteLength(currentTime);
+			double timeToSeekTo = Math.Round((pTypingGame.MusicTrack.CurrentTime * 1000d - this._song.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
 					
-			timeToSeekTo += pTypingGame.CurrentSong.Value.CurrentTimingPoint(currentTime).Time;
+			timeToSeekTo += this._song.CurrentTimingPoint(currentTime).Time;
 
 			if (right)
 				timeToSeekTo += noteLength;
@@ -526,7 +529,10 @@ namespace pTyping.Screens {
 				}
 				case Keys.S: {
 					// Save the song if ctrl+s is pressed
-					if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) pTypingGame.CurrentSong.Value.Save();
+					if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) {
+						this._song.Save();
+						SongManager.UpdateSongs();
+					}
 					break;
 				}
 				case Keys.D1: {
@@ -541,20 +547,21 @@ namespace pTyping.Screens {
 		}
 
 		public override void Update(GameTime gameTime) {
+			int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+			
 			for (int i = 0; i < this._notes.Count; i++) {
 				NoteDrawable noteDrawable = this._notes[i];
 
-				if (pTypingGame.MusicTrack.CurrentTime * 1000 > noteDrawable.Note.Time+10) {
+				if (currentTime > noteDrawable.Note.Time + 10 || currentTime < noteDrawable.Note.Time - Config.BaseApproachTime) {
 					noteDrawable.Visible = false;
 				} else {
 					noteDrawable.Visible = true;
-					if (noteDrawable.Tweens.Count == 0) {
+					if (noteDrawable.Tweens.Count(x => x.TweenType == TweenType.Movement) == 0) {
 						noteDrawable.Tweens.Add(new VectorTween(TweenType.Movement, new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset), PlayerScreen.RecepticlePos, (int)(noteDrawable.Note.Time - Config.BaseApproachTime), (int)noteDrawable.Note.Time));
 					}
 				}
 			}
 
-			int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
 			int milliseconds = (int)Math.Floor(currentTime         % 1000d);
 			int seconds     = (int)Math.Floor(currentTime / 1000d % 60d);
 			int minutes     = (int)Math.Floor(currentTime         / 1000d / 60d);

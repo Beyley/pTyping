@@ -10,6 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Helpers;
 using ManagedBass;
 using pTyping.Songs;
 using pTyping.Player;
@@ -52,6 +53,8 @@ namespace pTyping.Screens {
 		public static int TimingFair = 100;
 		public static int TimingPoor = 200;
 
+		private Song _song;
+
 		private Texture2D _noteTexture;
 		
 		public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
@@ -65,8 +68,10 @@ namespace pTyping.Screens {
 
 		public override void Initialize() {
 			base.Initialize();
+
+			this._song = pTypingGame.CurrentSong.Value.Copy();
 			
-			if (pTypingGame.CurrentSong.Value.Notes.Count == 0) {
+			if (this._song.Notes.Count == 0) {
 				//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
 				ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 			}
@@ -145,7 +150,7 @@ namespace pTyping.Screens {
 			this.Manager.Add(pTypingGame.CurrentSongBackground);
 			
 			pTypingGame.CurrentSongBackground.Tweens.Add(new ColorTween(TweenType.Color, pTypingGame.CurrentSongBackground.ColorOverride, new(1f * (1f - Config.BackgroundDim) , 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(), pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000));
-			pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
+			pTypingGame.LoadBackgroundFromSong(this._song);
 			#endregion
 			#region typing indicator
 			this._typingIndicator = new(RecepticlePos, pTypingGame.JapaneseFont, "", 60) {
@@ -180,11 +185,11 @@ namespace pTyping.Screens {
 		}
 		
 		private void SkipButtonClick(object sender, Point e) {
-			pTypingGame.MusicTrack.SeekTo(pTypingGame.CurrentSong.Value.Notes.First().Time - 2999);
+			pTypingGame.MusicTrack.SeekTo(this._song.Notes.First().Time - 2999);
 		}
 
 		public void AddNotes() {
-			foreach (Note note in pTypingGame.CurrentSong.Value.Notes) {
+			foreach (Note note in this._song.Notes) {
 				NoteDrawable noteDrawable = this.CreateNote(note);
 
 				this.Manager.Add(noteDrawable);
@@ -193,7 +198,7 @@ namespace pTyping.Screens {
 		}
 
 		public void CreateCutOffIndicators() {
-			foreach (Event @event in pTypingGame.CurrentSong.Value.Events) {
+			foreach (Event @event in this._song.Events) {
 				if(@event is not TypingCutoffEvent) continue;
 
 				TexturedDrawable cutoffIndicator = new(this._noteTexture, new(NoteStartPos.X, NoteStartPos.Y)) {
@@ -437,7 +442,7 @@ namespace pTyping.Screens {
 			#endregion
 			
 			#region skin button visibility
-			if (pTypingGame.CurrentSong.Value.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000) {
+			if (this._song.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000) {
 				this._skipButton.Visible = true;
 			} else {
 				this._skipButton.Visible = false;
@@ -469,7 +474,7 @@ namespace pTyping.Screens {
 					}
 				}
 
-				foreach (Event cutOffEvent in pTypingGame.CurrentSong.Value.Events) {
+				foreach (Event cutOffEvent in this._song.Events) {
 					if (cutOffEvent is not TypingCutoffEvent) continue;
 
 					if (currentTime > cutOffEvent.Time && cutOffEvent.Time > noteToType.Note.Time && !noteToType.Note.IsHit) {

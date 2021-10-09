@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Furball.Engine.Engine.Helpers.Logger;
+using pTyping.LoggingLevels;
 
 namespace pTyping.Songs {
 	public static class SongManager {
@@ -33,6 +35,8 @@ namespace pTyping.Songs {
 			}
 			
 			_Songs = songs;
+			
+			Logger.Log($"Loaded {Songs.Count} songs!", new LoggerLevelSongManagerUpdateInfo());
 		}
 	}
 }

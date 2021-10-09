@@ -107,10 +107,7 @@ namespace pTyping.Screens {
 			song.Save(stream);
 			// Close the filestream
 			stream.Close();
-			
-			// Queue a song update
-			SongManager.UpdateSongs();
-			
+
 			//Play the menu click sound (since we clicked a button)
 			pTypingGame.MenuClickSound.Play();
 			//Change the screen to the song select screen
