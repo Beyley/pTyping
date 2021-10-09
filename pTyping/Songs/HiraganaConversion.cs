@@ -2,12 +2,13 @@ using System.IO;
 using System.Collections.Generic;
 
 namespace pTyping.Songs {
-	public class HiraganaConversion {
-		public static readonly Dictionary<string, List<string>> Conversions = new();
-		
-		public static void LoadConversion() {
-			#region im sorry
-			string conversion = @"a	あ
+    public class HiraganaConversion {
+        public static readonly Dictionary<string, List<string>> Conversions = new();
+
+        public static void LoadConversion() {
+            #region im sorry
+
+            string conversion = @"a	あ
 i	い
 yi	い
 u	う
@@ -770,33 +771,37 @@ _	＿
 .	．
 /	／
 ";
-			#endregion
 
-			using StringReader reader = new(conversion);
-			string             line;
-			do
-			{
-				line = reader.ReadLine();
-				
-				if (line == null)
-					continue;
-				
-				string[] splitLine = line.Split("\t");
+            #endregion
 
-				string romaji   = splitLine[0];
-				string hiragana = splitLine[1];
-				
-				if (splitLine.Length > 2) continue;
+            using StringReader reader = new(conversion);
+            string             line;
+            do {
+                line = reader.ReadLine();
 
-				if (Conversions.TryGetValue(hiragana, out List<string> currentRomaji)) {
-					currentRomaji.Add(romaji);
-				} else {
-					Conversions.Add(hiragana, new() { romaji });
-				}
-				
-				// Conversions.Add((splitLine[0], splitLine[1]));
+                if (line == null)
+                    continue;
 
-			} while (line != null);
-		}
-	}
+                string[] splitLine = line.Split("\t");
+
+                string romaji   = splitLine[0];
+                string hiragana = splitLine[1];
+
+                if (splitLine.Length > 2) continue;
+
+                if (Conversions.TryGetValue(hiragana, out List<string> currentRomaji))
+                    currentRomaji.Add(romaji);
+                else
+                    Conversions.Add(
+                    hiragana,
+                    new() {
+                        romaji
+                    }
+                    );
+
+                // Conversions.Add((splitLine[0], splitLine[1]));
+
+            } while (line != null);
+        }
+    }
 }
