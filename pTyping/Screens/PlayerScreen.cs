@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Screens {
     public class PlayerScreen : Screen {
-        public PlayerScore Score = new();
+        private PlayerScore Score = new();
 
         private TextDrawable     _scoreDrawable;
         private TextDrawable     _accuracyDrawable;
@@ -35,7 +35,7 @@ namespace pTyping.Screens {
         private UiButtonDrawable _restartButton;
         private UiButtonDrawable _quitButton;
 
-        public SoundEffect HitSound = new();
+        public SoundEffect HitSoundNormal = new();
 
         private List<NoteDrawable> _notes = new();
 
@@ -62,7 +62,7 @@ namespace pTyping.Screens {
         public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         public static readonly Vector2 NoteEndPos   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
 
-        public int NoteToType;
+        private int NoteToType;
 
         public PlayerScreen() {}
 
@@ -221,9 +221,9 @@ namespace pTyping.Screens {
 
             #endregion
 
-            this.HitSound.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+            this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            this.HitSound.Volume = Config.Volume;
+            this.HitSoundNormal.Volume = Config.Volume;
 
             this.Play();
 
@@ -248,7 +248,7 @@ namespace pTyping.Screens {
             pTypingGame.MusicTrack.SeekTo(this._song.Notes.First().Time - 2999);
         }
 
-        public void AddNotes() {
+        private void AddNotes() {
             foreach (Note note in this._song.Notes) {
                 NoteDrawable noteDrawable = this.CreateNote(note);
 
@@ -257,7 +257,7 @@ namespace pTyping.Screens {
             }
         }
 
-        public void CreateCutOffIndicators() {
+        private void CreateCutOffIndicators() {
             foreach (Event @event in this._song.Events) {
                 if (@event is not TypingCutoffEvent) continue;
 
@@ -291,7 +291,7 @@ namespace pTyping.Screens {
             }
         }
 
-        public NoteDrawable CreateNote(Note note) {
+        private NoteDrawable CreateNote(Note note) {
             NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
                 TimeSource    = pTypingGame.MusicTrack,
                 ColorOverride = note.Color,
@@ -330,12 +330,12 @@ namespace pTyping.Screens {
             base.Dispose(disposing);
         }
 
-        public void OnKeyPress(object sender, Keys key) {
+        private void OnKeyPress(object sender, Keys key) {
             if (key == Keys.Escape)
                 pTypingGame.PauseResumeMusic();
         }
 
-        public void OnCharacterTyped(object sender, TextInputEventArgs args) {
+        private void OnCharacterTyped(object sender, TextInputEventArgs args) {
             NoteDrawable noteDrawable = this._notes[this.NoteToType];
 
             Note note = noteDrawable.Note;
@@ -357,7 +357,7 @@ namespace pTyping.Screens {
                     if (romaji[note.TypedRomaji.Length] == args.Character) {
                         //If true, then we finished the note, if false, then we continue
                         if (noteDrawable.TypeCharacter(romaji, timeDifference)) {
-                            this.HitSound.Play();
+                            this.HitSoundNormal.Play();
                             this.NoteUpdate(true, note);
 
                             this.NoteToType++;
