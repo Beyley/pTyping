@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace pTyping.Web {
     public class HttpResponse {
@@ -12,7 +13,7 @@ namespace pTyping.Web {
 
         public Dictionary<string, string> Headers = new();
 
-        public string MessageBody = "<b>Hewwowo worwd!</b><br><br><title>daddy uwu</title>";
+        public byte[] MessageBody;
 
         public static string DatePattern = "{0:ddd,' 'dd' 'MMM' 'yyyy' 'HH':'mm':'ss' 'K}";
         
@@ -24,23 +25,25 @@ namespace pTyping.Web {
 
         private void UpdateContentLengthHeader() {
             this.Headers.Remove("content-length");
-            this.Headers.Add("content-length", Encoding.UTF8.GetByteCount(this.MessageBody).ToString());
+            this.Headers.Add("content-length", this.MessageBody.Length.ToString());
         }
         
-        public override string ToString() {
+        public byte[] GetBytes() {
             string finalString = $"{HttpVersion} {this.StatusCode} {this.ReasonPhrase}{LineTerminator}";
             this.UpdateContentLengthHeader();
             foreach ((string header, string data) in this.Headers) {
                 finalString += $"{header}: {data}{LineTerminator}";
             }
             finalString += LineTerminator;
-            finalString += this.MessageBody;
+            
+            byte[] finalBytes = Encoding.UTF8.GetBytes(finalString);
+            finalBytes = finalBytes.Concat(this.MessageBody).ToArray();
 
-            return finalString;
+            return finalBytes;
         }
 
         public static implicit operator byte[](HttpResponse response) {
-            return Encoding.UTF8.GetBytes(response.ToString());
+            return response.GetBytes();
         }
     }
 }

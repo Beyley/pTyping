@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 using EeveeTools.Servers.TCP;
 
 namespace pTyping.Web {
@@ -11,7 +12,7 @@ namespace pTyping.Web {
             if (request.RequestUri.Contains("..")) {
                 response.StatusCode   = 403;
                 response.ReasonPhrase = "IM DEAD";
-                response.MessageBody  = "<b>You bitch ass motherfucker you duped moneybags didn't you?</b>";
+                response.MessageBody  = Encoding.UTF8.GetBytes("<b>You bitch ass motherfucker you duped moneybags didn't you?</b>");
                 this.SendResponse(response);
                 return;
             }
@@ -25,12 +26,12 @@ namespace pTyping.Web {
             if (!File.Exists(path)) {
                 response.StatusCode   = 404;
                 response.ReasonPhrase = "What the fuck is this?";
-                response.MessageBody  = "<b>where the hell am i?</b>";
+                response.MessageBody  = Encoding.UTF8.GetBytes("<b>where the hell am i?</b>");
                 this.SendResponse(response);
                 return;
             }
             
-            response.MessageBody = File.ReadAllText(path);
+            response.MessageBody = File.ReadAllBytes(path);
             this.SendResponse(response);
         }
 
