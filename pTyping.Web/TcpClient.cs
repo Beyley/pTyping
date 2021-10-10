@@ -45,7 +45,7 @@ namespace pTyping.Web {
                 ".xml"  => "text/xml",
                 ".js"   => "application/javascript",
                 ".zip"  => "application/zip",
-                _      => "application/octet-stream"
+                _       => "application/octet-stream"
             };
             
             this.SendResponse(response);
