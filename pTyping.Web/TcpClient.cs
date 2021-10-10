@@ -22,6 +22,7 @@ namespace pTyping.Web {
             if (Directory.Exists(path))
                 path = Path.Combine(path, "index.html");
 
+            //Checks if the file exists
             if (!File.Exists(path)) {
                 response.StatusCode   = 404;
                 response.ReasonPhrase = "What the fuck is this?";
@@ -30,7 +31,9 @@ namespace pTyping.Web {
                 return;
             }
 
+            //Read the target file and set the response body
             response.MessageBody = File.ReadAllBytes(path);
+            //Set the content type
             response.ContentType = Path.GetExtension(path).ToLower() switch {
                 ".html" => "text/html; charset=UTF-8",
                 ".htm"  => "text/html; charset=UTF-8",
