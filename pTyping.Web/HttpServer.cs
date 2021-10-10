@@ -1,9 +1,13 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using EeveeTools.Servers.TCP;
 
 namespace pTyping.Web {
-    public static class HTTPServer {
-        public static string Server = "pTyping Web Server";
+    public static class HttpServer {
+        public static string Server         = "pTyping Web Server";
+        public static string ExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception("shits fucked man");
+        public static string DataFolder     = "html";
         
         static void Main(string[] args) {
             string location = "0.0.0.0";

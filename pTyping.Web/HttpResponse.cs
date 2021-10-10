@@ -18,7 +18,7 @@ namespace pTyping.Web {
         
         public HttpResponse() {
             this.Headers.Add("date",   string.Format(DatePattern, DateTime.UtcNow));
-            this.Headers.Add("server", HTTPServer.Server);
+            this.Headers.Add("server", HttpServer.Server);
             this.Headers.Add("content-type", "text/html; charset=UTF-8");
         }
 
