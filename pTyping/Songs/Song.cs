@@ -1,6 +1,6 @@
 using System.IO;
 using System.Linq;
-using Portable.Text;
+using System.Text;
 using Newtonsoft.Json;
 using pTyping.Songs.Events;
 using pTyping.LoggingLevels;
