@@ -22,8 +22,9 @@ namespace pTyping {
         public static Texture2D BackButtonTexture;
         public static Texture2D DefaultBackground;
 
-        public static readonly AudioStream MusicTrack     = new();
-        public static readonly SoundEffect MenuClickSound = new();
+        public static readonly AudioStream MusicTrack          = new();
+        public static          Scheduler   MusicTrackScheduler;
+        public static readonly SoundEffect MenuClickSound      = new();
 
         public static Bindable<Song> CurrentSong = new(null);
 
@@ -146,6 +147,23 @@ namespace pTyping {
             // Instance.IsFixedTimeStep   = true;
         }
 
+        private double _musicTrackSchedulerDelta = 0;
+        protected override void Update(GameTime gameTime) {
+            base.Update(gameTime);
+
+            this._musicTrackSchedulerDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (this._musicTrackSchedulerDelta > 10 && MusicTrack.IsValidHandle) {
+                MusicTrackScheduler.Update(MusicTrack.GetCurrentTime());
+                this._musicTrackSchedulerDelta = 0;
+            }
+        }
+
+        protected override void EndRun() {
+            MusicTrackScheduler.Dispose(0);
+            
+            base.EndRun();
+        }
+
         protected override void Initialize() {
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);
@@ -183,6 +201,8 @@ namespace pTyping {
             ScreenManager.SetBlankTransition();
 
             SongManager.UpdateSongs();
+
+            MusicTrackScheduler = new();
         }
     }
 }
