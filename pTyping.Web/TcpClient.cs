@@ -32,6 +32,22 @@ namespace pTyping.Web {
             }
             
             response.MessageBody = File.ReadAllBytes(path);
+            response.ContentType = Path.GetExtension(path).ToLower() switch {
+                ".html" => "text/html; charset=UTF-8",
+                ".htm"  => "text/html; charset=UTF-8",
+                ".ico"  => "image/x-icon",
+                ".png"  => "image/png",
+                ".jpg"  => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".gif"  => "image/gif",
+                ".txt"  => "text/plain",
+                ".css"  => "text/css",
+                ".xml"  => "text/xml",
+                ".js"   => "application/javascript",
+                ".zip"  => "application/zip",
+                _      => "application/octet-stream"
+            };
+            
             this.SendResponse(response);
         }
 
