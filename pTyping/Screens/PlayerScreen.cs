@@ -62,7 +62,9 @@ namespace pTyping.Screens {
         public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         public static readonly Vector2 NoteEndPos   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
 
-        private int NoteToType;
+        private bool _endScheduled = false;
+        
+        private int _noteToType;
 
         public PlayerScreen() {}
 
@@ -336,7 +338,7 @@ namespace pTyping.Screens {
         }
 
         private void OnCharacterTyped(object sender, TextInputEventArgs args) {
-            NoteDrawable noteDrawable = this._notes[this.NoteToType];
+            NoteDrawable noteDrawable = this._notes[this._noteToType];
 
             Note note = noteDrawable.Note;
 
@@ -360,7 +362,7 @@ namespace pTyping.Screens {
                             this.HitSoundNormal.Play();
                             this.NoteUpdate(true, note);
 
-                            this.NoteToType++;
+                            this._noteToType++;
                         }
                         this.ShowTypingIndicator(args.Character);
                         this.Score.Score += ScorePerCharacter;
@@ -509,17 +511,17 @@ namespace pTyping.Screens {
 
             bool checkNoteHittability = true;
 
-            if (this.NoteToType == this._notes.Count) {
+            if (this._noteToType == this._notes.Count) {
                 this.EndScore();
                 checkNoteHittability = false;
             }
 
             if (checkNoteHittability) {
-                NoteDrawable noteToType = this._notes[this.NoteToType];
+                NoteDrawable noteToType = this._notes[this._noteToType];
 
                 //Checks if the current note is not hit
-                if (!noteToType.Note.IsHit && this.NoteToType < this._notes.Count - 1) {
-                    NoteDrawable nextNoteToType = this._notes[this.NoteToType + 1];
+                if (!noteToType.Note.IsHit && this._noteToType < this._notes.Count - 1) {
+                    NoteDrawable nextNoteToType = this._notes[this._noteToType + 1];
 
                     //If we are within the next note
                     if (currentTime > nextNoteToType.Note.Time) {
@@ -528,7 +530,7 @@ namespace pTyping.Screens {
                         //Tell the game to update all the info
                         this.NoteUpdate(false, noteToType.Note);
                         //Change us to the next note
-                        this.NoteToType++;
+                        this._noteToType++;
                     }
                 }
 
@@ -541,7 +543,7 @@ namespace pTyping.Screens {
                         //Tell the game to update all the info
                         this.NoteUpdate(false, noteToType.Note);
                         //Change us to the next note
-                        this.NoteToType++;
+                        this._noteToType++;
 
                         break;
                     }
@@ -552,7 +554,14 @@ namespace pTyping.Screens {
         }
 
         public void EndScore() {
-            ScreenManager.ChangeScreen(new ScoreResultsScreen(this.Score));
+            if (!this._endScheduled) {
+                pTypingGame.MusicTrackScheduler.ScheduleMethod(
+                delegate {
+                    ScreenManager.ChangeScreen(new ScoreResultsScreen(this.Score));
+                }, pTypingGame.MusicTrack.GetCurrentTime() + 1500);
+
+                this._endScheduled = true;
+            }
         }
 
         public void Play() {
