@@ -16,13 +16,12 @@ namespace pTyping.Web {
                 this.SendResponse(response);
                 return;
             }
-            
+
             string path = Path.GetFullPath(Path.Combine(HttpServer.ExecutablePath, HttpServer.DataFolder, request.RequestUri.TrimStart('/').TrimStart('\\')));
-            
-            if (Directory.Exists(path)) {
+
+            if (Directory.Exists(path))
                 path = Path.Combine(path, "index.html");
-            }
-            
+
             if (!File.Exists(path)) {
                 response.StatusCode   = 404;
                 response.ReasonPhrase = "What the fuck is this?";
@@ -30,7 +29,7 @@ namespace pTyping.Web {
                 this.SendResponse(response);
                 return;
             }
-            
+
             response.MessageBody = File.ReadAllBytes(path);
             response.ContentType = Path.GetExtension(path).ToLower() switch {
                 ".html" => "text/html; charset=UTF-8",
@@ -47,16 +46,16 @@ namespace pTyping.Web {
                 ".zip"  => "application/zip",
                 _       => "application/octet-stream"
             };
-            
+
             this.SendResponse(response);
         }
 
         public void SendResponse(HttpResponse response) {
-            this.Stream.Write((byte[]) response);
+            this.Stream.Write((byte[])response);
             this.Stream.Flush();
             this.Client.Close();
         }
-        
-        protected override void HandleDisconnect() { }
+
+        protected override void HandleDisconnect() {}
     }
 }
