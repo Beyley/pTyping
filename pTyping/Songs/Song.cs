@@ -9,6 +9,11 @@ using System.Collections.Generic;
 using Furball.Engine.Engine.Helpers.Logger;
 
 namespace pTyping.Songs {
+    public enum SongType {
+        pTyping,
+        UTyping
+    }
+    
     [JsonObject(MemberSerialization.OptIn)]
     public class Song {
         [JsonProperty]
@@ -41,6 +46,8 @@ namespace pTyping.Songs {
         [JsonProperty]
         public int TimeSignature = 4;
 
+        public SongType Type;
+
         public FileInfo FileInfo;
 
         public static Song LoadFromFile(FileInfo fileInfo) {
@@ -53,6 +60,8 @@ namespace pTyping.Songs {
             $"pTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} [{song.Difficulty}] by {song.Creator}",
             new LoggerLevelSongInfo()
             );
+
+            song.Type = SongType.pTyping;
 
             return song;
         }
@@ -79,6 +88,7 @@ namespace pTyping.Songs {
             song.Name       = info[0];
             song.Artist     = info[1];
             song.Difficulty = info[3];
+            song.Type       = SongType.UTyping;
 
             string dataFilename = info[4];
 
