@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ManagedBass;
 using pTyping.Songs;
 using Furball.Engine;
@@ -125,13 +126,16 @@ namespace pTyping.Screens {
             #region Create new buttons for each song
 
             float tempY = 50;
-            foreach (Song song in SongManager.Songs) {
+
+            IEnumerable<Song> songList = this._editor ? SongManager.Songs.Where(x => x.Type == SongType.pTyping) : SongManager.Songs;
+
+            foreach (Song song in songList) {
                 UiButtonDrawable songButton = new(
                 new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY),
                 $"{song.Artist} - {song.Name} [{song.Difficulty}]",
                 pTypingGame.JapaneseFont,
                 35,
-                Color.Aqua,
+                song.Type == SongType.pTyping ? Color.Blue : Color.Green,
                 Color.Black,
                 Color.Black,
                 new Vector2(650, 50)

@@ -126,6 +126,8 @@ namespace pTyping {
         }
 
         public static void ChangeGlobalVolume(int mouseScroll) {
+            VolumeSelector.Tweens.Clear();
+            
             VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, VolumeSelector.ColorOverride.A / 255f, 1f, Time, Time + 200));
 
             VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
@@ -197,9 +199,7 @@ namespace pTyping {
             };
 
             HiraganaConversion.LoadConversion();
-
             ScreenManager.SetBlankTransition();
-
             SongManager.UpdateSongs();
 
             MusicTrackScheduler = new();
