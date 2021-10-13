@@ -371,6 +371,8 @@ namespace pTyping.Screens {
             FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
             FurballGame.InputManager.OnMouseDown   += this.OnClick;
             FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
+
+            pTypingGame.UserStatusEditing();
         }
 
         private void UpdateTextInputs(object sender, char _) {

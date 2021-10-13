@@ -51,9 +51,9 @@ namespace pTyping {
 
         public static void UserStatusEditing() {
             if(Config.Username == CurrentSong.Value.Creator)
-                OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
+                OnlineManager.ChangeUserAction(new(UserActionType.Editing, $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
             else
-                OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
+                OnlineManager.ChangeUserAction(new(UserActionType.Editing, $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
         }
         
         public static void UserStatusPickingSong() {
@@ -209,6 +209,7 @@ namespace pTyping {
             ScoreManager.Load();
             
             OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080");
+            OnlineManager.Initialize();
             OnlineManager.Login();
 
             base.Initialize();

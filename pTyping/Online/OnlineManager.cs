@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Console=Furball.Engine.Engine.Console.Console;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {
-        public ChatManager Chat;
+        public ChatManager  Chat;
+        public Dictionary<int, OnlinePlayer> Players = new(); 
 
         public ConnectionState State {
             get;
@@ -27,6 +30,7 @@ namespace pTyping.Online {
         protected abstract Task ClientLogout();
         protected abstract Task Connect();
         protected abstract Task Disconnect();
+        public virtual async Task SendMessage(string channel, string message) { }
         
         public abstract Task ChangeUserAction(UserAction action);
 
@@ -55,6 +59,19 @@ namespace pTyping.Online {
             await this.ClientLogout();
 
             await this.Disconnect();
+        }
+
+        public void Initialize() {
+            Console.AddFunction("send_message",  (message) => {
+                if(this.State != ConnectionState.Connected)
+                    return "You are not connected!";
+
+                string[] split = message.Split(" ");
+                
+                this.SendMessage(split[0], string.Join(" ", split, 1, split.Length - 1)).Wait();
+                
+                return "Message sent!";
+            });
         }
     }
 

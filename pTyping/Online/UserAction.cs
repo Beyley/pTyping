@@ -18,5 +18,6 @@ namespace pTyping.Online {
         Idle,
         Ingame,
         Leaving,
+        Editing
     }
 }

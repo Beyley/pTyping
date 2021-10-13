@@ -8,4 +8,8 @@ namespace pTyping.LoggingLevels {
     public class LoggerLevelSongManagerUpdateInfo : LoggerLevel {
         public override string Name => "SongManagerInfo";
     }
+
+    public class LoggerLevelOnlineInfo : LoggerLevel {
+        public override string Name => "OnlineInfo";
+    }
 }

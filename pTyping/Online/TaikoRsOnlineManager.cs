@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using System.Text;
-using Websocket.Client;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
+using pTyping.LoggingLevels;
+using WebSocketSharp;
 using pTyping.Online.TaikoRsPackets;
+
+using Logger=Furball.Engine.Engine.Helpers.Logger.Logger;
 
 namespace pTyping.Online {
     public class TaikoRsOnlineManager : OnlineManager {
-        private WebsocketClient _client;
+        private WebSocket _client;
 
         private readonly Uri _uri;
 
@@ -22,18 +24,18 @@ namespace pTyping.Online {
                 await this.Disconnect();
             
             this.InvokeOnConnectStart(this);
-
-            this._client = new(this._uri);
-            this._client.MessageReceived.Subscribe(this.HandleMessage);
-            await this._client.StartOrFail();
+            
+            this._client = new(this._uri.ToString());
+            await Task.Run(() => this._client.Connect());
+            this._client.OnMessage += this.HandleMessage;
 
             this.InvokeOnConnect(this);
         }
 
-        private void HandleMessage(ResponseMessage message) {
-            if (message.MessageType == WebSocketMessageType.Text) throw new InvalidDataException("The server you are connecting to does not follow the rules of the Taiko.rs server infrastructure");
+        private void HandleMessage(object sender, MessageEventArgs message) {
+            if (message.IsText) throw new InvalidDataException("The server you are connecting to does not follow the rules of the Taiko.rs server infrastructure");
 
-            MemoryStream  stream = new(message.Binary);
+            MemoryStream  stream = new(message.RawData);
             TaikoRsReader reader = new(stream);
 
             TaikoRsPacketId pid = (TaikoRsPacketId)reader.ReadUInt16();
@@ -49,11 +51,54 @@ namespace pTyping.Online {
                     
                     break;
                 }
+                case TaikoRsPacketId.Server_UserJoined: {
+                    PacketServerUserJoined packet = new();
+                    packet.ReadPacket(reader);
+
+                    if (this.Players.ContainsKey(packet.Player.UserId)) break;
+                    
+                    this.Players.Add(packet.Player.UserId, packet.Player);
+                    Logger.Log($"{packet.Player.Username} joined!", new LoggerLevelOnlineInfo());
+                    
+                    break;
+                }
+                case TaikoRsPacketId.Server_UserLeft: {
+                    PacketServerUserLeft packet = new();
+                    packet.ReadPacket(reader);
+
+                    if(this.Players.Remove(packet.UserId, out OnlinePlayer playerLeft))
+                        Logger.Log($"{playerLeft.Username} left!", new LoggerLevelOnlineInfo());
+                    
+                    break;
+                }
+                case TaikoRsPacketId.Server_UserStatusUpdate: {
+                    PacketServerUserStatusUpdate packet = new();
+                    packet.ReadPacket(reader);
+
+                    if (this.Players.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                        player.Action = packet.Action;
+                        Logger.Log($"{player.Username} changed status to {player.Action.Action} : {player.Action.ActionText}!", new LoggerLevelOnlineInfo());
+                    }
+                    
+                    break;
+                }
+                case TaikoRsPacketId.Server_SendMessage: {
+                    PacketServerSendMessage packet = new();
+                    packet.ReadPacket(reader);
+
+                    Logger.Log($"Got message: {packet.Message} in channel {packet.Channel}", new LoggerLevelOnlineInfo());
+                    
+                    break;
+                }
             }
         }
 
+        public override async Task SendMessage(string channel, string message) {
+            await Task.Run(() => this._client.Send(new PacketClientSendMessage(channel, message).GetPacket()));
+        }
+
         protected override async Task Disconnect() {
-            await this._client.Stop(WebSocketCloseStatus.NormalClosure, "Client Disconnecting");
+            await Task.Run(() => this._client.Close(CloseStatusCode.Normal, "Client Disconnecting"));
             
             this.InvokeOnDisconnect(this);
             this.State = ConnectionState.Disconnected;
@@ -62,18 +107,18 @@ namespace pTyping.Online {
         public override async Task ChangeUserAction(UserAction action) {
             // new PacketClientStatusUpdate(action).GetPacket();
 
-            this._client.Send(new PacketClientStatusUpdate(action).GetPacket());
+            await Task.Run(() => this._client.Send(new PacketClientStatusUpdate(action).GetPacket()));
         }
 
         protected override async Task ClientLogin() {
-            this._client.Send(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket());
+            await Task.Run(() => this._client.Send(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket()));
 
             this.InvokeOnLoginStart(this);
             this.State = ConnectionState.Connecting;
         }
 
         protected override async Task ClientLogout() {
-            this._client.Send(new PacketClientUserLogout().GetPacket());
+            await Task.Run(() => this._client.Send(new PacketClientUserLogout().GetPacket()));
             
             this.InvokeOnLogout(this);
             this.State = ConnectionState.Disconnected;

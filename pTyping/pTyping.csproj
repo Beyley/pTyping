@@ -21,7 +21,7 @@
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.2040-develop" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
-        <PackageReference Include="Websocket.Client" Version="4.3.38" />
+        <PackageReference Include="zhuhaijun.WebSocketSharp" Version="0.0.1" />
     </ItemGroup>
 
 </Project>
