@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using pTyping.LoggingLevels;
 using WebSocketSharp;
 using pTyping.Online.TaikoRsPackets;
-
+using ErrorEventArgs=WebSocketSharp.ErrorEventArgs;
 using Logger=Furball.Engine.Engine.Helpers.Logger.Logger;
 
 namespace pTyping.Online {
@@ -28,8 +28,18 @@ namespace pTyping.Online {
             this._client = new(this._uri.ToString());
             await Task.Run(() => this._client.Connect());
             this._client.OnMessage += this.HandleMessage;
+            this._client.OnClose += this.ClientOnClose;
+            this._client.OnError += this.ClientOnError;
 
             this.InvokeOnConnect(this);
+        }
+        
+        private void ClientOnError(object sender, ErrorEventArgs e) {
+            this.State = ConnectionState.Disconnected;
+        }
+
+        private void ClientOnClose(object sender, CloseEventArgs e) {
+            this.State = ConnectionState.Disconnected;
         }
 
         private void HandleMessage(object sender, MessageEventArgs message) {
