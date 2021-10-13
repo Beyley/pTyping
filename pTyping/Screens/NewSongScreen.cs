@@ -86,6 +86,8 @@ namespace pTyping.Screens {
             this.Manager.Add(this._songDifficultyTextBox);
 
             #endregion
+            
+            pTypingGame.UserStatusListening();
         }
 
         private void CreateSong(FileInfo musicFileInfo) {

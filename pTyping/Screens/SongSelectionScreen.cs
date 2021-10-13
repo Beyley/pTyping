@@ -214,6 +214,8 @@ namespace pTyping.Screens {
             FurballGame.InputManager.OnKeyUp   += this.OnKeyUp;
 
             FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+            
+            pTypingGame.UserStatusPickingSong();
         }
 
         private void AudioSpeed2OnClick(object sender, Point e) {

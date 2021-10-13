@@ -109,6 +109,8 @@ namespace pTyping.Screens {
             pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 
             #endregion
+            
+            pTypingGame.UserStatusListening();
         }
     }
 }

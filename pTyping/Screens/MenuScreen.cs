@@ -167,6 +167,8 @@ namespace pTyping.Screens {
                 this.LoadSong(true);
             else
                 this.LoadSong(false);
+            
+            pTypingGame.UserStatusListening();
         }
 
 

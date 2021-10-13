@@ -16,6 +16,7 @@ using pTyping.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Online;
 using pTyping.Player;
 
 namespace pTyping {
@@ -34,6 +35,8 @@ namespace pTyping {
 
         public static ScoreManager ScoreManager = new();
 
+        public static OnlineManager OnlineManager;
+
         public static byte[] JapaneseFontData;
         public static FontSystem JapaneseFont = new(
         new FontSystemSettings {
@@ -46,6 +49,25 @@ namespace pTyping {
 
         public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
+        public static void UserStatusEditing() {
+            if(Config.Username == CurrentSong.Value.Creator)
+                OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
+            else
+                OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
+        }
+        
+        public static void UserStatusPickingSong() {
+            OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Choosing a song!"));
+        }
+        
+        public static void UserStatusListening() {
+            OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
+        }
+
+        public static void UserStatusPlaying() {
+            OnlineManager.ChangeUserAction(new(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]"));
+        }
+        
         public static void PlayMusic() {
             MusicTrack.Play();
             if (MusicTrack.IsValidHandle)
@@ -165,6 +187,7 @@ namespace pTyping {
 
         protected override void EndRun() {
             MusicTrackScheduler.Dispose(0);
+            OnlineManager.Logout().Wait();
             
             base.EndRun();
         }
@@ -184,6 +207,9 @@ namespace pTyping {
                 };
                 
             ScoreManager.Load();
+            
+            OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080");
+            OnlineManager.Login();
 
             base.Initialize();
 

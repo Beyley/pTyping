@@ -123,6 +123,8 @@ namespace pTyping.Screens {
             this.Manager.Add(res1920x1080button);
 
             #endregion
+            
+            pTypingGame.UserStatusListening();
         }
 
         private void BackgroundDimInputOnCommit(object sender, string e) {

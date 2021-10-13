@@ -233,6 +233,8 @@ namespace pTyping.Screens {
 
             FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
             FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
+
+            pTypingGame.UserStatusPlaying();
         }
 
         private void ResumeButtonClick(object sender, Point e) {
