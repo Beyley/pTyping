@@ -6,6 +6,7 @@ using pTyping.Songs.Events;
 using pTyping.LoggingLevels;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Helpers.Logger;
 
 namespace pTyping.Songs {
@@ -49,6 +50,20 @@ namespace pTyping.Songs {
         public SongType Type;
 
         public FileInfo FileInfo;
+
+        public string MapHash {
+            get {
+                this.Notes.Sort((x, y) => (int)(x.Time - y.Time));
+
+                StringBuilder notes  = new();
+                const string  format = "{0}:{1}:{2}:{3}";
+                foreach (Note note in this.Notes) {
+                    notes.AppendFormat(format, note.Time, note.Color, note.Text, note.YOffset);
+                }
+
+                return CryptoHelper.GetSha256(Encoding.Unicode.GetBytes(notes.ToString()));
+            }
+        }
 
         public static Song LoadFromFile(FileInfo fileInfo) {
             Song song = JsonConvert.DeserializeObject<Song>(File.ReadAllText(fileInfo.FullName));

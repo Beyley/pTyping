@@ -468,7 +468,7 @@ namespace pTyping.Screens {
 
         public void AddNote(Note note) {}
 
-        private void OnClick(object? sender, ((MouseButton mouseButton, Point position) args, string cursorName) e) {
+        private void OnClick(object sender, ((MouseButton mouseButton, Point position) args, string cursorName) e) {
             if (this.CurrentTool == EditorTool.CreateNote) {
                 Note note = new() {
                     Text = "a",

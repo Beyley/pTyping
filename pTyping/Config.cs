@@ -15,6 +15,8 @@ namespace pTyping {
         /// </summary>
         public static Bindable<int> TargetFPS = new(1000);
 
+        public static Bindable<string> Username = new("Guest");
+        
         /// <summary>
         /// The time it takes the notes to go from the right side of the screen to the left 
         /// </summary>

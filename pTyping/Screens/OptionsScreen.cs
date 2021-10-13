@@ -81,6 +81,24 @@ namespace pTyping.Screens {
             this.Manager.Add(targetFPSInput);
 
             #endregion
+            
+            #region Username
+
+            TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DEFAULT_FONT, "Username:", 30);
+            UiTextBoxDrawable usernameInput = new(
+            new Vector2(360 + usernameInputLabel.Size.X, 200),
+            FurballGame.DEFAULT_FONT,
+            Config.TargetFPS.Value.ToString(CultureInfo.InvariantCulture),
+            30,
+            200
+            );
+
+            usernameInput.OnCommit += this.UsernameInputOnCommit;
+
+            this.Manager.Add(usernameInputLabel);
+            this.Manager.Add(usernameInput);
+
+            #endregion
 
             #region 1600x900 res button
 
@@ -113,6 +131,10 @@ namespace pTyping.Screens {
 
         private void TargetFpsInputOnCommit(object sender, string e) {
             Config.TargetFPS.Value = int.Parse(e);
+        }
+        
+        private void UsernameInputOnCommit(object sender, string e) {
+            Config.Username.Value = e;
         }
     }
 }

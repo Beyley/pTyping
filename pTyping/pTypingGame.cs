@@ -16,6 +16,7 @@ using pTyping.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Player;
 
 namespace pTyping {
     public class pTypingGame : FurballGame {
@@ -30,6 +31,8 @@ namespace pTyping {
 
         public static TextDrawable     VolumeSelector;
         public static TexturedDrawable CurrentSongBackground;
+
+        public static ScoreManager ScoreManager = new();
 
         public static byte[] JapaneseFontData;
         public static FontSystem JapaneseFont = new(
@@ -166,6 +169,10 @@ namespace pTyping {
             base.EndRun();
         }
 
+        public static void SubmitScore(Song song, PlayerScore score) {
+            ScoreManager.AddScore(score);
+        }
+
         protected override void Initialize() {
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);
@@ -175,6 +182,8 @@ namespace pTyping {
                     Depth      = 1f,
                     OriginType = OriginType.Center
                 };
+                
+            ScoreManager.Load();
 
             base.Initialize();
 

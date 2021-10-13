@@ -1,18 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using ManagedBass;
 using pTyping.Songs;
+using pTyping.Player;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace pTyping.Screens {
@@ -21,11 +21,8 @@ namespace pTyping.Screens {
 
         private TextDrawable _songInfo;
 
-        private Texture2D        _defaultBackgroundImage;
-        private Texture2D        _backgroundImage;
-        private TexturedDrawable _backgroundImageDrawable;
-
-        private List<BaseDrawable> _songButtonList = new();
+        private List<BaseDrawable> _songButtonList    = new();
+        private List<BaseDrawable> _scoreDrawableList = new();
 
         private float _movingDirection;
 
@@ -283,6 +280,30 @@ namespace pTyping.Screens {
             }
 
             pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
+
+            #region Scores
+            this._scoreDrawableList.ForEach(x => this.Manager.Remove(x));
+
+            List<PlayerScore> scores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.MapHash).OrderByDescending(x => x.Score).ToList();
+            
+            float y = this._songInfo.Size.Y + 25;
+            for (int i = 0; i < scores.Count; i++) {
+                PlayerScore score = scores[i];
+                
+                TextDrawable scoreInfo = new(
+                new(15f, y),
+                pTypingGame.JapaneseFont,
+                $"{score.Username}\nScore: {score.Score}, {score.Accuracy * 100:00.##}%, {score.Combo}x",
+                25
+                );
+
+                y += scoreInfo.Size.Y + 10;
+
+                this._scoreDrawableList.Add(scoreInfo);
+                this.Manager.Add(scoreInfo);
+            }
+
+            #endregion
         }
 
         protected override void Dispose(bool disposing) {

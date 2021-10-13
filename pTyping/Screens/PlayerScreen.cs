@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Screens {
     public class PlayerScreen : Screen {
-        private PlayerScore Score = new();
+        private PlayerScore Score;
 
         private TextDrawable     _scoreDrawable;
         private TextDrawable     _accuracyDrawable;
@@ -72,6 +72,8 @@ namespace pTyping.Screens {
             base.Initialize();
 
             this._song = pTypingGame.CurrentSong.Value.Copy();
+
+            this.Score = new(this._song.MapHash, Config.Username);
 
             if (this._song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
@@ -557,6 +559,8 @@ namespace pTyping.Screens {
             if (!this._endScheduled) {
                 pTypingGame.MusicTrackScheduler.ScheduleMethod(
                 delegate {
+                    pTypingGame.SubmitScore(this._song, this.Score);
+                    
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this.Score));
                 }, pTypingGame.MusicTrack.GetCurrentTime() + 1500);
 
