@@ -52,7 +52,8 @@ namespace pTyping.Online {
             if(this.State == ConnectionState.Disconnected)
                 await this.Connect();
             
-            await this.ClientLogin();
+            if(this.State == ConnectionState.Connected)
+                await this.ClientLogin();
         }
 
         public async Task Logout() {

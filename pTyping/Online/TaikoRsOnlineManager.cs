@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using pTyping.LoggingLevels;
@@ -25,15 +26,22 @@ namespace pTyping.Online {
             
             this.InvokeOnConnectStart(this);
             
-            this._client = new(this._uri.ToString());
-            await Task.Run(() => this._client.Connect());
+            this._client           =  new WebSocket(this._uri.ToString());
+            
+            #region Disable logging
+            FieldInfo field = this._client.Log.GetType().GetField("_output", BindingFlags.NonPublic | BindingFlags.Instance);
+            field?.SetValue(this._client.Log, new Action<LogData, string>((_, _) => { }));
+            #endregion
+            
             this._client.OnMessage += this.HandleMessage;
-            this._client.OnClose += this.ClientOnClose;
-            this._client.OnError += this.ClientOnError;
+            this._client.OnClose   += this.ClientOnClose;
+            this._client.OnError   += this.ClientOnError;
+
+            await Task.Run(() => this._client.Connect());
 
             this.InvokeOnConnect(this);
         }
-        
+
         private void ClientOnError(object sender, ErrorEventArgs e) {
             this.State = ConnectionState.Disconnected;
         }
@@ -115,8 +123,6 @@ namespace pTyping.Online {
         }
         
         public override async Task ChangeUserAction(UserAction action) {
-            // new PacketClientStatusUpdate(action).GetPacket();
-
             await Task.Run(() => this._client.Send(new PacketClientStatusUpdate(action).GetPacket()));
         }
 
