@@ -1,6 +1,6 @@
 using System.IO;
-using Newtonsoft.Json;
 using pTyping.Online;
+using Newtonsoft.Json;
 
 namespace pTyping.Player {
     [JsonObject(MemberSerialization.OptIn)]
@@ -35,8 +35,34 @@ namespace pTyping.Player {
             this.MapHash  = mapHash;
             this.Username = username;
         }
+        
+        public PlayerScore() {
+            
+        }
 
         private static short _TaikoRsScoreVersion = 1;
+
+        public static PlayerScore TaikoRsDeserialize(TaikoRsReader reader) {
+            PlayerScore score = new();
+
+            reader.ReadUInt16(); // Version (we ignore rn)
+            
+            score.Username = reader.ReadString();
+            score.MapHash  = reader.ReadString();
+            reader.ReadByte(); // mode
+            score.Score         = reader.ReadInt64();
+            score.Combo         = reader.ReadInt16();
+            score.MaxCombo      = reader.ReadInt16();
+            score.PoorHits      = reader.ReadInt16();
+            score.FairHits      = reader.ReadInt16();
+            score.GoodHits      = reader.ReadInt16();
+            score.ExcellentHits = reader.ReadInt16();
+            reader.ReadInt16(); //katu
+            score.MissHits = reader.ReadInt16();
+            score.Accuracy = reader.ReadDouble();
+
+            return score;
+        }
         
         public byte[] TaikoRsSerialize() {
             MemoryStream  stream = new();

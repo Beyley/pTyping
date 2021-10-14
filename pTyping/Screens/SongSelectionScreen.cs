@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ManagedBass;
 using pTyping.Songs;
 using pTyping.Player;
@@ -27,6 +28,8 @@ namespace pTyping.Screens {
         private float _movingDirection;
 
         public SongSelectionScreen(bool editor) => this._editor = editor;
+
+        public bool GetScoresFromOnline = true;
 
         public override void Initialize() {
             base.Initialize();
@@ -286,7 +289,19 @@ namespace pTyping.Screens {
             #region Scores
             this._scoreDrawableList.ForEach(x => this.Manager.Remove(x));
 
-            List<PlayerScore> scores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.MapHash).OrderByDescending(x => x.Score).ToList();
+            List<PlayerScore> origScores;
+
+            if (this.GetScoresFromOnline) {
+                Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.MapHash);
+                
+                task.Wait();
+                
+                origScores = task.Result;
+            }
+            else
+                origScores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.MapHash);
+
+            List<PlayerScore> scores = origScores.OrderByDescending(x => x.Score).ToList();
             
             float y = this._songInfo.Size.Y + 25;
             for (int i = 0; i < scores.Count; i++) {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
@@ -20,6 +21,7 @@ namespace pTyping.Online {
         private readonly HttpClient _httpClient;
 
         private readonly string _scoreSubmitUrl = "/score_submit";
+        private readonly string _getScoresUrl = "/get_scores";
 
         public TaikoRsOnlineManager(string wsUri, string httpUri) {
             this._wsUri   = new(wsUri);
@@ -79,6 +81,43 @@ namespace pTyping.Online {
             catch {
                 //TODO tell the user the score submission failed
             }
+        }
+        protected override async Task<List<PlayerScore>> ClientGetScores(string hash) {
+            List<PlayerScore> scores = new();
+                
+            try {
+                string finalUri = this._httpUri + this._getScoresUrl;
+
+                MemoryStream  stream = new();
+                TaikoRsWriter writer = new(stream);
+                writer.Write(hash);
+                writer.Flush();
+
+                HttpContent content = new ByteArrayContent(stream.ToArray());
+
+                Task<HttpResponseMessage> task = this._httpClient.PostAsync(finalUri, content);
+                
+                await task;
+
+                TaikoRsReader reader = new(task.Result.Content.ReadAsStream());
+
+                ulong length = reader.ReadUInt64();
+
+                Logger.Log($"length: {length}");
+                for (ulong i = 0; i < length; i++) {
+                    PlayerScore score = PlayerScore.TaikoRsDeserialize(reader);
+                    
+                    Logger.Log($"reader score: username: {score.Username}");
+                    
+                    scores.Add(score);
+                    Logger.Log($"score read");
+                }
+            }
+            catch {
+                //TODO tell the user that getting the scores failed
+            }
+
+            return scores;
         }
 
         private void HandleMessage(object sender, MessageEventArgs args) {

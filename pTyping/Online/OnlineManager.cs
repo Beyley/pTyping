@@ -28,6 +28,13 @@ namespace pTyping.Online {
             if(this.State == ConnectionState.LoggedIn)
                 await this.ClientSubmitScore(score);
         }
+
+        public async Task<List<PlayerScore>> GetMapScores(string hash) {
+            if (this.State == ConnectionState.LoggedIn)
+                return await this.ClientGetScores(hash);
+
+            return new();
+        }
         
         public abstract string Username();
         public abstract string Password();
@@ -36,8 +43,9 @@ namespace pTyping.Online {
         protected abstract Task ClientLogout();
         protected abstract Task Connect();
         protected abstract Task Disconnect();
-        public abstract    Task SendMessage(string channel, string message);
+        public abstract    Task SendMessage(string            channel, string message);
         protected abstract Task ClientSubmitScore(PlayerScore score);
+        protected abstract Task<List<PlayerScore>> ClientGetScores(string hash);
 
         public abstract Task ChangeUserAction(UserAction action);
 
