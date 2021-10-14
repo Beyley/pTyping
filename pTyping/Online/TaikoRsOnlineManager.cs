@@ -103,15 +103,8 @@ namespace pTyping.Online {
 
                 ulong length = reader.ReadUInt64();
 
-                Logger.Log($"length: {length}");
-                for (ulong i = 0; i < length; i++) {
-                    PlayerScore score = PlayerScore.TaikoRsDeserialize(reader);
-                    
-                    Logger.Log($"reader score: username: {score.Username}");
-                    
-                    scores.Add(score);
-                    Logger.Log($"score read");
-                }
+                for (ulong i = 0; i < length; i++) 
+                    scores.Add(PlayerScore.TaikoRsDeserialize(reader));
             }
             catch {
                 //TODO tell the user that getting the scores failed
