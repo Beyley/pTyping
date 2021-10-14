@@ -75,7 +75,10 @@ namespace pTyping.Online {
                 HttpContent content = new ByteArrayContent(score.TaikoRsSerialize());
 
                 await this._httpClient.PostAsync(finalUri, content);
-            } catch { /* ignored */ }
+            }
+            catch {
+                //TODO tell the user the score submission failed
+            }
         }
 
         private void HandleMessage(object sender, MessageEventArgs args) {

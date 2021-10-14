@@ -204,7 +204,9 @@ namespace pTyping {
 
         public static void SubmitScore(Song song, PlayerScore score) {
             ScoreManager.AddScore(score);
-            OnlineManager.SubmitScore(score);
+            
+            if(OnlineManager.State == ConnectionState.LoggedIn)
+                OnlineManager.SubmitScore(score);
         }
 
         protected override void Initialize() {

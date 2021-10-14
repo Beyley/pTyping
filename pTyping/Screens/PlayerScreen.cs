@@ -342,6 +342,8 @@ namespace pTyping.Screens {
         }
 
         private void OnCharacterTyped(object sender, TextInputEventArgs args) {
+            if (this._song.AllNotesHit()) return;
+            
             NoteDrawable noteDrawable = this._notes[this._noteToType];
 
             Note note = noteDrawable.Note;
