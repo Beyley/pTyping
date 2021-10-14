@@ -50,7 +50,7 @@ namespace pTyping {
         public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
         public static void UserStatusEditing() {
-            if (OnlineManager.State != ConnectionState.Connected) return;
+            if (OnlineManager.State != ConnectionState.LoggedIn) return;
             
             if(Config.Username == CurrentSong.Value.Creator)
                 OnlineManager.ChangeUserAction(new(UserActionType.Editing, $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
@@ -59,19 +59,19 @@ namespace pTyping {
         }
         
         public static void UserStatusPickingSong() {
-            if (OnlineManager.State != ConnectionState.Connected) return;
+            if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
             OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Choosing a song!"));
         }
         
         public static void UserStatusListening() {
-            if (OnlineManager.State != ConnectionState.Connected) return;
+            if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
             OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
         }
 
         public static void UserStatusPlaying() {
-            if (OnlineManager.State != ConnectionState.Connected) return;
+            if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
             OnlineManager.ChangeUserAction(new(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]"));
         }
@@ -196,7 +196,7 @@ namespace pTyping {
         protected override void EndRun() {
             MusicTrackScheduler.Dispose(0);
             
-            if (OnlineManager.State == ConnectionState.Connected) 
+            if (OnlineManager.State == ConnectionState.LoggedIn) 
                 OnlineManager.Logout().Wait();
             
             base.EndRun();

@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
-using pTyping.LoggingLevels;
 using WebSocketSharp;
+using pTyping.LoggingLevels;
 using pTyping.Online.TaikoRsPackets;
 using ErrorEventArgs=WebSocketSharp.ErrorEventArgs;
 using Logger=Furball.Engine.Engine.Helpers.Logger.Logger;
@@ -21,12 +21,12 @@ namespace pTyping.Online {
         public override string Password() => Config.Password;
 
         protected override async Task Connect() {
-            if (this.State == ConnectionState.Connected)
+            if (this.State != ConnectionState.Disconnected)
                 await this.Disconnect();
             
             this.InvokeOnConnectStart(this);
-            
-            this._client           =  new WebSocket(this._uri.ToString());
+
+            this._client = new WebSocket(this._uri.ToString());
             
             #region Disable logging
             FieldInfo field = this._client.Log.GetType().GetField("_output", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -36,10 +36,15 @@ namespace pTyping.Online {
             this._client.OnMessage += this.HandleMessage;
             this._client.OnClose   += this.ClientOnClose;
             this._client.OnError   += this.ClientOnError;
+            this._client.OnOpen    += this.ClientOnOpen;
 
             await Task.Run(() => this._client.Connect());
 
             this.InvokeOnConnect(this);
+        }
+        
+        private void ClientOnOpen(object? sender, EventArgs e) {
+            this.State = ConnectionState.Connected;
         }
 
         private void ClientOnError(object sender, ErrorEventArgs e) {
@@ -50,10 +55,10 @@ namespace pTyping.Online {
             this.State = ConnectionState.Disconnected;
         }
 
-        private void HandleMessage(object sender, MessageEventArgs message) {
-            if (message.IsText) throw new InvalidDataException("The server you are connecting to does not follow the rules of the Taiko.rs server infrastructure");
+        private void HandleMessage(object sender, MessageEventArgs args) {
+            if (args.IsText) throw new InvalidDataException("The server you are connecting to does not follow the rules of the Taiko.rs server infrastructure");
 
-            MemoryStream  stream = new(message.RawData);
+            MemoryStream  stream = new(args.RawData);
             TaikoRsReader reader = new(stream);
 
             TaikoRsPacketId pid = (TaikoRsPacketId)reader.ReadUInt16();
@@ -64,7 +69,7 @@ namespace pTyping.Online {
                     packet.ReadPacket(reader);
 
                     this.UserId = packet.UserId;
-                    this.State  = ConnectionState.Connected;
+                    this.State  = ConnectionState.LoggedIn;
                     this.InvokeOnLoginComplete(this);
                     
                     break;
@@ -73,9 +78,9 @@ namespace pTyping.Online {
                     PacketServerUserJoined packet = new();
                     packet.ReadPacket(reader);
 
-                    if (this.Players.ContainsKey(packet.Player.UserId)) break;
+                    if (this.OnlinePlayers.ContainsKey(packet.Player.UserId)) break;
                     
-                    this.Players.Add(packet.Player.UserId, packet.Player);
+                    this.OnlinePlayers.Add(packet.Player.UserId, packet.Player);
                     Logger.Log($"{packet.Player.Username} joined!", new LoggerLevelOnlineInfo());
                     
                     break;
@@ -84,7 +89,7 @@ namespace pTyping.Online {
                     PacketServerUserLeft packet = new();
                     packet.ReadPacket(reader);
 
-                    if(this.Players.Remove(packet.UserId, out OnlinePlayer playerLeft))
+                    if(this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
                         Logger.Log($"{playerLeft.Username} left!", new LoggerLevelOnlineInfo());
                     
                     break;
@@ -93,7 +98,7 @@ namespace pTyping.Online {
                     PacketServerUserStatusUpdate packet = new();
                     packet.ReadPacket(reader);
 
-                    if (this.Players.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                    if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
                         player.Action = packet.Action;
                         Logger.Log($"{player.Username} changed status to {player.Action.Action} : {player.Action.ActionText}!", new LoggerLevelOnlineInfo());
                     }
@@ -104,7 +109,12 @@ namespace pTyping.Online {
                     PacketServerSendMessage packet = new();
                     packet.ReadPacket(reader);
 
-                    Logger.Log($"Got message: {packet.Message} in channel {packet.Channel}", new LoggerLevelOnlineInfo());
+                    if(this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                        ChatMessage message = new(player, packet.Channel, packet.Message);
+                        this.ChatLog.Add(message);
+
+                        Logger.Log($"<{message.Time.Hour:00}:{message.Time.Minute:00}> {message.Sender}: {message.Message}", new LoggerLevelChatMessage());
+                    }
                     
                     break;
                 }
@@ -130,14 +140,14 @@ namespace pTyping.Online {
             await Task.Run(() => this._client.Send(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket()));
 
             this.InvokeOnLoginStart(this);
-            this.State = ConnectionState.Connecting;
+            this.State = ConnectionState.LoggingIn;
         }
 
         protected override async Task ClientLogout() {
             await Task.Run(() => this._client.Send(new PacketClientUserLogout().GetPacket()));
             
             this.InvokeOnLogout(this);
-            this.State = ConnectionState.Disconnected;
+            this.State = ConnectionState.Connected;
         }
     }
 

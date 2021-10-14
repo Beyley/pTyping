@@ -8,6 +8,7 @@ namespace pTyping.Online.TaikoRsPackets {
             this.UserId            = reader.ReadInt32();
             this.Action.Action     = (UserActionType)reader.ReadUInt16();
             this.Action.ActionText = reader.ReadString();
+            this.Action.Mode       = (PlayMode)reader.ReadByte();
         }
     }
 }

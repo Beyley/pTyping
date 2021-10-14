@@ -16,6 +16,7 @@ namespace pTyping.Online.TaikoRsPackets {
             
             writer.Write((ushort)this.Action.Action);
             writer.Write(this.Action.ActionText);
+            writer.Write((byte)this.Action.Mode);
             
             writer.Flush();
 
