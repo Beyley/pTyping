@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using pTyping.Player;
 using Console=Furball.Engine.Engine.Console.Console;
 
 namespace pTyping.Online {
@@ -23,14 +24,20 @@ namespace pTyping.Online {
             protected set;
         }
 
+        public void SubmitScore(PlayerScore score) {
+            if(this.State == ConnectionState.LoggedIn)
+                this.ClientSubmitScore(score);
+        }
+        
         public abstract string Username();
         public abstract string Password();
 
-        protected abstract   Task ClientLogin();
-        protected abstract   Task ClientLogout();
-        protected abstract   Task Connect();
-        protected abstract   Task Disconnect();
-        public virtual async Task SendMessage(string channel, string message) {}
+        protected abstract Task ClientLogin();
+        protected abstract Task ClientLogout();
+        protected abstract Task Connect();
+        protected abstract Task Disconnect();
+        public abstract    Task SendMessage(string channel, string message);
+        protected abstract Task ClientSubmitScore(PlayerScore score);
 
         public abstract Task ChangeUserAction(UserAction action);
 

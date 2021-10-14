@@ -431,6 +431,8 @@ namespace pTyping.Screens {
                 this.Score.Score += scoreToAdd + Math.Min(this.Score.Combo - 1 * ScoreCombo, ScoreComboMax);
                 this.Score.Combo++;
             } else {
+                if (this.Score.Combo > this.Score.MaxCombo)
+                    this.Score.MaxCombo = this.Score.Combo;
                 this.Score.Combo = 0;
             }
 

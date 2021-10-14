@@ -204,6 +204,7 @@ namespace pTyping {
 
         public static void SubmitScore(Song song, PlayerScore score) {
             ScoreManager.AddScore(score);
+            OnlineManager.SubmitScore(score);
         }
 
         protected override void Initialize() {
@@ -218,7 +219,7 @@ namespace pTyping {
                 
             ScoreManager.Load();
             
-            OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080");
+            OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
             OnlineManager.Initialize();
             OnlineManager.Login();
 
