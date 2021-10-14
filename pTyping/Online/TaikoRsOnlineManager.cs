@@ -69,11 +69,13 @@ namespace pTyping.Online {
         }
 
         protected override async Task ClientSubmitScore(PlayerScore score) {
-            string finalUri = this._httpUri + this._scoreSubmitUrl;
+            try {
+                string finalUri = this._httpUri + this._scoreSubmitUrl;
 
-            HttpContent content = new ByteArrayContent(score.TaikoRsSerialize());
+                HttpContent content = new ByteArrayContent(score.TaikoRsSerialize());
 
-            await this._httpClient.PostAsync(finalUri, content);
+                await this._httpClient.PostAsync(finalUri, content);
+            } catch { /* ignored */ }
         }
 
         private void HandleMessage(object sender, MessageEventArgs args) {

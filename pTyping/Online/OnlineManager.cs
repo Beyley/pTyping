@@ -24,9 +24,9 @@ namespace pTyping.Online {
             protected set;
         }
 
-        public void SubmitScore(PlayerScore score) {
+        public async Task SubmitScore(PlayerScore score) {
             if(this.State == ConnectionState.LoggedIn)
-                this.ClientSubmitScore(score);
+                await this.ClientSubmitScore(score);
         }
         
         public abstract string Username();
