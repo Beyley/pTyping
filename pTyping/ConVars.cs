@@ -8,19 +8,19 @@ namespace pTyping {
         public static Login       Login       = new();
         public static Logout      Logout      = new();
 
-        public static FloatConVar  Volume        = new("master_volume", 0.05f);
-        public static FloatConVar  BackgroundDim = new("background_dim", 0.5f);
+        public static FloatConVar  Volume        = new("sl_master_volume", 0.05f);
+        public static FloatConVar  BackgroundDim = new("cl_background_dim", 0.5f);
         public static StringConVar Username      = new("username", "Guest");
         public static StringConVar Password      = new("password", "password");
 
         /// <summary>
         /// The time it takes the notes to go from the right side of the screen to the left 
         /// </summary>
-        public static IntConVar BaseApproachTime = new("base_approach_time", 2000);
+        public static IntConVar BaseApproachTime = new("cl_base_approach_time", 2000);
     }
 
     public class Logout : ConFunc {
-        public Logout() : base("logout") {}
+        public Logout() : base("net_logout") {}
 
         public override string Run(string consoleInput) {
             pTypingGame.OnlineManager.Logout().Wait();
@@ -34,7 +34,7 @@ namespace pTyping {
 
     public class Login : ConFunc {
 
-        public Login() : base("login") {}
+        public Login() : base("net_login") {}
 
         public override string Run(string consoleInput) {
             pTypingGame.OnlineManager.Login().Wait();
@@ -47,7 +47,7 @@ namespace pTyping {
     }
 
     public class SendMessage : ConFunc {
-        public SendMessage() : base("send_message") {}
+        public SendMessage() : base("net_send_message") {}
         public override string Run(string consoleInput) {
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
                 return "You are not logged in!";
