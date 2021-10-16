@@ -113,7 +113,7 @@ namespace pTyping.Screens {
                 TweenType.Movement,
                 new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset),
                 PlayerScreen.RecepticlePos,
-                (int)(note.Time - Config.BaseApproachTime),
+                (int)(note.Time - ConVars.BaseApproachTime.Value),
                 (int)note.Time
                 )
                 );
@@ -445,7 +445,7 @@ namespace pTyping.Screens {
 
                 double distanceToReticule = x - reticulePos;
 
-                double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * Config.BaseApproachTime;
+                double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * ConVars.BaseApproachTime.Value;
 
                 double timeAtCursor = currentTime + timeToReticule;
 
@@ -457,7 +457,7 @@ namespace pTyping.Screens {
 
                 double distanceInTime = snappedTimeAtCursor - currentTime;
 
-                double scaleTime = distanceInTime     / Config.BaseApproachTime;
+                double scaleTime = distanceInTime     / ConVars.BaseApproachTime.Value;
                 double scaleRaw  = distanceToReticule / (noteStartPos - reticulePos);
 
                 double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
@@ -514,7 +514,7 @@ namespace pTyping.Screens {
                     TweenType.Movement,
                     PlayerScreen.NoteStartPos,
                     PlayerScreen.RecepticlePos,
-                    (int)(note.Time - Config.BaseApproachTime),
+                    (int)(note.Time - ConVars.BaseApproachTime.Value),
                     (int)note.Time
                     )
                     );
@@ -539,7 +539,7 @@ namespace pTyping.Screens {
             TweenType.Movement,
             new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset),
             PlayerScreen.RecepticlePos,
-            (int)(noteDrawable.Note.Time - Config.BaseApproachTime),
+            (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
             (int)noteDrawable.Note.Time
             )
             );
@@ -548,7 +548,7 @@ namespace pTyping.Screens {
             TweenType.Movement,
             new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset),
             PlayerScreen.RecepticlePos,
-            (int)(noteDrawable.Note.Time - Config.BaseApproachTime),
+            (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
             (int)noteDrawable.Note.Time
             )
             );
@@ -647,12 +647,10 @@ namespace pTyping.Screens {
                     this.DeselectNote(true);
                     break;
                 }
-                case Keys.S: {
+                case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
                     // Save the song if ctrl+s is pressed
-                    if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl)) {
-                        this._song.Save();
-                        SongManager.UpdateSongs();
-                    }
+                    this._song.Save();
+                    SongManager.UpdateSongs();
                     break;
                 }
                 case Keys.D1: {
@@ -672,7 +670,7 @@ namespace pTyping.Screens {
             for (int i = 0; i < this._notes.Count; i++) {
                 NoteDrawable noteDrawable = this._notes[i];
 
-                if (currentTime > noteDrawable.Note.Time + 10 || currentTime < noteDrawable.Note.Time - Config.BaseApproachTime) {
+                if (currentTime > noteDrawable.Note.Time + 10 || currentTime < noteDrawable.Note.Time - ConVars.BaseApproachTime.Value) {
                     noteDrawable.Visible = false;
                 } else {
                     noteDrawable.Visible = true;
@@ -682,7 +680,7 @@ namespace pTyping.Screens {
                         TweenType.Movement,
                         new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset),
                         PlayerScreen.RecepticlePos,
-                        (int)(noteDrawable.Note.Time - Config.BaseApproachTime),
+                        (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
                         (int)noteDrawable.Note.Time
                         )
                         );

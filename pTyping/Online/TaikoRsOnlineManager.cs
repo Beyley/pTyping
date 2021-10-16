@@ -30,8 +30,8 @@ namespace pTyping.Online {
             this._httpClient = new();
         }
 
-        public override string Username() => Config.Username;
-        public override string Password() => Config.Password;
+        public override string Username() => ConVars.Username.Value;
+        public override string Password() => ConVars.Password.Value;
 
         protected override async Task Connect() {
             if (this.State != ConnectionState.Disconnected)

@@ -183,9 +183,16 @@ namespace pTyping.Screens {
 
             #endregion
 
+            #region Leaderboard select
+            
+            #endregion
+            
             #region Song info
 
-            this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, "", 35);
+            this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, "", 35) {
+                Clickable = false,
+                CoverClicks = false
+            };
 
             this.Manager.Add(this._songInfo);
 

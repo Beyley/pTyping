@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Online;
 using pTyping.Player;
+using Console=Furball.Engine.Engine.Console.Console;
 
 namespace pTyping {
     public class pTypingGame : FurballGame {
@@ -52,7 +53,7 @@ namespace pTyping {
         public static void UserStatusEditing() {
             if (OnlineManager.State != ConnectionState.LoggedIn) return;
             
-            if(Config.Username == CurrentSong.Value.Creator)
+            if(ConVars.Username.Value == CurrentSong.Value.Creator)
                 OnlineManager.ChangeUserAction(new(UserActionType.Editing, $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
             else
                 OnlineManager.ChangeUserAction(new(UserActionType.Editing, $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"));
@@ -79,7 +80,7 @@ namespace pTyping {
         public static void PlayMusic() {
             MusicTrack.Play();
             if (MusicTrack.IsValidHandle)
-                MusicTrack.Volume = Config.Volume;
+                MusicTrack.Volume = ConVars.Volume.Value;
         }
 
         public static void PauseResumeMusic() {
@@ -141,16 +142,16 @@ namespace pTyping {
             byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
             MenuClickSound.Load(menuClickSoundData);
 
-            MenuClickSound.Volume = Config.Volume;
+            MenuClickSound.Volume = ConVars.Volume.Value;
             if (MusicTrack.IsValidHandle)
-                MusicTrack.Volume = Config.Volume;
-            Config.Volume.OnChange += delegate(object _, float volume) {
+                MusicTrack.Volume = ConVars.Volume.Value;
+            ConVars.Volume.Value.OnChange += delegate(object _, float volume) {
                 MenuClickSound.Volume = volume;
                 if (MusicTrack.IsValidHandle)
-                    MusicTrack.Volume = Config.Volume;
+                    MusicTrack.Volume = ConVars.Volume.Value;
 
                 if (VolumeSelector is not null)
-                    VolumeSelector.Text = $"Volume: {Config.Volume.Value * 100f:00.##}";
+                    VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100f:00.##}";
             };
 
             DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
@@ -166,9 +167,9 @@ namespace pTyping {
             VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
 
             if (mouseScroll > 0)
-                Config.Volume.Value = Math.Clamp(Config.Volume + 0.05f, 0f, 1f);
+                ConVars.Volume.Value.Value = Math.Clamp(ConVars.Volume.Value + 0.05f, 0f, 1f);
             else
-                Config.Volume.Value = Math.Clamp(Config.Volume - 0.05f, 0f, 1f);
+                ConVars.Volume.Value.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
         }
 
         public static void ChangeTargetFPS(double target) {
@@ -210,6 +211,12 @@ namespace pTyping {
         }
 
         protected override void Initialize() {
+            Console.AddConVar(ConVars.Username);
+            Console.AddConVar(ConVars.Password);
+            Console.AddConVar(ConVars.Volume);
+            Console.AddConVar(ConVars.BackgroundDim);
+            Console.AddConVar(ConVars.BaseApproachTime);
+            
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);
 
@@ -227,7 +234,7 @@ namespace pTyping {
 
             base.Initialize();
 
-            VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {Config.Volume.Value}", 50) {
+            VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
                 OriginType = OriginType.BottomRight
             };
 
@@ -241,11 +248,11 @@ namespace pTyping {
 
             DrawableManager.Add(VolumeSelector);
 
-            ChangeTargetFPS(Config.TargetFPS);
+            // ChangeTargetFPS(1000);
 
-            Config.TargetFPS.OnChange += delegate(object _, int newTarget) {
-                ChangeTargetFPS(newTarget);
-            };
+            // Config.TargetFPS.OnChange += delegate(object _, int newTarget) {
+            //     ChangeTargetFPS(newTarget);
+            // };
 
             HiraganaConversion.LoadConversion();
             ScreenManager.SetBlankTransition();

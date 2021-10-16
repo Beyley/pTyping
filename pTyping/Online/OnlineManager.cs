@@ -78,43 +78,9 @@ namespace pTyping.Online {
         }
 
         public void Initialize() {
-            Console.AddFunction(
-            "send_message",
-            message => {
-                if (this.State != ConnectionState.LoggedIn)
-                    return "You are not logged in!";
-
-                string[] split = message.Split(" ");
-
-                this.SendMessage(split[0], string.Join(" ", split, 1, split.Length - 1)).Wait();
-
-                return "Message sent!";
-            }
-            );
-
-            Console.AddFunction(
-            "login",
-            _ => {
-                pTypingGame.OnlineManager.Login().Wait();
-
-                if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
-                    return "Login not successful!";
-
-                return "Logged in!";
-            }
-            );
-
-            Console.AddFunction(
-            "logout",
-            _ => {
-                pTypingGame.OnlineManager.Logout().Wait();
-
-                if (pTypingGame.OnlineManager.State != ConnectionState.Disconnected)
-                    return "Logout not successful!";
-
-                return "Logged out!";
-            }
-            );
+            Console.AddConFunc(ConVars.SendMessage);
+            Console.AddConFunc(ConVars.Login);
+            Console.AddConFunc(ConVars.Logout);
         }
     }
 

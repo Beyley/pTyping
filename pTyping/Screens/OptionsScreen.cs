@@ -52,7 +52,7 @@ namespace pTyping.Screens {
             UiTextBoxDrawable backgroundDimInput = new(
             new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
             FurballGame.DEFAULT_FONT,
-            Config.BackgroundDim.ToString(CultureInfo.InvariantCulture),
+            ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture),
             30,
             200
             );
@@ -66,19 +66,19 @@ namespace pTyping.Screens {
 
             #region Target FPS
 
-            TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
-            UiTextBoxDrawable targetFPSInput = new(
-            new Vector2(110 + targetFPSInputLabel.Size.X, 200),
-            FurballGame.DEFAULT_FONT,
-            Config.TargetFPS.Value.ToString(CultureInfo.InvariantCulture),
-            30,
-            200
-            );
-
-            targetFPSInput.OnCommit += this.TargetFpsInputOnCommit;
-
-            this.Manager.Add(targetFPSInputLabel);
-            this.Manager.Add(targetFPSInput);
+            // TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
+            // UiTextBoxDrawable targetFPSInput = new(
+            // new Vector2(110 + targetFPSInputLabel.Size.X, 200),
+            // FurballGame.DEFAULT_FONT,
+            // ConVars.TargetFPS.Value.Value.ToString(CultureInfo.InvariantCulture),
+            // 30,
+            // 200
+            // );
+            //
+            // targetFPSInput.OnCommit += this.TargetFpsInputOnCommit;
+            //
+            // this.Manager.Add(targetFPSInputLabel);
+            // this.Manager.Add(targetFPSInput);
 
             #endregion
             
@@ -88,7 +88,7 @@ namespace pTyping.Screens {
             UiTextBoxDrawable usernameInput = new(
             new Vector2(360 + usernameInputLabel.Size.X, 200),
             FurballGame.DEFAULT_FONT,
-            Config.TargetFPS.Value.ToString(CultureInfo.InvariantCulture),
+            ConVars.Username.Value.Value.ToString(CultureInfo.InvariantCulture),
             30,
             200
             );
@@ -128,15 +128,15 @@ namespace pTyping.Screens {
         }
 
         private void BackgroundDimInputOnCommit(object sender, string e) {
-            Config.BackgroundDim = float.Parse(e);
+            ConVars.BackgroundDim.Value.Value = float.Parse(e);
         }
 
-        private void TargetFpsInputOnCommit(object sender, string e) {
-            Config.TargetFPS.Value = int.Parse(e);
-        }
+        // private void TargetFpsInputOnCommit(object sender, string e) {
+        //     Config.TargetFPS.Value = int.Parse(e);
+        // }
         
         private void UsernameInputOnCommit(object sender, string e) {
-            Config.Username.Value = e;
+            ConVars.Username.Value.Value = e;
         }
     }
 }

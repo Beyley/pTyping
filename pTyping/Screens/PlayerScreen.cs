@@ -73,7 +73,7 @@ namespace pTyping.Screens {
 
             this._song = pTypingGame.CurrentSong.Value.Copy();
 
-            this.Score = new(this._song.MapHash, Config.Username);
+            this.Score = new(this._song.MapHash, ConVars.Username.Value);
 
             if (this._song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
@@ -205,7 +205,7 @@ namespace pTyping.Screens {
             new ColorTween(
             TweenType.Color,
             pTypingGame.CurrentSongBackground.ColorOverride,
-            new(1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim), 1f * (1f - Config.BackgroundDim)),
+            new(1f * (1f - ConVars.BackgroundDim.Value), 1f * (1f - ConVars.BackgroundDim.Value), 1f * (1f - ConVars.BackgroundDim.Value)),
             pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
             pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
             )
@@ -227,7 +227,7 @@ namespace pTyping.Screens {
 
             this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            this.HitSoundNormal.Volume = Config.Volume;
+            this.HitSoundNormal.Volume = ConVars.Volume.Value;
 
             this.Play();
 
@@ -276,7 +276,7 @@ namespace pTyping.Screens {
 
                 #region tweens
 
-                float travelTime = Config.BaseApproachTime;
+                float travelTime = ConVars.BaseApproachTime.Value;
 
                 float travelDistance = NoteStartPos.X - RecepticlePos.X;
                 float travelRatio    = travelTime / travelDistance;
@@ -309,7 +309,7 @@ namespace pTyping.Screens {
                 OriginType = OriginType.Center
             };
 
-            float travelTime = Config.BaseApproachTime;
+            float travelTime = ConVars.BaseApproachTime.Value;
 
             float travelDistance = NoteStartPos.X - RecepticlePos.X;
             float travelRatio    = travelTime / travelDistance;
