@@ -13,7 +13,9 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace pTyping.Screens {
@@ -29,7 +31,8 @@ namespace pTyping.Screens {
 
         public SongSelectionScreen(bool editor) => this._editor = editor;
 
-        public bool GetScoresFromOnline = true;
+        public static Bindable<LeaderboardType> LeaderboardType = new(Screens.LeaderboardType.Local);
+        private       TexturedDrawable          _leaderboardButton;
 
         public override void Initialize() {
             base.Initialize();
@@ -184,12 +187,20 @@ namespace pTyping.Screens {
             #endregion
 
             #region Leaderboard select
+
+            this._leaderboardButton = new(TextureFromLeaderboardType(LeaderboardType), new(10, 10)) {
+                Scale = new(0.05f)
+            };
             
+            this._leaderboardButton.OnClick += this.ChangeLeaderboardType;
+                
+            this.Manager.Add(this._leaderboardButton);
+                
             #endregion
             
             #region Song info
 
-            this._songInfo = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, "", 35) {
+            this._songInfo = new TextDrawable(new Vector2(this._leaderboardButton.Size.X + 20, 10), pTypingGame.JapaneseFont, "", 35) {
                 Clickable = false,
                 CoverClicks = false
             };
@@ -224,8 +235,29 @@ namespace pTyping.Screens {
             FurballGame.InputManager.OnKeyUp   += this.OnKeyUp;
 
             FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+
+            LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
             
             pTypingGame.UserStatusPickingSong();
+        }
+        
+        private void ChangeLeaderboardType(object sender, Point e) {
+            LeaderboardType.Value = LeaderboardType.Value switch {
+                Screens.LeaderboardType.Local  => Screens.LeaderboardType.Global,
+                Screens.LeaderboardType.Global => Screens.LeaderboardType.Friend,
+                Screens.LeaderboardType.Friend => Screens.LeaderboardType.Local,
+                _                              => LeaderboardType.Value
+            };
+            
+            this._leaderboardButton.SetTexture(TextureFromLeaderboardType(LeaderboardType));
+            
+            // this._leaderboardButton.Tweens.Clear();
+            this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, this._leaderboardButton.Scale, new(0.055f), FurballGame.Time, FurballGame.Time + 50));
+            this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, new(0.055f),                            new(0.05f),   FurballGame.Time + 50, FurballGame.Time + 100));
+        }
+
+        private void OnLeaderboardTypeChange(object sender, LeaderboardType e) {
+            this.UpdateScores();
         }
 
         private void AudioSpeed2OnClick(object sender, Point e) {
@@ -293,20 +325,32 @@ namespace pTyping.Screens {
 
             pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 
-            #region Scores
+            this.UpdateScores();
+        }
+
+        public void UpdateScores() {
             this._scoreDrawableList.ForEach(x => this.Manager.Remove(x));
 
-            List<PlayerScore> origScores;
+            List<PlayerScore> origScores = new();
 
-            if (this.GetScoresFromOnline) {
-                Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.MapHash);
+            switch (LeaderboardType.Value) {
+                case Screens.LeaderboardType.Friend: {
+                    //TODO: implement friend leaderboards
+                    break;
+                }
+                case Screens.LeaderboardType.Global: {
+                    Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.MapHash);
                 
-                task.Wait();
+                    task.Wait();
                 
-                origScores = task.Result;
+                    origScores = task.Result;
+                    break;
+                }
+                case Screens.LeaderboardType.Local: {
+                    origScores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.MapHash);
+                    break;
+                }
             }
-            else
-                origScores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.MapHash);
 
             List<PlayerScore> scores = origScores.OrderByDescending(x => x.Score).ToList();
             
@@ -325,17 +369,35 @@ namespace pTyping.Screens {
 
                 this._scoreDrawableList.Add(scoreInfo);
                 this.Manager.Add(scoreInfo);
-            }
-
-            #endregion
+            }            
         }
 
         protected override void Dispose(bool disposing) {
-            FurballGame.InputManager.OnKeyDown     -= this.OnKeyDown;
-            FurballGame.InputManager.OnKeyUp       -= this.OnKeyUp;
+            pTypingGame.CurrentSong.OnChange -= this.OnSongChange;
+
+            FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
+            FurballGame.InputManager.OnKeyUp   -= this.OnKeyUp;
+
             FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
+
+            LeaderboardType.OnChange -= this.OnLeaderboardTypeChange;
 
             base.Dispose(disposing);
         }
+
+        public static Texture2D TextureFromLeaderboardType(LeaderboardType type) {
+            return type switch {
+                Screens.LeaderboardType.Friend => pTypingGame.FriendLeaderboardButtonTexture,
+                Screens.LeaderboardType.Global => pTypingGame.GlobalLeaderboardButtonTexture,
+                Screens.LeaderboardType.Local  => pTypingGame.LocalLeaderboardButtonTexture,
+                _                              => throw new ArgumentOutOfRangeException(nameof (type), type, "That leaderboard type is not supported!")
+            };
+        }
+    }
+
+    public enum LeaderboardType {
+        Global,
+        Friend,
+        Local
     }
 }

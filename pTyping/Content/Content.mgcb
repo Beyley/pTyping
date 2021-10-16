@@ -61,8 +61,17 @@
 /processorParam:TextureFormat=Color
 /build:editortools.png
 
+#begin friend-leaderboard-button.png
+/copy:friend-leaderboard-button.png
+
+#begin global-leaderboard-button.png
+/copy:global-leaderboard-button.png
+
 #begin hitsound.wav
 /copy:hitsound.wav
+
+#begin local-leaderboard-button.png
+/copy:local-leaderboard-button.png
 
 #begin menubuttons.png
 /importer:TextureImporter

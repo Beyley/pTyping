@@ -50,6 +50,10 @@ namespace pTyping {
 
         public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
+        public static Texture2D LocalLeaderboardButtonTexture;
+        public static Texture2D FriendLeaderboardButtonTexture;
+        public static Texture2D GlobalLeaderboardButtonTexture;
+        
         public static void UserStatusEditing() {
             if (OnlineManager.State != ConnectionState.LoggedIn) return;
             
@@ -157,6 +161,10 @@ namespace pTyping {
             DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
             JapaneseFontData  = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);
+
+            LocalLeaderboardButtonTexture  = Texture2D.FromStream(GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
+            FriendLeaderboardButtonTexture = Texture2D.FromStream(GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
+            GlobalLeaderboardButtonTexture = Texture2D.FromStream(GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
         }
 
         public static void ChangeGlobalVolume(int mouseScroll) {
