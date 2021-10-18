@@ -27,7 +27,7 @@ namespace pTyping.Online.TaikoRsPackets {
         Unknown = 0,
 
         // login
-        Client_UserLogin,//username, password
+        Client_UserLogin,
         Server_LoginResponse,
 
         // status updates
@@ -38,10 +38,8 @@ namespace pTyping.Online.TaikoRsPackets {
         Server_UserLeft,
 
         // chat
-        Client_SendMessage,   // sender_id, channel_id, message
-        Server_SendMessage,   // sender_id, channel_id, message
-        Client_PrivateMessage,// receiver_id, message
-        Server_PrivateMessage,// sender_id, message
+        Client_SendMessage,// sender_id, channel_id, message
+        Server_SendMessage,// sender_id, channel_id, message
 
         // spectator?
         Client_Spectate,       // user_id to spectate
