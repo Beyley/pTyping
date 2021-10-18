@@ -6,7 +6,7 @@ using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {
-        public List<ChatMessage>             ChatLog;
+        public List<ChatMessage>             ChatLog = new();
         public Dictionary<int, OnlinePlayer> OnlinePlayers = new();
 
         public ConnectionState State {
@@ -64,6 +64,8 @@ namespace pTyping.Online {
         public event EventHandler OnDisconnect;
 
         public async Task Login() {
+            this.OnlinePlayers.Clear();
+            
             if (this.State == ConnectionState.Disconnected)
                 await this.Connect();
 
@@ -72,15 +74,15 @@ namespace pTyping.Online {
         }
 
         public async Task Logout() {
+            this.OnlinePlayers.Clear();
+            
             await this.ClientLogout();
 
             await this.Disconnect();
         }
 
         public void Initialize() {
-            Console.AddConFunc(ConVars.SendMessage);
-            Console.AddConFunc(ConVars.Login);
-            Console.AddConFunc(ConVars.Logout);
+            
         }
     }
 

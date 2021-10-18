@@ -167,8 +167,6 @@ namespace pTyping.Screens {
                 this.LoadSong(true);
             else
                 this.LoadSong(false);
-            
-            pTypingGame.UserStatusListening();
         }
 
 
@@ -201,10 +199,8 @@ namespace pTyping.Screens {
             pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 
             this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
-        }
-
-        protected override void Dispose(bool disposing) {
-            base.Dispose(disposing);
+            
+            pTypingGame.UserStatusListening();
         }
     }
 }

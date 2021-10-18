@@ -52,7 +52,7 @@ namespace pTyping.Screens {
             UiTextBoxDrawable backgroundDimInput = new(
             new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
             FurballGame.DEFAULT_FONT,
-            ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture),
+            ConVars.BackgroundDim.Value.ToString(CultureInfo.InvariantCulture),
             30,
             200
             );
@@ -88,7 +88,7 @@ namespace pTyping.Screens {
             UiTextBoxDrawable usernameInput = new(
             new Vector2(360 + usernameInputLabel.Size.X, 200),
             FurballGame.DEFAULT_FONT,
-            ConVars.Username.Value.Value.ToString(CultureInfo.InvariantCulture),
+            ConVars.Username.Value.ToString(CultureInfo.InvariantCulture),
             30,
             200
             );
@@ -128,7 +128,7 @@ namespace pTyping.Screens {
         }
 
         private void BackgroundDimInputOnCommit(object sender, string e) {
-            ConVars.BackgroundDim.Value.Value = float.Parse(e);
+            ConVars.BackgroundDim.Value = float.Parse(e);
         }
 
         // private void TargetFpsInputOnCommit(object sender, string e) {
@@ -136,7 +136,7 @@ namespace pTyping.Screens {
         // }
         
         private void UsernameInputOnCommit(object sender, string e) {
-            ConVars.Username.Value.Value = e;
+            ConVars.Username.Value = e;
         }
     }
 }

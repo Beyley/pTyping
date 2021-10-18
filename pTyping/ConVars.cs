@@ -22,7 +22,7 @@ namespace pTyping {
     public class Logout : ConFunc {
         public Logout() : base("net_logout") {}
 
-        public override ConsoleResult Run(string consoleInput) {
+        public override ConsoleResult Run(string[] consoleInput) {
             pTypingGame.OnlineManager.Logout().Wait();
 
             if (pTypingGame.OnlineManager.State != ConnectionState.Disconnected)
@@ -36,7 +36,7 @@ namespace pTyping {
 
         public Login() : base("net_login") {}
 
-        public override ConsoleResult Run(string consoleInput) {
+        public override ConsoleResult Run(string[] consoleInput) {
             pTypingGame.OnlineManager.Login().Wait();
 
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
@@ -48,13 +48,11 @@ namespace pTyping {
 
     public class SendMessage : ConFunc {
         public SendMessage() : base("net_send_message") {}
-        public override ConsoleResult Run(string consoleInput) {
+        public override ConsoleResult Run(string[] consoleInput) {
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
                 return new(ExecutionResult.Warning, "You are not logged in!");
 
-            string[] split = consoleInput.Split(" ");
-
-            pTypingGame.OnlineManager.SendMessage(split[0], string.Join(" ", split, 1, split.Length - 1)).Wait();
+            pTypingGame.OnlineManager.SendMessage(consoleInput[0], consoleInput[1]).Wait();
 
             return new(ExecutionResult.Success, "Message sent!");
         }

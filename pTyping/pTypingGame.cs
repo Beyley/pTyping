@@ -149,13 +149,13 @@ namespace pTyping {
             MenuClickSound.Volume = ConVars.Volume.Value;
             if (MusicTrack.IsValidHandle)
                 MusicTrack.Volume = ConVars.Volume.Value;
-            ConVars.Volume.Value.OnChange += delegate(object _, float volume) {
+            ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
                 MenuClickSound.Volume = volume;
                 if (MusicTrack.IsValidHandle)
                     MusicTrack.Volume = ConVars.Volume.Value;
 
                 if (VolumeSelector is not null)
-                    VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100f:00.##}";
+                    VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
             };
 
             DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
@@ -175,9 +175,9 @@ namespace pTyping {
             VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
 
             if (mouseScroll > 0)
-                ConVars.Volume.Value.Value = Math.Clamp(ConVars.Volume.Value + 0.05f, 0f, 1f);
+                ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value + 0.05f, 0f, 1f);
             else
-                ConVars.Volume.Value.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
+                ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
         }
 
         public static void ChangeTargetFPS(double target) {
@@ -242,7 +242,7 @@ namespace pTyping {
 
             base.Initialize();
 
-            VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
+            VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
                 OriginType = OriginType.BottomRight
             };
 

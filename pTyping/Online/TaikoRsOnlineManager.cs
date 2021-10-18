@@ -151,7 +151,7 @@ namespace pTyping.Online {
                 ChatMessage message = new(player, packet.Channel, packet.Message);
                 this.ChatLog.Add(message);
 
-                Logger.Log($"<{message.Time.Hour:00}:{message.Time.Minute:00}> {message.Sender}: {message.Message}", new LoggerLevelChatMessage());
+                Logger.Log($"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}", new LoggerLevelChatMessage());
             }
 
             return true;
@@ -174,7 +174,7 @@ namespace pTyping.Online {
             packet.ReadPacket(reader);
 
             if (this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
-                Logger.Log($"{playerLeft.Username} left!", new LoggerLevelOnlineInfo());
+                Logger.Log($"{playerLeft.Username} has gone offline!", new LoggerLevelOnlineInfo());
 
             return true;
         }
@@ -197,7 +197,7 @@ namespace pTyping.Online {
             if (this.OnlinePlayers.ContainsKey(packet.Player.UserId)) return true;
 
             this.OnlinePlayers.Add(packet.Player.UserId, packet.Player);
-            Logger.Log($"{packet.Player.Username} joined!", new LoggerLevelOnlineInfo());
+            Logger.Log($"{packet.Player.Username} is online!", new LoggerLevelOnlineInfo());
 
             return true;
         }
@@ -226,6 +226,8 @@ namespace pTyping.Online {
         }
 
         protected override async Task ClientLogout() {
+            if (!this._client.IsAlive) return;
+            
             await Task.Run(() => this._client.Send(new PacketClientUserLogout().GetPacket()));
 
             this.InvokeOnLogout(this);
