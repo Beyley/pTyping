@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using pTyping.Player;
-using Console=Furball.Engine.Engine.Console.Console;
+using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {

@@ -1,6 +1,6 @@
 using pTyping.Online;
-using Furball.Engine.Engine.Console;
-using Furball.Engine.Engine.Console.Types;
+using Furball.Engine.Engine.DevConsole;
+using Furball.Engine.Engine.DevConsole.Types;
 
 namespace pTyping {
     public class ConVars {
@@ -22,13 +22,13 @@ namespace pTyping {
     public class Logout : ConFunc {
         public Logout() : base("net_logout") {}
 
-        public override string Run(string consoleInput) {
+        public override ConsoleResult Run(string consoleInput) {
             pTypingGame.OnlineManager.Logout().Wait();
 
             if (pTypingGame.OnlineManager.State != ConnectionState.Disconnected)
-                return "Logout not successful!";
+                return new(ExecutionResult.Error, "Logout not successful!");
 
-            return "Logged out!";
+            return new(ExecutionResult.Success, "Logged out!");
         }
     }
 
@@ -36,27 +36,27 @@ namespace pTyping {
 
         public Login() : base("net_login") {}
 
-        public override string Run(string consoleInput) {
+        public override ConsoleResult Run(string consoleInput) {
             pTypingGame.OnlineManager.Login().Wait();
 
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
-                return "Login not successful!";
+                return new(ExecutionResult.Error, "Login not successful!");
 
-            return "Logged in!";
+            return new(ExecutionResult.Success, "Logged in!");
         }
     }
 
     public class SendMessage : ConFunc {
         public SendMessage() : base("net_send_message") {}
-        public override string Run(string consoleInput) {
+        public override ConsoleResult Run(string consoleInput) {
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
-                return "You are not logged in!";
+                return new(ExecutionResult.Warning, "You are not logged in!");
 
             string[] split = consoleInput.Split(" ");
 
             pTypingGame.OnlineManager.SendMessage(split[0], string.Join(" ", split, 1, split.Length - 1)).Wait();
 
-            return "Message sent!";
+            return new(ExecutionResult.Success, "Message sent!");
         }
     }
 }

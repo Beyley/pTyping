@@ -6,6 +6,7 @@ using ManagedBass;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
+using Furball.Engine.Engine.DevConsole;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -18,7 +19,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Online;
 using pTyping.Player;
-using Console=Furball.Engine.Engine.Console.Console;
 
 namespace pTyping {
     public class pTypingGame : FurballGame {
@@ -219,11 +219,11 @@ namespace pTyping {
         }
 
         protected override void Initialize() {
-            Console.AddConVar(ConVars.Username);
-            Console.AddConVar(ConVars.Password);
-            Console.AddConVar(ConVars.Volume);
-            Console.AddConVar(ConVars.BackgroundDim);
-            Console.AddConVar(ConVars.BaseApproachTime);
+            DevConsole.AddConVar(ConVars.Username);
+            DevConsole.AddConVar(ConVars.Password);
+            DevConsole.AddConVar(ConVars.Volume);
+            DevConsole.AddConVar(ConVars.BackgroundDim);
+            DevConsole.AddConVar(ConVars.BaseApproachTime);
             
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);

@@ -58,7 +58,7 @@ namespace pTyping.Online {
             this.InvokeOnConnect(this);
         }
 
-        private void ClientOnOpen(object? sender, EventArgs e) {
+        private void ClientOnOpen(object sender, EventArgs e) {
             this.State = ConnectionState.Connected;
         }
 
