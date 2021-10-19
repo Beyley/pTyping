@@ -14,15 +14,7 @@ namespace pTyping.Online {
             protected set;
         } = ConnectionState.Disconnected;
 
-        public int UserId {
-            get;
-            protected set;
-        }
-
-        public UserAction UserAction {
-            get;
-            protected set;
-        }
+        public OnlinePlayer Player = new();
 
         public async Task SubmitScore(PlayerScore score) {
             if(this.State == ConnectionState.LoggedIn)

@@ -163,6 +163,10 @@ namespace pTyping.Screens {
 
             #endregion
 
+            this.Manager.Add(pTypingGame.GetUserCard());
+            
+            pTypingGame.MenuPlayerUserCard.MoveTo(new(10f));
+
             if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
                 this.LoadSong(true);
             else

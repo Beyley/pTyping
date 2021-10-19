@@ -103,3 +103,6 @@
 #begin unifont.ttf
 /copy:unifont.ttf
 
+#begin user-card.png
+/copy:user-card.png
+

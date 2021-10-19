@@ -80,7 +80,7 @@ namespace pTyping.Drawables {
             Vector2.Zero,
             args.Scale * FurballGame.VerticalRatio,
             args.Effects,
-            args.LayerDepth
+            0f
             );
 
             // FIXME: this is a bit of a hack, it should definitely be done differently

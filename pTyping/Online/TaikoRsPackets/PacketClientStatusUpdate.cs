@@ -14,9 +14,9 @@ namespace pTyping.Online.TaikoRsPackets {
             MemoryStream  stream = new();
             TaikoRsWriter writer = new(stream);
             
-            writer.Write((ushort)this.Action.Action);
+            writer.Write((ushort)this.Action.Action.Value);
             writer.Write(this.Action.ActionText);
-            writer.Write((byte)this.Action.Mode);
+            writer.Write((byte)this.Action.Mode.Value);
             
             writer.Flush();
 

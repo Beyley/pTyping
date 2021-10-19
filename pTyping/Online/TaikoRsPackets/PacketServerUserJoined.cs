@@ -4,8 +4,8 @@ namespace pTyping.Online.TaikoRsPackets {
         
         protected override byte[] GetData() => throw new System.NotImplementedException();
         protected override void ReadData(TaikoRsReader reader) {
-            this.Player.UserId   = reader.ReadInt32();
-            this.Player.Username = reader.ReadString();
+            this.Player.UserId.Value   = reader.ReadInt32();
+            this.Player.Username.Value = reader.ReadString();
         }
     }
 }

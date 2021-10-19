@@ -33,6 +33,8 @@ namespace pTyping.Online.TaikoRsPackets {
         // status updates
         Client_StatusUpdate,
         Server_UserStatusUpdate,
+        Client_NotifyScoreUpdate,
+        Server_ScoreUpdate,
         Client_LogOut,
         Server_UserJoined,
         Server_UserLeft,

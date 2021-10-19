@@ -70,6 +70,10 @@ namespace pTyping.Online {
             this.State = ConnectionState.Disconnected;
         }
 
+        private async Task SendUpdateScoreRequest() {
+            await Task.Run(() => this._client.Send(new PacketClientNotifyScoreUpdate().GetPacket()));
+        }
+
         protected override async Task ClientSubmitScore(PlayerScore score) {
             try {
                 string finalUri = this._httpUri + this._scoreSubmitUrl;
@@ -81,6 +85,8 @@ namespace pTyping.Online {
             catch {
                 //TODO tell the user the score submission failed
             }
+
+            await this.SendUpdateScoreRequest();
         }
         protected override async Task<List<PlayerScore>> ClientGetScores(string hash) {
             List<PlayerScore> scores = new();
@@ -133,6 +139,7 @@ namespace pTyping.Online {
                 TaikoRsPacketId.Server_UserJoined       => this.HandleServerUserJoinedPacket(reader),
                 TaikoRsPacketId.Server_UserLeft         => this.HandleServerUserLeftPacket(reader),
                 TaikoRsPacketId.Server_SendMessage      => this.HandleServerSendMessagePacket(reader),
+                TaikoRsPacketId.Server_ScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
                 TaikoRsPacketId.Server_SpectatorJoined  => throw new NotImplementedException(),
                 TaikoRsPacketId.Server_SpectatorFrames  => throw new NotImplementedException(),
                 TaikoRsPacketId.Unknown                 => throw new Exception("Got Unknown packet id?"),
@@ -156,14 +163,30 @@ namespace pTyping.Online {
 
             return true;
         }
+
+        private bool HandleServerScoreUpdatePacket(TaikoRsReader reader) {
+            PacketServerScoreUpdate packet = new();
+            packet.ReadPacket(reader);
+
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                player.TotalScore.Value  = packet.TotalScore;
+                player.RankedScore.Value = packet.RankedScore;
+                player.Accuracy.Value    = packet.Accuracy;
+                player.PlayCount.Value   = packet.PlayCount;
+                
+                Logger.Log($"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}", new LoggerLevelOnlineInfo());
+            }
+            
+            return true;
+        }
         
         private bool HandleServerUserStatusUpdatePacket(TaikoRsReader reader) {
             PacketServerUserStatusUpdate packet = new();
             packet.ReadPacket(reader);
 
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-                player.Action = packet.Action;
-                Logger.Log($"{player.Username} changed status to {player.Action.Action} : {player.Action.ActionText}!", new LoggerLevelOnlineInfo());
+                player.Action.Value = packet.Action;
+                Logger.Log($"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}!", new LoggerLevelOnlineInfo());
             }
 
             return true;
@@ -183,10 +206,14 @@ namespace pTyping.Online {
             PacketServerLoginResponse packet = new();
             packet.ReadPacket(reader);
 
-            this.UserId = packet.UserId;
-            this.State  = ConnectionState.LoggedIn;
+            this.Player.Username.Value = this.Username();
+            this.Player.UserId.Value   = packet.UserId;
+            this.State                 = ConnectionState.LoggedIn;
+            
             this.InvokeOnLoginComplete(this);
 
+            this.OnlinePlayers.Add(this.Player.UserId, this.Player);
+            
             return true;
         }
         

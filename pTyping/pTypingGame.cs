@@ -17,6 +17,7 @@ using pTyping.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Drawables;
 using pTyping.Online;
 using pTyping.Player;
 
@@ -47,6 +48,32 @@ namespace pTyping {
             Effect               = FontSystemEffect.None
         }
         );
+
+        public static UserCardDrawable MenuPlayerUserCard;
+
+        public static ManagedDrawable GetUserCard() {
+            if (OnlineManager.State != ConnectionState.LoggedIn)
+                return new BlankDrawable();
+            
+            if(MenuPlayerUserCard is not null)
+                return MenuPlayerUserCard;
+
+            MenuPlayerUserCard = new(Vector2.Zero, OnlineManager.Player) {
+                Scale = new(0.3f)
+            };
+            
+            MenuPlayerUserCard.Player.OnChange                               += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.TotalScore.OnChange              += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.RankedScore.OnChange             += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.Accuracy.OnChange                += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.PlayCount.OnChange               += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.Action.OnChange                  += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.Action.Value.Action.OnChange     += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.Action.Value.Mode.OnChange       += (_, _) => MenuPlayerUserCard.UpdateText();
+            MenuPlayerUserCard.Player.Value.Action.Value.ActionText.OnChange += (_, _) => MenuPlayerUserCard.UpdateText();
+            
+            return MenuPlayerUserCard;
+        }
 
         public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
 
@@ -149,6 +176,7 @@ namespace pTyping {
             MenuClickSound.Volume = ConVars.Volume.Value;
             if (MusicTrack.IsValidHandle)
                 MusicTrack.Volume = ConVars.Volume.Value;
+            
             ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
                 MenuClickSound.Volume = volume;
                 if (MusicTrack.IsValidHandle)
@@ -215,7 +243,7 @@ namespace pTyping {
             ScoreManager.AddScore(score);
             
             if(OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.SubmitScore(score);
+                OnlineManager.SubmitScore(score).Wait();
         }
 
         protected override void Initialize() {

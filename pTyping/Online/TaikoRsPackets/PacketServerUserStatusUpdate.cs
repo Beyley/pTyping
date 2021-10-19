@@ -5,10 +5,10 @@ namespace pTyping.Online.TaikoRsPackets {
         
         protected override byte[] GetData() => throw new System.NotImplementedException();
         protected override void ReadData(TaikoRsReader reader) {
-            this.UserId            = reader.ReadInt32();
-            this.Action.Action     = (UserActionType)reader.ReadUInt16();
-            this.Action.ActionText = reader.ReadString();
-            this.Action.Mode       = (PlayMode)reader.ReadByte();
+            this.UserId                  = reader.ReadInt32();
+            this.Action.Action.Value     = (UserActionType)reader.ReadUInt16();
+            this.Action.ActionText.Value = reader.ReadString();
+            this.Action.Mode.Value       = (PlayMode)reader.ReadByte();
         }
     }
 }
