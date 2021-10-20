@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using pTyping.Player;
@@ -6,8 +7,8 @@ using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {
-        public List<ChatMessage>             ChatLog = new();
-        public Dictionary<int, OnlinePlayer> OnlinePlayers = new();
+        public List<ChatMessage>      ChatLog       = new();
+        public ObservableConcurrentDictionary<int, OnlinePlayer> OnlinePlayers = new();
 
         public ConnectionState State {
             get;
@@ -56,7 +57,9 @@ namespace pTyping.Online {
         public event EventHandler OnDisconnect;
 
         public async Task Login() {
-            this.OnlinePlayers.Clear();
+            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers) {
+                this.OnlinePlayers.Remove(keyValuePair.Key);
+            }
             
             if (this.State == ConnectionState.Disconnected)
                 await this.Connect();
@@ -66,7 +69,9 @@ namespace pTyping.Online {
         }
 
         public async Task Logout() {
-            this.OnlinePlayers.Clear();
+            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers) {
+                this.OnlinePlayers.Remove(keyValuePair.Key);
+            }
             
             await this.ClientLogout();
 

@@ -15,8 +15,11 @@ namespace pTyping.Drawables {
         private TexturedDrawable _backgroundDrawable;
         private TextDrawable     _usernameDrawable;
         private TextDrawable     _mainTextDrawable;
+        private TextDrawable     _statusTextDrawable;
         private TexturedDrawable _modeIconDrawable;
-        
+
+        public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
+
         public UserCardDrawable(Vector2 position, OnlinePlayer player) {
             this.Player   = new(player);
             this.Position = position;
@@ -26,7 +29,12 @@ namespace pTyping.Drawables {
                 Scale = new(1.7f)
             });
             this.Drawables.Add(this._mainTextDrawable = new(new(this._usernameDrawable.Position.X, 100), FurballGame.DEFAULT_FONT_STROKED, "", 45) {
-                Scale = new(1.7f)
+                Scale = new(1.7f),
+                Visible = true
+            });
+            this.Drawables.Add(this._statusTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFontStroked, "", 45) {
+                Scale   = new(1.7f),
+                Visible = true
             });
             this.Drawables.Add(this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
                 Scale = new(0.175f)
@@ -35,6 +43,13 @@ namespace pTyping.Drawables {
             this._modeIconDrawable.MoveTo(new Vector2(this._backgroundDrawable.Size.X - this._modeIconDrawable.Size.X - 10, 10));
             
             this.UpdateDrawable();
+        }
+
+        public override void Update(GameTime time) {
+            this._mainTextDrawable.Visible = !this.IsHovered;
+            this._statusTextDrawable.Visible = this.IsHovered;
+            
+            base.Update(time);
         }
 
         public static string GetFilenameForModeIcon(PlayMode mode) {
@@ -50,8 +65,9 @@ namespace pTyping.Drawables {
 
         public void UpdateDrawable() {
             this._usernameDrawable.Text = $@"{this.Player.Value.Username}";
-            this._mainTextDrawable.Text = $"Total Score: {this.Player.Value.TotalScore}\nRanked Score: {this.Player.Value.RankedScore}\nAccuracy: {this.Player.Value.Accuracy * 100:00.00} Play Count: {this.Player.Value.PlayCount}";
-
+            this._mainTextDrawable.Text = $"Total Score: {this.Player.Value.TotalScore}\nRanked Score: {this.Player.Value.RankedScore}\nAccuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Value.PlayCount}";
+            this._statusTextDrawable.Text = $"{this.Player.Value.Action.Value.ActionText}";
+            
             this._modeIconDrawable.SetTexture(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode), ContentSource.User));
             
             Color color = this.Player.Value.Action.Value.Action.Value switch {

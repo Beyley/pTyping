@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using FontStashSharp;
@@ -10,6 +11,7 @@ using Furball.Engine.Engine.DevConsole;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using pTyping.Songs;
@@ -46,6 +48,15 @@ namespace pTyping {
             KernelWidth          = 1,
             KernelHeight         = 1,
             Effect               = FontSystemEffect.None
+        }
+        );
+        public static FontSystem JapaneseFontStroked = new(
+        new FontSystemSettings {
+            FontResolutionFactor = 2f,
+            KernelWidth          = 1,
+            KernelHeight         = 1,
+            Effect               = FontSystemEffect.Stroked,
+            EffectAmount         = 2
         }
         );
 
@@ -189,10 +200,11 @@ namespace pTyping {
             DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
             JapaneseFontData  = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);
+            JapaneseFontStroked.AddFont(JapaneseFontData);
 
-            LocalLeaderboardButtonTexture  = Texture2D.FromStream(GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
-            FriendLeaderboardButtonTexture = Texture2D.FromStream(GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
-            GlobalLeaderboardButtonTexture = Texture2D.FromStream(GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
+            LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
+            FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
+            GlobalLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice,    new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
         }
 
         public static void ChangeGlobalVolume(int mouseScroll) {
@@ -208,17 +220,6 @@ namespace pTyping {
                 ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
         }
 
-        public static void ChangeTargetFPS(double target) {
-            // if (target == 0) {
-            // Instance.IsFixedTimeStep   = false;
-
-            // return;
-            // }
-
-            // Instance.TargetElapsedTime = TimeSpan.FromMilliseconds(1000d / target);
-            // Instance.IsFixedTimeStep   = true;
-        }
-
         private double _musicTrackSchedulerDelta = 0;
         protected override void Update(GameTime gameTime) {
             base.Update(gameTime);
@@ -228,6 +229,16 @@ namespace pTyping {
                 MusicTrackScheduler.Update(MusicTrack.GetCurrentTime());
                 this._musicTrackSchedulerDelta = 0;
             }
+            
+            if(this._userPanelManager.Visible)
+                this._userPanelManager.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime) {
+            base.Draw(gameTime);
+            
+            if(this._userPanelManager.Visible)
+                this._userPanelManager.Draw(gameTime, DrawableBatch);
         }
 
         protected override void EndRun() {
@@ -284,17 +295,44 @@ namespace pTyping {
 
             DrawableManager.Add(VolumeSelector);
 
-            // ChangeTargetFPS(1000);
-
-            // Config.TargetFPS.OnChange += delegate(object _, int newTarget) {
-            //     ChangeTargetFPS(newTarget);
-            // };
-
             HiraganaConversion.LoadConversion();
             ScreenManager.SetBlankTransition();
             SongManager.UpdateSongs();
 
             MusicTrackScheduler = new();
+            
+            OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
+
+            this._userPanelManager         = new();
+            this._userPanelManager.Visible = false;
+            this.UpdateUserPanel(null, null);
+            
+            InputManager.OnKeyDown += this.OnKeyDown;
+        }
+        
+        private void OnKeyDown(object sender, Keys e) {
+            if (e == Keys.F9) {
+                this._userPanelManager.Visible = !this._userPanelManager.Visible;
+            }
+        }
+
+        private DrawableManager       _userPanelManager;
+        private List<ManagedDrawable> _userPanelDrawables = new();
+        
+        private void UpdateUserPanel(object sender, object e) {
+            lock(this._userPanelDrawables) {
+                this._userPanelDrawables.ForEach(x => this._userPanelManager.Remove(x));
+                this._userPanelDrawables.Clear();
+
+                Vector2 pos = new(10);
+                foreach (KeyValuePair<int, OnlinePlayer> player in OnlineManager.OnlinePlayers) {
+                    UserCardDrawable drawable = player.Value.GetUserCard();
+                    drawable.MoveTo(pos);
+                    pos.X += drawable.Size.X + 10;
+                    this._userPanelDrawables.Add(drawable);
+                    this._userPanelManager.Add(drawable);
+                }
+            }
         }
     }
 }
