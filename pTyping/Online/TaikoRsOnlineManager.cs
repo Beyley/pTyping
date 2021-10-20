@@ -206,6 +206,22 @@ namespace pTyping.Online {
             PacketServerLoginResponse packet = new();
             packet.ReadPacket(reader);
 
+            //TODO notify user when login failed properly
+            if ((packet.UserId & 1 << 31) != 0) {
+                switch (packet.UserId) {
+                    case -1: {
+                        Logger.Log("Login failed! User not found.", new LoggerLevelOnlineInfo());
+                        this.Disconnect().Wait();
+                        return true;
+                    }
+                    case -2: {
+                        Logger.Log("Login failed! Password incorrect!", new LoggerLevelOnlineInfo());
+                        this.Disconnect().Wait();
+                        return true;
+                    }
+                }
+            }
+
             this.Player.Username.Value = this.Username();
             this.Player.UserId.Value   = packet.UserId;
             this.State                 = ConnectionState.LoggedIn;
@@ -242,7 +258,11 @@ namespace pTyping.Online {
         }
 
         public override async Task ChangeUserAction(UserAction action) {
-            await Task.Run(() => this._client.Send(new PacketClientStatusUpdate(action).GetPacket()));
+            // this.Player.Action.Value = action;
+
+            Logger.Log($"Sending action {action.Action} {action.ActionText}");
+
+            this._client.Send(new PacketClientStatusUpdate(action).GetPacket());
         }
 
         protected override async Task ClientLogin() {

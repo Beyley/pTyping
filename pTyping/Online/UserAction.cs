@@ -2,9 +2,9 @@ using Furball.Engine.Engine.Helpers;
 
 namespace pTyping.Online {
     public class UserAction {
-        public Bindable<UserActionType> Action;
-        public Bindable<string>         ActionText;
-        public Bindable<PlayMode>       Mode;
+        public Bindable<UserActionType> Action = new(UserActionType.Idle);
+        public Bindable<string>         ActionText = new("");
+        public Bindable<PlayMode>       Mode = new(PlayMode.Standard);
 
         public UserAction(UserActionType action, string actionText, PlayMode mode = PlayMode.pTyping) {
             this.Action     = new(action);

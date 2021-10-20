@@ -37,6 +37,9 @@
 /processorParam:TextureFormat=Color
 /build:background.png
 
+#begin catch-mode-icon.png
+/copy:catch-mode-icon.png
+
 #begin editorbuttons.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -73,6 +76,9 @@
 #begin local-leaderboard-button.png
 /copy:local-leaderboard-button.png
 
+#begin mania-mode-icon.png
+/copy:mania-mode-icon.png
+
 #begin menubuttons.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -99,6 +105,15 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:note.png
+
+#begin ptyping-mode.icon.png
+/copy:ptyping-mode.icon.png
+
+#begin standard-mode-icon.png
+/copy:standard-mode-icon.png
+
+#begin taiko-mode.icon.png
+/copy:taiko-mode.icon.png
 
 #begin unifont.ttf
 /copy:unifont.ttf
