@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using pTyping.LoggingLevels;
 using pTyping.Online.TaikoRsPackets;
 using pTyping.Player;
@@ -78,7 +78,15 @@ namespace pTyping.Online {
             try {
                 string finalUri = this._httpUri + this._scoreSubmitUrl;
 
-                HttpContent content = new ByteArrayContent(score.TaikoRsSerialize());
+                MemoryStream  stream = new();
+                TaikoRsWriter writer = new(stream);
+                
+                writer.Write(score.TaikoRsSerialize());
+                writer.Write(this.Password());
+                
+                writer.Flush();
+
+                HttpContent content = new ByteArrayContent(stream.ToArray());
 
                 await this._httpClient.PostAsync(finalUri, content);
             }
