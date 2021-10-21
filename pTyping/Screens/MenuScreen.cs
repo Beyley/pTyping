@@ -9,6 +9,7 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Drawables;
+using pTyping.Online;
 using pTyping.Songs;
 
 namespace pTyping.Screens {
@@ -163,9 +164,11 @@ namespace pTyping.Screens {
 
             #endregion
 
-            this.Manager.Add(pTypingGame.GetUserCard());
-            
-            pTypingGame.MenuPlayerUserCard.MoveTo(new(10f));
+            if(pTypingGame.OnlineManager.State == ConnectionState.LoggedIn) {
+                this.Manager.Add(pTypingGame.GetUserCard());
+
+                pTypingGame.MenuPlayerUserCard.MoveTo(new(10f));
+            }
 
             if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
                 this.LoadSong(true);

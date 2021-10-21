@@ -7,7 +7,7 @@ using pTyping.LoggingLevels;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Helpers.Logger;
+using Kettu;
 
 namespace pTyping.Songs {
     public enum SongType {

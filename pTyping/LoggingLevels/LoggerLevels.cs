@@ -1,4 +1,4 @@
-using Furball.Engine.Engine.Helpers.Logger;
+using Kettu;
 
 namespace pTyping.LoggingLevels {
     public class LoggerLevelSongInfo : LoggerLevel {

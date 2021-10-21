@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Furball.Engine.Engine.Helpers.Logger;
+using Kettu;
 using pTyping.LoggingLevels;
 
 namespace pTyping.Songs {

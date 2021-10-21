@@ -10,7 +10,7 @@ using pTyping.Online.TaikoRsPackets;
 using pTyping.Player;
 using WebSocketSharp;
 using ErrorEventArgs=WebSocketSharp.ErrorEventArgs;
-using Logger=Furball.Engine.Engine.Helpers.Logger.Logger;
+using Logger=Kettu.Logger;
 
 namespace pTyping.Online {
     public class TaikoRsOnlineManager : OnlineManager {
