@@ -17,6 +17,7 @@ using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using pTyping.Drawables;
 
 namespace pTyping.Screens {
     public class SongSelectionScreen : Screen {
@@ -24,8 +25,8 @@ namespace pTyping.Screens {
 
         private TextDrawable _songInfo;
 
-        private List<BaseDrawable> _songButtonList    = new();
-        private List<BaseDrawable> _scoreDrawableList = new();
+        private List<ManagedDrawable> _songButtonList    = new();
+        private LeaderboardDrawable _leaderboardDrawable;
 
         private float _movingDirection;
 
@@ -329,7 +330,7 @@ namespace pTyping.Screens {
         }
 
         public void UpdateScores() {
-            this._scoreDrawableList.ForEach(x => this.Manager.Remove(x));
+            this.Manager.Remove(this._leaderboardDrawable);
 
             List<PlayerScore> origScores = new();
 
@@ -353,23 +354,14 @@ namespace pTyping.Screens {
             }
 
             List<PlayerScore> scores = origScores.OrderByDescending(x => x.Score).ToList();
-            
+
             float y = this._songInfo.Size.Y + 25;
-            for (int i = 0; i < scores.Count; i++) {
-                PlayerScore score = scores[i];
-                
-                TextDrawable scoreInfo = new(
-                new(15f, y),
-                pTypingGame.JapaneseFont,
-                $"{score.Username}\nScore: {score.Score}, {score.Accuracy * 100:00.##}%, {score.Combo}x",
-                25
-                );
 
-                y += scoreInfo.Size.Y + 10;
-
-                this._scoreDrawableList.Add(scoreInfo);
-                this.Manager.Add(scoreInfo);
-            }            
+            this._leaderboardDrawable = new LeaderboardDrawable(scores) {
+                Position = new(25, y)
+            };
+            
+            this.Manager.Add(this._leaderboardDrawable);
         }
 
         protected override void Dispose(bool disposing) {
