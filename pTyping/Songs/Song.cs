@@ -1,14 +1,14 @@
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
-using pTyping.Songs.Events;
-using pTyping.LoggingLevels;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Furball.Engine.Engine.Helpers;
 using Kettu;
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
+using pTyping.LoggingLevels;
+using pTyping.Songs.Events;
 
 namespace pTyping.Songs {
     public enum SongType {
@@ -16,9 +16,16 @@ namespace pTyping.Songs {
         pTyping,
         UTyping
     }
-    
+
     [JsonObject(MemberSerialization.OptIn)]
     public class Song {
+
+        public FileInfo FileInfo;
+
+        [JsonProperty]
+        public int TimeSignature = 4;
+
+        public SongType Type;
         [JsonProperty]
         public List<Note> Notes { get; set; } = new();
 
@@ -31,12 +38,12 @@ namespace pTyping.Songs {
         [JsonProperty]
         public string Difficulty { get; set; }
         /// <summary>
-        /// A list of all timing points
+        ///     A list of all timing points
         /// </summary>
         [JsonProperty]
         public List<TimingPoint> TimingPoints { get; set; } = new();
         /// <summary>
-        /// A list of all events that happen in the song
+        ///     A list of all events that happen in the song
         /// </summary>
         [JsonProperty]
         public List<Event> Events { get; set; } = new();
@@ -46,22 +53,14 @@ namespace pTyping.Songs {
         [JsonProperty]
         public string BackgroundPath { get; set; }
 
-        [JsonProperty]
-        public int TimeSignature = 4;
-
-        public SongType Type;
-
-        public FileInfo FileInfo;
-
         public string MapHash {
             get {
                 this.Notes.Sort((x, y) => (int)(x.Time - y.Time));
 
                 StringBuilder notes  = new();
                 const string  format = "{0}:{1}:{2}:{3}";
-                foreach (Note note in this.Notes) {
+                foreach (Note note in this.Notes)
                     notes.AppendFormat(format, note.Time, note.Color, note.Text, note.YOffset);
-                }
 
                 return CryptoHelper.GetSha256(Encoding.Unicode.GetBytes(notes.ToString()));
             }

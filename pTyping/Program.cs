@@ -1,8 +1,10 @@
-﻿namespace pTyping {
+﻿using System.Text;
+
+namespace pTyping {
     internal class Program {
         private static void Main(string[] args) {
-            System.Text.Encoding.RegisterProvider (System.Text.CodePagesEncodingProvider.Instance);
-            
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             using pTypingGame game = new();
             game.Run();
         }

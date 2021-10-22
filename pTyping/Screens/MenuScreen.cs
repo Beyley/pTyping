@@ -98,7 +98,7 @@ namespace pTyping.Screens {
 
             #region Menu music
 
-            this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, $"None", 40) {
+            this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, "None", 40) {
                 OriginType = OriginType.TopRight
             };
 
@@ -164,7 +164,7 @@ namespace pTyping.Screens {
 
             #endregion
 
-            if(pTypingGame.OnlineManager.State == ConnectionState.LoggedIn) {
+            if (pTypingGame.OnlineManager.State == ConnectionState.LoggedIn) {
                 this.Manager.Add(pTypingGame.GetUserCard());
 
                 pTypingGame.MenuPlayerUserCard.MoveTo(new(10f));
@@ -206,7 +206,7 @@ namespace pTyping.Screens {
             pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 
             this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
-            
+
             pTypingGame.UserStatusListening();
         }
     }

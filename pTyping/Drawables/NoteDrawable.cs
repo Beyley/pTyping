@@ -3,10 +3,10 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
-using pTyping.Songs;
-using pTyping.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Screens;
+using pTyping.Songs;
 
 namespace pTyping.Drawables {
     public class NoteDrawable : TexturedDrawable {
@@ -14,15 +14,15 @@ namespace pTyping.Drawables {
 
         public Note Note;
 
-        public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
-
         public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) : base(texture, position) {
             this.LabelTextDrawable       = new TextDrawable(Vector2.Zero, font, "", size);
             this.LabelTextDrawable.Scale = new(1);
         }
 
+        public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
+
         /// <summary>
-        /// Types a character
+        ///     Types a character
         /// </summary>
         /// <param name="hiragana">The hiragana being typed</param>
         /// <param name="romaji">The romaji path to take</param>

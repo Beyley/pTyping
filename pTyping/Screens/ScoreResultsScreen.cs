@@ -1,5 +1,4 @@
 using System;
-using pTyping.Player;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -7,6 +6,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
+using pTyping.Player;
 
 namespace pTyping.Screens {
     public class ScoreResultsScreen : Screen {
@@ -109,7 +109,7 @@ namespace pTyping.Screens {
             pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 
             #endregion
-            
+
             pTypingGame.UserStatusListening();
         }
     }

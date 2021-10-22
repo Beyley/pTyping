@@ -1,5 +1,5 @@
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 namespace pTyping.Songs {
     public class HiraganaConversion {
@@ -798,8 +798,6 @@ _	＿
                         romaji
                     }
                     );
-
-                // Conversions.Add((splitLine[0], splitLine[1]));
 
             } while (line != null);
         }

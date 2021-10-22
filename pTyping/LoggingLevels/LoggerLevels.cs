@@ -12,7 +12,7 @@ namespace pTyping.LoggingLevels {
     public class LoggerLevelOnlineInfo : LoggerLevel {
         public override string Name => "OnlineInfo";
     }
-    
+
     public class LoggerLevelChatMessage : LoggerLevel {
         public override string Name => "ChatMessage";
     }

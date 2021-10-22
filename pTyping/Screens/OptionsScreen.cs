@@ -81,7 +81,7 @@ namespace pTyping.Screens {
             // this.Manager.Add(targetFPSInput);
 
             #endregion
-            
+
             #region Username
 
             TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DEFAULT_FONT, "Username:", 30);
@@ -123,7 +123,7 @@ namespace pTyping.Screens {
             this.Manager.Add(res1920x1080button);
 
             #endregion
-            
+
             pTypingGame.UserStatusListening();
         }
 
@@ -134,7 +134,7 @@ namespace pTyping.Screens {
         // private void TargetFpsInputOnCommit(object sender, string e) {
         //     Config.TargetFPS.Value = int.Parse(e);
         // }
-        
+
         private void UsernameInputOnCommit(object sender, string e) {
             ConVars.Username.Value = e;
         }

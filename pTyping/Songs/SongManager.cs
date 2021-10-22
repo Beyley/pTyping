@@ -10,8 +10,10 @@ namespace pTyping.Songs {
         public static string SongFolder          = "songs/";
         public static string QualifiedSongFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception(), SongFolder);
 
-        private static List<Song> _Songs = new();
-        public static  List<Song> Songs => _Songs;
+        public static List<Song> Songs {
+            get;
+            private set;
+        } = new();
 
         public static void UpdateSongs() {
             List<Song> songs = new();
@@ -32,7 +34,7 @@ namespace pTyping.Songs {
                     songs.Add(tempSong);
             }
 
-            _Songs = songs;
+            Songs = songs;
 
             Logger.Log($"Loaded {Songs.Count} songs!", new LoggerLevelSongManagerUpdateInfo());
         }

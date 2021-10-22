@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using pTyping.LoggingLevels;
 using pTyping.Online.TaikoRsPackets;
 using pTyping.Player;
@@ -14,14 +14,14 @@ using Logger=Kettu.Logger;
 
 namespace pTyping.Online {
     public class TaikoRsOnlineManager : OnlineManager {
-        private readonly Uri _httpUri;
-
-        private readonly Uri        _wsUri;
-        private          WebSocket  _client;
+        private readonly string     _getScoresUrl = "/get_scores";
         private readonly HttpClient _httpClient;
+        private readonly Uri        _httpUri;
 
         private readonly string _scoreSubmitUrl = "/score_submit";
-        private readonly string _getScoresUrl = "/get_scores";
+
+        private readonly Uri       _wsUri;
+        private          WebSocket _client;
 
         public TaikoRsOnlineManager(string wsUri, string httpUri) {
             this._wsUri   = new(wsUri);
@@ -64,10 +64,12 @@ namespace pTyping.Online {
 
         private void ClientOnError(object sender, ErrorEventArgs e) {
             this.State = ConnectionState.Disconnected;
+            this.Disconnect().Wait();
         }
 
         private void ClientOnClose(object sender, CloseEventArgs e) {
             this.State = ConnectionState.Disconnected;
+            this.Disconnect().Wait();
         }
 
         private async Task SendUpdateScoreRequest() {
@@ -80,10 +82,10 @@ namespace pTyping.Online {
 
                 MemoryStream  stream = new();
                 TaikoRsWriter writer = new(stream);
-                
+
                 writer.Write(score.TaikoRsSerialize());
                 writer.Write(this.Password());
-                
+
                 writer.Flush();
 
                 HttpContent content = new ByteArrayContent(stream.ToArray());
@@ -98,7 +100,7 @@ namespace pTyping.Online {
         }
         protected override async Task<List<PlayerScore>> ClientGetScores(string hash) {
             List<PlayerScore> scores = new();
-                
+
             try {
                 string finalUri = this._httpUri + this._getScoresUrl;
 
@@ -110,14 +112,14 @@ namespace pTyping.Online {
                 HttpContent content = new ByteArrayContent(stream.ToArray());
 
                 Task<HttpResponseMessage> task = this._httpClient.PostAsync(finalUri, content);
-                
+
                 await task;
 
                 TaikoRsReader reader = new(task.Result.Content.ReadAsStream());
 
                 ulong length = reader.ReadUInt64();
 
-                for (ulong i = 0; i < length; i++) 
+                for (ulong i = 0; i < length; i++)
                     scores.Add(PlayerScore.TaikoRsDeserialize(reader));
             }
             catch {
@@ -130,12 +132,12 @@ namespace pTyping.Online {
         private static void CheckMessageIntegrity(MessageEventArgs args) {
             if (args.IsText) throw new InvalidDataException("Recieved non-binary data!");
 
-            if(args.RawData.Length == 0) throw new InvalidDataException("Recieved empty data packet!");
+            if (args.RawData.Length == 0) throw new InvalidDataException("Recieved empty data packet!");
         }
 
         private void HandleMessage(object sender, MessageEventArgs args) {
             CheckMessageIntegrity(args);
-            
+
             MemoryStream  stream = new(args.RawData);
             TaikoRsReader reader = new(stream);
 
@@ -150,109 +152,12 @@ namespace pTyping.Online {
                 TaikoRsPacketId.ServerScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
                 TaikoRsPacketId.ServerSpectatorJoined  => throw new NotImplementedException(),
                 TaikoRsPacketId.ServerSpectatorFrames  => throw new NotImplementedException(),
-                TaikoRsPacketId.Unknown                 => throw new Exception("Got Unknown packet id?"),
-                _                                       => throw new Exception("Recieved client packet?")
+                TaikoRsPacketId.Unknown                => throw new Exception("Got Unknown packet id?"),
+                _                                      => throw new Exception("Recieved client packet?")
             };
 
             if (!success) throw new Exception($"Error reading packet with PID: {pid}");
         }
-        
-        #region Handle packets
-        private bool HandleServerSendMessagePacket(TaikoRsReader reader) {
-            PacketServerSendMessage packet = new();
-            packet.ReadPacket(reader);
-
-            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-                ChatMessage message = new(player, packet.Channel, packet.Message);
-                this.ChatLog.Add(message);
-
-                Logger.Log($"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}", new LoggerLevelChatMessage());
-            }
-
-            return true;
-        }
-
-        private bool HandleServerScoreUpdatePacket(TaikoRsReader reader) {
-            PacketServerScoreUpdate packet = new();
-            packet.ReadPacket(reader);
-
-            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-                player.TotalScore.Value  = packet.TotalScore;
-                player.RankedScore.Value = packet.RankedScore;
-                player.Accuracy.Value    = packet.Accuracy;
-                player.PlayCount.Value   = packet.PlayCount;
-                
-                Logger.Log($"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}", new LoggerLevelOnlineInfo());
-            }
-            
-            return true;
-        }
-        
-        private bool HandleServerUserStatusUpdatePacket(TaikoRsReader reader) {
-            PacketServerUserStatusUpdate packet = new();
-            packet.ReadPacket(reader);
-
-            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-                player.Action.Value = packet.Action;
-                Logger.Log($"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}!", new LoggerLevelOnlineInfo());
-            }
-
-            return true;
-        }
-        
-        private bool HandleServerUserLeftPacket(TaikoRsReader reader) {
-            PacketServerUserLeft packet = new();
-            packet.ReadPacket(reader);
-
-            if (this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
-                Logger.Log($"{playerLeft.Username} has gone offline!", new LoggerLevelOnlineInfo());
-
-            return true;
-        }
-        
-        private bool HandleServerLoginResponsePacket(TaikoRsReader reader) {
-            PacketServerLoginResponse packet = new();
-            packet.ReadPacket(reader);
-
-            //TODO notify user when login failed properly
-            if ((packet.UserId & 1 << 31) != 0) {
-                switch (packet.UserId) {
-                    case -1: {
-                        Logger.Log("Login failed! User not found.", new LoggerLevelOnlineInfo());
-                        this.Disconnect().Wait();
-                        return true;
-                    }
-                    case -2: {
-                        Logger.Log("Login failed! Password incorrect!", new LoggerLevelOnlineInfo());
-                        this.Disconnect().Wait();
-                        return true;
-                    }
-                }
-            }
-
-            this.Player.Username.Value = this.Username();
-            this.Player.UserId.Value   = packet.UserId;
-            this.State                 = ConnectionState.LoggedIn;
-            
-            this.InvokeOnLoginComplete(this);
-
-            this.OnlinePlayers.Add(this.Player.UserId, this.Player);
-            
-            return true;
-        }
-        
-        private bool HandleServerUserJoinedPacket(TaikoRsReader reader) {
-            PacketServerUserJoined packet = new();
-            packet.ReadPacket(reader);
-
-            if (this.OnlinePlayers.ContainsKey(packet.Player.UserId)) return true;
-
-            this.OnlinePlayers.Add(packet.Player.UserId, packet.Player);
-            Logger.Log($"{packet.Player.Username} is online!", new LoggerLevelOnlineInfo());
-
-            return true;
-        }
-        #endregion
 
         public override async Task SendMessage(string channel, string message) {
             await Task.Run(() => this._client.Send(new PacketClientSendMessage(channel, message).GetPacket()));
@@ -282,12 +187,116 @@ namespace pTyping.Online {
 
         protected override async Task ClientLogout() {
             if (!this._client.IsAlive) return;
-            
+
             await Task.Run(() => this._client.Send(new PacketClientUserLogout().GetPacket()));
 
             this.InvokeOnLogout(this);
             this.State = ConnectionState.Connected;
         }
+
+        #region Handle packets
+
+        private bool HandleServerSendMessagePacket(TaikoRsReader reader) {
+            PacketServerSendMessage packet = new();
+            packet.ReadPacket(reader);
+
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                ChatMessage message = new(player, packet.Channel, packet.Message);
+                this.ChatLog.Add(message);
+
+                Logger.Log(
+                $"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}",
+                new LoggerLevelChatMessage()
+                );
+            }
+
+            return true;
+        }
+
+        private bool HandleServerScoreUpdatePacket(TaikoRsReader reader) {
+            PacketServerScoreUpdate packet = new();
+            packet.ReadPacket(reader);
+
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                player.TotalScore.Value  = packet.TotalScore;
+                player.RankedScore.Value = packet.RankedScore;
+                player.Accuracy.Value    = packet.Accuracy;
+                player.PlayCount.Value   = packet.PlayCount;
+
+                Logger.Log(
+                $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
+                new LoggerLevelOnlineInfo()
+                );
+            }
+
+            return true;
+        }
+
+        private bool HandleServerUserStatusUpdatePacket(TaikoRsReader reader) {
+            PacketServerUserStatusUpdate packet = new();
+            packet.ReadPacket(reader);
+
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                player.Action.Value = packet.Action;
+                Logger.Log($"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}!", new LoggerLevelOnlineInfo());
+            }
+
+            return true;
+        }
+
+        private bool HandleServerUserLeftPacket(TaikoRsReader reader) {
+            PacketServerUserLeft packet = new();
+            packet.ReadPacket(reader);
+
+            if (this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
+                Logger.Log($"{playerLeft.Username} has gone offline!", new LoggerLevelOnlineInfo());
+
+            return true;
+        }
+
+        private bool HandleServerLoginResponsePacket(TaikoRsReader reader) {
+            PacketServerLoginResponse packet = new();
+            packet.ReadPacket(reader);
+
+            //TODO notify user when login failed properly
+            if ((packet.UserId & (1 << 31)) != 0)
+                switch (packet.UserId) {
+                    case -1: {
+                        Logger.Log("Login failed! User not found.", new LoggerLevelOnlineInfo());
+                        this.Disconnect().Wait();
+                        return true;
+                    }
+                    case -2: {
+                        Logger.Log("Login failed! Password incorrect!", new LoggerLevelOnlineInfo());
+                        this.Disconnect().Wait();
+                        return true;
+                    }
+                }
+
+            this.Player.Username.Value = this.Username();
+            this.Player.UserId.Value   = packet.UserId;
+            this.State                 = ConnectionState.LoggedIn;
+
+            this.InvokeOnLoginComplete(this);
+
+            this.OnlinePlayers.Add(this.Player.UserId, this.Player);
+
+            return true;
+        }
+
+        private bool HandleServerUserJoinedPacket(TaikoRsReader reader) {
+            PacketServerUserJoined packet = new();
+            packet.ReadPacket(reader);
+
+            if (this.OnlinePlayers.ContainsKey(packet.Player.UserId)) return true;
+
+            this.OnlinePlayers.Add(packet.Player.UserId, packet.Player);
+            Logger.Log($"{packet.Player.Username} is online!", new LoggerLevelOnlineInfo());
+
+            return true;
+        }
+
+        #endregion
     }
 
     public class TaikoRsReader : BinaryReader {

@@ -1,55 +1,53 @@
 using System.IO;
-using pTyping.Online;
 using Newtonsoft.Json;
+using pTyping.Online;
 
 namespace pTyping.Player {
     [JsonObject(MemberSerialization.OptIn)]
     public class PlayerScore {
-        [JsonProperty]
-        public long   Score;
+
+        private static short _TaikoRsScoreVersion = 1;
         [JsonProperty]
         public double Accuracy = 1d;
         [JsonProperty]
         public int Combo;
-        [JsonProperty]
-        public int MaxCombo = 0;
-        
+
         [JsonProperty]
         public int ExcellentHits = 0;
         [JsonProperty]
-        public int GoodHits      = 0;
+        public int FairHits = 0;
         [JsonProperty]
-        public int FairHits      = 0;
-        [JsonProperty]
-        public int PoorHits      = 0;
-        [JsonProperty]
-        public int MissHits      = 0;
+        public int GoodHits = 0;
 
         [JsonProperty]
         public string MapHash;
+        [JsonProperty]
+        public int MaxCombo = 0;
+        [JsonProperty]
+        public int MissHits = 0;
+        [JsonProperty]
+        public int PoorHits = 0;
+        [JsonProperty]
+        public long Score;
 
         [JsonProperty]
         public string Username;
-        
+
         public PlayerScore(string mapHash, string username) {
             this.MapHash  = mapHash;
             this.Username = username;
         }
-        
-        public PlayerScore() {
-            
-        }
 
-        private static short _TaikoRsScoreVersion = 1;
+        public PlayerScore() {}
 
         public static PlayerScore TaikoRsDeserialize(TaikoRsReader reader) {
             PlayerScore score = new();
 
-            reader.ReadUInt16(); // Version (we ignore rn)
-            
+            reader.ReadUInt16();// Version (we ignore rn)
+
             score.Username = reader.ReadString();
             score.MapHash  = reader.ReadString();
-            reader.ReadByte(); // mode
+            reader.ReadByte();// mode
             score.Score         = reader.ReadInt64();
             score.Combo         = reader.ReadInt16();
             score.MaxCombo      = reader.ReadInt16();
@@ -57,17 +55,17 @@ namespace pTyping.Player {
             score.FairHits      = reader.ReadInt16();
             score.GoodHits      = reader.ReadInt16();
             score.ExcellentHits = reader.ReadInt16();
-            reader.ReadInt16(); //katu
+            reader.ReadInt16();//katu
             score.MissHits = reader.ReadInt16();
             score.Accuracy = reader.ReadDouble();
 
             return score;
         }
-        
+
         public byte[] TaikoRsSerialize() {
             MemoryStream  stream = new();
             TaikoRsWriter writer = new(stream);
-            
+
             writer.Write(_TaikoRsScoreVersion);
             writer.Write(this.Username);
             writer.Write(this.MapHash);
@@ -75,14 +73,14 @@ namespace pTyping.Player {
             writer.Write(this.Score);
             writer.Write((short)this.Combo);
             writer.Write((short)this.MaxCombo);
-            writer.Write((short)this.PoorHits); //50
-            writer.Write((short)this.FairHits); //100
-            writer.Write((short)this.GoodHits); //300
-            writer.Write((short)this.ExcellentHits); //geki
-            writer.Write((short)0); //katu
+            writer.Write((short)this.PoorHits);     //50
+            writer.Write((short)this.FairHits);     //100
+            writer.Write((short)this.GoodHits);     //300
+            writer.Write((short)this.ExcellentHits);//geki
+            writer.Write((short)0);                 //katu
             writer.Write((short)this.MissHits);
             writer.Write(this.Accuracy);
-            
+
             writer.Flush();
 
             return stream.ToArray();

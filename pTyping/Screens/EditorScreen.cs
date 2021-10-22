@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
@@ -11,11 +10,12 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using pTyping.Songs;
-using pTyping.Drawables;
+using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using pTyping.Drawables;
+using pTyping.Songs;
 
 namespace pTyping.Screens {
     public enum EditorTool {
@@ -25,33 +25,35 @@ namespace pTyping.Screens {
     }
 
     public class EditorScreen : Screen {
-        private TextDrawable               _currentTimeDrawable;
+
+        private const float                 EDITOR_TOOL_BASE_SIZE   = 0.4f;
+        private const float                 EDITOR_TOOL_SCALED_SIZE = 0.55f;
+        private       UiTextBoxDrawable     _colorInput;
+        private       TextDrawable          _colorInputLabel;
+        private       LinePrimitiveDrawable _createLine;
+        private       TextDrawable          _currentTimeDrawable;
+        private       TexturedDrawable      _editorToolCreateNote;
+
+        private TexturedDrawable _editorToolSelect;
+        private bool             _isDragging = false;
+
+        private double _mouseTime;
+
+        private readonly List<NoteDrawable> _notes = new();
+
+        private Texture2D                  _noteTexture;
+        private UiProgressBarDrawable      _progressBar;
         private TexturedDrawable           _recepticle;
         private NoteDrawable               _selectedNote;
         private RectanglePrimitiveDrawable _selectionRect;
-        private UiProgressBarDrawable      _progressBar;
-        private LinePrimitiveDrawable      _createLine;
 
-        private UiTextBoxDrawable _textInput;
-        private TextDrawable      _textInputLabel;
-        private UiTextBoxDrawable _colorInput;
-        private TextDrawable      _colorInputLabel;
+        private Song _song;
 
-        private TexturedDrawable _editorToolSelect;
-        private TexturedDrawable _editorToolCreateNote;
-
-        private List<NoteDrawable> _notes        = new();
+        private UiTextBoxDrawable  _textInput;
+        private TextDrawable       _textInputLabel;
         private List<NoteDrawable> _timelineBars = new();
 
         public EditorTool CurrentTool = EditorTool.None;
-
-        private Texture2D _noteTexture;
-        private bool      _isDragging = false;
-
-        private const float EDITOR_TOOL_BASE_SIZE   = 0.4f;
-        private const float EDITOR_TOOL_SCALED_SIZE = 0.55f;
-
-        private Song _song;
 
         public override void Initialize() {
             base.Initialize();
@@ -430,8 +432,6 @@ namespace pTyping.Screens {
                 this._createLine.Visible = false;
             }
         }
-
-        private double _mouseTime;
         private void OnMouseMove(object sender, (Point, string) e) {
             (int x, int y) = e.Item1;
             if (y < PlayerScreen.RECEPTICLE_POS.Y + 40f && y > PlayerScreen.RECEPTICLE_POS.Y - 40f) {

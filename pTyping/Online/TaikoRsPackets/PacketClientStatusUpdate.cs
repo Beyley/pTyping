@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace pTyping.Online.TaikoRsPackets {
@@ -9,22 +10,22 @@ namespace pTyping.Online.TaikoRsPackets {
 
             this.PacketId = TaikoRsPacketId.ClientStatusUpdate;
         }
-        
+
         protected override byte[] GetData() {
             MemoryStream  stream = new();
             TaikoRsWriter writer = new(stream);
-            
+
             writer.Write((ushort)this.Action.Action.Value);
             writer.Write(this.Action.ActionText);
             writer.Write((byte)this.Action.Mode.Value);
-            
+
             writer.Flush();
 
             return stream.ToArray();
         }
-        
+
         protected override void ReadData(TaikoRsReader reader) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

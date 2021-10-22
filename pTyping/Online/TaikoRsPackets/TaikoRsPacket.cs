@@ -2,25 +2,25 @@ using System.IO;
 
 namespace pTyping.Online.TaikoRsPackets {
     public abstract class TaikoRsPacket {
-        public void ReadPacket(TaikoRsReader reader) => this.ReadData(reader);
 
         public TaikoRsPacketId PacketId;
+        public void            ReadPacket(TaikoRsReader reader) => this.ReadData(reader);
 
         protected abstract byte[] GetData();
-        protected abstract void ReadData(TaikoRsReader reader);
+        protected abstract void   ReadData(TaikoRsReader reader);
 
         public byte[] GetPacket() {
             MemoryStream  stream = new();
             TaikoRsWriter writer = new(stream);
-            
+
             writer.Write((ushort)this.PacketId);
             writer.Write(this.GetData());
             writer.Flush();
-            
+
             return stream.ToArray();
         }
     }
-    
+
     public enum TaikoRsPacketId : ushort {
         Unknown = 0,
 
@@ -45,7 +45,7 @@ namespace pTyping.Online.TaikoRsPackets {
         ClientSpectate,       // user_id to spectate
         ServerSpectatorJoined,// user_id of spectator
         ClientSpectatorFrames,// frame_count, [SpectatorFrame]
-        ServerSpectatorFrames,// sender_id, frame_count, [SpectatorFrame]
+        ServerSpectatorFrames // sender_id, frame_count, [SpectatorFrame]
 
         // multiplayer?
     }

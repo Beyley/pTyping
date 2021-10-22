@@ -1,10 +1,12 @@
+using System;
+
 namespace pTyping.Online.TaikoRsPackets {
     public class PacketServerSendMessage : TaikoRsPacket {
-        public int    UserId;
-        public string Message;
         public string Channel;
-        
-        protected override byte[] GetData() => throw new System.NotImplementedException();
+        public string Message;
+        public int    UserId;
+
+        protected override byte[] GetData() => throw new NotImplementedException();
         protected override void ReadData(TaikoRsReader reader) {
             this.UserId  = reader.ReadInt32();
             this.Message = reader.ReadString();

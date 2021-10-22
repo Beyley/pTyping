@@ -9,10 +9,10 @@ using pTyping.Songs;
 
 namespace pTyping.Screens {
     public class NewSongScreen : Screen {
-        private UiTextBoxDrawable _songNameTextBox;
         private UiTextBoxDrawable _songArtistTextBox;
         private UiTextBoxDrawable _songCreatorTextBox;
         private UiTextBoxDrawable _songDifficultyTextBox;
+        private UiTextBoxDrawable _songNameTextBox;
 
         public override void Initialize() {
             base.Initialize();
@@ -86,7 +86,7 @@ namespace pTyping.Screens {
             this.Manager.Add(this._songDifficultyTextBox);
 
             #endregion
-            
+
             pTypingGame.UserStatusListening();
         }
 

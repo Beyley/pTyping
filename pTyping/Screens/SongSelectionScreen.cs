@@ -1,39 +1,39 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using ManagedBass;
-using pTyping.Songs;
-using pTyping.Player;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Drawables;
+using pTyping.Player;
+using pTyping.Songs;
 
 namespace pTyping.Screens {
     public class SongSelectionScreen : Screen {
-        private bool _editor;
 
-        private TextDrawable _songInfo;
-
-        private List<ManagedDrawable> _songButtonList    = new();
-        private LeaderboardDrawable _leaderboardDrawable;
+        public static    Bindable<LeaderboardType> LeaderboardType = new(Screens.LeaderboardType.Local);
+        private readonly bool                      _editor;
+        private          TexturedDrawable          _leaderboardButton;
+        private          LeaderboardDrawable       _leaderboardDrawable;
 
         private float _movingDirection;
 
-        public SongSelectionScreen(bool editor) => this._editor = editor;
+        private readonly List<ManagedDrawable> _songButtonList = new();
 
-        public static Bindable<LeaderboardType> LeaderboardType = new(Screens.LeaderboardType.Local);
-        private       TexturedDrawable          _leaderboardButton;
+        private TextDrawable _songInfo;
+
+        public SongSelectionScreen(bool editor) => this._editor = editor;
 
         public override void Initialize() {
             base.Initialize();
@@ -192,17 +192,17 @@ namespace pTyping.Screens {
             this._leaderboardButton = new(TextureFromLeaderboardType(LeaderboardType), new(10, 10)) {
                 Scale = new(0.05f)
             };
-            
+
             this._leaderboardButton.OnClick += this.ChangeLeaderboardType;
-                
+
             this.Manager.Add(this._leaderboardButton);
-                
+
             #endregion
-            
+
             #region Song info
 
             this._songInfo = new TextDrawable(new Vector2(this._leaderboardButton.Size.X + 20, 10), pTypingGame.JapaneseFont, "", 35) {
-                Clickable = false,
+                Clickable   = false,
                 CoverClicks = false
             };
 
@@ -238,10 +238,10 @@ namespace pTyping.Screens {
             FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 
             LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
-            
+
             pTypingGame.UserStatusPickingSong();
         }
-        
+
         private void ChangeLeaderboardType(object sender, Point e) {
             LeaderboardType.Value = LeaderboardType.Value switch {
                 Screens.LeaderboardType.Local  => Screens.LeaderboardType.Global,
@@ -249,12 +249,12 @@ namespace pTyping.Screens {
                 Screens.LeaderboardType.Friend => Screens.LeaderboardType.Local,
                 _                              => LeaderboardType.Value
             };
-            
+
             this._leaderboardButton.SetTexture(TextureFromLeaderboardType(LeaderboardType));
-            
+
             // this._leaderboardButton.Tweens.Clear();
             this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, this._leaderboardButton.Scale, new(0.055f), FurballGame.Time, FurballGame.Time + 50));
-            this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, new(0.055f),                            new(0.05f),   FurballGame.Time + 50, FurballGame.Time + 100));
+            this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, new(0.055f), new(0.05f), FurballGame.Time + 50, FurballGame.Time + 100));
         }
 
         private void OnLeaderboardTypeChange(object sender, LeaderboardType e) {
@@ -341,9 +341,9 @@ namespace pTyping.Screens {
                 }
                 case Screens.LeaderboardType.Global: {
                     Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.MapHash);
-                
+
                     task.Wait();
-                
+
                     origScores = task.Result;
                     break;
                 }
@@ -360,7 +360,7 @@ namespace pTyping.Screens {
             this._leaderboardDrawable = new LeaderboardDrawable(scores) {
                 Position = new(25, y)
             };
-            
+
             this.Manager.Add(this._leaderboardDrawable);
         }
 

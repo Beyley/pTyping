@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Audio;
@@ -12,32 +12,16 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using ManagedBass;
-using pTyping.Songs;
-using pTyping.Player;
-using pTyping.Drawables;
-using pTyping.Songs.Events;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using pTyping.Drawables;
+using pTyping.Player;
+using pTyping.Songs;
+using pTyping.Songs.Events;
 
 namespace pTyping.Screens {
     public class PlayerScreen : Screen {
-        private PlayerScore _score;
-
-        private TextDrawable     _scoreDrawable;
-        private TextDrawable     _accuracyDrawable;
-        private TextDrawable     _comboDrawable;
-        private TextDrawable     _typingIndicator;
-        private TexturedDrawable _recepticle;
-        private UiButtonDrawable _skipButton;
-
-        private UiButtonDrawable _resumeButton;
-        private UiButtonDrawable _restartButton;
-        private UiButtonDrawable _quitButton;
-
-        public SoundEffect HitSoundNormal = new();
-
-        private List<NoteDrawable> _notes = new();
 
         public static readonly int SCORE_EXCELLENT = 1500;
         public static readonly int SCORE_GOOD      = 1000;
@@ -45,7 +29,7 @@ namespace pTyping.Screens {
         public static readonly int SCORE_POOR      = 0;
 
         public static readonly int SCORE_PER_CHARACTER = 500;
-        public static readonly int SCORE_COMBO        = 10;
+        public static readonly int SCORE_COMBO         = 10;
         public static readonly int SCORE_COMBO_MAX     = 1000;
 
         public static readonly int TIMING_EXCELLENT = 20;
@@ -53,19 +37,35 @@ namespace pTyping.Screens {
         public static readonly int TIMING_FAIR      = 100;
         public static readonly int TIMING_POOR      = 200;
 
-        private Song _song;
+        public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+
+        public static readonly Vector2      NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2      NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
+        private                TextDrawable _accuracyDrawable;
+        private                TextDrawable _comboDrawable;
+
+        private bool _endScheduled = false;
+
+        private readonly List<NoteDrawable> _notes = new();
 
         private Texture2D _noteTexture;
 
-        public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        private int              _noteToType;
+        private UiButtonDrawable _quitButton;
+        private TexturedDrawable _recepticle;
+        private UiButtonDrawable _restartButton;
 
-        public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-        public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
+        private UiButtonDrawable _resumeButton;
+        private PlayerScore      _score;
 
-        private bool _endScheduled = false;
-        
-        private int _noteToType;
-        
+        private TextDrawable     _scoreDrawable;
+        private UiButtonDrawable _skipButton;
+
+        private Song         _song;
+        private TextDrawable _typingIndicator;
+
+        public SoundEffect HitSoundNormal = new();
+
         public override void Initialize() {
             base.Initialize();
 
@@ -341,7 +341,7 @@ namespace pTyping.Screens {
 
         private void OnCharacterTyped(object sender, TextInputEventArgs args) {
             if (this._song.AllNotesHit()) return;
-            
+
             NoteDrawable noteDrawable = this._notes[this._noteToType];
 
             Note note = noteDrawable.Note;
@@ -564,9 +564,11 @@ namespace pTyping.Screens {
                 pTypingGame.MusicTrackScheduler.ScheduleMethod(
                 delegate {
                     pTypingGame.SubmitScore(this._song, this._score);
-                    
+
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));
-                }, pTypingGame.MusicTrack.GetCurrentTime() + 1500);
+                },
+                pTypingGame.MusicTrack.GetCurrentTime() + 1500
+                );
 
                 this._endScheduled = true;
             }

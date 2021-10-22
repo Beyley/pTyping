@@ -7,18 +7,18 @@ using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {
-        public List<ChatMessage>      ChatLog       = new();
+        public List<ChatMessage>                                 ChatLog       = new();
         public ObservableConcurrentDictionary<int, OnlinePlayer> OnlinePlayers = new();
+
+        public OnlinePlayer Player = new();
 
         public ConnectionState State {
             get;
             protected set;
         } = ConnectionState.Disconnected;
 
-        public OnlinePlayer Player = new();
-
         public async Task SubmitScore(PlayerScore score) {
-            if(this.State == ConnectionState.LoggedIn)
+            if (this.State == ConnectionState.LoggedIn)
                 await this.ClientSubmitScore(score);
         }
 
@@ -28,17 +28,17 @@ namespace pTyping.Online {
 
             return new();
         }
-        
+
         public abstract string Username();
         public abstract string Password();
 
-        protected abstract Task ClientLogin();
-        protected abstract Task ClientLogout();
-        protected abstract Task Connect();
-        protected abstract Task Disconnect();
-        public abstract    Task SendMessage(string            channel, string message);
-        protected abstract Task ClientSubmitScore(PlayerScore score);
-        protected abstract Task<List<PlayerScore>> ClientGetScores(string hash);
+        protected abstract Task                    ClientLogin();
+        protected abstract Task                    ClientLogout();
+        protected abstract Task                    Connect();
+        protected abstract Task                    Disconnect();
+        public abstract    Task                    SendMessage(string            channel, string message);
+        protected abstract Task                    ClientSubmitScore(PlayerScore score);
+        protected abstract Task<List<PlayerScore>> ClientGetScores(string        hash);
 
         public abstract Task ChangeUserAction(UserAction action);
 
@@ -57,10 +57,9 @@ namespace pTyping.Online {
         public event EventHandler OnDisconnect;
 
         public async Task Login() {
-            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers) {
+            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers)
                 this.OnlinePlayers.Remove(keyValuePair.Key);
-            }
-            
+
             if (this.State == ConnectionState.Disconnected)
                 await this.Connect();
 
@@ -69,18 +68,15 @@ namespace pTyping.Online {
         }
 
         public async Task Logout() {
-            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers) {
+            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers)
                 this.OnlinePlayers.Remove(keyValuePair.Key);
-            }
-            
+
             await this.ClientLogout();
 
             await this.Disconnect();
         }
 
-        public void Initialize() {
-            
-        }
+        public void Initialize() {}
     }
 
     public enum ConnectionState {
