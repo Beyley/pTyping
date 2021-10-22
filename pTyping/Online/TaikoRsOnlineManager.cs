@@ -152,7 +152,6 @@ namespace pTyping.Online {
                 TaikoRsPacketId.ServerUserLeft         => this.HandleServerUserLeftPacket(reader),
                 TaikoRsPacketId.ServerSendMessage      => this.HandleServerSendMessagePacket(reader),
                 TaikoRsPacketId.ServerScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
-                TaikoRsPacketId.ServerPong             => this.HandleServerPongPacket(),
                 TaikoRsPacketId.ServerSpectatorJoined  => throw new NotImplementedException(),
                 TaikoRsPacketId.ServerSpectatorFrames  => throw new NotImplementedException(),
                 TaikoRsPacketId.Unknown                => throw new Exception("Got Unknown packet id?"),
