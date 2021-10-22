@@ -166,7 +166,11 @@ namespace pTyping.Online {
         }
 
         protected override async Task Disconnect() {
-            await Task.Run(() => this._client.Close(CloseStatusCode.Normal, "Client Disconnecting"));
+            await Task.Run(
+            () => {
+                if (this._client.IsAlive) this._client.Close(CloseStatusCode.Normal, "Client Disconnecting");
+            }
+            );
 
             this.InvokeOnDisconnect(this);
             this.State = ConnectionState.Disconnected;

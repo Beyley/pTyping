@@ -3,7 +3,7 @@ using Furball.Engine.Engine.DevConsole.Types;
 using pTyping.Online;
 
 namespace pTyping {
-    public class ConVars {
+    public class ConVars : ConVarStore {
         public static FloatConVar  Volume        = new("sl_master_volume", 0.05f);
         public static FloatConVar  BackgroundDim = new("cl_background_dim", 0.5f);
         public static StringConVar Username      = new("username", "beyley");
@@ -19,7 +19,7 @@ namespace pTyping {
     }
 
     public class Logout : ConFunc {
-        public Logout() : base("net_logout") {}
+        public Logout() : base("sv_logout") {}
 
         public override ConsoleResult Run(string[] consoleInput) {
             pTypingGame.OnlineManager.Logout().Wait();
@@ -33,7 +33,7 @@ namespace pTyping {
 
     public class Login : ConFunc {
 
-        public Login() : base("net_login") {}
+        public Login() : base("sv_login") {}
 
         public override ConsoleResult Run(string[] consoleInput) {
             pTypingGame.OnlineManager.Login().Wait();
@@ -46,7 +46,7 @@ namespace pTyping {
     }
 
     public class SendMessage : ConFunc {
-        public SendMessage() : base("net_send_message") {}
+        public SendMessage() : base("sv_send_message") {}
         public override ConsoleResult Run(string[] consoleInput) {
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
                 return new(ExecutionResult.Warning, "You are not logged in!");
