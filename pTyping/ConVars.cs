@@ -4,10 +4,6 @@ using pTyping.Online;
 
 namespace pTyping {
     public class ConVars {
-        public static SendMessage SendMessage = new();
-        public static Login       Login       = new();
-        public static Logout      Logout      = new();
-
         public static FloatConVar  Volume        = new("sl_master_volume", 0.05f);
         public static FloatConVar  BackgroundDim = new("cl_background_dim", 0.5f);
         public static StringConVar Username      = new("username", "beyley");

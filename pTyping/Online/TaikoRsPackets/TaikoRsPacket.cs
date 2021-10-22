@@ -36,6 +36,8 @@ namespace pTyping.Online.TaikoRsPackets {
         ClientLogOut,
         ServerUserJoined,
         ServerUserLeft,
+        ClientPing,
+        ServerPong,
 
         // chat
         ClientSendMessage,// sender_id, channel_id, message

@@ -13,7 +13,7 @@ namespace pTyping.Online {
         public Bindable<long>   TotalScore  = new(0);
         public Bindable<int>    UserId      = new(-1);
         public Bindable<string> Username    = new("Unknown user!");
-
+        
         public UserCardDrawable GetUserCard() {
             if (this._userCard is null) {
                 this._userCard = new(new(0), this) {

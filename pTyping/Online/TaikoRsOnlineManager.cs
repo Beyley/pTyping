@@ -23,6 +23,8 @@ namespace pTyping.Online {
         private readonly Uri       _wsUri;
         private          WebSocket _client;
 
+        public bool IsAlive => this._client.IsAlive;
+
         public TaikoRsOnlineManager(string wsUri, string httpUri) {
             this._wsUri   = new(wsUri);
             this._httpUri = new(httpUri);
@@ -73,7 +75,7 @@ namespace pTyping.Online {
         }
 
         private async Task SendUpdateScoreRequest() {
-            await Task.Run(() => this._client.Send(new PacketClientNotifyScoreUpdate().GetPacket()));
+            await this._client.SendRealAsync(new PacketClientNotifyScoreUpdate().GetPacket());
         }
 
         protected override async Task ClientSubmitScore(PlayerScore score) {
@@ -150,6 +152,7 @@ namespace pTyping.Online {
                 TaikoRsPacketId.ServerUserLeft         => this.HandleServerUserLeftPacket(reader),
                 TaikoRsPacketId.ServerSendMessage      => this.HandleServerSendMessagePacket(reader),
                 TaikoRsPacketId.ServerScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
+                TaikoRsPacketId.ServerPong             => this.HandleServerPongPacket(),
                 TaikoRsPacketId.ServerSpectatorJoined  => throw new NotImplementedException(),
                 TaikoRsPacketId.ServerSpectatorFrames  => throw new NotImplementedException(),
                 TaikoRsPacketId.Unknown                => throw new Exception("Got Unknown packet id?"),
@@ -160,7 +163,7 @@ namespace pTyping.Online {
         }
 
         public override async Task SendMessage(string channel, string message) {
-            await Task.Run(() => this._client.Send(new PacketClientSendMessage(channel, message).GetPacket()));
+            await this._client.SendRealAsync(new PacketClientSendMessage(channel, message).GetPacket());
         }
 
         protected override async Task Disconnect() {
@@ -168,6 +171,8 @@ namespace pTyping.Online {
 
             this.InvokeOnDisconnect(this);
             this.State = ConnectionState.Disconnected;
+
+            Logger.Log("Disconnected from the server!", new LoggerLevelOnlineInfo());
         }
 
         public override async Task ChangeUserAction(UserAction action) {
@@ -175,26 +180,29 @@ namespace pTyping.Online {
 
             Logger.Log($"Sending action {action.Action} {action.ActionText}");
 
-            await Task.Run(delegate { this._client.Send(new PacketClientStatusUpdate(action).GetPacket()); });
+            await this._client.SendRealAsync(new PacketClientStatusUpdate(action).GetPacket());
+            ;
         }
 
         protected override async Task ClientLogin() {
-            await Task.Run(() => this._client.Send(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket()));
+            await this._client.SendRealAsync(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket());
 
             this.InvokeOnLoginStart(this);
             this.State = ConnectionState.LoggingIn;
         }
 
         protected override async Task ClientLogout() {
-            if (!this._client.IsAlive) return;
+            if (this._client.ReadyState != WebSocketState.Open) return;
 
-            await Task.Run(() => this._client.Send(new PacketClientUserLogout().GetPacket()));
+            await this._client.SendRealAsync(new PacketClientUserLogout().GetPacket());
 
             this.InvokeOnLogout(this);
             this.State = ConnectionState.Connected;
         }
 
         #region Handle packets
+
+        private bool HandleServerPongPacket() => true;
 
         private bool HandleServerSendMessagePacket(TaikoRsReader reader) {
             PacketServerSendMessage packet = new();
