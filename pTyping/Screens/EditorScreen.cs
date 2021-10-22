@@ -74,7 +74,7 @@ namespace pTyping.Screens {
 
             foreach (Note note in this._song.Notes) {
                 NoteDrawable noteDrawable = new(
-                new Vector2(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset),
+                new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
                 this._noteTexture,
                 pTypingGame.JapaneseFont,
                 50
@@ -111,8 +111,8 @@ namespace pTyping.Screens {
                 noteDrawable.Tweens.Add(
                 new VectorTween(
                 TweenType.Movement,
-                new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + note.YOffset),
-                PlayerScreen.RecepticlePos,
+                new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
+                PlayerScreen.RECEPTICLE_POS,
                 (int)(note.Time - ConVars.BaseApproachTime.Value),
                 (int)note.Time
                 )
@@ -434,7 +434,7 @@ namespace pTyping.Screens {
         private double _mouseTime;
         private void OnMouseMove(object sender, (Point, string) e) {
             (int x, int y) = e.Item1;
-            if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
+            if (y < PlayerScreen.RECEPTICLE_POS.Y + 40f && y > PlayerScreen.RECEPTICLE_POS.Y - 40f) {
                 if (this.CurrentTool == EditorTool.CreateNote)
                     this._createLine.Visible = true;
                 this._createLine.OriginType = OriginType.Center;
@@ -457,12 +457,11 @@ namespace pTyping.Screens {
 
                 double distanceInTime = snappedTimeAtCursor - currentTime;
 
-                double scaleTime = distanceInTime     / ConVars.BaseApproachTime.Value;
-                double scaleRaw  = distanceToReticule / (noteStartPos - reticulePos);
+                double scaleTime = distanceInTime / ConVars.BaseApproachTime.Value;
 
                 double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
 
-                this._createLine.Position = new Vector2((float)newX, PlayerScreen.RecepticlePos.Y - 40);
+                this._createLine.Position = new Vector2((float)newX, PlayerScreen.RECEPTICLE_POS.Y - 40);
             } else {
                 this._createLine.Visible = false;
             }
@@ -477,9 +476,9 @@ namespace pTyping.Screens {
                     Time = this._mouseTime
                 };
 
-                (int x, int y) = e.args.position;
-                if (y < PlayerScreen.RecepticlePos.Y + 40f && y > PlayerScreen.RecepticlePos.Y - 40f) {
-                    NoteDrawable noteDrawable = new(PlayerScreen.NoteStartPos, this._noteTexture, pTypingGame.JapaneseFont, 50) {
+                (int _, int y) = e.args.position;
+                if (y < PlayerScreen.RECEPTICLE_POS.Y + 40f && y > PlayerScreen.RECEPTICLE_POS.Y - 40f) {
+                    NoteDrawable noteDrawable = new(PlayerScreen.NOTE_START_POS, this._noteTexture, pTypingGame.JapaneseFont, 50) {
                         TimeSource    = pTypingGame.MusicTrack,
                         ColorOverride = note.Color,
                         LabelTextDrawable = {
@@ -512,8 +511,8 @@ namespace pTyping.Screens {
                     noteDrawable.Tweens.Add(
                     new VectorTween(
                     TweenType.Movement,
-                    PlayerScreen.NoteStartPos,
-                    PlayerScreen.RecepticlePos,
+                    PlayerScreen.NOTE_START_POS,
+                    PlayerScreen.RECEPTICLE_POS,
                     (int)(note.Time - ConVars.BaseApproachTime.Value),
                     (int)note.Time
                     )
@@ -537,8 +536,8 @@ namespace pTyping.Screens {
             noteDrawable.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset),
-            PlayerScreen.RecepticlePos,
+            new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
+            PlayerScreen.RECEPTICLE_POS,
             (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
             (int)noteDrawable.Note.Time
             )
@@ -546,8 +545,8 @@ namespace pTyping.Screens {
             this._selectionRect.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset),
-            PlayerScreen.RecepticlePos,
+            new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
+            PlayerScreen.RECEPTICLE_POS,
             (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
             (int)noteDrawable.Note.Time
             )
@@ -678,8 +677,8 @@ namespace pTyping.Screens {
                         noteDrawable.Tweens.Add(
                         new VectorTween(
                         TweenType.Movement,
-                        new(PlayerScreen.NoteStartPos.X, PlayerScreen.NoteStartPos.Y + noteDrawable.Note.YOffset),
-                        PlayerScreen.RecepticlePos,
+                        new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
+                        PlayerScreen.RECEPTICLE_POS,
                         (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
                         (int)noteDrawable.Note.Time
                         )

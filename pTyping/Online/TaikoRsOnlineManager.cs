@@ -142,14 +142,14 @@ namespace pTyping.Online {
             TaikoRsPacketId pid = reader.ReadPacketId();
 
             bool success = pid switch {
-                TaikoRsPacketId.Server_LoginResponse    => this.HandleServerLoginResponsePacket(reader),
-                TaikoRsPacketId.Server_UserStatusUpdate => this.HandleServerUserStatusUpdatePacket(reader),
-                TaikoRsPacketId.Server_UserJoined       => this.HandleServerUserJoinedPacket(reader),
-                TaikoRsPacketId.Server_UserLeft         => this.HandleServerUserLeftPacket(reader),
-                TaikoRsPacketId.Server_SendMessage      => this.HandleServerSendMessagePacket(reader),
-                TaikoRsPacketId.Server_ScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
-                TaikoRsPacketId.Server_SpectatorJoined  => throw new NotImplementedException(),
-                TaikoRsPacketId.Server_SpectatorFrames  => throw new NotImplementedException(),
+                TaikoRsPacketId.ServerLoginResponse    => this.HandleServerLoginResponsePacket(reader),
+                TaikoRsPacketId.ServerUserStatusUpdate => this.HandleServerUserStatusUpdatePacket(reader),
+                TaikoRsPacketId.ServerUserJoined       => this.HandleServerUserJoinedPacket(reader),
+                TaikoRsPacketId.ServerUserLeft         => this.HandleServerUserLeftPacket(reader),
+                TaikoRsPacketId.ServerSendMessage      => this.HandleServerSendMessagePacket(reader),
+                TaikoRsPacketId.ServerScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
+                TaikoRsPacketId.ServerSpectatorJoined  => throw new NotImplementedException(),
+                TaikoRsPacketId.ServerSpectatorFrames  => throw new NotImplementedException(),
                 TaikoRsPacketId.Unknown                 => throw new Exception("Got Unknown packet id?"),
                 _                                       => throw new Exception("Recieved client packet?")
             };
@@ -270,7 +270,7 @@ namespace pTyping.Online {
 
             Logger.Log($"Sending action {action.Action} {action.ActionText}");
 
-            this._client.Send(new PacketClientStatusUpdate(action).GetPacket());
+            await Task.Run(delegate { this._client.Send(new PacketClientStatusUpdate(action).GetPacket()); });
         }
 
         protected override async Task ClientLogin() {

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Furball.Engine.Engine.Helpers;
 
 namespace pTyping.Online {
@@ -30,6 +31,7 @@ namespace pTyping.Online {
         Taiko    = 1,
         Catch    = 2,
         Mania    = 3,
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         pTyping  = 4
     }
 }

@@ -6,7 +6,7 @@ namespace pTyping.Online.TaikoRsPackets {
             this.Username = username;
             this.Password = password;
 
-            this.PacketId = TaikoRsPacketId.Client_UserLogin;
+            this.PacketId = TaikoRsPacketId.ClientUserLogin;
         }
 
         public string Username;

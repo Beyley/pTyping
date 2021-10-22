@@ -7,7 +7,7 @@ namespace pTyping.Online.TaikoRsPackets {
         public PacketClientStatusUpdate(UserAction action) {
             this.Action = action;
 
-            this.PacketId = TaikoRsPacketId.Client_StatusUpdate;
+            this.PacketId = TaikoRsPacketId.ClientStatusUpdate;
         }
         
         protected override byte[] GetData() {

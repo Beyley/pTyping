@@ -1,8 +1,10 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace pTyping.Web {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum HttpMethod {
         OPTIONS,
         GET,

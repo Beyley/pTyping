@@ -2,8 +2,6 @@ using System.IO;
 
 namespace pTyping.Online.TaikoRsPackets {
     public abstract class TaikoRsPacket {
-        public TaikoRsPacket() { }
-
         public void ReadPacket(TaikoRsReader reader) => this.ReadData(reader);
 
         public TaikoRsPacketId PacketId;
@@ -27,27 +25,27 @@ namespace pTyping.Online.TaikoRsPackets {
         Unknown = 0,
 
         // login
-        Client_UserLogin,
-        Server_LoginResponse,
+        ClientUserLogin,
+        ServerLoginResponse,
 
         // status updates
-        Client_StatusUpdate,
-        Server_UserStatusUpdate,
-        Client_NotifyScoreUpdate,
-        Server_ScoreUpdate,
-        Client_LogOut,
-        Server_UserJoined,
-        Server_UserLeft,
+        ClientStatusUpdate,
+        ServerUserStatusUpdate,
+        ClientNotifyScoreUpdate,
+        ServerScoreUpdate,
+        ClientLogOut,
+        ServerUserJoined,
+        ServerUserLeft,
 
         // chat
-        Client_SendMessage,// sender_id, channel_id, message
-        Server_SendMessage,// sender_id, channel_id, message
+        ClientSendMessage,// sender_id, channel_id, message
+        ServerSendMessage,// sender_id, channel_id, message
 
         // spectator?
-        Client_Spectate,       // user_id to spectate
-        Server_SpectatorJoined,// user_id of spectator
-        Client_SpectatorFrames,// frame_count, [SpectatorFrame]
-        Server_SpectatorFrames,// sender_id, frame_count, [SpectatorFrame]
+        ClientSpectate,       // user_id to spectate
+        ServerSpectatorJoined,// user_id of spectator
+        ClientSpectatorFrames,// frame_count, [SpectatorFrame]
+        ServerSpectatorFrames,// sender_id, frame_count, [SpectatorFrame]
 
         // multiplayer?
     }

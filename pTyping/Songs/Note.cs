@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
@@ -14,18 +15,38 @@ namespace pTyping.Songs {
 
     [JsonObject(MemberSerialization.OptIn)]
     public class Note {
-        public List<string> ThisCharacterRomaji {
+        public (string Hiragana, List<string> Romaji) TypableRomaji {
             get {
                 if (this.IsHit)
-                    return new() {
-                        string.Empty
-                    };
+                    return (string.Empty, new() {
+                                   string.Empty
+                               });
 
-                HiraganaConversion.Conversions.TryGetValue(this.Text[this.Typed.Length].ToString(), out List<string> possible);
+                string       textToCheck = string.Empty;
+                List<string> possible    = null;
+                
+                if(this.Text.Length - this.Typed.Length >= 3) {//Try to get the next 3 chars
+                    textToCheck = this.Text.Substring(this.Typed.Length, 3);
+                    HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+                }
+                
+                //Try to get the next 2 chars instead
+                if (possible is null && this.Text.Length - this.Typed.Length >= 2) {
+                    textToCheck = this.Text.Substring(this.Typed.Length, 2);
+                    HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+                }
+                
+                //Try to get the next char instead
+                if (possible is null) {
+                    textToCheck = this.Text.Substring(this.Typed.Length, 1);
+                    HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+                }
 
+                if (possible is null) throw new Exception("Unknown character! Did you put kanji? smh my head");
+                
                 possible.Sort((x, y) => x.Length - y.Length);
 
-                return possible;
+                return (textToCheck, possible);
             }
         }
 

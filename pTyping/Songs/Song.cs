@@ -6,11 +6,13 @@ using pTyping.Songs.Events;
 using pTyping.LoggingLevels;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Furball.Engine.Engine.Helpers;
 using Kettu;
 
 namespace pTyping.Songs {
     public enum SongType {
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         pTyping,
         UTyping
     }

@@ -3,7 +3,7 @@ using System;
 namespace pTyping.Online.TaikoRsPackets {
     public class PacketClientNotifyScoreUpdate : TaikoRsPacket {
         public PacketClientNotifyScoreUpdate() {
-            this.PacketId = TaikoRsPacketId.Client_NotifyScoreUpdate;
+            this.PacketId = TaikoRsPacketId.ClientNotifyScoreUpdate;
         }
         
         protected override byte[] GetData() => Array.Empty<byte>();

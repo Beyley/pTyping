@@ -9,7 +9,7 @@ namespace pTyping.Online.TaikoRsPackets {
             this.Message = message;
             this.Channel = channel;
 
-            this.PacketId = TaikoRsPacketId.Client_SendMessage;
+            this.PacketId = TaikoRsPacketId.ClientSendMessage;
         }
         
         protected override byte[] GetData() {

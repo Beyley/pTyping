@@ -9,7 +9,7 @@ namespace pTyping.Web {
         public static string ExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception("shits fucked man");
         public static string DataFolder     = "html";
 
-        private static void Main(string[] args) {
+        private static void Main() {
             string location = "0.0.0.0";
             short  port     = 8080;
 

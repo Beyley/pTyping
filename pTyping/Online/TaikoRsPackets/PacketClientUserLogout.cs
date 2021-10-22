@@ -3,7 +3,7 @@ using System;
 namespace pTyping.Online.TaikoRsPackets {
     public class PacketClientUserLogout : TaikoRsPacket {
         public PacketClientUserLogout() {
-            this.PacketId = TaikoRsPacketId.Client_LogOut;
+            this.PacketId = TaikoRsPacketId.ClientLogOut;
         }
         
         protected override byte[] GetData() {
@@ -11,7 +11,7 @@ namespace pTyping.Online.TaikoRsPackets {
         }
         
         protected override void ReadData(TaikoRsReader reader) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

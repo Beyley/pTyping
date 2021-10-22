@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace pTyping.Screens {
     public class PlayerScreen : Screen {
-        private PlayerScore Score;
+        private PlayerScore _score;
 
         private TextDrawable     _scoreDrawable;
         private TextDrawable     _accuracyDrawable;
@@ -39,55 +39,53 @@ namespace pTyping.Screens {
 
         private List<NoteDrawable> _notes = new();
 
-        public static readonly int ScoreExcellent = 1500;
-        public static readonly int ScoreGood      = 1000;
-        public static readonly int ScoreFair      = 500;
-        public static readonly int ScorePoor      = 0;
+        public static readonly int SCORE_EXCELLENT = 1500;
+        public static readonly int SCORE_GOOD      = 1000;
+        public static readonly int SCORE_FAIR      = 500;
+        public static readonly int SCORE_POOR      = 0;
 
-        public static readonly int ScorePerCharacter = 500;
-        public static readonly int ScoreCombo        = 10;
-        public static readonly int ScoreComboMax     = 1000;
+        public static readonly int SCORE_PER_CHARACTER = 500;
+        public static readonly int SCORE_COMBO        = 10;
+        public static readonly int SCORE_COMBO_MAX     = 1000;
 
-        public static readonly int TimingExcellent = 20;
-        public static readonly int TimingGood      = 50;
-        public static readonly int TimingFair      = 100;
-        public static readonly int TimingPoor      = 200;
+        public static readonly int TIMING_EXCELLENT = 20;
+        public static readonly int TIMING_GOOD      = 50;
+        public static readonly int TIMING_FAIR      = 100;
+        public static readonly int TIMING_POOR      = 200;
 
         private Song _song;
 
         private Texture2D _noteTexture;
 
-        public static readonly Vector2 RecepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
-        public static readonly Vector2 NoteStartPos = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-        public static readonly Vector2 NoteEndPos   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
+        public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
 
         private bool _endScheduled = false;
         
         private int _noteToType;
-
-        public PlayerScreen() {}
-
+        
         public override void Initialize() {
             base.Initialize();
 
             this._song = pTypingGame.CurrentSong.Value.Copy();
 
-            this.Score = new(this._song.MapHash, ConVars.Username.Value);
+            this._score = new(this._song.MapHash, ConVars.Username.Value);
 
             if (this._song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 
             #region UI
 
-            this._scoreDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Score.Score:00000000}", 60);
+            this._scoreDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this._score.Score:00000000}", 60);
             this._accuracyDrawable = new TextDrawable(
             new Vector2(5, 5 + this._scoreDrawable.Size.Y),
             FurballGame.DEFAULT_FONT,
-            $"{this.Score.Accuracy * 100:0.00}%",
+            $"{this._score.Accuracy * 100:0.00}%",
             60
-            ) {};
-            this._comboDrawable = new TextDrawable(new Vector2(RecepticlePos.X, RecepticlePos.Y - 70), FurballGame.DEFAULT_FONT, $"{this.Score.Combo}x", 70) {
+            );
+            this._comboDrawable = new TextDrawable(new Vector2(RECEPTICLE_POS.X, RECEPTICLE_POS.Y - 70), FurballGame.DEFAULT_FONT, $"{this._score.Combo}x", 70) {
                 OriginType = OriginType.BottomCenter
             };
 
@@ -168,7 +166,7 @@ namespace pTyping.Screens {
 
             this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
 
-            this._recepticle = new TexturedDrawable(this._noteTexture, RecepticlePos) {
+            this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
                 Scale      = new(0.55f),
                 OriginType = OriginType.Center
             };
@@ -182,16 +180,16 @@ namespace pTyping.Screens {
 
             #region Playfield decorations
 
-            LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, RecepticlePos.Y - 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+            LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, RECEPTICLE_POS.Y - 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
                 ColorOverride = Color.Gray
             };
-            LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, RecepticlePos.Y + 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+            LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, RECEPTICLE_POS.Y + 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
                 ColorOverride = Color.Gray
             };
             this.Manager.Add(playfieldTopLine);
             this.Manager.Add(playfieldBottomLine);
 
-            RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, RecepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
+            RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, RECEPTICLE_POS.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
                 ColorOverride = new(100, 100, 100, 100),
                 Depth         = 0.9f
             };
@@ -215,7 +213,7 @@ namespace pTyping.Screens {
             #endregion
             #region typing indicator
 
-            this._typingIndicator = new(RecepticlePos, pTypingGame.JapaneseFont, "", 60) {
+            this._typingIndicator = new(RECEPTICLE_POS, pTypingGame.JapaneseFont, "", 60) {
                 OriginType = OriginType.Center
             };
 
@@ -267,7 +265,7 @@ namespace pTyping.Screens {
             foreach (Event @event in this._song.Events) {
                 if (@event is not TypingCutoffEvent) continue;
 
-                TexturedDrawable cutoffIndicator = new(this._noteTexture, new(NoteStartPos.X, NoteStartPos.Y)) {
+                TexturedDrawable cutoffIndicator = new(this._noteTexture, new(NOTE_START_POS.X, NOTE_START_POS.Y)) {
                     TimeSource    = pTypingGame.MusicTrack,
                     ColorOverride = Color.LightBlue,
                     Scale         = new(0.3f),
@@ -278,17 +276,17 @@ namespace pTyping.Screens {
 
                 float travelTime = ConVars.BaseApproachTime.Value;
 
-                float travelDistance = NoteStartPos.X - RecepticlePos.X;
+                float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
                 float travelRatio    = travelTime / travelDistance;
 
-                float afterTravelTime = (RecepticlePos.X - NoteEndPos.X) * travelRatio;
+                float afterTravelTime = (RECEPTICLE_POS.X - NOTE_END_POS.X) * travelRatio;
 
                 cutoffIndicator.Tweens.Add(
-                new VectorTween(TweenType.Movement, new(NoteStartPos.X, NoteStartPos.Y), RecepticlePos, (int)(@event.Time - travelTime), (int)@event.Time)
+                new VectorTween(TweenType.Movement, new(NOTE_START_POS.X, NOTE_START_POS.Y), RECEPTICLE_POS, (int)(@event.Time - travelTime), (int)@event.Time)
                 );
 
                 cutoffIndicator.Tweens.Add(
-                new VectorTween(TweenType.Movement, RecepticlePos, new(NoteEndPos.X, RecepticlePos.Y), (int)@event.Time, (int)(@event.Time + afterTravelTime))
+                new VectorTween(TweenType.Movement, RECEPTICLE_POS, new(NOTE_END_POS.X, RECEPTICLE_POS.Y), (int)@event.Time, (int)(@event.Time + afterTravelTime))
                 );
 
                 #endregion
@@ -298,11 +296,11 @@ namespace pTyping.Screens {
         }
 
         private NoteDrawable CreateNote(Note note) {
-            NoteDrawable noteDrawable = new(new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
+            NoteDrawable noteDrawable = new(new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
                 TimeSource    = pTypingGame.MusicTrack,
                 ColorOverride = note.Color,
                 LabelTextDrawable = {
-                    Text  = $"{note.Text}\n{string.Join("\n", note.ThisCharacterRomaji)}",
+                    Text  = $"{note.Text}\n{string.Join("\n", note.TypableRomaji.Romaji)}",
                     Scale = new(1f)
                 },
                 Scale      = new(0.55f),
@@ -311,17 +309,17 @@ namespace pTyping.Screens {
 
             float travelTime = ConVars.BaseApproachTime.Value;
 
-            float travelDistance = NoteStartPos.X - RecepticlePos.X;
+            float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
             float travelRatio    = travelTime / travelDistance;
 
-            float afterTravelTime = (RecepticlePos.X - NoteEndPos.X) * travelRatio;
+            float afterTravelTime = (RECEPTICLE_POS.X - NOTE_END_POS.X) * travelRatio;
 
             noteDrawable.Tweens.Add(
-            new VectorTween(TweenType.Movement, new(NoteStartPos.X, NoteStartPos.Y + note.YOffset), RecepticlePos, (int)(note.Time - travelTime), (int)note.Time)
+            new VectorTween(TweenType.Movement, new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), RECEPTICLE_POS, (int)(note.Time - travelTime), (int)note.Time)
             );
 
             noteDrawable.Tweens.Add(
-            new VectorTween(TweenType.Movement, RecepticlePos, new(NoteEndPos.X, RecepticlePos.Y), (int)note.Time, (int)(note.Time + afterTravelTime))
+            new VectorTween(TweenType.Movement, RECEPTICLE_POS, new(NOTE_END_POS.X, RECEPTICLE_POS.Y), (int)note.Time, (int)(note.Time + afterTravelTime))
             );
 
             noteDrawable.Note = note;
@@ -355,8 +353,8 @@ namespace pTyping.Screens {
 
             int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
 
-            if (currentTime > note.Time - TimingPoor) {
-                List<string> romajiToType = note.ThisCharacterRomaji;
+            if (currentTime > note.Time - TIMING_POOR) {
+                (string hiragana, List<string> romajiToType) = note.TypableRomaji;
 
                 List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
 
@@ -364,14 +362,14 @@ namespace pTyping.Screens {
                     double timeDifference = Math.Abs(currentTime - note.Time);
                     if (romaji[note.TypedRomaji.Length] == args.Character) {
                         //If true, then we finished the note, if false, then we continue
-                        if (noteDrawable.TypeCharacter(romaji, timeDifference)) {
+                        if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference)) {
                             this.HitSoundNormal.Play();
                             this.NoteUpdate(true, note);
 
                             this._noteToType++;
                         }
                         this.ShowTypingIndicator(args.Character);
-                        this.Score.Score += ScorePerCharacter;
+                        this._score.Score += SCORE_PER_CHARACTER;
 
                         break;
                     }
@@ -391,7 +389,7 @@ namespace pTyping.Screens {
 
         private void UpdateNoteText() {
             foreach (NoteDrawable noteDrawable in this._notes)
-                noteDrawable.LabelTextDrawable.Text = $"{noteDrawable.Note.Text}\n{string.Join("\n", noteDrawable.Note.ThisCharacterRomaji)}";
+                noteDrawable.LabelTextDrawable.Text = $"{noteDrawable.Note.Text}\n{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
         }
 
         private void NoteUpdate(bool wasHit, Note note) {
@@ -410,58 +408,58 @@ namespace pTyping.Screens {
                         break;
                 }
 
-            if (numberHit + numberMiss == 0) this.Score.Accuracy = 1d;
+            if (numberHit + numberMiss == 0) this._score.Accuracy = 1d;
             else
-                this.Score.Accuracy = numberHit / ((double)numberHit + (double)numberMiss);
+                this._score.Accuracy = numberHit / (numberHit + (double)numberMiss);
 
             if (wasHit) {
                 int scoreToAdd = 0;
                 switch (note.HitResult) {
                     case HitResult.Excellent:
-                        scoreToAdd = ScoreExcellent;
+                        scoreToAdd = SCORE_EXCELLENT;
                         break;
                     case HitResult.Fair:
-                        scoreToAdd = ScoreFair;
+                        scoreToAdd = SCORE_FAIR;
                         break;
                     case HitResult.Good:
-                        scoreToAdd = ScoreGood;
+                        scoreToAdd = SCORE_GOOD;
                         break;
                     case HitResult.Poor:
-                        scoreToAdd = ScorePoor;
+                        scoreToAdd = SCORE_POOR;
                         break;
                 }
-                this.Score.Score += scoreToAdd + Math.Min(this.Score.Combo - 1 * ScoreCombo, ScoreComboMax);
-                this.Score.Combo++;
+                this._score.Score += scoreToAdd + Math.Min(this._score.Combo - 1 * SCORE_COMBO, SCORE_COMBO_MAX);
+                this._score.Combo++;
             } else {
-                if (this.Score.Combo > this.Score.MaxCombo)
-                    this.Score.MaxCombo = this.Score.Combo;
-                this.Score.Combo = 0;
+                if (this._score.Combo > this._score.MaxCombo)
+                    this._score.MaxCombo = this._score.Combo;
+                this._score.Combo = 0;
             }
 
             Color hitColor = Color.Red;
             switch (note.HitResult) {
                 case HitResult.Excellent: {
-                    this.Score.ExcellentHits++;
+                    this._score.ExcellentHits++;
                     hitColor = Color.Blue;
                     break;
                 }
                 case HitResult.Good: {
-                    this.Score.GoodHits++;
+                    this._score.GoodHits++;
                     hitColor = Color.Green;
                     break;
                 }
                 case HitResult.Fair: {
-                    this.Score.FairHits++;
+                    this._score.FairHits++;
                     hitColor = Color.Yellow;
                     break;
                 }
                 case HitResult.Poor: {
-                    this.Score.PoorHits++;
+                    this._score.PoorHits++;
                     hitColor = Color.Orange;
                     break;
                 }
                 case HitResult.Miss: {
-                    this.Score.MissHits++;
+                    this._score.MissHits++;
                     hitColor = Color.Red;
                     break;
                 }
@@ -492,9 +490,9 @@ namespace pTyping.Screens {
 
             #region update UI
 
-            this._scoreDrawable.Text    = $"{this.Score.Score:00000000}";
-            this._accuracyDrawable.Text = $"{this.Score.Accuracy * 100:0.00}%";
-            this._comboDrawable.Text    = $"{this.Score.Combo}x";
+            this._scoreDrawable.Text    = $"{this._score.Score:00000000}";
+            this._accuracyDrawable.Text = $"{this._score.Accuracy * 100:0.00}%";
+            this._comboDrawable.Text    = $"{this._score.Combo}x";
 
             bool isPaused = pTypingGame.MusicTrack.PlaybackState == PlaybackState.Paused;
 
@@ -565,9 +563,9 @@ namespace pTyping.Screens {
             if (!this._endScheduled) {
                 pTypingGame.MusicTrackScheduler.ScheduleMethod(
                 delegate {
-                    pTypingGame.SubmitScore(this._song, this.Score);
+                    pTypingGame.SubmitScore(this._song, this._score);
                     
-                    ScreenManager.ChangeScreen(new ScoreResultsScreen(this.Score));
+                    ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));
                 }, pTypingGame.MusicTrack.GetCurrentTime() + 1500);
 
                 this._endScheduled = true;

@@ -24,18 +24,19 @@ namespace pTyping.Drawables {
         /// <summary>
         /// Types a character
         /// </summary>
+        /// <param name="hiragana">The hiragana being typed</param>
         /// <param name="romaji">The romaji path to take</param>
         /// <param name="timeDifference">The time difference from now to the note</param>
         /// <returns>Whether the note has been fully completed</returns>
-        public bool TypeCharacter(string romaji, double timeDifference) {
+        public bool TypeCharacter(string hiragana, string romaji, double timeDifference) {
             if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
-                if (timeDifference < PlayerScreen.TimingExcellent)
+                if (timeDifference < PlayerScreen.TIMING_EXCELLENT)
                     this.Note.HitResult = HitResult.Excellent;
-                else if (timeDifference < PlayerScreen.TimingGood)
+                else if (timeDifference < PlayerScreen.TIMING_GOOD)
                     this.Note.HitResult = HitResult.Good;
-                else if (timeDifference < PlayerScreen.TimingFair)
+                else if (timeDifference < PlayerScreen.TIMING_FAIR)
                     this.Note.HitResult = HitResult.Fair;
-                else if (timeDifference < PlayerScreen.TimingPoor)
+                else if (timeDifference < PlayerScreen.TIMING_POOR)
                     this.Note.HitResult = HitResult.Poor;
             }
 
@@ -44,7 +45,7 @@ namespace pTyping.Drawables {
 
             //Checks if we have finished typing the current romaji
             if (string.Equals(this.Note.TypedRomaji, romaji)) {
-                this.Note.Typed += this.Note.Text[this.Note.Typed.Length];
+                this.Note.Typed += hiragana;
                 //Clear the typed romaji
                 this.Note.TypedRomaji = string.Empty;
 
