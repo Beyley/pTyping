@@ -192,7 +192,8 @@ namespace pTyping.Screens {
             #region mods
 
             this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 50)) {
-                Visible = false
+                Visible    = false,
+                OriginType = OriginType.BottomLeft
             };
             this.Manager.Add(this._modScreen);
 
