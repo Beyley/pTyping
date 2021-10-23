@@ -19,7 +19,8 @@ namespace pTyping.Player.Mods {
             new EaseOutMod(),
             new HardRockMod(),
             new EasyMod(),
-            new RotateMod()
+            new RotateMod(),
+            new RandomHeightMod()
         };
 
         public static double ScoreMultiplier(List<PlayerMod> mods) => mods.Aggregate<PlayerMod, double>(1f, (current, mod) => current * mod.ScoreMultiplier());

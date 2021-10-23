@@ -63,7 +63,7 @@ namespace pTyping.Screens {
         private TextDrawable     _scoreDrawable;
         private UiButtonDrawable _skipButton;
 
-        private Song         _song;
+        public  Song         Song;
         private TextDrawable _typingIndicator;
 
         public SoundEffect HitSoundNormal = new();
@@ -71,13 +71,13 @@ namespace pTyping.Screens {
         public override void Initialize() {
             base.Initialize();
 
-            this._song = pTypingGame.CurrentSong.Value.Copy();
+            this.Song = pTypingGame.CurrentSong.Value.Copy();
 
-            this._score            = new(this._song.MapHash, ConVars.Username.Value);
+            this._score            = new(this.Song.MapHash, ConVars.Username.Value);
             this._score.Mods       = pTypingGame.SelectedMods;
             this._score.ModsString = string.Join(',', this._score.Mods);
 
-            if (this._song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
+            if (this.Song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 
             #region UI
@@ -219,7 +219,7 @@ namespace pTyping.Screens {
             pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
             )
             );
-            pTypingGame.LoadBackgroundFromSong(this._song);
+            pTypingGame.LoadBackgroundFromSong(this.Song);
 
             #endregion
             #region typing indicator
@@ -263,11 +263,11 @@ namespace pTyping.Screens {
         }
 
         private void SkipButtonClick(object sender, Point e) {
-            pTypingGame.MusicTrack.SeekTo(this._song.Notes.First().Time - 2999);
+            pTypingGame.MusicTrack.SeekTo(this.Song.Notes.First().Time - 2999);
         }
 
         private void AddNotes() {
-            foreach (Note note in this._song.Notes) {
+            foreach (Note note in this.Song.Notes) {
                 NoteDrawable noteDrawable = this.CreateNote(note);
 
                 this.Manager.Add(noteDrawable);
@@ -276,7 +276,7 @@ namespace pTyping.Screens {
         }
 
         private void CreateCutOffIndicators() {
-            foreach (Event @event in this._song.Events) {
+            foreach (Event @event in this.Song.Events) {
                 if (@event is not TypingCutoffEvent) continue;
 
                 TexturedDrawable cutoffIndicator = new(this._noteTexture, new(NOTE_START_POS.X, NOTE_START_POS.Y)) {
@@ -354,7 +354,7 @@ namespace pTyping.Screens {
         }
 
         private void OnCharacterTyped(object sender, TextInputEventArgs args) {
-            if (this._song.AllNotesHit()) return;
+            if (this.Song.AllNotesHit()) return;
 
             NoteDrawable noteDrawable = this._notes[this._noteToType];
 
@@ -531,7 +531,7 @@ namespace pTyping.Screens {
 
             #region skin button visibility
 
-            if (this._song.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000)
+            if (this.Song.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000)
                 this._skipButton.Visible = true;
             else
                 this._skipButton.Visible = false;
@@ -563,7 +563,7 @@ namespace pTyping.Screens {
                     }
                 }
 
-                foreach (Event cutOffEvent in this._song.Events) {
+                foreach (Event cutOffEvent in this.Song.Events) {
                     if (cutOffEvent is not TypingCutoffEvent) continue;
 
                     if (currentTime > cutOffEvent.Time && cutOffEvent.Time > noteToType.Note.Time && !noteToType.Note.IsHit) {
@@ -592,8 +592,8 @@ namespace pTyping.Screens {
                 delegate {
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnMapEnd(pTypingGame.MusicTrack, this._notes, this);
-                    
-                    pTypingGame.SubmitScore(this._song, this._score);
+
+                    pTypingGame.SubmitScore(this.Song, this._score);
 
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));
                 },
