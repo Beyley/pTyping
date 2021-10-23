@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using pTyping.Player;
+using pTyping.Player.Mods;
 
 namespace pTyping.Songs {
     public class ScoreManager {
@@ -31,6 +33,14 @@ namespace pTyping.Songs {
 
             reader.Close();
             stream.Close();
+
+            foreach (PlayerScore score in this._scores) {
+                if (score.ModsString is "") continue;
+
+                string[] splitMods = score.ModsString.Split(',');
+                foreach (string mod in splitMods)//this is dumb shit
+                    score.Mods.Add(Activator.CreateInstance(Type.GetType(mod)) as PlayerMod);
+            }
         }
 
         public void Save() {

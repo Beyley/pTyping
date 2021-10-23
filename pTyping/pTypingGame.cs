@@ -163,6 +163,8 @@ namespace pTyping {
                 MusicTrack.Free();
             }
             MusicTrack.Load(data);
+
+            MusicTrack.TempoFrequencyLock = true;
         }
 
         public static void LoadBackButtonTexture() {

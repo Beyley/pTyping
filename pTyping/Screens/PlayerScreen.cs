@@ -73,8 +73,9 @@ namespace pTyping.Screens {
 
             this._song = pTypingGame.CurrentSong.Value.Copy();
 
-            this._score      = new(this._song.MapHash, ConVars.Username.Value);
-            this._score.Mods = pTypingGame.SelectedMods;
+            this._score            = new(this._song.MapHash, ConVars.Username.Value);
+            this._score.Mods       = pTypingGame.SelectedMods;
+            this._score.ModsString = string.Join(',', this._score.Mods);
 
             if (this._song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));

@@ -23,7 +23,7 @@ namespace pTyping.Player {
         public List<PlayerMod> Mods = new();
 
         [JsonProperty]
-        public string ModsString => PlayerMod.GetModString(this.Mods);
+        public string ModsString = "";
 
         [JsonProperty]
         public string MapHash;
