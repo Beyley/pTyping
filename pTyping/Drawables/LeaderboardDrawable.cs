@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Microsoft.Xna.Framework;
@@ -14,7 +15,7 @@ namespace pTyping.Drawables {
             this._scores = scores;
 
             float y = 0;
-            foreach (PlayerScore score in this._scores) {
+            foreach (PlayerScore score in this._scores.GetRange(0, Math.Min(8, scores.Count))) {
                 LeaderboardElementDrawable drawable = new(score) {
                     Position = new(0, y)
                 };
