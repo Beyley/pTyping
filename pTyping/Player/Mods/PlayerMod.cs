@@ -16,8 +16,12 @@ namespace pTyping.Player.Mods {
             new DoubleTimeMod(),
             new HiddenMod(),
             new EaseInMod(),
-            new EaseOutMod()
+            new EaseOutMod(),
+            new HardRockMod(),
+            new EasyMod()
         };
+
+        public static double ScoreMultiplier(List<PlayerMod> mods) => mods.Aggregate<PlayerMod, double>(1f, (current, mod) => current * mod.ScoreMultiplier());
 
         public static string GetModString(List<PlayerMod> mods) => mods.Aggregate("", (current, playerMod) => current + playerMod.ShorthandName());
 
@@ -40,5 +44,7 @@ namespace pTyping.Player.Mods {
         public virtual void OnNoteHit(Note note) {}
 
         public virtual void Update(GameTime time) {}
+
+        public virtual void BeforeNoteCreate(PlayerScreen player) {}
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 using pTyping.Online;
 using pTyping.Player.Mods;
@@ -39,11 +38,9 @@ namespace pTyping.Player {
             get;
             protected set;
         }
-
-        public double ScoreMultiplier => this.Mods.Aggregate<PlayerMod, double>(1f, (current, mod) => current * mod.ScoreMultiplier());
-
+        
         public void AddScore(int score) {
-            this.Score += (int)(score * this.ScoreMultiplier);
+            this.Score += (int)(score * PlayerMod.ScoreMultiplier(this.Mods));
         }
 
         [JsonProperty]

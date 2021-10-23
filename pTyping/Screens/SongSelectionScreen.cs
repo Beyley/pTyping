@@ -191,9 +191,10 @@ namespace pTyping.Screens {
 
             #region mods
 
-            this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 50)) {
+            this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
                 Visible    = false,
-                OriginType = OriginType.BottomLeft
+                OriginType = OriginType.BottomLeft,
+                Depth      = 0.5f
             };
             this.Manager.Add(this._modScreen);
 
@@ -346,7 +347,8 @@ namespace pTyping.Screens {
             float y = this._songInfo.Size.Y + 25;
 
             this._leaderboardDrawable = new LeaderboardDrawable(scores) {
-                Position = new(25, y)
+                Position = new(25, y),
+                Depth    = 0.9f
             };
 
             this.Manager.Add(this._leaderboardDrawable);

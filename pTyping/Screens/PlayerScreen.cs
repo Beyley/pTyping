@@ -23,7 +23,8 @@ using pTyping.Songs.Events;
 
 namespace pTyping.Screens {
     public class PlayerScreen : Screen {
-
+        public int BaseApproachTime = ConVars.BaseApproachTime.Value;
+        
         public static readonly int SCORE_EXCELLENT = 1500;
         public static readonly int SCORE_GOOD      = 1000;
         public static readonly int SCORE_FAIR      = 500;
@@ -182,6 +183,8 @@ namespace pTyping.Screens {
 
             #endregion
 
+            this._score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
+
             this.AddNotes();
             this.CreateCutOffIndicators();
 
@@ -284,7 +287,7 @@ namespace pTyping.Screens {
 
                 #region tweens
 
-                float travelTime = ConVars.BaseApproachTime.Value;
+                float travelTime = this.BaseApproachTime;
 
                 float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
                 float travelRatio    = travelTime / travelDistance;
@@ -317,7 +320,7 @@ namespace pTyping.Screens {
                 OriginType = OriginType.Center
             };
 
-            float travelTime = ConVars.BaseApproachTime.Value;
+            float travelTime = this.BaseApproachTime;
 
             float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
             float travelRatio    = travelTime / travelDistance;

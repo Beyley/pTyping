@@ -15,7 +15,9 @@ namespace pTyping {
         /// <summary>
         ///     The time it takes the notes to go from the right side of the screen to the left
         /// </summary>
-        public static IntConVar BaseApproachTime = new("cl_base_approach_time", 2000);
+        public static IntConVar BaseApproachTime = new("cl_base_approach_time", 2000) {
+            Protected = true
+        };
     }
 
     public class Logout : ConFunc {
