@@ -123,8 +123,10 @@ namespace pTyping.Screens {
             Color.White,
             pauseUiButtonSize
             ) {
-                OriginType = OriginType.Center
+                OriginType = OriginType.Center,
+                Depth      = -1f
             };
+            
             this._restartButton = new(
             new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.3f),
             "Restart",
@@ -135,8 +137,10 @@ namespace pTyping.Screens {
             Color.White,
             pauseUiButtonSize
             ) {
-                OriginType = OriginType.Center
+                OriginType = OriginType.Center,
+                Depth      = -1f
             };
+            
             this._quitButton = new(
             new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f),
             "Quit",
@@ -147,7 +151,8 @@ namespace pTyping.Screens {
             Color.White,
             pauseUiButtonSize
             ) {
-                OriginType = OriginType.Center
+                OriginType = OriginType.Center,
+                Depth      = -1f
             };
 
             this._resumeButton.OnClick  += this.ResumeButtonClick;
