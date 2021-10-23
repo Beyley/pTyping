@@ -576,6 +576,10 @@ namespace pTyping.Screens {
             }
 
             base.Update(gameTime);
+
+            if (this._score.Mods.Count != 0)
+                foreach (PlayerMod mod in this._score.Mods)
+                    mod.Update(gameTime);
         }
 
         public void EndScore() {

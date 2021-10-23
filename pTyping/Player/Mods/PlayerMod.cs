@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Furball.Engine.Engine.Audio;
 using Kettu;
+using Microsoft.Xna.Framework;
 using pTyping.LoggingLevels;
 using pTyping.Screens;
 using pTyping.Songs;
@@ -33,5 +34,7 @@ namespace pTyping.Player.Mods {
         public virtual void OnCharacterTyped(Note note, string character, bool correct) {}
 
         public virtual void OnNoteHit(Note note) {}
+
+        public virtual void Update(GameTime time) {}
     }
 }
