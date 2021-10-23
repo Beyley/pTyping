@@ -3,11 +3,11 @@ using pTyping.Drawables;
 
 namespace pTyping.Online {
     public class OnlinePlayer {
-
         private UserCardDrawable     _userCard;
         public  Bindable<double>     Accuracy  = new(1d);
         public  Bindable<UserAction> Action    = new(new(UserActionType.Idle, "Idling."));
         public  Bindable<int>        PlayCount = new(0);
+        public  Bindable<int>        Rank      = new(0);
 
         public Bindable<long>   RankedScore = new(0);
         public Bindable<long>   TotalScore  = new(0);

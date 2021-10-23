@@ -109,6 +109,7 @@ namespace pTyping.Online {
                 MemoryStream  stream = new();
                 TaikoRsWriter writer = new(stream);
                 writer.Write(hash);
+                writer.Write((byte)PlayMode.pTyping);
                 writer.Flush();
 
                 HttpContent content = new ByteArrayContent(stream.ToArray());
@@ -205,8 +206,6 @@ namespace pTyping.Online {
 
         #region Handle packets
 
-        private bool HandleServerPongPacket() => true;
-
         private bool HandleServerSendMessagePacket(TaikoRsReader reader) {
             PacketServerSendMessage packet = new();
             packet.ReadPacket(reader);
@@ -233,6 +232,7 @@ namespace pTyping.Online {
                 player.RankedScore.Value = packet.RankedScore;
                 player.Accuracy.Value    = packet.Accuracy;
                 player.PlayCount.Value   = packet.PlayCount;
+                player.Rank.Value        = packet.Rank;
 
                 Logger.Log(
                 $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
@@ -287,11 +287,14 @@ namespace pTyping.Online {
             this.Player.Username.Value = this.Username();
             this.Player.UserId.Value   = packet.UserId;
             this.State                 = ConnectionState.LoggedIn;
-
+            
             this.InvokeOnLoginComplete(this);
 
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);
 
+            this._client.SendRealAsync(new PacketClientStatusUpdate(new UserAction(UserActionType.Idle, "")).GetPacket()).Wait();
+            this._client.SendRealAsync(new PacketClientNotifyScoreUpdate().GetPacket()).Wait();
+            
             return true;
         }
 

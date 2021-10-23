@@ -7,7 +7,8 @@ namespace pTyping.Online.TaikoRsPackets {
         public long   RankedScore;
         public long   TotalScore;
         public int    UserId;
-
+        public int    Rank;
+        
         protected override byte[] GetData() => throw new NotImplementedException();
 
         protected override void ReadData(TaikoRsReader reader) {
@@ -16,6 +17,7 @@ namespace pTyping.Online.TaikoRsPackets {
             this.RankedScore = reader.ReadInt64();
             this.Accuracy    = reader.ReadDouble();
             this.PlayCount   = reader.ReadInt32();
+            this.Rank        = reader.ReadInt32();
         }
     }
 }
