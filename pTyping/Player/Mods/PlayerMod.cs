@@ -4,6 +4,7 @@ using System.Linq;
 using Furball.Engine.Engine.Audio;
 using Kettu;
 using Microsoft.Xna.Framework;
+using pTyping.Drawables;
 using pTyping.LoggingLevels;
 using pTyping.Screens;
 using pTyping.Songs;
@@ -12,7 +13,10 @@ namespace pTyping.Player.Mods {
     public abstract class PlayerMod {
         public static List<PlayerMod> RegisteredMods = new() {
             new HalfTimeMod(),
-            new DoubleTimeMod()
+            new DoubleTimeMod(),
+            new HiddenMod(),
+            new EaseInMod(),
+            new EaseOutMod()
         };
 
         public static string GetModString(List<PlayerMod> mods) => mods.Aggregate("", (current, playerMod) => current + playerMod.ShorthandName());
@@ -23,11 +27,11 @@ namespace pTyping.Player.Mods {
         public abstract string ShorthandName();
         public abstract double ScoreMultiplier();
 
-        public virtual void OnMapStart(AudioStream musicTrack, List<Note> notes, PlayerScreen player) {
+        public virtual void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) initialized!", LoggerLevelModInfo.Instance);
         }
 
-        public virtual void OnMapEnd(AudioStream musicTrack, List<Note> notes, PlayerScreen player) {
+        public virtual void OnMapEnd(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) uninitialized!", LoggerLevelModInfo.Instance);
         }
 

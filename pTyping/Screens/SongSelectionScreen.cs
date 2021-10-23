@@ -33,6 +33,8 @@ namespace pTyping.Screens {
 
         private TextDrawable _songInfo;
 
+        private ModSelectionScreenDrawable _modScreen;
+
         public SongSelectionScreen(bool editor) => this._editor = editor;
 
         public override void Initialize() {
@@ -187,9 +189,34 @@ namespace pTyping.Screens {
 
             #endregion
 
-            ModSelectionScreenDrawable modScreen = new(new(100, 100));
-            this.Manager.Add(modScreen);
+            #region mods
 
+            this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 50)) {
+                Visible = false
+            };
+            this.Manager.Add(this._modScreen);
+
+            UiButtonDrawable toggleMods = new(
+            new(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
+            "Mods",
+            FurballGame.DEFAULT_FONT_STROKED,
+            30,
+            Color.Blue,
+            Color.White,
+            Color.White,
+            new(0)
+            ) {
+                OriginType = OriginType.BottomLeft
+            };
+
+            toggleMods.OnClick += delegate {
+                this._modScreen.Visible = !this._modScreen.Visible;
+            };
+
+            this.Manager.Add(toggleMods);
+
+            #endregion
+            
             if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0)
                 pTypingGame.CurrentSong.Value = SongManager.Songs[0];
             else if (pTypingGame.CurrentSong?.Value != null)
@@ -230,7 +257,7 @@ namespace pTyping.Screens {
         }
 
         private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
-            foreach (BaseDrawable songButton in this._songButtonList)
+            foreach (ManagedDrawable songButton in this._songButtonList)
                 songButton.Position += new Vector2(0f, e.scrollAmount);
         }
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Furball.Engine.Engine.Audio;
+using pTyping.Drawables;
 using pTyping.Screens;
-using pTyping.Songs;
 
 namespace pTyping.Player.Mods {
     public class HalfTimeMod : PlayerMod {
@@ -14,13 +14,13 @@ namespace pTyping.Player.Mods {
         public override string ShorthandName()   => "HT";
         public override double ScoreMultiplier() => 0.6d;
 
-        public override void OnMapStart(AudioStream musicTrack, List<Note> notes, PlayerScreen player) {
+        public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             musicTrack.AudioRate = 0.5f;
 
             base.OnMapStart(musicTrack, notes, player);
         }
 
-        public override void OnMapEnd(AudioStream musicTrack, List<Note> notes, PlayerScreen player) {
+        public override void OnMapEnd(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             musicTrack.AudioRate = 1f;
 
             base.OnMapEnd(musicTrack, notes, player);

@@ -391,9 +391,14 @@ namespace pTyping.Screens {
                 return;
 
             this._selectedNote.Note.Text = this._textInput.Text.Trim();
-            // this._selectedNote.Note.TextToType = pTypingGame.Alphanumeric.Replace(this._textToTypeInput.Text.Trim(), string.Empty);
-            if (this._colorInput.Text.Length - 1 is 3 or 4 or 6 or 8)
-                this._selectedNote.Note.Color.FromHexString(this._colorInput.Text);
+
+            try {
+                if (this._colorInput.Text.Length - 1 is 3 or 4 or 6 or 8)
+                    this._selectedNote.Note.Color.FromHexString(this._colorInput.Text);
+            }
+            catch {
+                // ignored
+            }
 
             this._selectedNote.LabelTextDrawable.Text = $"{this._selectedNote.Note.Text}";
             this._selectedNote.ColorOverride          = this._selectedNote.Note.Color;

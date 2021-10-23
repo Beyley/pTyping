@@ -237,7 +237,7 @@ namespace pTyping.Screens {
             this.Play();
 
             foreach (PlayerMod mod in pTypingGame.SelectedMods)
-                mod.OnMapStart(pTypingGame.MusicTrack, this._song.Notes, this);
+                mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
 
             FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
             FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
@@ -587,7 +587,7 @@ namespace pTyping.Screens {
                 pTypingGame.MusicTrackScheduler.ScheduleMethod(
                 delegate {
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
-                        mod.OnMapEnd(pTypingGame.MusicTrack, this._song.Notes, this);
+                        mod.OnMapEnd(pTypingGame.MusicTrack, this._notes, this);
                     
                     pTypingGame.SubmitScore(this._song, this._score);
 

@@ -90,7 +90,7 @@ namespace pTyping.Drawables {
             // tempArgs.Position   -= this.LabelTextDrawable.Size / 2f + this.Size / 2f;
             tempArgs.Position.Y += 100f;
             tempArgs.Position.X += this.LabelTextDrawable.Size.X / 4f;
-            tempArgs.Color      =  this.LabelTextDrawable.ColorOverride;
+            tempArgs.Color = new(this.LabelTextDrawable.ColorOverride.R, this.LabelTextDrawable.ColorOverride.G, this.LabelTextDrawable.ColorOverride.B, args.Color.A);
             this.LabelTextDrawable.Draw(time, batch, tempArgs);
         }
     }
