@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
+using Kettu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -25,14 +26,12 @@ namespace pTyping.Screens {
     }
 
     public class EditorScreen : Screen {
-
-        private const float                 EDITOR_TOOL_BASE_SIZE   = 0.4f;
-        private const float                 EDITOR_TOOL_SCALED_SIZE = 0.55f;
-        private       UiTextBoxDrawable     _colorInput;
-        private       TextDrawable          _colorInputLabel;
-        private       LinePrimitiveDrawable _createLine;
-        private       TextDrawable          _currentTimeDrawable;
-        private       TexturedDrawable      _editorToolCreateNote;
+        private readonly Vector2               _editorToolSizes = new(0.4f, 0.55f);
+        private          UiTextBoxDrawable     _colorInput;
+        private          TextDrawable          _colorInputLabel;
+        private          LinePrimitiveDrawable _createLine;
+        private          TextDrawable          _currentTimeDrawable;
+        private          TexturedDrawable      _editorToolCreateNote;
 
         private TexturedDrawable _editorToolSelect;
         private bool             _isDragging = false;
@@ -74,55 +73,8 @@ namespace pTyping.Screens {
 
             this.Manager.Add(this._recepticle);
 
-            foreach (Note note in this._song.Notes) {
-                NoteDrawable noteDrawable = new(
-                new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
-                this._noteTexture,
-                pTypingGame.JapaneseFont,
-                50
-                ) {
-                    TimeSource    = pTypingGame.MusicTrack,
-                    ColorOverride = note.Color,
-                    LabelTextDrawable = {
-                        Text  = $"{note.Text}",
-                        Scale = new(1f)
-                    },
-                    Scale      = new(0.55f, 0.55f),
-                    OriginType = OriginType.Center,
-                    Note       = note
-                };
-
-                noteDrawable.OnClick += delegate {
-                    if (this._isDragging) return;
-
-                    this.OnNoteClick(noteDrawable);
-                };
-
-                noteDrawable.OnDrag += delegate(object _, Point point) {
-                    this.OnNoteDrag(noteDrawable, point);
-                };
-
-                noteDrawable.OnDragBegin += delegate {
-                    this._isDragging = true;
-                };
-
-                noteDrawable.OnDragEnd += delegate {
-                    this._isDragging = false;
-                };
-
-                noteDrawable.Tweens.Add(
-                new VectorTween(
-                TweenType.Movement,
-                new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
-                PlayerScreen.RECEPTICLE_POS,
-                (int)(note.Time - ConVars.BaseApproachTime.Value),
-                (int)note.Time
-                )
-                );
-
-                this.Manager.Add(noteDrawable);
-                this._notes.Add(noteDrawable);
-            }
+            foreach (Note note in this._song.Notes)
+                this.CreateNote(note);
 
             #endregion
 
@@ -283,7 +235,7 @@ namespace pTyping.Screens {
             Texture2D editorToolButtonsTextures = ContentManager.LoadMonogameAsset<Texture2D>("editortools");
 
             this._editorToolSelect = new(editorToolButtonsTextures, new Vector2(10, 10), new Rectangle(0, 0, 240, 240)) {
-                Scale = new(EDITOR_TOOL_BASE_SIZE),
+                Scale = new(this._editorToolSizes.X),
                 Depth = 0f
             };
             this._editorToolSelect.OnClick += delegate {
@@ -291,7 +243,7 @@ namespace pTyping.Screens {
             };
 
             this._editorToolCreateNote = new(editorToolButtonsTextures, new Vector2(10, this._editorToolSelect.Size.Y + 20), new Rectangle(0, 240, 240, 240)) {
-                Scale = new(EDITOR_TOOL_BASE_SIZE),
+                Scale = new(this._editorToolSizes.X),
                 Depth = 0.5f
             };
             this._editorToolCreateNote.OnClick += delegate {
@@ -377,6 +329,67 @@ namespace pTyping.Screens {
             pTypingGame.UserStatusEditing();
         }
 
+        public void CreateNote(Note note, bool isNew = false) {
+            NoteDrawable noteDrawable = new(
+            new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
+            this._noteTexture,
+            pTypingGame.JapaneseFont,
+            50
+            ) {
+                TimeSource    = pTypingGame.MusicTrack,
+                ColorOverride = note.Color,
+                LabelTextDrawable = {
+                    Text  = $"{note.Text}",
+                    Scale = new(1f)
+                },
+                Scale      = new(0.55f, 0.55f),
+                OriginType = OriginType.Center,
+                Note       = note
+            };
+
+            noteDrawable.OnClick += delegate {
+                if (this._isDragging) return;
+
+                this.OnNoteClick(noteDrawable);
+            };
+
+            noteDrawable.OnDrag += delegate(object _, Point point) {
+                // Logger.Log("dragging?");
+                this.OnNoteDrag(noteDrawable, point);
+            };
+
+            noteDrawable.OnDragBegin += delegate {
+                Logger.Log("drag start?");
+            };
+
+            noteDrawable.OnDragEnd += delegate {
+                Logger.Log("drag end?");
+            };
+
+            noteDrawable.OnDragBegin += delegate {
+                this._isDragging = true;
+            };
+
+            noteDrawable.OnDragEnd += delegate {
+                this._isDragging = false;
+            };
+
+            noteDrawable.Tweens.Add(
+            new VectorTween(
+            TweenType.Movement,
+            new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
+            PlayerScreen.RECEPTICLE_POS,
+            (int)(note.Time - ConVars.BaseApproachTime.Value),
+            (int)note.Time
+            )
+            );
+
+            this.Manager.Add(noteDrawable);
+            this._notes.Add(noteDrawable);
+            if (isNew)
+                this._song.Notes.Add(note);
+        }
+
         private void UpdateTextInputs(object sender, char _) {
             if (this._selectedNote == null)
                 return;
@@ -405,33 +418,32 @@ namespace pTyping.Screens {
                 this._colorInputLabel.Visible = true;
 
                 this._editorToolSelect.Tweens.Add(
-                new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(EDITOR_TOOL_SCALED_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
+                new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(this._editorToolSizes.Y), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
                 );
             } else {
                 this._textInput.Visible      = false;
                 this._textInputLabel.Visible = false;
-                // this._textToTypeInput.Visible      = false;
-                // this._textToTypeInputLabel.Visible = false;
                 this._colorInput.Visible      = false;
                 this._colorInputLabel.Visible = false;
 
                 this._editorToolSelect.Tweens.Add(
-                new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(EDITOR_TOOL_BASE_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
+                new VectorTween(TweenType.Scale, this._editorToolSelect.Scale, new(this._editorToolSizes.X), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
                 );
             }
 
             if (tool == EditorTool.CreateNote) {
                 this._editorToolCreateNote.Tweens.Add(
-                new VectorTween(TweenType.Scale, this._editorToolCreateNote.Scale, new(EDITOR_TOOL_SCALED_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
+                new VectorTween(TweenType.Scale, this._editorToolCreateNote.Scale, new(this._editorToolSizes.Y), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
                 );
             } else {
                 this._editorToolCreateNote.Tweens.Add(
-                new VectorTween(TweenType.Scale, this._editorToolCreateNote.Scale, new(EDITOR_TOOL_BASE_SIZE), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
+                new VectorTween(TweenType.Scale, this._editorToolCreateNote.Scale, new(this._editorToolSizes.X), FurballGame.Time, FurballGame.Time + 150, Easing.Out)
                 );
 
                 this._createLine.Visible = false;
             }
         }
+        
         private void OnMouseMove(object sender, (Point, string) e) {
             (int x, int y) = e.Item1;
             if (y < PlayerScreen.RECEPTICLE_POS.Y + 40f && y > PlayerScreen.RECEPTICLE_POS.Y - 40f) {
@@ -467,8 +479,6 @@ namespace pTyping.Screens {
             }
         }
 
-        public void AddNote(Note note) {}
-
         private void OnClick(object sender, ((MouseButton mouseButton, Point position) args, string cursorName) e) {
             if (this.CurrentTool == EditorTool.CreateNote) {
                 Note note = new() {
@@ -476,54 +486,12 @@ namespace pTyping.Screens {
                     Time = this._mouseTime
                 };
 
-                (int _, int y) = e.args.position;
-                if (y < PlayerScreen.RECEPTICLE_POS.Y + 40f && y > PlayerScreen.RECEPTICLE_POS.Y - 40f) {
-                    NoteDrawable noteDrawable = new(PlayerScreen.NOTE_START_POS, this._noteTexture, pTypingGame.JapaneseFont, 50) {
-                        TimeSource    = pTypingGame.MusicTrack,
-                        ColorOverride = note.Color,
-                        LabelTextDrawable = {
-                            Text  = $"{note.Text}",
-                            Scale = new(1f)
-                        },
-                        Scale      = new(0.55f, 0.55f),
-                        OriginType = OriginType.Center,
-                        Note       = note
-                    };
-
-                    noteDrawable.OnClick += delegate {
-                        if (this._isDragging) return;
-
-                        this.OnNoteClick(noteDrawable);
-                    };
-
-                    noteDrawable.OnDrag += delegate(object _, Point point) {
-                        this.OnNoteDrag(noteDrawable, point);
-                    };
-
-                    noteDrawable.OnDragBegin += delegate {
-                        this._isDragging = true;
-                    };
-
-                    noteDrawable.OnDragEnd += delegate {
-                        this._isDragging = false;
-                    };
-
-                    noteDrawable.Tweens.Add(
-                    new VectorTween(
-                    TweenType.Movement,
-                    PlayerScreen.NOTE_START_POS,
-                    PlayerScreen.RECEPTICLE_POS,
-                    (int)(note.Time - ConVars.BaseApproachTime.Value),
-                    (int)note.Time
-                    )
-                    );
-
-                    this.Manager.Add(noteDrawable);
-                    this._notes.Add(noteDrawable);
-                    this._song.Notes.Add(noteDrawable.Note);
-                }
+                if (InPlayfieldPreview(e.args.position))
+                    this.CreateNote(note, true);
             }
         }
+
+        public static bool InPlayfieldPreview(Point pos) => pos.Y < PlayerScreen.RECEPTICLE_POS.Y + 40f && pos.Y > PlayerScreen.RECEPTICLE_POS.Y - 40f;
 
         public void OnNoteDrag(NoteDrawable noteDrawable, Point cursorPos) {
             if (this._selectedNote != noteDrawable) return;

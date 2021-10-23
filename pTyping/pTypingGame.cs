@@ -297,7 +297,9 @@ namespace pTyping {
             base.Initialize();
 
             VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
-                OriginType = OriginType.BottomRight
+                OriginType  = OriginType.BottomRight,
+                Clickable   = false,
+                CoverClicks = false
             };
 
             //Set the opacity to 0
