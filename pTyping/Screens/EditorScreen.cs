@@ -11,7 +11,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
-using Kettu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -81,17 +80,23 @@ namespace pTyping.Screens {
             #region Playfield decorations
 
             LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, recepticlePos.Y - 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-                ColorOverride = Color.Gray
+                ColorOverride = Color.Gray,
+                Clickable     = false,
+                CoverClicks   = false
             };
             LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-                ColorOverride = Color.Gray
+                ColorOverride = Color.Gray,
+                Clickable     = false,
+                CoverClicks   = false
             };
             this.Manager.Add(playfieldTopLine);
             this.Manager.Add(playfieldBottomLine);
 
             RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
                 ColorOverride = new(100, 100, 100, 100),
-                Depth         = 0.9f
+                Depth         = 0.9f,
+                Clickable     = false,
+                CoverClicks   = false
             };
             this.Manager.Add(playfieldBackgroundCover);
 
@@ -257,7 +262,7 @@ namespace pTyping.Screens {
 
             #region Edit note info
 
-            #region text to show
+            #region text
 
             this._textInputLabel = new(
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.75f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.70f),
@@ -354,16 +359,7 @@ namespace pTyping.Screens {
             };
 
             noteDrawable.OnDrag += delegate(object _, Point point) {
-                // Logger.Log("dragging?");
                 this.OnNoteDrag(noteDrawable, point);
-            };
-
-            noteDrawable.OnDragBegin += delegate {
-                Logger.Log("drag start?");
-            };
-
-            noteDrawable.OnDragEnd += delegate {
-                Logger.Log("drag end?");
             };
 
             noteDrawable.OnDragBegin += delegate {
@@ -412,8 +408,6 @@ namespace pTyping.Screens {
             if (tool == EditorTool.Select) {
                 this._textInput.Visible      = true;
                 this._textInputLabel.Visible = true;
-                // this._textToTypeInput.Visible      = true;
-                // this._textToTypeInputLabel.Visible = true;
                 this._colorInput.Visible      = true;
                 this._colorInputLabel.Visible = true;
 
@@ -445,17 +439,16 @@ namespace pTyping.Screens {
         }
         
         private void OnMouseMove(object sender, (Point, string) e) {
-            (int x, int y) = e.Item1;
-            if (y < PlayerScreen.RECEPTICLE_POS.Y + 40f && y > PlayerScreen.RECEPTICLE_POS.Y - 40f) {
-                if (this.CurrentTool == EditorTool.CreateNote)
-                    this._createLine.Visible = true;
+            if (InPlayfieldPreview(e.Item1)) {
+                this._createLine.Visible = this.CurrentTool == EditorTool.CreateNote;
+                
                 this._createLine.OriginType = OriginType.Center;
 
                 double currentTime  = pTypingGame.MusicTrack.CurrentTime * 1000;
                 double reticulePos  = FurballGame.DEFAULT_WINDOW_WIDTH   * 0.15f;
                 double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 
-                double distanceToReticule = x - reticulePos;
+                double distanceToReticule = e.Item1.X - reticulePos;
 
                 double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * ConVars.BaseApproachTime.Value;
 
@@ -560,11 +553,8 @@ namespace pTyping.Screens {
             base.Dispose(disposing);
         }
 
-        private void OnMouseScroll(object sender, (int, string) args) {
-            if (args.Item1 > 0)
-                this.TimelineMove(false);
-            else
-                this.TimelineMove(true);
+        private void OnMouseScroll(object sender, (int scrollAmount, string) args) {
+            this.TimelineMove(args.scrollAmount <= 0);
         }
 
         public void TimelineMove(bool right) {
