@@ -16,6 +16,7 @@ namespace pTyping.Drawables {
         private readonly TexturedDrawable       _modeIconDrawable;
         private readonly TextDrawable           _statusTextDrawable;
         private readonly TextDrawable           _usernameDrawable;
+        private readonly TextDrawable           _rankDrawable;
         public           Bindable<OnlinePlayer> Player;
 
         public UserCardDrawable(Vector2 position, OnlinePlayer player) {
@@ -28,6 +29,16 @@ namespace pTyping.Drawables {
                 Scale = new(1.7f)
             }
             );
+
+            this.Drawables.Add(
+            this._rankDrawable = new(new(0, 0), FurballGame.DEFAULT_FONT_STROKED, "", 175) {
+                Scale         = new(2f),
+                ColorOverride = new(255, 255, 255, 100)
+            }
+            );
+
+            this._rankDrawable.MoveTo(new(this._backgroundDrawable.Size.X - 370, 0));
+            
             this.Drawables.Add(
             this._mainTextDrawable = new(new(this._usernameDrawable.Position.X, 100), FurballGame.DEFAULT_FONT_STROKED, "", 45) {
                 Scale   = new(1.7f),
@@ -76,6 +87,7 @@ namespace pTyping.Drawables {
             this._mainTextDrawable.Text =
                 $"Total Score: {this.Player.Value.TotalScore}\nRanked Score: {this.Player.Value.RankedScore}\nAccuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Value.PlayCount}";
             this._statusTextDrawable.Text = $"{this.Player.Value.Action.Value.ActionText}";
+            this._rankDrawable.Text       = this.Player.Value.Rank == 0 ? "" : $"#{this.Player.Value.Rank.Value}";
 
             this._modeIconDrawable.SetTexture(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode), ContentSource.User));
 
