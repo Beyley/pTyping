@@ -176,7 +176,7 @@ namespace pTyping.Online {
             this.InvokeOnDisconnect(this);
             this.State = ConnectionState.Disconnected;
 
-            Logger.Log("Disconnected from the server!", new LoggerLevelOnlineInfo());
+            Logger.Log("Disconnected from the server!", LoggerLevelOnlineInfo.Instance);
         }
 
         public override async Task ChangeUserAction(UserAction action) {
@@ -216,7 +216,7 @@ namespace pTyping.Online {
 
                 Logger.Log(
                 $"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}",
-                new LoggerLevelChatMessage()
+                LoggerLevelChatMessage.Instance
                 );
             }
 
@@ -236,7 +236,7 @@ namespace pTyping.Online {
 
                 Logger.Log(
                 $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
-                new LoggerLevelOnlineInfo()
+                LoggerLevelOnlineInfo.Instance
                 );
             }
 
@@ -249,7 +249,7 @@ namespace pTyping.Online {
 
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
                 player.Action.Value = packet.Action;
-                Logger.Log($"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}!", new LoggerLevelOnlineInfo());
+                Logger.Log($"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}!", LoggerLevelOnlineInfo.Instance);
             }
 
             return true;
@@ -260,7 +260,7 @@ namespace pTyping.Online {
             packet.ReadPacket(reader);
 
             if (this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
-                Logger.Log($"{playerLeft.Username} has gone offline!", new LoggerLevelOnlineInfo());
+                Logger.Log($"{playerLeft.Username} has gone offline!", LoggerLevelOnlineInfo.Instance);
 
             return true;
         }
@@ -273,12 +273,12 @@ namespace pTyping.Online {
             if ((packet.UserId & (1 << 31)) != 0)
                 switch (packet.UserId) {
                     case -1: {
-                        Logger.Log("Login failed! User not found.", new LoggerLevelOnlineInfo());
+                        Logger.Log("Login failed! User not found.", LoggerLevelOnlineInfo.Instance);
                         this.Disconnect().Wait();
                         return true;
                     }
                     case -2: {
-                        Logger.Log("Login failed! Password incorrect!", new LoggerLevelOnlineInfo());
+                        Logger.Log("Login failed! Password incorrect!", LoggerLevelOnlineInfo.Instance);
                         this.Disconnect().Wait();
                         return true;
                     }
@@ -305,7 +305,7 @@ namespace pTyping.Online {
             if (this.OnlinePlayers.ContainsKey(packet.Player.UserId)) return true;
 
             this.OnlinePlayers.Add(packet.Player.UserId, packet.Player);
-            Logger.Log($"{packet.Player.Username} is online!", new LoggerLevelOnlineInfo());
+            Logger.Log($"{packet.Player.Username} is online!", LoggerLevelOnlineInfo.Instance);
 
             return true;
         }

@@ -74,7 +74,7 @@ namespace pTyping.Songs {
 
             Logger.Log(
             $"pTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} [{song.Difficulty}] by {song.Creator}",
-            new LoggerLevelSongInfo()
+            LoggerLevelSongInfo.Instance
             );
 
             song.Type = SongType.pTyping;
@@ -199,7 +199,7 @@ namespace pTyping.Songs {
 
             Logger.Log(
             $"UTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} diff:{song.Difficulty}",
-            new LoggerLevelSongInfo()
+            LoggerLevelSongInfo.Instance
             );
 
             return song;
@@ -230,7 +230,7 @@ namespace pTyping.Songs {
 
             File.WriteAllText(this.FileInfo.FullName, JsonConvert.SerializeObject(this, Formatting.Indented));
 
-            Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", new LoggerLevelSongInfo());
+            Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", LoggerLevelSongInfo.Instance);
         }
 
         public void Save(FileStream stream) {
@@ -242,7 +242,7 @@ namespace pTyping.Songs {
             writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
             writer.Flush();
 
-            Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", new LoggerLevelSongInfo());
+            Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", LoggerLevelSongInfo.Instance);
         }
 
         public bool AllNotesHit() => this.Notes.All(note => note.IsHit);

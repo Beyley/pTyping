@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -20,6 +19,7 @@ using Microsoft.Xna.Framework.Input;
 using pTyping.Drawables;
 using pTyping.Online;
 using pTyping.Player;
+using pTyping.Player.Mods;
 using pTyping.Screens;
 using pTyping.Songs;
 
@@ -62,8 +62,6 @@ namespace pTyping {
 
         public static UserCardDrawable MenuPlayerUserCard;
 
-        public static readonly Regex Alphanumeric = new("[^a-zA-Z0-9]");
-
         public static Texture2D LocalLeaderboardButtonTexture;
         public static Texture2D FriendLeaderboardButtonTexture;
         public static Texture2D GlobalLeaderboardButtonTexture;
@@ -72,6 +70,8 @@ namespace pTyping {
         private readonly List<ManagedDrawable> _userPanelDrawables       = new();
 
         private DrawableManager _userPanelManager;
+
+        public static List<PlayerMod> SelectedMods = new();
 
         public pTypingGame() : base(new MenuScreen()) {
             // this.Window.AllowUserResizing = true;
@@ -268,7 +268,7 @@ namespace pTyping {
         public static void SubmitScore(Song song, PlayerScore score) {
             ScoreManager.AddScore(score);
 
-            if (OnlineManager.State == ConnectionState.LoggedIn)
+            if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0)
                 OnlineManager.SubmitScore(score).Wait();
         }
 

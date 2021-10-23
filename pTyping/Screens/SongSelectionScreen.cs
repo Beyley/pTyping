@@ -61,44 +61,6 @@ namespace pTyping.Screens {
 
             #endregion
 
-            #region Song speed buttons
-
-            if (!this._editor) {
-                UiButtonDrawable audioSpeed1 = new(
-                new(backButton.Size.X + 10, FurballGame.DEFAULT_WINDOW_HEIGHT),
-                "0.75x speed",
-                FurballGame.DEFAULT_FONT,
-                30,
-                Color.Red,
-                Color.White,
-                Color.White,
-                new(0),
-                this.AudioSpeed1OnClick
-                ) {
-                    OriginType = OriginType.BottomLeft
-                };
-
-                this.Manager.Add(audioSpeed1);
-
-                UiButtonDrawable audioSpeed2 = new(
-                new(backButton.Size.X + audioSpeed1.Size.X + 20, FurballGame.DEFAULT_WINDOW_HEIGHT),
-                "1.5x speed",
-                FurballGame.DEFAULT_FONT,
-                30,
-                Color.Red,
-                Color.White,
-                Color.White,
-                new(0),
-                this.AudioSpeed2OnClick
-                ) {
-                    OriginType = OriginType.BottomLeft
-                };
-
-                this.Manager.Add(audioSpeed2);
-            }
-
-            #endregion
-
             #region Create new song button
 
             if (this._editor) {
@@ -225,6 +187,9 @@ namespace pTyping.Screens {
 
             #endregion
 
+            ModSelectionScreenDrawable modScreen = new(new(100, 100));
+            this.Manager.Add(modScreen);
+
             if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0)
                 pTypingGame.CurrentSong.Value = SongManager.Songs[0];
             else if (pTypingGame.CurrentSong?.Value != null)
@@ -238,6 +203,9 @@ namespace pTyping.Screens {
             FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 
             LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
+
+            if (pTypingGame.MusicTrack.IsValidHandle)
+                pTypingGame.MusicTrack.AudioRate = 1f;
 
             pTypingGame.UserStatusPickingSong();
         }
@@ -259,14 +227,6 @@ namespace pTyping.Screens {
 
         private void OnLeaderboardTypeChange(object sender, LeaderboardType e) {
             this.UpdateScores();
-        }
-
-        private void AudioSpeed2OnClick(object sender, Point e) {
-            pTypingGame.MusicTrack.Frequency *= 1.5f;
-        }
-
-        private void AudioSpeed1OnClick(object sender, Point e) {
-            pTypingGame.MusicTrack.Frequency *= 0.75f;
         }
 
         private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {

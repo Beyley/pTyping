@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using pTyping.Online;
+using pTyping.Player.Mods;
 
 namespace pTyping.Player {
     [JsonObject(MemberSerialization.OptIn)]
@@ -18,6 +21,10 @@ namespace pTyping.Player {
         public int FairHits = 0;
         [JsonProperty]
         public int GoodHits = 0;
+        public List<PlayerMod> Mods = new();
+
+        [JsonProperty]
+        public string ModsString => PlayerMod.GetModString(this.Mods);
 
         [JsonProperty]
         public string MapHash;
@@ -28,7 +35,16 @@ namespace pTyping.Player {
         [JsonProperty]
         public int PoorHits = 0;
         [JsonProperty]
-        public long Score;
+        public long Score {
+            get;
+            protected set;
+        }
+
+        public double ScoreMultiplier => this.Mods.Aggregate<PlayerMod, double>(1f, (current, mod) => current * mod.ScoreMultiplier());
+
+        public void AddScore(int score) {
+            this.Score += (int)(score * this.ScoreMultiplier);
+        }
 
         [JsonProperty]
         public string Username;

@@ -17,6 +17,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Drawables;
 using pTyping.Player;
+using pTyping.Player.Mods;
 using pTyping.Songs;
 using pTyping.Songs.Events;
 
@@ -71,7 +72,8 @@ namespace pTyping.Screens {
 
             this._song = pTypingGame.CurrentSong.Value.Copy();
 
-            this._score = new(this._song.MapHash, ConVars.Username.Value);
+            this._score      = new(this._song.MapHash, ConVars.Username.Value);
+            this._score.Mods = pTypingGame.SelectedMods;
 
             if (this._song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
@@ -234,6 +236,9 @@ namespace pTyping.Screens {
 
             this.Play();
 
+            foreach (PlayerMod mod in pTypingGame.SelectedMods)
+                mod.OnMapStart(pTypingGame.MusicTrack, this._song.Notes, this);
+
             FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
             FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
 
@@ -374,10 +379,16 @@ namespace pTyping.Screens {
                             this._noteToType++;
                         }
                         this.ShowTypingIndicator(args.Character);
-                        this._score.Score += SCORE_PER_CHARACTER;
+                        this._score.AddScore(SCORE_PER_CHARACTER);
+
+                        foreach (PlayerMod mod in pTypingGame.SelectedMods)
+                            mod.OnCharacterTyped(note, args.Character.ToString(), true);
 
                         break;
                     }
+
+                    foreach (PlayerMod mod in pTypingGame.SelectedMods)
+                        mod.OnCharacterTyped(note, args.Character.ToString(), false);
                 }
             }
 
@@ -398,6 +409,9 @@ namespace pTyping.Screens {
         }
 
         private void NoteUpdate(bool wasHit, Note note) {
+            foreach (PlayerMod mod in pTypingGame.SelectedMods)
+                mod.OnNoteHit(note);
+
             int numberHit  = 0;
             int numberMiss = 0;
             foreach (NoteDrawable noteDrawable in this._notes)
@@ -433,7 +447,7 @@ namespace pTyping.Screens {
                         scoreToAdd = SCORE_POOR;
                         break;
                 }
-                this._score.Score += scoreToAdd + Math.Min(this._score.Combo - 1 * SCORE_COMBO, SCORE_COMBO_MAX);
+                this._score.AddScore(scoreToAdd + Math.Min(this._score.Combo - 1 * SCORE_COMBO, SCORE_COMBO_MAX));
                 this._score.Combo++;
             } else {
                 if (this._score.Combo > this._score.MaxCombo)
@@ -568,6 +582,9 @@ namespace pTyping.Screens {
             if (!this._endScheduled) {
                 pTypingGame.MusicTrackScheduler.ScheduleMethod(
                 delegate {
+                    foreach (PlayerMod mod in pTypingGame.SelectedMods)
+                        mod.OnMapEnd(pTypingGame.MusicTrack, this._song.Notes, this);
+                    
                     pTypingGame.SubmitScore(this._song, this._score);
 
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));

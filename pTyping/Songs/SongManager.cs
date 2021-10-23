@@ -36,7 +36,7 @@ namespace pTyping.Songs {
 
             Songs = songs;
 
-            Logger.Log($"Loaded {Songs.Count} songs!", new LoggerLevelSongManagerUpdateInfo());
+            Logger.Log($"Loaded {Songs.Count} songs!", LoggerLevelSongManagerUpdateInfo.Instance);
         }
     }
 }

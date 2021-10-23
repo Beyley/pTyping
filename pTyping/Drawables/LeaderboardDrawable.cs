@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Microsoft.Xna.Framework;
 using pTyping.Player;
+using pTyping.Player.Mods;
 
 namespace pTyping.Drawables {
     public class LeaderboardDrawable : CompositeDrawable {
@@ -46,7 +47,8 @@ namespace pTyping.Drawables {
 
             public void UpdateText() {
                 this._usernameInfoDrawable.Text = this.Score.Username;
-                this._infoTextDrawable.Text     = $"Score: {this.Score.Score} | Accuracy: {this.Score.Accuracy * 100:00.##} | {this.Score.MaxCombo}x";
+                this._infoTextDrawable.Text =
+                    $"Score: {this.Score.Score} | Accuracy: {this.Score.Accuracy * 100:00.##} | {this.Score.MaxCombo}x | {PlayerMod.GetModString(this.Score.Mods)}";
             }
         }
     }
