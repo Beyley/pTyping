@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using pTyping.Player;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {
-        public List<ChatMessage>                                 ChatLog       = new();
+        public ObservableCollection<ChatMessage>                 ChatLog       = new();
         public ObservableConcurrentDictionary<int, OnlinePlayer> OnlinePlayers = new();
 
         public OnlinePlayer Player = new();

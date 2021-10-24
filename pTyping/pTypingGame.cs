@@ -70,6 +70,7 @@ namespace pTyping {
         private readonly List<ManagedDrawable> _userPanelDrawables       = new();
 
         private DrawableManager _userPanelManager;
+        private ChatDrawable    _chatDrawable;
 
         public static List<PlayerMod> SelectedMods = new();
 
@@ -326,12 +327,27 @@ namespace pTyping {
             this._userPanelManager.Visible = false;
             this.UpdateUserPanel(null, null);
 
+            this._chatDrawable = new(new(10, DEFAULT_WINDOW_HEIGHT - 10)) {
+                OriginType = OriginType.BottomLeft
+            };
+            this._userPanelManager.Add(this._chatDrawable);
+
             InputManager.OnKeyDown += this.OnKeyDown;
         }
 
         private void OnKeyDown(object sender, Keys e) {
-            if (e == Keys.F9)
-                this._userPanelManager.Visible = !this._userPanelManager.Visible;
+            switch (e) {
+                case Keys.F8:
+                case Keys.F9:
+                    this._userPanelManager.Visible = !this._userPanelManager.Visible;
+
+                    this._chatDrawable.MessageInputDrawable.Selected = false;
+
+                    foreach (BaseDrawable drawable in this._userPanelManager.Drawables)
+                        drawable.Visible = this._userPanelManager.Visible;
+
+                    break;
+            }
         }
 
         private void UpdateUserPanel(object sender, object e) {

@@ -33,5 +33,7 @@ namespace pTyping.Online {
 
             return this._userCard;
         }
+
+        public override string ToString() => this.Username;
     }
 }

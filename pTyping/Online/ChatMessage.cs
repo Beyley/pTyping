@@ -13,5 +13,7 @@ namespace pTyping.Online {
             this.Message = message;
             this.Time    = DateTime.Now;
         }
+
+        public override string ToString() => $"<{this.Time.Hour:00}:{this.Time.Minute:00}> {this.Sender}: {this.Message}";
     }
 }
