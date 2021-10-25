@@ -66,6 +66,8 @@ namespace pTyping.Songs {
             }
         }
 
+        public double BeatsPerMinute => 60000 / this.TimingPoints[0].Tempo;
+
         public static Song LoadFromFile(FileInfo fileInfo) {
             Song song = JsonConvert.DeserializeObject<Song>(File.ReadAllText(fileInfo.FullName));
             song.FileInfo = fileInfo;
@@ -88,12 +90,7 @@ namespace pTyping.Songs {
                 Artist     = "",
                 Creator    = "",
                 Difficulty = "",
-                FileInfo   = fileInfo,
-                TimingPoints = new() {
-                    new() {
-                        Tempo = 500
-                    }
-                }
+                FileInfo   = fileInfo
             };
 
             string infoData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(fileInfo.FullName));
@@ -103,12 +100,13 @@ namespace pTyping.Songs {
 
             song.Name       = info[0];
             song.Artist     = info[1];
+            song.Creator    = info[2];
             song.Difficulty = info[3];
             song.Type       = SongType.UTyping;
 
             string dataFilename = info[4];
 
-            string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName, dataFilename)));
+            string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, dataFilename)));
 
             if (mapData[0] != '@') return null;
 
@@ -181,12 +179,24 @@ namespace pTyping.Songs {
 
                         break;
                     }
-                    //A rest in the song (what this does im still not sure) in the format of
+                    //A beatline beat (happens every 1/4th beat except for full beats)
                     //-TimeInSeconds
                     //ex. -17.747059
                     case "-": {
                         song.Events.Add(
-                        new RestEvent {
+                        new BeatLineBeatEvent {
+                            Time = double.Parse(line) * 1000d
+                        }
+                        );
+
+                        break;
+                    }
+                    //A beatline bar (happens every full beat)
+                    //=TimeInSeconds
+                    //ex. =4.544444
+                    case "=": {
+                        song.Events.Add(
+                        new BeatLineBarEvent {
                             Time = double.Parse(line) * 1000d
                         }
                         );
@@ -197,8 +207,19 @@ namespace pTyping.Songs {
 
             } while (line != null);
 
+            List<BeatLineBarEvent> beatLineBarEvents = song.Events.Where(x => x is BeatLineBarEvent).Cast<BeatLineBarEvent>().ToList();
+
+            double tempo = beatLineBarEvents[1].Time - beatLineBarEvents[0].Time;
+
+            song.TimingPoints.Add(
+            new TimingPoint {
+                Time  = song.Events.First(x => x is BeatLineBarEvent).Time,
+                Tempo = tempo / 4d
+            }
+            );
+            
             Logger.Log(
-            $"UTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} diff:{song.Difficulty}",
+            $"UTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} diff:{song.Difficulty} creator:{song.Creator}",
             LoggerLevelSongInfo.Instance
             );
 

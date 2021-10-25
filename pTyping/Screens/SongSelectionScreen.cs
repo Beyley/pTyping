@@ -302,7 +302,7 @@ namespace pTyping.Screens {
 
         public void UpdateSelectedSong(bool fromPrevScreen = false) {
             this._songInfo.Text =
-                $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]\nCreated by {pTypingGame.CurrentSong.Value.Creator}";
+                $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]\nCreated by {pTypingGame.CurrentSong.Value.Creator}\nBPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
 
             string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
 

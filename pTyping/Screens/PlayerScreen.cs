@@ -63,6 +63,8 @@ namespace pTyping.Screens {
         private TextDrawable     _scoreDrawable;
         private UiButtonDrawable _skipButton;
 
+        private LyricDrawable _lyricDrawable;
+
         public  Song         Song;
         private TextDrawable _typingIndicator;
 
@@ -112,6 +114,9 @@ namespace pTyping.Screens {
             this._skipButton.Visible    = false;
 
             this.Manager.Add(this._skipButton);
+
+            this._lyricDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 25, 25), this.Song);
+            this.Manager.Add(this._lyricDrawable);
 
             #region Pause UI
 
@@ -528,6 +533,8 @@ namespace pTyping.Screens {
             this._quitButton.Clickable    = isPaused;
 
             #endregion
+
+            this._lyricDrawable.UpdateLyric(currentTime);
 
             #region skin button visibility
 
