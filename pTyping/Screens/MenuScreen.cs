@@ -42,7 +42,8 @@ namespace pTyping.Screens {
 
             TexturedDrawable playButton = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
                 OriginType = OriginType.Center,
-                Scale      = new(0.75f)
+                Scale      = new(0.75f),
+                ToolTip    = "gordon this is a tool tip"
             };
             TexturedDrawable editButton = new(
             menuButtonsTexture,
@@ -50,7 +51,8 @@ namespace pTyping.Screens {
             TexturePositions.MENU_EDIT_BUTTON
             ) {
                 OriginType = OriginType.Center,
-                Scale      = new(0.75f)
+                Scale      = new(0.75f),
+                ToolTip    = "you can use it to get across big pits!"
             };
             TexturedDrawable optionsButton = new(
             menuButtonsTexture,
