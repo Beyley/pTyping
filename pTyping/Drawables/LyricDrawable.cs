@@ -13,8 +13,6 @@ namespace pTyping.Drawables {
 
         private double _lastTime = 0;
 
-        public override Vector2 Size => new(1);
-
         public LyricDrawable(Vector2 pos, Song song) {
             foreach (Event e in song.Events)
                 if (e is LyricEvent le)

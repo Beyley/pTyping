@@ -115,7 +115,7 @@ namespace pTyping.Screens {
 
             this.Manager.Add(this._skipButton);
 
-            this._lyricDrawable = new(new(RECEPTICLE_POS.X - 100, RECEPTICLE_POS.Y + 100), this.Song);
+            this._lyricDrawable = new(new(RECEPTICLE_POS.X - 100, RECEPTICLE_POS.Y + 200), this.Song);
             this.Manager.Add(this._lyricDrawable);
 
             #region Pause UI
