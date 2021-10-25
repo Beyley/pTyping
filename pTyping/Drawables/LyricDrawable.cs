@@ -13,6 +13,8 @@ namespace pTyping.Drawables {
 
         private double _lastTime = 0;
 
+        public override Vector2 Size => new(1);
+
         public LyricDrawable(Vector2 pos, Song song) {
             foreach (Event e in song.Events)
                 if (e is LyricEvent le)
@@ -23,7 +25,7 @@ namespace pTyping.Drawables {
             this._currentLyricText = new(new(0), pTypingGame.JapaneseFont, "", 35);
             this.Drawables.Add(this._currentLyricText);
 
-            this._nextLyricText = new(new(0, this._currentLyricText.Font.MeasureString("A").Y + 10), pTypingGame.JapaneseFont, "", 27) {
+            this._nextLyricText = new(new(0), pTypingGame.JapaneseFont, "", 27) {
                 ColorOverride = Color.LightGray
             };
             this.Drawables.Add(this._nextLyricText);
@@ -55,10 +57,8 @@ namespace pTyping.Drawables {
             this._currentLyricText.Text = $"{thisLyric.Lyric}";
             this._nextLyricText.Text    = $"{nextLyric.Lyric}";
 
-            Vector2 _currentLyricSize = this._currentLyricText.Size;
-
-            this._currentLyricText.MoveTo(new(-_currentLyricSize.X, 0));
-            this._nextLyricText.MoveTo(new(-this._nextLyricText.Size.X, _currentLyricSize.Y + 10));
+            this._currentLyricText.MoveTo(new(0, 0));
+            this._nextLyricText.MoveTo(new(0, this._currentLyricText.Size.Y + 10));
 
             this._lastTime = time;
         }

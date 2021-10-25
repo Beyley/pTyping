@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Player;
 using pTyping.Screens;
 using pTyping.Songs;
 
@@ -28,7 +29,7 @@ namespace pTyping.Drawables {
         /// <param name="romaji">The romaji path to take</param>
         /// <param name="timeDifference">The time difference from now to the note</param>
         /// <returns>Whether the note has been fully completed</returns>
-        public bool TypeCharacter(string hiragana, string romaji, double timeDifference) {
+        public bool TypeCharacter(string hiragana, string romaji, double timeDifference, PlayerScore score) {
             if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
                 if (timeDifference < PlayerScreen.TIMING_EXCELLENT)
                     this.Note.HitResult = HitResult.Excellent;
@@ -46,6 +47,7 @@ namespace pTyping.Drawables {
             //Checks if we have finished typing the current romaji
             if (string.Equals(this.Note.TypedRomaji, romaji)) {
                 this.Note.Typed += hiragana;
+                score.AddScore(PlayerScreen.SCORE_PER_CHARACTER);
                 //Clear the typed romaji
                 this.Note.TypedRomaji = string.Empty;
 

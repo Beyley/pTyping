@@ -115,7 +115,7 @@ namespace pTyping.Screens {
 
             this.Manager.Add(this._skipButton);
 
-            this._lyricDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 25, 25), this.Song);
+            this._lyricDrawable = new(new(RECEPTICLE_POS.X - 100, RECEPTICLE_POS.Y + 100), this.Song);
             this.Manager.Add(this._lyricDrawable);
 
             #region Pause UI
@@ -381,14 +381,13 @@ namespace pTyping.Screens {
                     double timeDifference = Math.Abs(currentTime - note.Time);
                     if (romaji[note.TypedRomaji.Length] == args.Character) {
                         //If true, then we finished the note, if false, then we continue
-                        if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference)) {
+                        if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this._score)) {
                             this.HitSoundNormal.Play();
                             this.NoteUpdate(true, note);
 
                             this._noteToType++;
                         }
                         this.ShowTypingIndicator(args.Character);
-                        this._score.AddScore(SCORE_PER_CHARACTER);
 
                         foreach (PlayerMod mod in pTypingGame.SelectedMods)
                             mod.OnCharacterTyped(note, args.Character.ToString(), true);
