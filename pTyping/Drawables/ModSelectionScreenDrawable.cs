@@ -41,10 +41,13 @@ namespace pTyping.Drawables {
                 this.Drawables.Add(modButton);
 
                 x += modButton.Size.X + 30;
-                if (i + 1 % 4 == 0) {
+                if ((i + 1) % 4 == 0 && i != PlayerMod.RegisteredMods.Count - 1) {
                     x =  0;
                     y += modButton.Size.Y + 25;
                 }
+
+                if (i == PlayerMod.RegisteredMods.Count - 1)
+                    y += modButton.Size.Y + 25;
             }
 
             this._scoreMultiplier = new(

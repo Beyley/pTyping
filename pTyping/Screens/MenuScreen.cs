@@ -178,7 +178,6 @@ namespace pTyping.Screens {
                 this.LoadSong(false);
         }
 
-
         public void LoadSong(bool chooseNewOne) {
             if (SongManager.Songs.Count == 0) return;
 
