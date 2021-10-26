@@ -12,11 +12,10 @@ namespace pTyping.Songs {
 
         public static List<Song> Songs {
             get;
-            private set;
         } = new();
 
         public static void UpdateSongs() {
-            List<Song> songs = new();
+            Songs.Clear();
 
             DirectoryInfo dirInfo = new(QualifiedSongFolder);
 
@@ -25,16 +24,14 @@ namespace pTyping.Songs {
                 dirInfo.Create();
 
             foreach (FileInfo file in dirInfo.GetFiles("*.pts", SearchOption.AllDirectories))
-                songs.Add(Song.LoadFromFile(file));
+                Songs.Add(Song.LoadFromFile(file));
 
             foreach (FileInfo file in dirInfo.GetFiles("info.txt", SearchOption.AllDirectories)) {
                 Song tempSong = Song.LoadUTypingSong(file);
 
                 if (tempSong is not null)
-                    songs.Add(tempSong);
+                    Songs.Add(tempSong);
             }
-
-            Songs = songs;
 
             Logger.Log($"Loaded {Songs.Count} songs!", LoggerLevelSongManagerUpdateInfo.Instance);
         }

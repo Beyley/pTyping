@@ -1,6 +1,9 @@
+using Furball.Engine.Engine;
 using Furball.Engine.Engine.DevConsole;
 using Furball.Engine.Engine.DevConsole.Types;
 using pTyping.Online;
+using pTyping.Screens;
+using pTyping.Songs;
 
 namespace pTyping {
     public class ConVars : ConVarStore {
@@ -12,12 +15,27 @@ namespace pTyping {
         "ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff"
         );
 
+        public static ConFunc LoadUTypingReplay = new LoadUTypingReplay();
+        public static ConFunc Logout            = new Logout();
+        public static ConFunc Login             = new Login();
+        public static ConFunc SendMessage       = new SendMessage();
+
         /// <summary>
         ///     The time it takes the notes to go from the right side of the screen to the left
         /// </summary>
         public static IntConVar BaseApproachTime = new("cl_base_approach_time", 2000) {
             Protected = true
         };
+    }
+
+    public class LoadUTypingReplay : ConFunc {
+        public LoadUTypingReplay() : base("cl_load_utyping_replay") {}
+
+        public override ConsoleResult Run(string[] consoleInput) {
+            ScreenManager.ChangeScreen(new PlayerScreen(Replay.LoadUTypingReplay(consoleInput[0])));
+
+            return new ConsoleResult(ExecutionResult.Success, "Loaded UTyping replay!");
+        }
     }
 
     public class Logout : ConFunc {

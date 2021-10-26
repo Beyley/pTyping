@@ -70,6 +70,16 @@ namespace pTyping.Screens {
 
         public SoundEffect HitSoundNormal = new();
 
+        private          bool   _playingReplay;
+        private readonly Replay _replay = new();
+
+        public PlayerScreen() {}
+
+        public PlayerScreen(Replay replay) {
+            this._playingReplay = true;
+            this._replay        = replay;
+        }
+
         public override void Initialize() {
             base.Initialize();
 
@@ -249,9 +259,15 @@ namespace pTyping.Screens {
                 mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
 
             FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
-            FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
+            if (!this._playingReplay)
+                FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
 
             pTypingGame.UserStatusPlaying();
+
+            if (!this._playingReplay) {
+                this._replay.Username = pTypingGame.OnlineManager.Username();
+                this._replay.SongHash = this.Song.MapHash;
+            }
         }
 
         private void ResumeButtonClick(object sender, Point e) {
@@ -359,6 +375,16 @@ namespace pTyping.Screens {
         }
 
         private void OnCharacterTyped(object sender, TextInputEventArgs args) {
+            if (char.IsControl(args.Character))
+                return;
+
+            this._replay.Frames.Add(
+            new() {
+                Character = args.Character,
+                Time      = pTypingGame.MusicTrack.GetCurrentTime()
+            }
+            );
+
             if (this.Song.AllNotesHit()) return;
 
             NoteDrawable noteDrawable = this._notes[this._noteToType];
@@ -590,6 +616,22 @@ namespace pTyping.Screens {
             if (this._score.Mods.Count != 0)
                 foreach (PlayerMod mod in this._score.Mods)
                     mod.Update(gameTime);
+
+            #region Replays
+
+            if (this._playingReplay && this._replay.Frames.TrueForAll(x => x.Used))
+                this._playingReplay = false;
+
+            if (this._playingReplay) {
+                ReplayFrame currentFrame = this._replay.Frames.First(x => !x.Used);
+
+                if (currentTime > currentFrame.Time) {
+                    this.OnCharacterTyped(null, new TextInputEventArgs(currentFrame.Character));
+                    currentFrame.Used = true;
+                }
+            }
+
+            #endregion
         }
 
         public void EndScore() {
@@ -600,6 +642,8 @@ namespace pTyping.Screens {
                         mod.OnMapEnd(pTypingGame.MusicTrack, this._notes, this);
 
                     pTypingGame.SubmitScore(this.Song, this._score);
+
+                    this._replay.Time = DateTime.Now;
 
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));
                 },

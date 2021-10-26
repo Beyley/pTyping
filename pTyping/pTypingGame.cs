@@ -276,11 +276,18 @@ namespace pTyping {
         }
 
         protected override void Initialize() {
-            DevConsole.AddConVar(ConVars.Username);
-            DevConsole.AddConVar(ConVars.Password);
-            DevConsole.AddConVar(ConVars.Volume);
-            DevConsole.AddConVar(ConVars.BackgroundDim);
-            DevConsole.AddConVar(ConVars.BaseApproachTime);
+            // DevConsole.AddConVar(ConVars.Username);
+            // DevConsole.AddConVar(ConVars.Password);
+            // DevConsole.AddConVar(ConVars.Volume);
+            // DevConsole.AddConVar(ConVars.BackgroundDim);
+            // DevConsole.AddConVar(ConVars.BaseApproachTime);
+
+            // DevConsole.AddConFunc(new LoadUTypingReplay());
+            // DevConsole.AddConFunc(new Logout());
+            // DevConsole.AddConFunc(new Login());
+            // DevConsole.AddConFunc(new SendMessage());
+
+            DevConsole.AddConVarStore(typeof(ConVars));
 
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
             JapaneseFont.AddFont(JapaneseFontData);
