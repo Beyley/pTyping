@@ -71,14 +71,18 @@ namespace pTyping.Screens {
         public SoundEffect HitSoundNormal = new();
 
         private          bool              _playingReplay;
-        private readonly Replay            _replay       = new();
-        private readonly List<ReplayFrame> _replayFrames = new();
+        private readonly PlayerScore       _playingScoreReplay = new();
+        private readonly List<ReplayFrame> _replayFrames       = new();
 
         public PlayerScreen() {}
 
-        public PlayerScreen(Replay replay) {
-            this._playingReplay = true;
-            this._replay        = replay;
+        /// <summary>
+        ///     Used to play a replay
+        /// </summary>
+        /// <param name="replay">The score to get the replay from</param>
+        public PlayerScreen(PlayerScore replay) {
+            this._playingReplay      = true;
+            this._playingScoreReplay = replay;
         }
 
         public override void Initialize() {
@@ -264,11 +268,6 @@ namespace pTyping.Screens {
                 FurballGame.Instance.Window.TextInput += this.OnCharacterTyped;
 
             pTypingGame.UserStatusPlaying();
-
-            if (!this._playingReplay) {
-                this._replay.Username = pTypingGame.OnlineManager.Username();
-                this._replay.SongHash = this.Song.MapHash;
-            }
         }
 
         private void ResumeButtonClick(object sender, Point e) {
@@ -621,12 +620,12 @@ namespace pTyping.Screens {
 
             #region Replays
 
-            if (this._playingReplay && Array.TrueForAll(this._replay.Frames, x => x.Used))
+            if (this._playingReplay && Array.TrueForAll(this._playingScoreReplay.ReplayFrames, x => x.Used))
                 this._playingReplay = false;
 
             if (this._playingReplay) {
-                for (int i = 0; i < this._replay.Frames.Length; i++) {
-                    ref ReplayFrame currentFrame = ref this._replay.Frames[i];
+                for (int i = 0; i < this._playingScoreReplay.ReplayFrames.Length; i++) {
+                    ref ReplayFrame currentFrame = ref this._playingScoreReplay.ReplayFrames[i];
 
                     if (currentTime > currentFrame.Time && !currentFrame.Used) {
                         this.OnCharacterTyped(this, new TextInputEventArgs(currentFrame.Character));
@@ -647,8 +646,8 @@ namespace pTyping.Screens {
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnMapEnd(pTypingGame.MusicTrack, this._notes, this);
 
-                    this._replay.Time   = DateTime.Now;
-                    this._replay.Frames = this._replayFrames.ToArray();
+                    this._score.Time         = DateTime.Now;
+                    this._score.ReplayFrames = this._replayFrames.ToArray();
                     
                     pTypingGame.SubmitScore(this.Song, this._score);
 

@@ -2,8 +2,8 @@ using Furball.Engine.Engine;
 using Furball.Engine.Engine.DevConsole;
 using Furball.Engine.Engine.DevConsole.Types;
 using pTyping.Online;
+using pTyping.Player;
 using pTyping.Screens;
-using pTyping.Songs;
 
 namespace pTyping {
     public class ConVars : ConVarStore {
@@ -32,7 +32,7 @@ namespace pTyping {
         public LoadUTypingReplay() : base("cl_load_utyping_replay") {}
 
         public override ConsoleResult Run(string[] consoleInput) {
-            ScreenManager.ChangeScreen(new PlayerScreen(Replay.LoadUTypingReplay(consoleInput[0])));
+            ScreenManager.ChangeScreen(new PlayerScreen(PlayerScore.LoadUTypingReplay(consoleInput[0])));
 
             return new ConsoleResult(ExecutionResult.Success, "Loaded UTyping replay!");
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -24,7 +25,9 @@ namespace pTyping.Player {
 
         [JsonProperty]
         public string ModsString = "";
-
+        [JsonProperty]
+        public ReplayFrame[] ReplayFrames = Array.Empty<ReplayFrame>();
+        
         [JsonProperty]
         public string MapHash;
         [JsonProperty]
@@ -38,6 +41,9 @@ namespace pTyping.Player {
             get;
             protected set;
         }
+
+        [JsonProperty]
+        public DateTime Time;
         
         public void AddScore(int score) {
             this.Score += (int)(score * PlayerMod.ScoreMultiplier(this.Mods));
@@ -52,6 +58,35 @@ namespace pTyping.Player {
         }
 
         public PlayerScore() {}
+
+        public static PlayerScore LoadUTypingReplay(string path) {
+            FileStream   stream = File.OpenRead(path);
+            BinaryReader reader = new(stream);
+
+            PlayerScore replay = new(pTypingGame.CurrentSong.Value.MapHash, "UTyping");
+
+            List<ReplayFrame> frames = new();
+
+            while (stream.Position < stream.Length)
+                frames.Add(ReplayFrame.UTypingDeserialize(reader));
+
+            stream.Close();
+
+            replay.ReplayFrames = frames.ToArray();
+
+            return replay;
+        }
+
+        public void SaveUTypingReplay(string path) {
+            FileStream   stream = File.Create(path);
+            BinaryWriter writer = new(stream);
+
+            foreach (ReplayFrame frame in this.ReplayFrames)
+                frame.UTypingSerialize(writer);
+
+            writer.Flush();
+            stream.Close();
+        }
 
         public static PlayerScore TaikoRsDeserialize(TaikoRsReader reader) {
             PlayerScore score = new();
@@ -97,6 +132,31 @@ namespace pTyping.Player {
             writer.Flush();
 
             return stream.ToArray();
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public struct ReplayFrame {
+        [JsonProperty]
+        public char Character;
+        [JsonProperty]
+        public double Time;
+
+        public bool Used;
+
+        public static ReplayFrame UTypingDeserialize(BinaryReader reader) {
+            ReplayFrame frame = new();
+
+            frame.Character = reader.ReadChar();
+            frame.Time      = reader.ReadDouble() * 1000d;
+            frame.Used      = false;
+
+            return frame;
+        }
+
+        public void UTypingSerialize(BinaryWriter writer) {
+            writer.Write(this.Character);
+            writer.Write(this.Time / 1000d);
         }
     }
 }
