@@ -31,22 +31,26 @@ namespace pTyping.Songs {
             Replay replay = new(pTypingGame.CurrentSong.Value.MapHash, "UTyping");
 
             List<ReplayFrame> frames = new();
-            
-            while (stream.Position < stream.Length) {
-                ReplayFrame frame = new();
 
-                frame.Character = reader.ReadChar();
-                frame.Time      = reader.ReadDouble() * 1000d;
-                frame.Used      = false;
-
-                frames.Add(frame);
-            }
+            while (stream.Position < stream.Length)
+                frames.Add(ReplayFrame.UTypingDeserialize(reader));
 
             stream.Close();
 
             replay.Frames = frames.ToArray();
 
             return replay;
+        }
+
+        public void SaveUTypingReplay(string path) {
+            FileStream   stream = File.Create(path);
+            BinaryWriter writer = new(stream);
+
+            foreach (ReplayFrame frame in this.Frames)
+                frame.UTypingSerialize(writer);
+
+            writer.Flush();
+            stream.Close();
         }
     }
 
@@ -58,5 +62,20 @@ namespace pTyping.Songs {
         public double Time;
 
         public bool Used;
+
+        public static ReplayFrame UTypingDeserialize(BinaryReader reader) {
+            ReplayFrame frame = new();
+
+            frame.Character = reader.ReadChar();
+            frame.Time      = reader.ReadDouble() * 1000d;
+            frame.Used      = false;
+
+            return frame;
+        }
+
+        public void UTypingSerialize(BinaryWriter writer) {
+            writer.Write(this.Character);
+            writer.Write(this.Time / 1000d);
+        }
     }
 }
