@@ -70,8 +70,9 @@ namespace pTyping.Screens {
 
         public SoundEffect HitSoundNormal = new();
 
-        private          bool   _playingReplay;
-        private readonly Replay _replay = new();
+        private          bool              _playingReplay;
+        private readonly Replay            _replay       = new();
+        private readonly List<ReplayFrame> _replayFrames = new();
 
         public PlayerScreen() {}
 
@@ -378,12 +379,13 @@ namespace pTyping.Screens {
             if (char.IsControl(args.Character))
                 return;
 
-            this._replay.Frames.Add(
-            new() {
-                Character = args.Character,
-                Time      = pTypingGame.MusicTrack.GetCurrentTime()
-            }
-            );
+            if (!this._playingReplay)
+                this._replayFrames.Add(
+                new() {
+                    Character = args.Character,
+                    Time      = pTypingGame.MusicTrack.GetCurrentTime()
+                }
+                );
 
             if (this.Song.AllNotesHit()) return;
 
@@ -619,15 +621,19 @@ namespace pTyping.Screens {
 
             #region Replays
 
-            if (this._playingReplay && this._replay.Frames.TrueForAll(x => x.Used))
+            if (this._playingReplay && Array.TrueForAll(this._replay.Frames, x => x.Used))
                 this._playingReplay = false;
 
             if (this._playingReplay) {
-                ReplayFrame currentFrame = this._replay.Frames.First(x => !x.Used);
+                for (int i = 0; i < this._replay.Frames.Length; i++) {
+                    ref ReplayFrame currentFrame = ref this._replay.Frames[i];
 
-                if (currentTime > currentFrame.Time) {
-                    this.OnCharacterTyped(null, new TextInputEventArgs(currentFrame.Character));
-                    currentFrame.Used = true;
+                    if (currentTime > currentFrame.Time && !currentFrame.Used) {
+                        this.OnCharacterTyped(this, new TextInputEventArgs(currentFrame.Character));
+
+                        currentFrame.Used = true;
+                        break;
+                    }
                 }
             }
 
@@ -641,9 +647,10 @@ namespace pTyping.Screens {
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnMapEnd(pTypingGame.MusicTrack, this._notes, this);
 
+                    this._replay.Time   = DateTime.Now;
+                    this._replay.Frames = this._replayFrames.ToArray();
+                    
                     pTypingGame.SubmitScore(this.Song, this._score);
-
-                    this._replay.Time = DateTime.Now;
 
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));
                 },
