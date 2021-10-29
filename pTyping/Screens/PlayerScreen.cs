@@ -206,9 +206,10 @@ namespace pTyping.Screens {
 
             this._score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
 
-            this.AddNotes();
+            this.CreateNotes();
             this.CreateCutOffIndicators();
-
+            this.CreateBeatLines();
+            
             #region Playfield decorations
 
             LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, RECEPTICLE_POS.Y - 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
@@ -287,7 +288,53 @@ namespace pTyping.Screens {
             pTypingGame.MusicTrack.SeekTo(this.Song.Notes.First().Time - 2999);
         }
 
-        private void AddNotes() {
+        private void CreateBeatLines() {
+            foreach (Event @event in this.Song.Events) {
+
+                LinePrimitiveDrawable drawable = @event switch {
+                    BeatLineBarEvent => new LinePrimitiveDrawable(new(0), 100, (float)Math.PI / 2f) {
+                        Thickness = 3f
+                    },
+                    BeatLineBeatEvent => new LinePrimitiveDrawable(new(0), 100, (float)Math.PI / 2f),
+                    _                 => null
+                };
+
+                float travelTime = this.BaseApproachTime;
+
+                float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
+                float travelRatio    = travelTime / travelDistance;
+
+                float afterTravelTime = (RECEPTICLE_POS.X - NOTE_END_POS.X) * travelRatio;
+
+                drawable?.Tweens.Add(
+                new VectorTween(
+                TweenType.Movement,
+                new(NOTE_START_POS.X, NOTE_START_POS.Y - drawable.Length / 2f),
+                new(RECEPTICLE_POS.X, RECEPTICLE_POS.Y - drawable.Length / 2f),
+                (int)(@event.Time - travelTime),
+                (int)@event.Time
+                )
+                );
+
+                drawable?.Tweens.Add(
+                new VectorTween(
+                TweenType.Movement,
+                new(RECEPTICLE_POS.X, RECEPTICLE_POS.Y - drawable.Length / 2f),
+                new(NOTE_END_POS.X, RECEPTICLE_POS.Y   - drawable.Length / 2f),
+                (int)@event.Time,
+                (int)(@event.Time + afterTravelTime)
+                )
+                );
+
+                if (drawable != null) {
+                    drawable.TimeSource = pTypingGame.MusicTrack;
+                    drawable.Depth      = 0.5f;
+                    this.Manager.Add(drawable);
+                }
+            }
+        }
+
+        private void CreateNotes() {
             foreach (Note note in this.Song.Notes) {
                 NoteDrawable noteDrawable = this.CreateNote(note);
 
@@ -339,6 +386,7 @@ namespace pTyping.Screens {
                     Scale = new(1f)
                 },
                 Scale      = new(0.55f),
+                Depth      = 0f,
                 OriginType = OriginType.Center
             };
 
