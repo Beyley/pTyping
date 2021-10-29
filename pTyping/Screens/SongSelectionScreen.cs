@@ -169,31 +169,33 @@ namespace pTyping.Screens {
 
             #region mods
 
-            this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
-                Visible    = false,
-                OriginType = OriginType.BottomLeft,
-                Depth      = 0.5f
-            };
-            this.Manager.Add(this._modScreen);
+            if (!this._editor) {
+                this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
+                    Visible    = false,
+                    OriginType = OriginType.BottomLeft,
+                    Depth      = 0.5f
+                };
+                this.Manager.Add(this._modScreen);
 
-            UiButtonDrawable toggleMods = new(
-            new(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
-            "Mods",
-            FurballGame.DEFAULT_FONT_STROKED,
-            30,
-            Color.Blue,
-            Color.White,
-            Color.White,
-            new(0)
-            ) {
-                OriginType = OriginType.BottomLeft
-            };
+                UiButtonDrawable toggleMods = new(
+                new(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
+                "Mods",
+                FurballGame.DEFAULT_FONT_STROKED,
+                30,
+                Color.Blue,
+                Color.White,
+                Color.White,
+                new(0)
+                ) {
+                    OriginType = OriginType.BottomLeft
+                };
 
-            toggleMods.OnClick += delegate {
-                this._modScreen.Visible = !this._modScreen.Visible;
-            };
+                toggleMods.OnClick += delegate {
+                    this._modScreen.Visible = !this._modScreen.Visible;
+                };
 
-            this.Manager.Add(toggleMods);
+                this.Manager.Add(toggleMods);
+            }
 
             #endregion
             
