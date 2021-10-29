@@ -29,11 +29,10 @@ namespace pTyping.Screens {
 
         private float _movingDirection;
 
-        private readonly List<ManagedDrawable> _songButtonList = new();
-
         private TextDrawable _songInfo;
 
         private ModSelectionScreenDrawable _modScreen;
+        private SongSelectDrawable         _songSelectDrawable;
 
         public SongSelectionScreen(bool editor) => this._editor = editor;
 
@@ -97,34 +96,12 @@ namespace pTyping.Screens {
 
             IEnumerable<Song> songList = this._editor ? SongManager.Songs.Where(x => x.Type == SongType.pTyping) : SongManager.Songs;
 
-            foreach (Song song in songList) {
-                UiButtonDrawable songButton = new(
-                new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, tempY),
-                $"{song.Artist} - {song.Name} [{song.Difficulty}]",
-                pTypingGame.JapaneseFont,
-                35,
-                song.Type == SongType.pTyping ? Color.Blue : Color.Green,
-                Color.Black,
-                Color.Black,
-                new Vector2(650, 50)
-                ) {
-                    OriginType = OriginType.TopRight,
-                    TextDrawable = {
-                        OriginType = OriginType.RightCenter
-                    },
-                    Depth = 0.9f
-                };
+            this._songSelectDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10), songList) {
+                OriginType = OriginType.TopRight,
+                Depth      = 0.8f
+            };
 
-                songButton.OnClick += delegate {
-                    pTypingGame.CurrentSong.Value = song;
-                };
-
-                this._songButtonList.Add(songButton);
-
-                this.Manager.Add(songButton);
-
-                tempY += 60;
-            }
+            this.Manager.Add(this._songSelectDrawable);
 
             #endregion
 
@@ -140,7 +117,8 @@ namespace pTyping.Screens {
             Color.White,
             new(0)
             ) {
-                OriginType = OriginType.BottomRight
+                OriginType = OriginType.BottomRight,
+                Depth      = 0f
             };
 
             startButton.OnClick += delegate {
@@ -259,14 +237,12 @@ namespace pTyping.Screens {
         }
 
         private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
-            foreach (ManagedDrawable songButton in this._songButtonList)
-                songButton.Position += new Vector2(0f, e.scrollAmount);
+            this._songSelectDrawable.TargetScroll += e.scrollAmount;
         }
 
         public override void Update(GameTime gameTime) {
             if (this._movingDirection != 0f)
-                foreach (BaseDrawable songButton in this._songButtonList)
-                    songButton.Position += new Vector2(0f, this._movingDirection * (gameTime.ElapsedGameTime.Ticks / 10000f));
+                this._songSelectDrawable.TargetScroll += this._movingDirection * (gameTime.ElapsedGameTime.Ticks / 10000f);
 
             base.Update(gameTime);
         }
