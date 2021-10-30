@@ -18,7 +18,7 @@ namespace pTyping.Screens {
 
             TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
                 OriginType = OriginType.BottomLeft,
-                Scale      = new(0.4f, 0.4f)
+                Scale      = pTypingGame.BackButtonScale
             };
 
             backButton.OnClick += delegate {
