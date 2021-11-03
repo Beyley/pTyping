@@ -48,7 +48,8 @@ namespace pTyping.Screens {
 
         private bool _endScheduled = false;
 
-        private readonly List<NoteDrawable> _notes = new();
+        private readonly List<NoteDrawable>                       _notes    = new();
+        private readonly List<Tuple<LinePrimitiveDrawable, bool>> _beatBars = new();
 
         private Texture2D _noteTexture;
 
@@ -290,7 +291,6 @@ namespace pTyping.Screens {
 
         private void CreateBeatLines() {
             foreach (Event @event in this.Song.Events) {
-
                 LinePrimitiveDrawable drawable = @event switch {
                     BeatLineBarEvent => new LinePrimitiveDrawable(new(0), 100, (float)Math.PI / 2f) {
                         Thickness = 3f
@@ -329,7 +329,7 @@ namespace pTyping.Screens {
                 if (drawable != null) {
                     drawable.TimeSource = pTypingGame.MusicTrack;
                     drawable.Depth      = 0.5f;
-                    this.Manager.Add(drawable);
+                    this._beatBars.Add(new(drawable, false));
                 }
             }
         }
@@ -338,7 +338,6 @@ namespace pTyping.Screens {
             foreach (Note note in this.Song.Notes) {
                 NoteDrawable noteDrawable = this.CreateNote(note);
 
-                this.Manager.Add(noteDrawable);
                 this._notes.Add(noteDrawable);
             }
         }
@@ -589,6 +588,28 @@ namespace pTyping.Screens {
 
         public override void Update(GameTime gameTime) {
             int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+
+            for (int i = 0; i < this._notes.Count; i++) {
+                NoteDrawable note = this._notes[i];
+
+                if (note.Added) continue;
+
+                if (currentTime < note.Note.Time - 2000) continue;
+
+                this.Manager.Add(note);
+                note.Added = true;
+            }
+
+            for (int i = 0; i < this._beatBars.Count; i++) {
+                Tuple<LinePrimitiveDrawable, bool> note = this._beatBars[i];
+
+                if (note.Item2) continue;
+
+                if (currentTime < note.Item1.Tweens[0].StartTime) continue;
+
+                this.Manager.Add(note.Item1);
+                this._beatBars[i] = new(note.Item1, true);
+            }
 
             #region update UI
 

@@ -241,16 +241,18 @@ namespace pTyping.Screens {
             Texture2D editorToolButtonsTextures = ContentManager.LoadMonogameAsset<Texture2D>("editortools");
 
             this._editorToolSelect = new(editorToolButtonsTextures, new Vector2(10, 10), new Rectangle(0, 0, 240, 240)) {
-                Scale = new(this._editorToolSizes.X),
-                Depth = 0f
+                Scale   = new(this._editorToolSizes.X),
+                Depth   = 0f,
+                ToolTip = "Select notes and drag them around!"
             };
             this._editorToolSelect.OnClick += delegate {
                 this.ChangeTool(EditorTool.Select);
             };
 
             this._editorToolCreateNote = new(editorToolButtonsTextures, new Vector2(10, this._editorToolSelect.Size.Y + 20), new Rectangle(0, 240, 240, 240)) {
-                Scale = new(this._editorToolSizes.X),
-                Depth = 0.5f
+                Scale   = new(this._editorToolSizes.X),
+                Depth   = 0.5f,
+                ToolTip = "Create a note on cursor click!"
             };
             this._editorToolCreateNote.OnClick += delegate {
                 this.ChangeTool(EditorTool.CreateNote);

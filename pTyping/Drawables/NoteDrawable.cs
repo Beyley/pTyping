@@ -14,6 +14,7 @@ namespace pTyping.Drawables {
         public TextDrawable LabelTextDrawable;
 
         public Note Note;
+        public bool Added = false;
 
         public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) : base(texture, position) {
             this.LabelTextDrawable       = new TextDrawable(Vector2.Zero, font, "", size);
