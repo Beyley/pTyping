@@ -137,7 +137,8 @@ namespace pTyping.Screens {
             this.Manager.Add(this._selectionRect);
 
             this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
-                Visible = false
+                Visible    = false,
+                TimeSource = pTypingGame.MusicTrack
             };
 
             this.Manager.Add(this._createLine);
@@ -442,36 +443,59 @@ namespace pTyping.Screens {
                 this._createLine.Visible = false;
             }
         }
-        
-        private void OnMouseMove(object sender, (Point, string) e) {
+
+        private void OnMouseMove(object sender, (Point mousePos, string cursorName) e) {
             if (InPlayfieldPreview(e.Item1)) {
                 this._createLine.Visible = this.CurrentTool == EditorTool.CreateNote;
                 
                 this._createLine.OriginType = OriginType.Center;
 
-                double currentTime  = pTypingGame.MusicTrack.CurrentTime * 1000;
-                double reticulePos  = FurballGame.DEFAULT_WINDOW_WIDTH   * 0.15f;
+                double currentTime  = pTypingGame.MusicTrack.GetCurrentTime();
+                double reticuleXPos = this._recepticle.Position.X;
                 double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 
-                double distanceToReticule = e.Item1.X - reticulePos;
+                double speed = (noteStartPos - reticuleXPos) / ConVars.BaseApproachTime.Value;
 
-                double timeToReticule = distanceToReticule / (noteStartPos - reticulePos) * ConVars.BaseApproachTime.Value;
+                double relativeMousePosition = (e.mousePos.X - reticuleXPos) * 0.925;
 
-                double timeAtCursor = currentTime + timeToReticule;
+                double timeAtCursor = relativeMousePosition / speed + currentTime;
 
+                TimingPoint timingPoint = this._song.CurrentTimingPoint(timeAtCursor);
+                
                 double noteLength = this._song.DividedNoteLength(timeAtCursor);
 
-                double snappedTimeAtCursor = Math.Round((timeAtCursor - this._song.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength +
-                                             pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
-                this._mouseTime = snappedTimeAtCursor;
+                double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
 
-                double distanceInTime = snappedTimeAtCursor - currentTime;
+                this._mouseTime = roundedTime;
 
-                double scaleTime = distanceInTime / ConVars.BaseApproachTime.Value;
+                this._createLine.Tweens.Clear();
+                this._createLine.Tweens.Add(
+                new VectorTween(
+                TweenType.Movement,
+                new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y - 40),
+                new(PlayerScreen.RECEPTICLE_POS.X, PlayerScreen.RECEPTICLE_POS.Y - 40),
+                (int)(this._mouseTime - ConVars.BaseApproachTime.Value),
+                (int)this._mouseTime
+                )
+                );
 
-                double newX = scaleTime * (noteStartPos - reticulePos) + reticulePos;
+                // double timeToReticule = distanceToReticule / (noteStartPos - reticuleXPos) * ConVars.BaseApproachTime.Value;
+                //
+                // double timeAtCursor = currentTime + timeToReticule;
+                //
+                // double noteLength = this._song.DividedNoteLength(timeAtCursor);
+                //
+                // double snappedTimeAtCursor = Math.Round((timeAtCursor - this._song.CurrentTimingPoint(timeAtCursor).Time) / noteLength) * noteLength +
+                //                              pTypingGame.CurrentSong.Value.CurrentTimingPoint(timeAtCursor).Time;
+                // this._mouseTime = snappedTimeAtCursor;
+                //
+                // double distanceInTime = snappedTimeAtCursor - currentTime;
+                //
+                // double scaleTime = distanceInTime / ConVars.BaseApproachTime.Value;
+                //
+                // double newX = scaleTime * (noteStartPos - reticuleXPos) + reticuleXPos;
 
-                this._createLine.Position = new Vector2((float)newX, PlayerScreen.RECEPTICLE_POS.Y - 40);
+                // this._createLine.Position = new Vector2((float)newX, PlayerScreen.RECEPTICLE_POS.Y - 40);
             } else {
                 this._createLine.Visible = false;
             }

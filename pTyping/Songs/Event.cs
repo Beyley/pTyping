@@ -10,7 +10,6 @@ namespace pTyping.Songs {
     }
 
     public enum EventType {
-        Rest,
         Lyric,
         TypingCutoff,
         BeatLineBar,
