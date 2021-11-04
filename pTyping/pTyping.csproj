@@ -29,6 +29,10 @@
     <ItemGroup>
         <None Remove="Content\user-card.kra~"/>
         <None Remove="Content\mode-icons.kra~"/>
+        <None Remove="Content\song-button-background.png~"/>
+        <None Remove="Content\song-button-background.kra~"/>
+        <None Remove="Content\backbutton.png~"/>
+        <None Remove="Content\back-button.kra~"/>
     </ItemGroup>
 
 </Project>

@@ -466,6 +466,8 @@ namespace pTyping.Screens {
                 
                 double noteLength = this._song.DividedNoteLength(timeAtCursor);
 
+                timeAtCursor += noteLength / 2d;
+
                 double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
 
                 this._mouseTime = roundedTime;
