@@ -14,7 +14,7 @@ namespace pTyping.Player.Mods {
 
         public override string Name()            => "Ease Out";
         public override string ShorthandName()   => "EO";
-        public override double ScoreMultiplier() => 1.1d;
+        public override double ScoreMultiplier() => 1.025d;
 
         public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             foreach (Tween noteTween in notes.SelectMany(note => note.Tweens.Where(noteTween => noteTween.TweenType == TweenType.Movement)))

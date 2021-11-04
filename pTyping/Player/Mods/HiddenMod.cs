@@ -13,7 +13,7 @@ namespace pTyping.Player.Mods {
         public override string Name()          => "Hidden";
         public override string ShorthandName() => "HD";
 
-        public override double ScoreMultiplier() => 1.1d;
+        public override double ScoreMultiplier() => 1.025d;
 
         public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             foreach (NoteDrawable note in notes)

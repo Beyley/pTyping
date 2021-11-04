@@ -447,7 +447,7 @@ namespace pTyping.Screens {
         }
 
         private void OnMouseMove(object sender, (Point mousePos, string cursorName) e) {
-            if (InPlayfieldPreview(e.Item1)) {
+            if (InPlayfieldPreview(e.mousePos)) {
                 this._createLine.Visible = this.CurrentTool == EditorTool.CreateNote;
                 
                 this._createLine.OriginType = OriginType.Center;

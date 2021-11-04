@@ -9,7 +9,7 @@ namespace pTyping.Player.Mods {
         };
         public override string Name()            => "Easy";
         public override string ShorthandName()   => "EZ";
-        public override double ScoreMultiplier() => 0.75d;
+        public override double ScoreMultiplier() => 0.9d;
 
         public override void BeforeNoteCreate(PlayerScreen player) {
             player.BaseApproachTime = (int)(player.BaseApproachTime * 1.4d);

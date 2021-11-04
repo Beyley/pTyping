@@ -12,7 +12,7 @@ namespace pTyping.Player.Mods {
 
         public override string Name()            => "Double Time";
         public override string ShorthandName()   => "DT";
-        public override double ScoreMultiplier() => 1.12d;
+        public override double ScoreMultiplier() => 1.05d;
 
         public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             musicTrack.AudioRate = 1.5f;

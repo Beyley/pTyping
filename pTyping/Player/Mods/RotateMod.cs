@@ -11,7 +11,7 @@ namespace pTyping.Player.Mods {
         public override List<Type> IncompatibleMods() => new();
         public override string     Name()             => "Rotate";
         public override string     ShorthandName()    => "RT";
-        public override double     ScoreMultiplier()  => 1.15d;
+        public override double     ScoreMultiplier()  => 1.05d;
 
         public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
             foreach (NoteDrawable note in notes)
