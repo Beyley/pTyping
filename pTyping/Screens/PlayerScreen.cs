@@ -589,12 +589,13 @@ namespace pTyping.Screens {
         public override void Update(GameTime gameTime) {
             int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
 
+            #region spawn notes and bars as needed 
             for (int i = 0; i < this._notes.Count; i++) {
                 NoteDrawable note = this._notes[i];
 
                 if (note.Added) continue;
 
-                if (currentTime < note.Note.Time - 2000) continue;
+                if (currentTime < note.Note.Time - this.BaseApproachTime) continue;
 
                 this.Manager.Add(note);
                 note.Added = true;
@@ -610,6 +611,8 @@ namespace pTyping.Screens {
                 this.Manager.Add(note.Item1);
                 this._beatBars[i] = new(note.Item1, true);
             }
+
+            #endregion
 
             #region update UI
 
