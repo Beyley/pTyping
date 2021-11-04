@@ -220,9 +220,37 @@ namespace pTyping {
             };
 
             DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
-            JapaneseFontData  = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
-            JapaneseFont.AddFont(JapaneseFontData);
-            JapaneseFontStroked.AddFont(JapaneseFontData);
+
+            JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
+
+            try {
+                JapaneseFont = ContentManager.LoadSystemFont(
+                "Aller",
+                new FontSystemSettings {
+                    FontResolutionFactor = 2f,
+                    KernelWidth          = 1,
+                    KernelHeight         = 1,
+                    Effect               = FontSystemEffect.None
+                }
+                );
+                JapaneseFont.AddFont(JapaneseFontData);
+
+                JapaneseFontStroked = ContentManager.LoadSystemFont(
+                "Aller",
+                new FontSystemSettings {
+                    FontResolutionFactor = 2f,
+                    KernelWidth          = 1,
+                    KernelHeight         = 1,
+                    Effect               = FontSystemEffect.Stroked,
+                    EffectAmount         = 2
+                }
+                );
+                JapaneseFontStroked.AddFont(JapaneseFontData);
+            }
+            catch {
+                JapaneseFont.AddFont(JapaneseFontData);
+                JapaneseFontStroked.AddFont(JapaneseFontData);
+            }
 
             LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
             FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
@@ -279,9 +307,6 @@ namespace pTyping {
 
         protected override void Initialize() {
             DevConsole.AddConVarStore(typeof(ConVars));
-
-            JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
-            JapaneseFont.AddFont(JapaneseFontData);
 
             CurrentSongBackground =
                 new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
