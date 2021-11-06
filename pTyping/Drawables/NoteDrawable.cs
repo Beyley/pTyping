@@ -32,14 +32,13 @@ namespace pTyping.Drawables {
         /// <returns>Whether the note has been fully completed</returns>
         public bool TypeCharacter(string hiragana, string romaji, double timeDifference, PlayerScore score) {
             if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
-                if (timeDifference < PlayerScreen.TIMING_EXCELLENT)
-                    this.Note.HitResult = HitResult.Excellent;
-                else if (timeDifference < PlayerScreen.TIMING_GOOD)
-                    this.Note.HitResult = HitResult.Good;
-                else if (timeDifference < PlayerScreen.TIMING_FAIR)
-                    this.Note.HitResult = HitResult.Fair;
-                else if (timeDifference < PlayerScreen.TIMING_POOR)
-                    this.Note.HitResult = HitResult.Poor;
+                this.Note.HitResult = timeDifference switch {
+                    < PlayerScreen.TIMING_EXCELLENT => HitResult.Excellent,
+                    < PlayerScreen.TIMING_GOOD      => HitResult.Good,
+                    < PlayerScreen.TIMING_FAIR      => HitResult.Fair,
+                    < PlayerScreen.TIMING_POOR      => HitResult.Poor,
+                    _                               => this.Note.HitResult
+                };
             }
 
             //Types the next character
@@ -88,13 +87,12 @@ namespace pTyping.Drawables {
             );
 
             // FIXME: this is a bit of a hack, it should definitely be done differently
-            DrawableManagerArgs tempArgs = args;
-            tempArgs.Scale = new(1f);
+            args.Scale = new(1f);
             // tempArgs.Position   -= this.LabelTextDrawable.Size / 2f + this.Size / 2f;
-            tempArgs.Position.Y += 100f;
-            tempArgs.Position.X += this.LabelTextDrawable.Size.X / 4f;
-            tempArgs.Color = new(this.LabelTextDrawable.ColorOverride.R, this.LabelTextDrawable.ColorOverride.G, this.LabelTextDrawable.ColorOverride.B, args.Color.A);
-            this.LabelTextDrawable.Draw(time, batch, tempArgs);
+            args.Position.Y += 100f;
+            args.Position.X += this.LabelTextDrawable.Size.X / 4f;
+            args.Color = new(this.LabelTextDrawable.ColorOverride.R, this.LabelTextDrawable.ColorOverride.G, this.LabelTextDrawable.ColorOverride.B, args.Color.A);
+            this.LabelTextDrawable.Draw(time, batch, args);
         }
     }
 }
