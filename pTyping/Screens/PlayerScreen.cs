@@ -24,20 +24,20 @@ using pTyping.Songs.Events;
 namespace pTyping.Screens {
     public class PlayerScreen : Screen {
         public int BaseApproachTime = ConVars.BaseApproachTime.Value;
-        
-        public static readonly int SCORE_EXCELLENT = 1500;
-        public static readonly int SCORE_GOOD      = 1000;
-        public static readonly int SCORE_FAIR      = 500;
-        public static readonly int SCORE_POOR      = 0;
 
-        public static readonly int SCORE_PER_CHARACTER = 500;
-        public static readonly int SCORE_COMBO         = 10;
-        public static readonly int SCORE_COMBO_MAX     = 1000;
+        public const int SCORE_EXCELLENT = 1500;
+        public const int SCORE_GOOD      = 1000;
+        public const int SCORE_FAIR      = 500;
+        public const int SCORE_POOR      = 0;
 
-        public static readonly int TIMING_EXCELLENT = 20;
-        public static readonly int TIMING_GOOD      = 50;
-        public static readonly int TIMING_FAIR      = 100;
-        public static readonly int TIMING_POOR      = 200;
+        public const int SCORE_PER_CHARACTER = 500;
+        public const int SCORE_COMBO         = 10;
+        public const int SCORE_COMBO_MAX     = 1000;
+
+        public const int TIMING_EXCELLENT = 20;
+        public const int TIMING_GOOD      = 50;
+        public const int TIMING_FAIR      = 100;
+        public const int TIMING_POOR      = 200;
 
         public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
@@ -205,6 +205,7 @@ namespace pTyping.Screens {
 
             #endregion
 
+            //Called before creating the notes
             this._score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
 
             this.CreateNotes();
@@ -494,24 +495,31 @@ namespace pTyping.Screens {
             foreach (PlayerMod mod in pTypingGame.SelectedMods)
                 mod.OnNoteHit(note);
 
-            int numberHit  = 0;
-            int numberMiss = 0;
-            foreach (NoteDrawable noteDrawable in this._notes)
+            double numberHit = 0;
+            double total     = 0;
+            foreach (NoteDrawable noteDrawable in this._notes) {
                 switch (noteDrawable.Note.HitResult) {
                     case HitResult.Excellent:
-                    case HitResult.Good:
-                    case HitResult.Fair:
-                    case HitResult.Poor:
                         numberHit++;
                         break;
-                    case HitResult.Miss:
-                        numberMiss++;
+                    case HitResult.Good:
+                        numberHit += (double)SCORE_GOOD / SCORE_EXCELLENT;
+                        break;
+                    case HitResult.Fair:
+                        numberHit += (double)SCORE_FAIR / SCORE_EXCELLENT;
+                        break;
+                    case HitResult.Poor:
+                        numberHit += (double)SCORE_FAIR / SCORE_EXCELLENT;
                         break;
                 }
 
-            if (numberHit + numberMiss == 0) this._score.Accuracy = 1d;
+                if (noteDrawable.Note.IsHit)
+                    total++;
+            }
+
+            if (total == 0) this._score.Accuracy = 1d;
             else
-                this._score.Accuracy = numberHit / (numberHit + (double)numberMiss);
+                this._score.Accuracy = numberHit / total;
 
             if (wasHit) {
                 int scoreToAdd = 0;
