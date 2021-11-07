@@ -58,7 +58,13 @@ namespace pTyping.Editor {
             Logger.Log($"EditorTool {this.GetType().Name} has been deinitialized!", LoggerLevelEditorInfo.Instance);
         }
 
+        /// <summary>
+        ///     Register handlers and such here
+        /// </summary>
         public virtual void Initialize()   {}
+        /// <summary>
+        ///     Unregister your handlers and such here
+        /// </summary>
         public virtual void Deinitialize() {}
 
         public virtual void OnMouseClick((MouseButton mouseButton, Point position) args) {}

@@ -1,3 +1,5 @@
+using System.Collections.Specialized;
+using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
@@ -6,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Drawables;
 using pTyping.Screens;
+using WebSocketSharp;
 
 namespace pTyping.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -28,6 +31,49 @@ namespace pTyping.Editor.Tools {
                 note.OnDrag      += this.OnNoteDrag;
                 note.OnDragEnd   += this.OnNoteDragEnd;
             }
+
+            this.EditorInstance.State.SelectedNotes.CollectionChanged += this.OnSelectedNotesChanged;
+
+            this.NoteText.OnChange   += this.UpdateNote;
+            this.NoteColour.OnChange += this.UpdateNote;
+        }
+
+        private void UpdateNote(object? sender, string e) {
+            if (this.EditorInstance.State.SelectedNotes.Count is 0 or > 1) {
+                this.NoteText.Value   = "";
+                this.NoteColour.Value = "";
+                return;
+            }
+
+            NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
+
+            note.Note.Text              = this.NoteText.Value;
+            note.LabelTextDrawable.Text = $"{note.Note.Text}";
+
+            try {
+                if (this.NoteColour.Value.Trim().IsNullOrEmpty()) return;
+
+                // Logger.Log($"{ColorConverter.FromHexString(this.NoteColour.Value)} : {this.NoteColour.Value}");
+
+                note.Note.Color = ColorConverter.FromHexString(this.NoteColour.Value);
+
+                note.ColorOverride = note.Note.Color;
+            }
+            catch {/* IGNORED */
+            }
+        }
+
+        private void OnSelectedNotesChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (this.EditorInstance.State.SelectedNotes.Count is 0 or > 1) {
+                this.NoteText.Value   = "";
+                this.NoteColour.Value = "";
+                return;
+            }
+
+            NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
+
+            this.NoteText.Value   = note.Note.Text;
+            this.NoteColour.Value = note.Note.Color.ToHexString();
         }
 
         public override void Deinitialize() {
@@ -37,6 +83,11 @@ namespace pTyping.Editor.Tools {
                 note.OnDrag      -= this.OnNoteDrag;
                 note.OnDragEnd   -= this.OnNoteDragEnd;
             }
+
+            this.EditorInstance.State.SelectedNotes.CollectionChanged -= this.OnSelectedNotesChanged;
+
+            this.NoteText.OnChange   -= this.UpdateNote;
+            this.NoteColour.OnChange -= this.UpdateNote;
         }
 
         private void OnNoteDragBegin(object sender, Point e) {
