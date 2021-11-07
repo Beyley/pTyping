@@ -341,11 +341,15 @@ namespace pTyping.Screens {
 
             float y = 10;
             foreach (FieldInfo field in result) {
+                string name    = field.GetCustomAttribute<ToolOptionAttribute>()!.Name;
+                string tooltip = field.GetCustomAttribute<ToolOptionAttribute>()!.ToolTip;
+                
                 //The drawable that you interact with
                 ManagedDrawable drawable;
                 //The label showing what it is
-                TextDrawable labelDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, field.Name, 30) {
-                    OriginType = OriginType.TopRight
+                TextDrawable labelDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, name, 30) {
+                    OriginType = OriginType.TopRight,
+                    ToolTip    = tooltip
                 };
                 y += labelDrawable.Size.Y + 5f;
 

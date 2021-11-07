@@ -13,7 +13,15 @@ using pTyping.Screens;
 
 namespace pTyping.Editor {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class ToolOptionAttribute : Attribute {}
+    public class ToolOptionAttribute : Attribute {
+        public string Name;
+        public string ToolTip;
+
+        public ToolOptionAttribute(string name, string tooltip = "") {
+            this.Name    = name;
+            this.ToolTip = tooltip;
+        }
+    }
     
     public abstract class EditorTool : IComparable<EditorTool> {
 
