@@ -1,18 +1,25 @@
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Drawables;
 using pTyping.Screens;
 
 namespace pTyping.Editor.Tools {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class SelectTool : EditorTool {
-        private double _lastDragTime = 0;
-        private bool   _isDragging   = false;
-
         public override string Name    => "Select";
         public override string Tooltip => "Select, move, and change notes in the timeline.";
+
+        [ToolOption]
+        public Bindable<string> NoteText = new(string.Empty);
+        [ToolOption]
+        public Bindable<string> NoteColor = new(string.Empty);
+        
+        private double _lastDragTime = 0;
+        private bool   _isDragging   = false;
 
         public override void Initialize() {
             foreach (NoteDrawable note in this.EditorInstance.State.Notes) {

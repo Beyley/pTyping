@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -34,7 +35,9 @@ namespace pTyping.Screens {
 
         public readonly EditorState State = new();
 
-        public List<ManagedDrawable> _selectionRects = new();
+        private readonly List<ManagedDrawable> _selectionRects = new();
+
+        private readonly List<ManagedDrawable> _toolOptions = new();
 
         public override void Initialize() {
             base.Initialize();
@@ -210,9 +213,11 @@ namespace pTyping.Screens {
                 UiTickboxDrawable tickboxDrawable = new(new(10, y), tool.Name, 35, false, true) {
                     ToolTip = tool.Tooltip
                 };
-
+                
                 tickboxDrawable.OnClick += delegate {
-                    this.ChangeTool(tool);
+                    MethodInfo method = this.GetType().GetMethod("ChangeTool").MakeGenericMethod(tool.GetType());
+
+                    method.Invoke(this, new object[] {});
                 };
 
                 tool.TickBoxDrawable = tickboxDrawable;
@@ -314,9 +319,11 @@ namespace pTyping.Screens {
                 this.State.Song.Notes.Add(note);
         }
 
-        public void ChangeTool <T>() => this.ChangeTool(this.EditorTools.First(x => x is T));
+        public void ChangeTool <T>() {
+            EditorTool newTool = this.EditorTools.First(x => x is T);
 
-        public void ChangeTool(EditorTool newTool) {
+            T toolAsT = (T)Convert.ChangeType(newTool, typeof(T));
+            
             if (newTool == this.CurrentTool) return;
 
             foreach (EditorTool tool in this.EditorTools)
@@ -327,6 +334,58 @@ namespace pTyping.Screens {
             this.CurrentTool = newTool;
 
             newTool?.SelectTool(this, ref this.Manager);
+
+            this._toolOptions.ForEach(x => this.Manager.Remove(x));
+            this._toolOptions.Clear();
+
+            //Gets all fields with the ToolOptionAttribute
+            List<FieldInfo> result = typeof(T).GetFields().Where(p => p.GetCustomAttributes(typeof(ToolOptionAttribute), true).Any()).ToList();
+
+            float y = 10;
+            foreach (FieldInfo field in result) {
+                ManagedDrawable drawable;
+                TextDrawable labelDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, field.Name, 30) {
+                    OriginType = OriginType.TopRight
+                };
+                y += labelDrawable.Size.Y + 5f;
+
+                switch (field.FieldType.ToString()) {
+                    case "Furball.Engine.Engine.Helpers.Bindable`1[System.String]": {
+                        Bindable<string> value = (Bindable<string>)field.GetValue(toolAsT);
+
+                        UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value, 30, 300) {
+                            OriginType = OriginType.TopRight
+                        };
+
+                        void OnUpdate(object sender, char c) {
+                            value.Value = textBox.Text;
+                        }
+
+                        textBox.OnLetterTyped   += OnUpdate;
+                        textBox.OnLetterRemoved += OnUpdate;
+
+                        value.OnChange += delegate(object _, string s) {
+                            textBox.Text = s;
+                        };
+
+                        y += textBox.Size.Y + 10f;
+
+                        drawable = textBox;
+
+                        break;
+                    }
+                    default: {
+                        drawable = new BlankDrawable();
+
+                        break;
+                    }
+                }
+
+                this._toolOptions.Add(labelDrawable);
+                this._toolOptions.Add(drawable);
+                this.Manager.Add(labelDrawable);
+                this.Manager.Add(drawable);
+            }
         }
 
         private void OnMouseMove(object sender, (Point mousePos, string cursorName) e) {
@@ -434,6 +493,7 @@ namespace pTyping.Screens {
                 case Keys.Delete: {
                     // Delete the selected notes
                     this.DeleteSelectedNotes();
+                    this.State.SelectedNotes.Clear();
                     break;
                 }
                 case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {

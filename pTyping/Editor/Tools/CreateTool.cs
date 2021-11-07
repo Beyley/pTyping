@@ -8,6 +8,7 @@ using pTyping.Screens;
 using pTyping.Songs;
 
 namespace pTyping.Editor.Tools {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class CreateTool : EditorTool {
         public override string Name    => "Create Note";
         public override string Tooltip => "Create notes on the timeline.";

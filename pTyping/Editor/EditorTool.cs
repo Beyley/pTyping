@@ -12,6 +12,9 @@ using pTyping.LoggingLevels;
 using pTyping.Screens;
 
 namespace pTyping.Editor {
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class ToolOptionAttribute : Attribute {}
+    
     public abstract class EditorTool : IComparable<EditorTool> {
 
         public          UiTickboxDrawable TickBoxDrawable;
