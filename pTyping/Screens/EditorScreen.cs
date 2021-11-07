@@ -215,9 +215,7 @@ namespace pTyping.Screens {
                 };
                 
                 tickboxDrawable.OnClick += delegate {
-                    MethodInfo method = this.GetType().GetMethod("ChangeTool").MakeGenericMethod(tool.GetType());
-
-                    method.Invoke(this, new object[] {});
+                    this.ChangeTool(tool.GetType());
                 };
 
                 tool.TickBoxDrawable = tickboxDrawable;
@@ -231,7 +229,7 @@ namespace pTyping.Screens {
 
             #endregion
 
-            this.ChangeTool<SelectTool>();
+            this.ChangeTool(typeof(SelectTool));
             
             FurballGame.InputManager.OnKeyDown     += this.OnKeyPress;
             FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
@@ -319,10 +317,10 @@ namespace pTyping.Screens {
                 this.State.Song.Notes.Add(note);
         }
 
-        public void ChangeTool <T>() {
-            EditorTool newTool = this.EditorTools.First(x => x is T);
+        public void ChangeTool(Type type) {
+            EditorTool newTool = this.EditorTools.First(x => x.GetType() == type);
 
-            T toolAsT = (T)Convert.ChangeType(newTool, typeof(T));
+            object toolAsRealType = Convert.ChangeType(newTool, type);
             
             if (newTool == this.CurrentTool) return;
 
@@ -339,24 +337,31 @@ namespace pTyping.Screens {
             this._toolOptions.Clear();
 
             //Gets all fields with the ToolOptionAttribute
-            List<FieldInfo> result = typeof(T).GetFields().Where(p => p.GetCustomAttributes(typeof(ToolOptionAttribute), true).Any()).ToList();
+            List<FieldInfo> result = ObjectHelper.GetAllFieldsWithAttribute(type, typeof(ToolOptionAttribute));
 
             float y = 10;
             foreach (FieldInfo field in result) {
+                //The drawable that you interact with
                 ManagedDrawable drawable;
+                //The label showing what it is
                 TextDrawable labelDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, field.Name, 30) {
                     OriginType = OriginType.TopRight
                 };
                 y += labelDrawable.Size.Y + 5f;
 
+                //Checks the type that the attribute is attatched to
                 switch (field.FieldType.ToString()) {
+                    //Is it a Bindable<string>
                     case "Furball.Engine.Engine.Helpers.Bindable`1[System.String]": {
-                        Bindable<string> value = (Bindable<string>)field.GetValue(toolAsT);
+                        //Get the value of the type
+                        Bindable<string> value = (Bindable<string>)field.GetValue(toolAsRealType);
 
+                        //The text box you type in
                         UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value, 30, 300) {
                             OriginType = OriginType.TopRight
                         };
 
+                        //When the textbox is updated, update value
                         void OnUpdate(object sender, char c) {
                             value.Value = textBox.Text;
                         }
@@ -364,8 +369,45 @@ namespace pTyping.Screens {
                         textBox.OnLetterTyped   += OnUpdate;
                         textBox.OnLetterRemoved += OnUpdate;
 
+                        //When the value changes, update the text box
                         value.OnChange += delegate(object _, string s) {
                             textBox.Text = s;
+                        };
+                        
+                        y += textBox.Size.Y + 10f;
+                        
+                        drawable = textBox;
+
+                        break;
+                    }
+                    //Is it a Bindable<int>
+                    case "Furball.Engine.Engine.Helpers.Bindable`1[System.Int32]": {
+                        //Get the value of the type
+                        Bindable<int> value = (Bindable<int>)field.GetValue(toolAsRealType);
+
+                        //The text box you type in
+                        UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value.ToString(), 30, 300) {
+                            OriginType = OriginType.TopRight
+                        };
+
+                        //When the textbox is updated, update value
+                        void OnUpdate(object sender, char c) {
+                            if (int.TryParse(textBox.Text, out int result)) {
+                                value.Value           = result;
+                                textBox.ColorOverride = Color.White;
+                            } else {
+                                textBox.ColorOverride = Color.Red;
+                            }
+                        }
+
+                        textBox.OnLetterTyped   += OnUpdate;
+                        textBox.OnLetterRemoved += OnUpdate;
+
+                        //When the value changes, update the text box
+                        value.OnChange += delegate(object _, int s) {
+                            textBox.Text = s.ToString();
+
+                            textBox.ColorOverride = Color.White;
                         };
 
                         y += textBox.Size.Y + 10f;
@@ -503,11 +545,11 @@ namespace pTyping.Screens {
                     break;
                 }
                 case Keys.D1: {
-                    this.ChangeTool<SelectTool>();
+                    this.ChangeTool(typeof(SelectTool));
                     break;
                 }
                 case Keys.D2: {
-                    this.ChangeTool<CreateTool>();
+                    this.ChangeTool(typeof(CreateTool));
                     break;
                 }
             }
