@@ -592,6 +592,10 @@ namespace pTyping.Screens {
                     this.ChangeTool(typeof(CreateTool));
                     break;
                 }
+                case Keys.D3: {
+                    this.ChangeTool(typeof(BulkCreateTool));
+                    break;
+                }
             }
         }
 

@@ -12,6 +12,5 @@ namespace pTyping.Editor {
         public double MouseTime;
 
         public Song Song;
-
     }
 }
