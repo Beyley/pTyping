@@ -16,9 +16,9 @@ namespace pTyping.Editor.Tools {
         public override string Name    => "Select";
         public override string Tooltip => "Select, move, and change notes in the timeline.";
 
-        [ToolOption("Note Text", "The note's text you are going to type ingame")]
+        [ToolOption("Note Text", "The note's text you are going to type ingame.")]
         public Bindable<string> NoteText = new(string.Empty);
-        [ToolOption("Note Colour", "The colour tint of the note")]
+        [ToolOption("Note Colour", "The colour tint of the note.")]
         public Bindable<string> NoteColour = new(string.Empty);
         
         private double _lastDragTime = 0;
