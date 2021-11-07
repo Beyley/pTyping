@@ -26,9 +26,9 @@ namespace pTyping.Screens {
     public class EditorScreen : Screen {
         private TextDrawable _currentTimeDrawable;
 
-        private Texture2D                  _noteTexture;
-        private UiProgressBarDrawable      _progressBar;
-        private TexturedDrawable           _recepticle;
+        public  Texture2D             NoteTexture;
+        private UiProgressBarDrawable _progressBar;
+        private TexturedDrawable      _recepticle;
 
         public EditorTool       CurrentTool;
         public List<EditorTool> EditorTools;
@@ -50,10 +50,10 @@ namespace pTyping.Screens {
 
             #region Gameplay preview
 
-            this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+            this.NoteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
 
             Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-            this._recepticle = new TexturedDrawable(this._noteTexture, recepticlePos) {
+            this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
                 Scale      = new(0.55f),
                 OriginType = OriginType.Center
             };
@@ -284,7 +284,7 @@ namespace pTyping.Screens {
         public void CreateNote(Note note, bool isNew = false) {
             NoteDrawable noteDrawable = new(
             new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
-            this._noteTexture,
+            this.NoteTexture,
             pTypingGame.JapaneseFont,
             50
             ) {
@@ -599,8 +599,12 @@ namespace pTyping.Screens {
             }
         }
 
+        private double _lastTime = 0;
         public override void Update(GameTime gameTime) {
             this.State.CurrentTime = pTypingGame.MusicTrack.GetCurrentTime();
+
+            if (!this.State.CurrentTime.Equals(this._lastTime))
+                this.CurrentTool?.OnTimeChange(this.State.CurrentTime);
 
             for (int i = 0; i < this.State.Notes.Count; i++) {
                 NoteDrawable noteDrawable = this.State.Notes[i];
@@ -616,8 +620,10 @@ namespace pTyping.Screens {
             int minutes      = (int)Math.Floor(this.State.CurrentTime         / 1000d / 60d);
 
             this._currentTimeDrawable.Text = $"Time: {minutes:00}:{seconds:00}:{milliseconds:000}";
-            this._progressBar.Progress     = (float)pTypingGame.MusicTrack.CurrentTime * 1000f / (float)pTypingGame.MusicTrack.Length;
+            this._progressBar.Progress     = (float)this.State.CurrentTime / (float)pTypingGame.MusicTrack.Length;
 
+            this._lastTime = this.State.CurrentTime;
+            
             base.Update(gameTime);
         }
     }

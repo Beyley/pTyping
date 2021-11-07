@@ -75,6 +75,8 @@ namespace pTyping.Editor {
 
         public virtual void OnKeyPress(Keys key) {}
 
+        public virtual void OnTimeChange(double time) {}
+
         public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
     }
 }
