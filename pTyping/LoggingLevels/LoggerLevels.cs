@@ -39,4 +39,12 @@ namespace pTyping.LoggingLevels {
 
         public static LoggerLevelModInfo Instance = new();
     }
+
+    public class LoggerLevelEditorInfo : LoggerLevel {
+        private LoggerLevelEditorInfo() {}
+
+        public override string Name => "EditorInfo";
+
+        public static LoggerLevelEditorInfo Instance = new();
+    }
 }
