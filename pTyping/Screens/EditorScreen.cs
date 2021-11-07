@@ -420,6 +420,42 @@ namespace pTyping.Screens {
 
                         break;
                     }
+                    //Is it a Bindable<double>
+                    case "Furball.Engine.Engine.Helpers.Bindable`1[System.Double]": {
+                        //Get the value of the type
+                        Bindable<double> value = (Bindable<double>)field.GetValue(toolAsRealType);
+
+                        //The text box you type in
+                        UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value.ToString(), 30, 300) {
+                            OriginType = OriginType.TopRight
+                        };
+
+                        //When the textbox is updated, update value
+                        void OnUpdate(object sender, char c) {
+                            if (double.TryParse(textBox.Text, out double result)) {
+                                value.Value           = result;
+                                textBox.ColorOverride = Color.White;
+                            } else {
+                                textBox.ColorOverride = Color.Red;
+                            }
+                        }
+
+                        textBox.OnLetterTyped   += OnUpdate;
+                        textBox.OnLetterRemoved += OnUpdate;
+
+                        //When the value changes, update the text box
+                        value.OnChange += delegate(object _, double s) {
+                            textBox.Text = s.ToString();
+
+                            textBox.ColorOverride = Color.White;
+                        };
+
+                        y += textBox.Size.Y + 10f;
+
+                        drawable = textBox;
+
+                        break;
+                    }
                     default: {
                         drawable = new BlankDrawable();
 
