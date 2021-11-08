@@ -418,8 +418,11 @@ namespace pTyping.Screens {
         }
 
         private void OnKeyPress(object sender, Keys key) {
-            if (key == Keys.Escape)
+            if (key == Keys.Escape) {
+                if (this._endScheduled) return;
+                
                 pTypingGame.PauseResumeMusic();
+            }
         }
 
         private void OnCharacterTyped(object sender, TextInputEventArgs args) {
@@ -721,7 +724,7 @@ namespace pTyping.Screens {
 
         public void EndScore() {
             if (!this._endScheduled) {
-                pTypingGame.MusicTrackScheduler.ScheduleMethod(
+                FurballGame.GameTimeScheduler.ScheduleMethod(
                 delegate {
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnMapEnd(pTypingGame.MusicTrack, this._notes, this);
@@ -733,7 +736,7 @@ namespace pTyping.Screens {
 
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._score));
                 },
-                pTypingGame.MusicTrack.GetCurrentTime() + 1500
+                FurballGame.Time + 1500
                 );
 
                 this._endScheduled = true;
