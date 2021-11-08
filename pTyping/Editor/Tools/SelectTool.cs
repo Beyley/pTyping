@@ -47,7 +47,7 @@ namespace pTyping.Editor.Tools {
 
             NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
 
-            note.Note.Text              = this.NoteText.Value;
+            note.Note.Text              = this.NoteText.Value.Trim();
             note.LabelTextDrawable.Text = $"{note.Note.Text}";
 
             try {
@@ -111,10 +111,12 @@ namespace pTyping.Editor.Tools {
 
             double difference = this.EditorInstance.State.MouseTime - this._lastDragTime;
 
-            foreach (NoteDrawable noteDrawable in this.EditorInstance.State.SelectedNotes) {
+            if (this.EditorInstance.State.SelectedNotes.Count == 1) {
+                NoteDrawable noteDrawable = this.EditorInstance.State.SelectedNotes[0];
+
                 noteDrawable.Tweens.Clear();
 
-                noteDrawable.Note.Time += difference;
+                noteDrawable.Note.Time = this.EditorInstance.State.MouseTime;
 
                 noteDrawable.Tweens.Add(
                 new VectorTween(
@@ -127,6 +129,24 @@ namespace pTyping.Editor.Tools {
                     KeepAlive = true
                 }
                 );
+            } else {
+                foreach (NoteDrawable noteDrawable in this.EditorInstance.State.SelectedNotes) {
+                    noteDrawable.Tweens.Clear();
+
+                    noteDrawable.Note.Time += difference;
+
+                    noteDrawable.Tweens.Add(
+                    new VectorTween(
+                    TweenType.Movement,
+                    new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
+                    PlayerScreen.RECEPTICLE_POS,
+                    (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
+                    (int)noteDrawable.Note.Time
+                    ) {
+                        KeepAlive = true
+                    }
+                    );
+                }
             }
 
             this.EditorInstance.UpdateSelectionRects(null, null);
