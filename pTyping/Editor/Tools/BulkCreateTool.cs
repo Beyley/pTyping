@@ -101,7 +101,13 @@ namespace pTyping.Editor.Tools {
 
             double spacing = this.EditorInstance.State.Song.CurrentTimingPoint(time).Tempo / this.Spacing.Value;
 
-            Color color = ColorConverter.FromHexString(this.Color.Value);
+            Color color = Microsoft.Xna.Framework.Color.Red;
+
+            try {
+                color = ColorConverter.FromHexString(this.Color.Value);
+            }
+            catch {/* */
+            }
 
             List<Note> notes = new();
             
@@ -130,7 +136,7 @@ namespace pTyping.Editor.Tools {
             if (!EditorScreen.InPlayfield(args.position)) return;
 
             List<Note> notes = this.GenerateNotes();
-            notes.ForEach(x => this.EditorInstance.CreateNote(x));
+            notes.ForEach(x => this.EditorInstance.CreateNote(x, true));
         }
     }
 }

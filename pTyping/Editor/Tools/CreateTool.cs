@@ -59,7 +59,7 @@ namespace pTyping.Editor.Tools {
 
             Note noteToAdd = new() {
                 Time  = this.EditorInstance.State.MouseTime,
-                Text  = this.DefaultNoteText,
+                Text  = this.DefaultNoteText.Value.Trim(),
                 Color = ColorConverter.FromHexString(this.DefaultNoteColor)
             };
 
