@@ -39,12 +39,17 @@ namespace pTyping.Screens {
         public const int TIMING_FAIR      = 100;
         public const int TIMING_POOR      = 200;
 
-        public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public readonly Color COLOR_EXCELLENT = new(255, 255, 0);
+        public readonly Color COLOR_GOOD      = new(0, 255, 0);
+        public readonly Color COLOR_FAIR      = new(0, 128, 255);
+        public readonly Color COLOR_POOR      = new(128, 128, 128);
 
-        public static readonly Vector2      NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-        public static readonly Vector2      NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT                                   / 2f);
-        private                TextDrawable _accuracyDrawable;
-        private                TextDrawable _comboDrawable;
+        public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+
+        private TextDrawable _accuracyDrawable;
+        private TextDrawable _comboDrawable;
 
         private bool _endScheduled = false;
 
@@ -512,7 +517,7 @@ namespace pTyping.Screens {
                         numberHit += (double)SCORE_FAIR / SCORE_EXCELLENT;
                         break;
                     case HitResult.Poor:
-                        numberHit += (double)SCORE_FAIR / SCORE_EXCELLENT;
+                        numberHit += (double)SCORE_POOR / SCORE_EXCELLENT;
                         break;
                 }
 
@@ -525,54 +530,48 @@ namespace pTyping.Screens {
                 this._score.Accuracy = numberHit / total;
 
             if (wasHit) {
-                int scoreToAdd = 0;
-                switch (note.HitResult) {
-                    case HitResult.Excellent:
-                        scoreToAdd = SCORE_EXCELLENT;
-                        break;
-                    case HitResult.Fair:
-                        scoreToAdd = SCORE_FAIR;
-                        break;
-                    case HitResult.Good:
-                        scoreToAdd = SCORE_GOOD;
-                        break;
-                    case HitResult.Poor:
-                        scoreToAdd = SCORE_POOR;
-                        break;
-                }
-                this._score.AddScore(scoreToAdd + Math.Min(this._score.Combo - 1 * SCORE_COMBO, SCORE_COMBO_MAX));
+                int scoreToAdd = note.HitResult switch {
+                    HitResult.Excellent => SCORE_EXCELLENT,
+                    HitResult.Fair      => SCORE_FAIR,
+                    HitResult.Good      => SCORE_GOOD,
+                    HitResult.Poor      => SCORE_POOR,
+                    _                   => 0
+                };
+
+                int scoreCombo = Math.Min(SCORE_COMBO * this._score.Combo, SCORE_COMBO_MAX);
+                this._score.AddScore(scoreToAdd + scoreCombo);
                 this._score.Combo++;
+
+                if (this._score.Combo > this._score.MaxCombo)
+                    this._score.MaxCombo = this._score.Combo;
             } else {
                 if (this._score.Combo > this._score.MaxCombo)
                     this._score.MaxCombo = this._score.Combo;
+                
                 this._score.Combo = 0;
             }
 
-            Color hitColor = Color.Red;
+            Color hitColor;
             switch (note.HitResult) {
                 case HitResult.Excellent: {
                     this._score.ExcellentHits++;
-                    hitColor = Color.Blue;
+                    hitColor = this.COLOR_EXCELLENT;
                     break;
                 }
                 case HitResult.Good: {
                     this._score.GoodHits++;
-                    hitColor = Color.Green;
+                    hitColor = this.COLOR_GOOD;
                     break;
                 }
                 case HitResult.Fair: {
                     this._score.FairHits++;
-                    hitColor = Color.Yellow;
+                    hitColor = this.COLOR_FAIR;
                     break;
                 }
+                default:
                 case HitResult.Poor: {
                     this._score.PoorHits++;
-                    hitColor = Color.Orange;
-                    break;
-                }
-                case HitResult.Miss: {
-                    this._score.MissHits++;
-                    hitColor = Color.Red;
+                    hitColor = this.COLOR_POOR;
                     break;
                 }
             }
@@ -697,9 +696,9 @@ namespace pTyping.Screens {
 
             base.Update(gameTime);
 
-            if (this._score.Mods.Count != 0)
-                foreach (PlayerMod mod in this._score.Mods)
-                    mod.Update(gameTime);
+
+            foreach (PlayerMod mod in this._score.Mods)
+                mod.Update(gameTime);
 
             #region Replays
 

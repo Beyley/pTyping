@@ -70,7 +70,7 @@ namespace pTyping.Drawables {
         public void Miss() {
             this.Visible        = false;
             this.Note.Typed     = this.Note.Text;
-            this.Note.HitResult = HitResult.Miss;
+            this.Note.HitResult = HitResult.Poor;
         }
 
         public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {

@@ -21,6 +21,9 @@ namespace pTyping.Player {
         public int FairHits = 0;
         [JsonProperty]
         public int GoodHits = 0;
+        [JsonProperty]
+        public int PoorHits = 0;
+        
         public List<PlayerMod> Mods = new();
 
         [JsonProperty]
@@ -32,10 +35,6 @@ namespace pTyping.Player {
         public string MapHash;
         [JsonProperty]
         public int MaxCombo = 0;
-        [JsonProperty]
-        public int MissHits = 0;
-        [JsonProperty]
-        public int PoorHits = 0;
         [JsonProperty]
         public long Score {
             get;
@@ -103,8 +102,8 @@ namespace pTyping.Player {
             score.FairHits      = reader.ReadInt16();
             score.GoodHits      = reader.ReadInt16();
             score.ExcellentHits = reader.ReadInt16();
-            reader.ReadInt16();//katu
-            score.MissHits = reader.ReadInt16();
+            reader.ReadInt16();// ignore katu
+            reader.ReadInt16();// ignore miss
             score.Accuracy = reader.ReadDouble();
 
             return score;
@@ -121,12 +120,12 @@ namespace pTyping.Player {
             writer.Write(this.Score);
             writer.Write((short)this.Combo);
             writer.Write((short)this.MaxCombo);
-            writer.Write((short)this.PoorHits);     //50
-            writer.Write((short)this.FairHits);     //100
-            writer.Write((short)this.GoodHits);     //300
-            writer.Write((short)this.ExcellentHits);//geki
-            writer.Write((short)0);                 //katu
-            writer.Write((short)this.MissHits);
+            writer.Write((short)this.PoorHits);     // 50
+            writer.Write((short)this.FairHits);     // 100
+            writer.Write((short)this.GoodHits);     // 300
+            writer.Write((short)this.ExcellentHits);// geki
+            writer.Write((short)0);                 // katu
+            writer.Write((short)0);                 // miss
             writer.Write(this.Accuracy);
 
             writer.Flush();

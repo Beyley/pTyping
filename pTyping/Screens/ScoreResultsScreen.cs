@@ -54,10 +54,10 @@ namespace pTyping.Screens {
             y += 20 + good.Size.Y;
             TextDrawable fair = new(new(100, y), FurballGame.DEFAULT_FONT, $"Fair: {this.Score.FairHits}x", 35);
             y += 20 + fair.Size.Y;
-            TextDrawable poor = new(new(100, y), FurballGame.DEFAULT_FONT, $"Poor: {this.Score.PoorHits}x", 35);
+            TextDrawable poor = new(new(100, y), FurballGame.DEFAULT_FONT, $"Poor/Miss: {this.Score.PoorHits}x", 35);
             y += 20 + poor.Size.Y;
-            TextDrawable miss = new(new(100, y), FurballGame.DEFAULT_FONT, $"Miss: {this.Score.MissHits}x", 35);
-            y += 20 + miss.Size.Y;
+            // TextDrawable miss = new(new(100, y), FurballGame.DEFAULT_FONT, $"Miss: {this.Score.MissHits}x", 35);
+            // y += 20 + miss.Size.Y;
             TextDrawable mods = new(new(100, y), FurballGame.DEFAULT_FONT, $"Mods: {PlayerMod.GetModString(this.Score.Mods)}", 35);
 
             this.Manager.Add(score);
@@ -67,7 +67,7 @@ namespace pTyping.Screens {
             this.Manager.Add(good);
             this.Manager.Add(fair);
             this.Manager.Add(poor);
-            this.Manager.Add(miss);
+            // this.Manager.Add(miss);
             this.Manager.Add(mods);
 
             #endregion

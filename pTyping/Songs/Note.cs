@@ -9,7 +9,6 @@ namespace pTyping.Songs {
         Good,
         Fair,
         Poor,
-        Miss,
         NotHit
     }
 
