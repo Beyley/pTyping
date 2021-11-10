@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using pTyping.Player;
+using pTyping.Scores;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {

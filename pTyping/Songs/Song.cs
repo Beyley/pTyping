@@ -7,7 +7,7 @@ using Furball.Engine.Engine.Helpers;
 using Kettu;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using pTyping.LoggingLevels;
+using pTyping.Engine;
 using pTyping.Songs.Events;
 
 namespace pTyping.Songs {

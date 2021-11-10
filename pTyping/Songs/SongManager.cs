@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Kettu;
-using pTyping.LoggingLevels;
+using pTyping.Engine;
 
 namespace pTyping.Songs {
     public static class SongManager {

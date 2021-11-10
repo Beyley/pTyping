@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using pTyping.Screens.Player;
 
 namespace pTyping.Songs {
     public enum HitResult {

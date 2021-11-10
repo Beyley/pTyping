@@ -16,12 +16,15 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using pTyping.Drawables;
 using pTyping.Online;
-using pTyping.Player;
-using pTyping.Player.Mods;
-using pTyping.Screens;
+using pTyping.Online.Taiko_rs;
+using pTyping.Scores;
+using pTyping.Screens.Menus;
+using pTyping.Screens.Online;
+using pTyping.Screens.Player;
+using pTyping.Screens.Player.Mods;
 using pTyping.Songs;
+using ConVars=pTyping.Engine.ConVars;
 
 namespace pTyping {
     public class pTypingGame : FurballGame {
