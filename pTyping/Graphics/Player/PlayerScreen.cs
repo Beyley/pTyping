@@ -36,8 +36,8 @@ namespace pTyping.Graphics.Player {
 
         public PlayerScreen() {}
 
-        private readonly bool        _playingReplay = false;
-        private          PlayerScore _playingScoreReplay;
+        private          bool        _playingReplay = false;
+        private readonly PlayerScore _playingScoreReplay;
         
         /// <summary>
         ///     Used to play a replay
@@ -60,6 +60,8 @@ namespace pTyping.Graphics.Player {
                 Position   = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
                 OriginType = OriginType.LeftCenter
             };
+
+            this._player.RecordReplay = !this._playingReplay;
 
             this._player.OnAllNotesComplete += this.EndScore;
 
@@ -281,6 +283,21 @@ namespace pTyping.Graphics.Player {
                 this._skipButton.Visible = false;
 
             #endregion
+
+            if (this._playingReplay && Array.TrueForAll(this._playingScoreReplay.ReplayFrames, x => x.Used))
+                this._playingReplay = false;
+
+            if (this._playingReplay)
+                for (int i = 0; i < this._playingScoreReplay.ReplayFrames.Length; i++) {
+                    ref ReplayFrame currentFrame = ref this._playingScoreReplay.ReplayFrames[i];
+
+                    if (currentTime > currentFrame.Time && !currentFrame.Used) {
+                        this._player.TypeCharacter(this, new TextInputEventArgs(currentFrame.Character));
+
+                        currentFrame.Used = true;
+                        break;
+                    }
+                }
 
             base.Update(gameTime);
         }

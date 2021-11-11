@@ -69,8 +69,10 @@ namespace pTyping.Graphics.Player {
 
         public SoundEffect HitSoundNormal = new();
 
-        private          bool              _playingReplay;
-        private readonly PlayerScore       _playingScoreReplay = new();
+        public bool RecordReplay = true;
+
+        // private          bool              _playingReplay;
+        // private readonly PlayerScore       _playingScoreReplay = new();
         public readonly  List<ReplayFrame> ReplayFrames        = new();
 
         public event EventHandler<Color> OnComboUpdate;
@@ -258,7 +260,7 @@ namespace pTyping.Graphics.Player {
             if (char.IsControl(args.Character))
                 return;
 
-            if (!this._playingReplay)
+            if (this.RecordReplay)
                 this.ReplayFrames.Add(
                 new() {
                     Character = args.Character,
@@ -478,24 +480,6 @@ namespace pTyping.Graphics.Player {
 
             base.Update(time);
 
-            #region Replays
-
-            if (this._playingReplay && Array.TrueForAll(this._playingScoreReplay.ReplayFrames, x => x.Used))
-                this._playingReplay = false;
-
-            if (this._playingReplay)
-                for (int i = 0; i < this._playingScoreReplay.ReplayFrames.Length; i++) {
-                    ref ReplayFrame currentFrame = ref this._playingScoreReplay.ReplayFrames[i];
-
-                    if (currentTime > currentFrame.Time && !currentFrame.Used) {
-                        this.TypeCharacter(this, new TextInputEventArgs(currentFrame.Character));
-
-                        currentFrame.Used = true;
-                        break;
-                    }
-                }
-
-            #endregion
         }
 
         public void CallMapEnd() {
@@ -509,8 +493,6 @@ namespace pTyping.Graphics.Player {
 
         public void Play() {
             pTypingGame.PlayMusic();
-
-            // pTypingGame.MusicTrack.SeekTo(0);
         }
     }
 }
