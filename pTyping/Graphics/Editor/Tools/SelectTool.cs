@@ -7,10 +7,10 @@ using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
-using pTyping.Screens.Player;
+using pTyping.Graphics.Player;
 using WebSocketSharp;
 
-namespace pTyping.Screens.Editor.Tools {
+namespace pTyping.Graphics.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class SelectTool : EditorTool {
         public override string Name    => "Select";
@@ -121,8 +121,8 @@ namespace pTyping.Screens.Editor.Tools {
                 noteDrawable.Tweens.Add(
                 new VectorTween(
                 TweenType.Movement,
-                new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
-                PlayerScreen.RECEPTICLE_POS,
+                new Vector2(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
+                EditorScreen.RECEPTICLE_POS,
                 (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
                 (int)noteDrawable.Note.Time
                 ) {
@@ -138,8 +138,8 @@ namespace pTyping.Screens.Editor.Tools {
                     noteDrawable.Tweens.Add(
                     new VectorTween(
                     TweenType.Movement,
-                    new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
-                    PlayerScreen.RECEPTICLE_POS,
+                    new Vector2(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
+                    EditorScreen.RECEPTICLE_POS,
                     (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
                     (int)noteDrawable.Note.Time
                     ) {

@@ -15,13 +15,13 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using pTyping.Drawables;
+using pTyping.Graphics.Drawables;
+using pTyping.Graphics.Editor;
+using pTyping.Graphics.Player;
 using pTyping.Scores;
-using pTyping.Screens.Editor;
-using pTyping.Screens.Player;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Menus.SongSelect {
+namespace pTyping.Graphics.Menus.SongSelect {
     public class SongSelectionScreen : Screen {
 
         public static    Bindable<LeaderboardType> LeaderboardType = new(SongSelect.LeaderboardType.Local);

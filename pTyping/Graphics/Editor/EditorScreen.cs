@@ -16,14 +16,14 @@ using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using pTyping.Drawables;
 using pTyping.Engine;
-using pTyping.Screens.Editor.Tools;
-using pTyping.Screens.Menus.SongSelect;
-using pTyping.Screens.Player;
+using pTyping.Graphics.Drawables;
+using pTyping.Graphics.Editor.Tools;
+using pTyping.Graphics.Menus.SongSelect;
+using pTyping.Graphics.Player;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Editor {
+namespace pTyping.Graphics.Editor {
 
     public class EditorScreen : Screen {
         private TextDrawable _currentTimeDrawable;
@@ -40,6 +40,10 @@ namespace pTyping.Screens.Editor {
         private readonly List<ManagedDrawable> _selectionRects = new();
 
         private readonly List<ManagedDrawable> _toolOptions = new();
+
+        public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
         public override void Initialize() {
             base.Initialize();
@@ -264,8 +268,8 @@ namespace pTyping.Screens.Editor {
                 rect.Tweens.Add(
                 new VectorTween(
                 TweenType.Movement,
-                new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + selectedNote.Note.YOffset),
-                PlayerScreen.RECEPTICLE_POS,
+                new(NOTE_START_POS.X, NOTE_START_POS.Y + selectedNote.Note.YOffset),
+                RECEPTICLE_POS,
                 (int)(selectedNote.Note.Time - ConVars.BaseApproachTime.Value),
                 (int)selectedNote.Note.Time
                 ) {
@@ -285,7 +289,7 @@ namespace pTyping.Screens.Editor {
 
         public void CreateNote(Note note, bool isNew = false) {
             NoteDrawable noteDrawable = new(
-            new Vector2(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
+            new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset),
             this.NoteTexture,
             pTypingGame.JapaneseFont,
             50
@@ -304,8 +308,8 @@ namespace pTyping.Screens.Editor {
             noteDrawable.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y + note.YOffset),
-            PlayerScreen.RECEPTICLE_POS,
+            new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset),
+            RECEPTICLE_POS,
             (int)(note.Time - ConVars.BaseApproachTime.Value),
             (int)note.Time
             ) {
@@ -500,7 +504,7 @@ namespace pTyping.Screens.Editor {
             this.CurrentTool?.OnMouseClick(e.args);
         }
 
-        public static bool InPlayfield(Point pos) => pos.Y < PlayerScreen.RECEPTICLE_POS.Y + 40f && pos.Y > PlayerScreen.RECEPTICLE_POS.Y - 40f;
+        public static bool InPlayfield(Point pos) => pos.Y < RECEPTICLE_POS.Y + 40f && pos.Y > RECEPTICLE_POS.Y - 40f;
 
         protected override void Dispose(bool disposing) {
             FurballGame.InputManager.OnKeyDown     -= this.OnKeyPress;

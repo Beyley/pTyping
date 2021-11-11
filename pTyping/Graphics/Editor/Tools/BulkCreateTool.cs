@@ -6,11 +6,11 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
-using pTyping.Screens.Player;
+using pTyping.Graphics.Player;
 using pTyping.Songs;
 using WebSocketSharp;
 
-namespace pTyping.Screens.Editor.Tools {
+namespace pTyping.Graphics.Editor.Tools {
     public class BulkCreateTool : EditorTool {
         public override string Name    => "Bulk Create Notes";
         public override string Tooltip => "Create multiple notes with a set spacing.";
@@ -82,8 +82,8 @@ namespace pTyping.Screens.Editor.Tools {
                 drawable.Tweens.Add(
                 new VectorTween(
                 TweenType.Movement,
-                PlayerScreen.NOTE_START_POS,
-                PlayerScreen.RECEPTICLE_POS,
+                EditorScreen.NOTE_START_POS,
+                EditorScreen.RECEPTICLE_POS,
                 (int)(note.Time - ConVars.BaseApproachTime.Value),
                 (int)note.Time
                 )

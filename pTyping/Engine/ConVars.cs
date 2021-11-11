@@ -1,9 +1,9 @@
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.DevConsole;
 using Furball.Engine.Engine.DevConsole.Types;
+using pTyping.Graphics.Player;
 using pTyping.Online;
 using pTyping.Scores;
-using pTyping.Screens.Player;
 
 namespace pTyping.Engine {
     public class ConVars : ConVarStore {

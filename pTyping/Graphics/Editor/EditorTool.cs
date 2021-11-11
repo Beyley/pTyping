@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 
-namespace pTyping.Screens.Editor {
+namespace pTyping.Graphics.Editor {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class ToolOptionAttribute : Attribute {
         public string Name;

@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace pTyping.Drawables {
+namespace pTyping.Graphics.Drawables {
     public static class TexturePositions {
         public static readonly Rectangle MENU_PLAY_BUTTON    = new(0, 0, 300, 100);
         public static readonly Rectangle MENU_EDIT_BUTTON    = new(0, 100, 300, 100);

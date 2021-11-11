@@ -1,5 +1,5 @@
 using Furball.Engine.Engine.Helpers;
-using pTyping.Screens.Online;
+using pTyping.Graphics.Online;
 
 namespace pTyping.Online {
     public class OnlinePlayer {

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using pTyping.Songs;
 using pTyping.Songs.Events;
 
-namespace pTyping.Screens.Player {
+namespace pTyping.Graphics.Player {
     public class LyricDrawable : CompositeDrawable {
         private readonly List<LyricEvent> _lyrics = new();
 
@@ -21,12 +21,12 @@ namespace pTyping.Screens.Player {
             this.Position = pos;
 
             this._currentLyricText = new(new(0), pTypingGame.JapaneseFont, "", 35);
-            this.Drawables.Add(this._currentLyricText);
+            this._drawables.Add(this._currentLyricText);
 
             this._nextLyricText = new(new(0), pTypingGame.JapaneseFont, "", 27) {
                 ColorOverride = Color.LightGray
             };
-            this.Drawables.Add(this._nextLyricText);
+            this._drawables.Add(this._nextLyricText);
         }
 
         public void UpdateLyric(double time) {

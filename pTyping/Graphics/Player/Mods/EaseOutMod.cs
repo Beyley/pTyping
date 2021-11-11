@@ -4,7 +4,7 @@ using System.Linq;
 using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 
-namespace pTyping.Screens.Player.Mods {
+namespace pTyping.Graphics.Player.Mods {
     public class EaseOutMod : PlayerMod {
         public override List<Type> IncompatibleMods() => new() {
             typeof(EaseInMod)
@@ -14,7 +14,7 @@ namespace pTyping.Screens.Player.Mods {
         public override string ShorthandName()   => "EO";
         public override double ScoreMultiplier() => 1.025d;
 
-        public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
+        public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
             foreach (Tween noteTween in notes.SelectMany(note => note.Tweens.Where(noteTween => noteTween.TweenType == TweenType.Movement)))
                 noteTween.Easing = Easing.Out;
 

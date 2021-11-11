@@ -8,7 +8,7 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 
-namespace pTyping.Screens.Online {
+namespace pTyping.Graphics.Online {
     public class ChatDrawable : CompositeDrawable {
         private readonly TextDrawable      _channelContents;
         public           UiTextBoxDrawable MessageInputDrawable;
@@ -18,8 +18,8 @@ namespace pTyping.Screens.Online {
         public ChatDrawable(Vector2 pos) {
             this.Position = pos;
 
-            this.Drawables.Add(this._channelContents     = new(new(0), pTypingGame.JapaneseFontStroked, "", 35));
-            this.Drawables.Add(this.MessageInputDrawable = new(new(0), pTypingGame.JapaneseFontStroked, "", 35, FurballGame.DEFAULT_WINDOW_WIDTH - 20, true));
+            this._drawables.Add(this._channelContents     = new(new(0), pTypingGame.JapaneseFontStroked, "", 35));
+            this._drawables.Add(this.MessageInputDrawable = new(new(0), pTypingGame.JapaneseFontStroked, "", 35, FurballGame.DEFAULT_WINDOW_WIDTH - 20, true));
 
             this.MessageInputDrawable.OnCommit += delegate {
                 pTypingGame.OnlineManager.SendMessage(this.SelectedChannel, this.MessageInputDrawable.Text);

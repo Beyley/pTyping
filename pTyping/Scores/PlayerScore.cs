@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
 using pTyping.Online.Taiko_rs;
-using pTyping.Screens.Player.Mods;
 
 namespace pTyping.Scores {
     [JsonObject(MemberSerialization.OptIn)]

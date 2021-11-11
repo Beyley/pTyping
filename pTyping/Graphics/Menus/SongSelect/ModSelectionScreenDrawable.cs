@@ -3,9 +3,9 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
-using pTyping.Screens.Player.Mods;
+using pTyping.Graphics.Player.Mods;
 
-namespace pTyping.Screens.Menus.SongSelect {
+namespace pTyping.Graphics.Menus.SongSelect {
     public class ModSelectionScreenDrawable : CompositeDrawable {
         private readonly List<(PlayerMod mod, UiButtonDrawable button)> _mods = new();
 
@@ -38,7 +38,7 @@ namespace pTyping.Screens.Menus.SongSelect {
                 };
 
                 this._mods.Add((mod, modButton));
-                this.Drawables.Add(modButton);
+                this._drawables.Add(modButton);
 
                 x += modButton.Size.X + 30;
                 if ((i + 1) % 4 == 0 && i != PlayerMod.RegisteredMods.Count - 1) {
@@ -56,7 +56,7 @@ namespace pTyping.Screens.Menus.SongSelect {
             $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x",
             30
             );
-            this.Drawables.Add(this._scoreMultiplier);
+            this._drawables.Add(this._scoreMultiplier);
         }
 
         private void OnButtonClick(UiButtonDrawable modButton, PlayerMod mod) {

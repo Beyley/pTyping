@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using pTyping.Screens.Player.Mods;
+using pTyping.Graphics.Player.Mods;
 
 namespace pTyping.Scores {
     public class ScoreManager {

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Player.Mods {
+namespace pTyping.Graphics.Player.Mods {
     public abstract class PlayerMod {
         public static List<PlayerMod> RegisteredMods = new() {
             new HalfTimeMod(),
@@ -31,11 +31,11 @@ namespace pTyping.Screens.Player.Mods {
         public abstract string ShorthandName();
         public abstract double ScoreMultiplier();
 
-        public virtual void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
+        public virtual void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
             Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) initialized!", LoggerLevelModInfo.Instance);
         }
 
-        public virtual void OnMapEnd(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
+        public virtual void OnMapEnd(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
             Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) uninitialized!", LoggerLevelModInfo.Instance);
         }
 
@@ -45,6 +45,6 @@ namespace pTyping.Screens.Player.Mods {
 
         public virtual void Update(GameTime time) {}
 
-        public virtual void BeforeNoteCreate(PlayerScreen player) {}
+        public virtual void BeforeNoteCreate(Player player) {}
     }
 }

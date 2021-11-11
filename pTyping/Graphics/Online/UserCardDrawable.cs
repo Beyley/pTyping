@@ -8,7 +8,7 @@ using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using pTyping.Online;
 
-namespace pTyping.Screens.Online {
+namespace pTyping.Graphics.Online {
     public class UserCardDrawable : CompositeDrawable {
 
         private readonly TexturedDrawable       _backgroundDrawable;
@@ -23,14 +23,14 @@ namespace pTyping.Screens.Online {
             this.Player   = new(player);
             this.Position = position;
 
-            this.Drawables.Add(this._backgroundDrawable = new(ContentManager.LoadTextureFromFile("user-card.png", ContentSource.User), new(0f)));
-            this.Drawables.Add(
+            this._drawables.Add(this._backgroundDrawable = new(ContentManager.LoadTextureFromFile("user-card.png", ContentSource.User), new(0f)));
+            this._drawables.Add(
             this._usernameDrawable = new(new(15f), FurballGame.DEFAULT_FONT_STROKED, "", 55) {
                 Scale = new(1.7f)
             }
             );
 
-            this.Drawables.Add(
+            this._drawables.Add(
             this._rankDrawable = new(new(0, 0), FurballGame.DEFAULT_FONT_STROKED, "", 175) {
                 Scale         = new(2f),
                 ColorOverride = new(255, 255, 255, 100)
@@ -38,20 +38,20 @@ namespace pTyping.Screens.Online {
             );
 
             this._rankDrawable.MoveTo(new(this._backgroundDrawable.Size.X - 370, 0));
-            
-            this.Drawables.Add(
+
+            this._drawables.Add(
             this._mainTextDrawable = new(new(this._usernameDrawable.Position.X, 100), FurballGame.DEFAULT_FONT_STROKED, "", 45) {
                 Scale   = new(1.7f),
                 Visible = true
             }
             );
-            this.Drawables.Add(
+            this._drawables.Add(
             this._statusTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFontStroked, "", 45) {
                 Scale   = new(1.7f),
                 Visible = true
             }
             );
-            this.Drawables.Add(
+            this._drawables.Add(
             this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
                 Scale = new(0.175f)
             }

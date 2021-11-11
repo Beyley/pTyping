@@ -16,13 +16,13 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using pTyping.Graphics.Menus;
+using pTyping.Graphics.Online;
+using pTyping.Graphics.Player;
+using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
 using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
-using pTyping.Screens.Menus;
-using pTyping.Screens.Online;
-using pTyping.Screens.Player;
-using pTyping.Screens.Player.Mods;
 using pTyping.Songs;
 using ConVars=pTyping.Engine.ConVars;
 
@@ -289,7 +289,7 @@ namespace pTyping {
             base.Draw(gameTime);
 
             if (this._userPanelManager.Visible)
-                this._userPanelManager.Draw(gameTime, DrawableBatch);
+                this._userPanelManager.Draw(gameTime, DrawableBatch, new());
         }
 
         protected override void EndRun() {

@@ -7,7 +7,7 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Menus.SongSelect {
+namespace pTyping.Graphics.Menus.SongSelect {
     public class NewSongScreen : Screen {
         private UiTextBoxDrawable _songArtistTextBox;
         private UiTextBoxDrawable _songCreatorTextBox;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace pTyping.Screens.Player.Mods {
+namespace pTyping.Graphics.Player.Mods {
     public class EasyMod : PlayerMod {
         public override List<Type> IncompatibleMods() => new() {
             typeof(HardRockMod)
@@ -10,7 +10,7 @@ namespace pTyping.Screens.Player.Mods {
         public override string ShorthandName()   => "EZ";
         public override double ScoreMultiplier() => 0.9d;
 
-        public override void BeforeNoteCreate(PlayerScreen player) {
+        public override void BeforeNoteCreate(Player player) {
             player.BaseApproachTime = (int)(player.BaseApproachTime * 1.4d);
 
             base.BeforeNoteCreate(player);

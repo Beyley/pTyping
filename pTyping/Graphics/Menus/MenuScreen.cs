@@ -8,13 +8,13 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using pTyping.Drawables;
+using pTyping.Graphics.Drawables;
+using pTyping.Graphics.Menus.Options;
+using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
-using pTyping.Screens.Menus.Options;
-using pTyping.Screens.Menus.SongSelect;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Menus {
+namespace pTyping.Graphics.Menus {
     public class MenuScreen : Screen {
         private TextDrawable _musicTitle;
 

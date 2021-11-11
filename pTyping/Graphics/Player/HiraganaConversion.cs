@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace pTyping.Screens.Player {
+namespace pTyping.Graphics.Player {
     public class HiraganaConversion {
         public static readonly Dictionary<string, List<string>> CONVERSIONS = new();
 

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Microsoft.Xna.Framework;
+using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
-using pTyping.Screens.Player.Mods;
 
-namespace pTyping.Drawables {
+namespace pTyping.Graphics.Drawables {
     public class LeaderboardDrawable : CompositeDrawable {
 
         private readonly List<LeaderboardElementDrawable> _leaderboardElementDrawables = new();
@@ -22,7 +22,7 @@ namespace pTyping.Drawables {
                 };
 
                 this._leaderboardElementDrawables.Add(drawable);
-                this.Drawables.Add(drawable);
+                this._drawables.Add(drawable);
 
                 y += drawable.Size.Y;
             }
@@ -37,8 +37,8 @@ namespace pTyping.Drawables {
             public LeaderboardElementDrawable(PlayerScore score) {
                 this.Score = score;
 
-                this.Drawables.Add(this._usernameInfoDrawable = new TextDrawable(new(0f),                                        pTypingGame.JapaneseFont, "a", 30));
-                this.Drawables.Add(this._infoTextDrawable     = new TextDrawable(new(0f, this._usernameInfoDrawable.Size.Y + 5), pTypingGame.JapaneseFont, "a", 25));
+                this._drawables.Add(this._usernameInfoDrawable = new TextDrawable(new(0f),                                        pTypingGame.JapaneseFont, "a", 30));
+                this._drawables.Add(this._infoTextDrawable     = new TextDrawable(new(0f, this._usernameInfoDrawable.Size.Y + 5), pTypingGame.JapaneseFont, "a", 25));
 
                 this.UpdateText();
             }

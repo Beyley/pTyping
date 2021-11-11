@@ -6,10 +6,9 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
-using pTyping.Screens.Player;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Editor.Tools {
+namespace pTyping.Graphics.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class CreateTool : EditorTool {
         public override string Name    => "Create Note";
@@ -43,8 +42,8 @@ namespace pTyping.Screens.Editor.Tools {
                 this._createLine.Tweens.Add(
                 new VectorTween(
                 TweenType.Movement,
-                new(PlayerScreen.NOTE_START_POS.X, PlayerScreen.NOTE_START_POS.Y - 40),
-                new(PlayerScreen.RECEPTICLE_POS.X, PlayerScreen.RECEPTICLE_POS.Y - 40),
+                new(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y - 40),
+                new(EditorScreen.RECEPTICLE_POS.X, EditorScreen.RECEPTICLE_POS.Y - 40),
                 (int)(this.EditorInstance.State.MouseTime - ConVars.BaseApproachTime.Value),
                 (int)this.EditorInstance.State.MouseTime
                 )

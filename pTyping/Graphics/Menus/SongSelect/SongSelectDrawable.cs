@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Menus.SongSelect {
+namespace pTyping.Graphics.Menus.SongSelect {
     public class SongSelectDrawable : CompositeDrawable {
         public float TargetScroll = 0;
 
@@ -25,7 +25,7 @@ namespace pTyping.Screens.Menus.SongSelect {
 
                 drawable.Tags.Add(y.ToString(CultureInfo.CurrentCulture));
 
-                this.Drawables.Add(drawable);
+                this._drawables.Add(drawable);
                 this._buttonDrawables.Add(drawable);
 
                 y += drawable.Size.Y + 7.5f;
@@ -63,8 +63,8 @@ namespace pTyping.Screens.Menus.SongSelect {
 
                 this._titleDrawable = new(new(5), pTypingGame.JapaneseFontStroked, $"{song.Artist} - {song.Name} [{song.Difficulty}]", 30);
 
-                this.Drawables.Add(this._titleDrawable);
-                this.Drawables.Add(this._backgroundDrawable);
+                this._drawables.Add(this._titleDrawable);
+                this._drawables.Add(this._backgroundDrawable);
 
                 this.OnClick += delegate {
                     pTypingGame.CurrentSong.Value = song;

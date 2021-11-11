@@ -5,7 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using pTyping.Engine;
 
-namespace pTyping.Screens.Player.Mods {
+namespace pTyping.Graphics.Player.Mods {
     public class HiddenMod : PlayerMod {
         public override List<Type> IncompatibleMods() => new();
 
@@ -14,7 +14,7 @@ namespace pTyping.Screens.Player.Mods {
 
         public override double ScoreMultiplier() => 1.025d;
 
-        public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, PlayerScreen player) {
+        public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
             foreach (NoteDrawable note in notes)
                 note.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, (int)(note.Note.Time - ConVars.BaseApproachTime.Value), (int)(note.Note.Time - 500)));
 

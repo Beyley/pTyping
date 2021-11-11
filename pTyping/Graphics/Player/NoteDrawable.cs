@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using pTyping.Scores;
 using pTyping.Songs;
 
-namespace pTyping.Screens.Player {
+namespace pTyping.Graphics.Player {
     public class NoteDrawable : TexturedDrawable {
         public TextDrawable LabelTextDrawable;
 
@@ -32,11 +32,11 @@ namespace pTyping.Screens.Player {
         public bool TypeCharacter(string hiragana, string romaji, double timeDifference, PlayerScore score) {
             if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
                 this.Note.HitResult = timeDifference switch {
-                    < PlayerScreen.TIMING_EXCELLENT => HitResult.Excellent,
-                    < PlayerScreen.TIMING_GOOD      => HitResult.Good,
-                    < PlayerScreen.TIMING_FAIR      => HitResult.Fair,
-                    < PlayerScreen.TIMING_POOR      => HitResult.Poor,
-                    _                               => this.Note.HitResult
+                    < Player.TIMING_EXCELLENT => HitResult.Excellent,
+                    < Player.TIMING_GOOD      => HitResult.Good,
+                    < Player.TIMING_FAIR      => HitResult.Fair,
+                    < Player.TIMING_POOR      => HitResult.Poor,
+                    _                         => this.Note.HitResult
                 };
             }
 
@@ -46,7 +46,7 @@ namespace pTyping.Screens.Player {
             //Checks if we have finished typing the current romaji
             if (string.Equals(this.Note.TypedRomaji, romaji)) {
                 this.Note.Typed += hiragana;
-                score.AddScore(PlayerScreen.SCORE_PER_CHARACTER);
+                score.AddScore(Player.SCORE_PER_CHARACTER);
                 //Clear the typed romaji
                 this.Note.TypedRomaji = string.Empty;
 

@@ -6,11 +6,11 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
+using pTyping.Graphics.Menus.SongSelect;
+using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
-using pTyping.Screens.Menus.SongSelect;
-using pTyping.Screens.Player.Mods;
 
-namespace pTyping.Screens.Player {
+namespace pTyping.Graphics.Player {
     public class ScoreResultsScreen : Screen {
         public PlayerScore Score;
 

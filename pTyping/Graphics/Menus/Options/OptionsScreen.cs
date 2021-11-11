@@ -8,7 +8,7 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 
-namespace pTyping.Screens.Menus.Options {
+namespace pTyping.Graphics.Menus.Options {
     public class OptionsScreen : Screen {
         public override void Initialize() {
             base.Initialize();
