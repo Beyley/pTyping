@@ -37,39 +37,39 @@ namespace pTyping.Songs {
         public string TypedRomaji = "";
         [JsonProperty]
         public float YOffset;
-        public (string Hiragana, List<string> Romaji) TypableRomaji {
-            get {
-                if (this.IsHit)
-                    return (string.Empty, new() {
-                                   string.Empty
-                               });
+        public (string Hiragana, List<string> Romaji) TypableRomaji => this.GetTypableRomaji(this.Typed);
 
-                string       textToCheck = string.Empty;
-                List<string> possible    = null;
+        public (string Hiragana, List<string> Romaji) GetTypableRomaji(string typed = "") {
+            if (this.IsHit)
+                return (string.Empty, new() {
+                               string.Empty
+                           });
 
-                if (this.Text.Length - this.Typed.Length >= 3) {//Try to get the next 3 chars
-                    textToCheck = this.Text.Substring(this.Typed.Length, 3);
-                    HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
-                }
+            string       textToCheck = string.Empty;
+            List<string> possible    = null;
 
-                //Try to get the next 2 chars instead
-                if (possible is null && this.Text.Length - this.Typed.Length >= 2) {
-                    textToCheck = this.Text.Substring(this.Typed.Length, 2);
-                    HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
-                }
-
-                //Try to get the next char instead
-                if (possible is null) {
-                    textToCheck = this.Text.Substring(this.Typed.Length, 1);
-                    HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
-                }
-
-                if (possible is null) throw new Exception("Unknown character! Did you put kanji? smh my head");
-
-                possible.Sort((x, y) => x.Length - y.Length);
-
-                return (textToCheck, possible);
+            if (this.Text.Length - typed.Length >= 3) {//Try to get the next 3 chars
+                textToCheck = this.Text.Substring(typed.Length, 3);
+                HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
             }
+
+            //Try to get the next 2 chars instead
+            if (possible is null && this.Text.Length - typed.Length >= 2) {
+                textToCheck = this.Text.Substring(typed.Length, 2);
+                HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+            }
+
+            //Try to get the next char instead
+            if (possible is null) {
+                textToCheck = this.Text.Substring(typed.Length, 1);
+                HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+            }
+
+            if (possible is null) throw new Exception("Unknown character! Did you put kanji? smh my head");
+
+            possible.Sort((x, y) => x.Length - y.Length);
+
+            return (textToCheck, possible);
         }
 
         public bool IsHit => this.Typed == this.Text;

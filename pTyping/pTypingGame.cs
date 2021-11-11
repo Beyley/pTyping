@@ -304,7 +304,7 @@ namespace pTyping {
         public static void SubmitScore(Song song, PlayerScore score) {
             ScoreManager.AddScore(score);
 
-            if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0)
+            if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0 && score.Username == OnlineManager.Username())
                 OnlineManager.SubmitScore(score).Wait();
         }
 

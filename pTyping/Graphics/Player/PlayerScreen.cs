@@ -57,11 +57,10 @@ namespace pTyping.Graphics.Player {
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 
             this._player = new(this.Song) {
-                Position   = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
-                OriginType = OriginType.LeftCenter
+                Position     = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
+                OriginType   = OriginType.LeftCenter,
+                RecordReplay = !this._playingReplay
             };
-
-            this._player.RecordReplay = !this._playingReplay;
 
             this._player.OnAllNotesComplete += this.EndScore;
 
@@ -309,9 +308,12 @@ namespace pTyping.Graphics.Player {
                     this._player.CallMapEnd();
 
                     this._player.Score.Time         = DateTime.Now;
-                    this._player.Score.ReplayFrames = this._player.ReplayFrames.ToArray();
-
-                    pTypingGame.SubmitScore(this.Song, this._player.Score);
+                    if (this._playingScoreReplay == null) {
+                        this._player.Score.ReplayFrames = this._player.ReplayFrames.ToArray();
+                        pTypingGame.SubmitScore(this.Song, this._player.Score);
+                    } else {
+                        this._player.Score.Username = this._playingScoreReplay.Username;
+                    }
 
                     ScreenManager.ChangeScreen(new ScoreResultsScreen(this._player.Score));
                 },

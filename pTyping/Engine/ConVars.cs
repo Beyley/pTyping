@@ -38,6 +38,16 @@ namespace pTyping.Engine {
         }
     }
 
+    public class LoadAutoReplay : ConFunc {
+        public LoadAutoReplay() : base("cl_load_auto_replay") {}
+
+        public override ConsoleResult Run(string[] consoleInput) {
+            ScreenManager.ChangeScreen(new PlayerScreen(AutoReplayCreator.CreateReplay(pTypingGame.CurrentSong.Value)));
+
+            return new ConsoleResult(ExecutionResult.Success, "Loaded auto replay!");
+        }
+    }
+
     public class Logout : ConFunc {
         public Logout() : base("sv_logout") {}
 
