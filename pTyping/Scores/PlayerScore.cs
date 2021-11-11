@@ -130,6 +130,7 @@ namespace pTyping.Scores {
             writer.Write(this.Accuracy);
 
             writer.Flush();
+            writer.Close();
 
             return stream.ToArray();
         }
