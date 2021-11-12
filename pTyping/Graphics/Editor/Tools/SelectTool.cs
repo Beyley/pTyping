@@ -24,14 +24,14 @@ namespace pTyping.Graphics.Editor.Tools {
         public override string Tooltip => "Select, move, and change notes in the timeline.";
 
         public override void Initialize() {
-            foreach (NoteDrawable note in this.EditorInstance.State.Notes) {
+            foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
                 note.OnClick     += this.OnNoteClick;
                 note.OnDragBegin += this.OnNoteDragBegin;
                 note.OnDrag      += this.OnNoteDrag;
                 note.OnDragEnd   += this.OnNoteDragEnd;
             }
 
-            this.EditorInstance.State.SelectedNotes.CollectionChanged += this.OnSelectedNotesChanged;
+            this.EditorInstance.EditorState.SelectedNotes.CollectionChanged += this.OnSelectedNotesChanged;
 
             this.NoteText.OnChange   += this.UpdateNoteText;
             this.NoteColour.OnChange += this.UpdateNoteColor;
@@ -52,12 +52,12 @@ namespace pTyping.Graphics.Editor.Tools {
         }
 
         private void UpdateNoteText(object __, string _) {
-            if (this.EditorInstance.State.SelectedNotes.Count is 0)
+            if (this.EditorInstance.EditorState.SelectedNotes.Count is 0)
                 // this.NoteText.Value   = "";
                 // this.NoteColour.Value = new(255, 0, 0);
                 return;
 
-            foreach (NoteDrawable note in this.EditorInstance.State.SelectedNotes) {
+            foreach (NoteDrawable note in this.EditorInstance.EditorState.SelectedNotes) {
                 note.Note.Text              = this.NoteText.Value.Trim();
                 note.LabelTextDrawable.Text = $"{note.Note.Text}";
 
@@ -66,11 +66,11 @@ namespace pTyping.Graphics.Editor.Tools {
         }
 
         private void UpdateNoteColor(object __, Color _) {
-            if (this.EditorInstance.State.SelectedNotes.Count == 0)// this.NoteText.Value   = "";
+            if (this.EditorInstance.EditorState.SelectedNotes.Count == 0)// this.NoteText.Value   = "";
                 // this.NoteColour.Value = new(255, 0, 0);
                 return;
 
-            foreach (NoteDrawable note in this.EditorInstance.State.SelectedNotes) {
+            foreach (NoteDrawable note in this.EditorInstance.EditorState.SelectedNotes) {
                 note.Note.Color    = this.NoteColour.Value;
                 note.ColorOverride = note.Note.Color;
 
@@ -79,25 +79,25 @@ namespace pTyping.Graphics.Editor.Tools {
         }
 
         private void OnSelectedNotesChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if (this.EditorInstance.State.SelectedNotes.Count != 1)// this.NoteText.Value   = "";
+            if (this.EditorInstance.EditorState.SelectedNotes.Count != 1)// this.NoteText.Value   = "";
                 // this.NoteColour.Value = new(255, 0, 0);
                 return;
 
-            NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
+            NoteDrawable note = this.EditorInstance.EditorState.SelectedNotes.First();
 
             this.NoteText.Value   = note.Note.Text;
             this.NoteColour.Value = note.Note.Color;
         }
 
         public override void Deinitialize() {
-            foreach (NoteDrawable note in this.EditorInstance.State.Notes) {
+            foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
                 note.OnClick     -= this.OnNoteClick;
                 note.OnDragBegin -= this.OnNoteDragBegin;
                 note.OnDrag      -= this.OnNoteDrag;
                 note.OnDragEnd   -= this.OnNoteDragEnd;
             }
 
-            this.EditorInstance.State.SelectedNotes.CollectionChanged -= this.OnSelectedNotesChanged;
+            this.EditorInstance.EditorState.SelectedNotes.CollectionChanged -= this.OnSelectedNotesChanged;
 
             this.NoteText.OnChange   -= this.UpdateNoteText;
             this.NoteColour.OnChange -= this.UpdateNoteColor;
@@ -105,12 +105,12 @@ namespace pTyping.Graphics.Editor.Tools {
 
         private void OnNoteDragBegin(object sender, Point e) {
             //We only allow dragging notes around when shift is held
-            if (!FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift) || this.EditorInstance.State.SelectedNotes.Count == 0) {
+            if (!FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift) || this.EditorInstance.EditorState.SelectedNotes.Count == 0) {
                 this._isDragging = false;
                 return;
             }
 
-            this._lastDragTime = this.EditorInstance.State.MouseTime;
+            this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
 
             this._isDragging = true;
         }
@@ -122,14 +122,14 @@ namespace pTyping.Graphics.Editor.Tools {
                 return;
             }
 
-            double difference = this.EditorInstance.State.MouseTime - this._lastDragTime;
+            double difference = this.EditorInstance.EditorState.MouseTime - this._lastDragTime;
 
-            if (this.EditorInstance.State.SelectedNotes.Count == 1) {
-                NoteDrawable noteDrawable = this.EditorInstance.State.SelectedNotes[0];
+            if (this.EditorInstance.EditorState.SelectedNotes.Count == 1) {
+                NoteDrawable noteDrawable = this.EditorInstance.EditorState.SelectedNotes[0];
 
                 noteDrawable.Tweens.Clear();
 
-                noteDrawable.Note.Time = this.EditorInstance.State.MouseTime;
+                noteDrawable.Note.Time = this.EditorInstance.EditorState.MouseTime;
 
                 noteDrawable.Tweens.Add(
                 new VectorTween(
@@ -145,7 +145,7 @@ namespace pTyping.Graphics.Editor.Tools {
 
                 this.EditorInstance.SaveNeeded = true;
             } else {
-                foreach (NoteDrawable noteDrawable in this.EditorInstance.State.SelectedNotes) {
+                foreach (NoteDrawable noteDrawable in this.EditorInstance.EditorState.SelectedNotes) {
                     noteDrawable.Tweens.Clear();
 
                     noteDrawable.Note.Time += difference;
@@ -168,7 +168,7 @@ namespace pTyping.Graphics.Editor.Tools {
 
             this.EditorInstance.UpdateSelectionRects(null, null);
 
-            this._lastDragTime = this.EditorInstance.State.MouseTime;
+            this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
         }
 
         private void OnNoteDragEnd(object sender, Point e) {
@@ -183,11 +183,11 @@ namespace pTyping.Graphics.Editor.Tools {
 
             //If the user is holding control, then let them select multiple notes, otherwise, only allow selecting one
             if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl) || FurballGame.InputManager.HeldKeys.Contains(Keys.RightControl)) {
-                if (!this.EditorInstance.State.SelectedNotes.Remove(note))
-                    this.EditorInstance.State.SelectedNotes.Add(note);
+                if (!this.EditorInstance.EditorState.SelectedNotes.Remove(note))
+                    this.EditorInstance.EditorState.SelectedNotes.Add(note);
             } else {
-                this.EditorInstance.State.SelectedNotes.Clear();
-                this.EditorInstance.State.SelectedNotes.Add(note);
+                this.EditorInstance.EditorState.SelectedNotes.Clear();
+                this.EditorInstance.EditorState.SelectedNotes.Add(note);
             }
         }
     }

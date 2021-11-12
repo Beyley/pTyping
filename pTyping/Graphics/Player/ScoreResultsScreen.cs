@@ -11,7 +11,7 @@ using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 
 namespace pTyping.Graphics.Player {
-    public class ScoreResultsScreen : Screen {
+    public class ScoreResultsScreen : pScreen {
         public PlayerScore Score;
 
         public ScoreResultsScreen(PlayerScore score) => this.Score = score;
@@ -120,5 +120,12 @@ namespace pTyping.Graphics.Player {
 
             pTypingGame.UserStatusListening();
         }
+
+        public override string Name  => "Score Results";
+        public override string State => "Looking at scores!";
+
+        public override string Details => $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
+Played by {this.Score.Username}
+Score: {this.Score.Score:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
     }
 }

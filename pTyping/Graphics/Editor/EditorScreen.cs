@@ -28,7 +28,7 @@ using TextCopy;
 
 namespace pTyping.Graphics.Editor {
 
-    public class EditorScreen : Screen {
+    public class EditorScreen : pScreen {
         private TextDrawable _currentTimeDrawable;
 
         public  Texture2D             NoteTexture;
@@ -38,7 +38,7 @@ namespace pTyping.Graphics.Editor {
         public EditorTool       CurrentTool;
         public List<EditorTool> EditorTools;
 
-        public readonly EditorState State = new();
+        public readonly EditorState EditorState = new();
 
         private readonly List<ManagedDrawable> _selectionRects = new();
 
@@ -56,7 +56,7 @@ namespace pTyping.Graphics.Editor {
 
             //Create a copy of the song so that we dont edit it globally
             //TODO: should `Song` be a struct?
-            this.State.Song = pTypingGame.CurrentSong.Value.Copy();
+            this.EditorState.Song = pTypingGame.CurrentSong.Value.Copy();
 
             pTypingGame.MusicTrack.Stop();
 
@@ -72,7 +72,7 @@ namespace pTyping.Graphics.Editor {
 
             this.Manager.Add(this._recepticle);
 
-            foreach (Note note in this.State.Song.Notes)
+            foreach (Note note in this.EditorState.Song.Notes)
                 this.CreateNote(note);
 
             #endregion
@@ -113,7 +113,7 @@ namespace pTyping.Graphics.Editor {
             pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
             )
             );
-            pTypingGame.LoadBackgroundFromSong(this.State.Song);
+            pTypingGame.LoadBackgroundFromSong(this.EditorState.Song);
 
             #endregion
 
@@ -121,7 +121,7 @@ namespace pTyping.Graphics.Editor {
 
             #region Visualization drawables
 
-            this.State.SelectedNotes.CollectionChanged += this.UpdateSelectionRects;
+            this.EditorState.SelectedNotes.CollectionChanged += this.UpdateSelectionRects;
 
             #endregion
 
@@ -202,13 +202,13 @@ namespace pTyping.Graphics.Editor {
             };
 
             leftButton.OnClick += delegate {
-                if (this.State.Song.Notes.Count > 0)
-                    pTypingGame.MusicTrack.SeekTo(this.State.Song.Notes.First().Time);
+                if (this.EditorState.Song.Notes.Count > 0)
+                    pTypingGame.MusicTrack.SeekTo(this.EditorState.Song.Notes.First().Time);
             };
 
             rightButton.OnClick += delegate {
-                if (this.State.Song.Notes.Count > 0)
-                    pTypingGame.MusicTrack.SeekTo(this.State.Song.Notes.Last().Time);
+                if (this.EditorState.Song.Notes.Count > 0)
+                    pTypingGame.MusicTrack.SeekTo(this.EditorState.Song.Notes.Last().Time);
             };
 
             this.Manager.Add(playButton);
@@ -269,7 +269,7 @@ namespace pTyping.Graphics.Editor {
 
             this._selectionRects.Clear();
 
-            foreach (NoteDrawable selectedNote in this.State.SelectedNotes) {
+            foreach (NoteDrawable selectedNote in this.EditorState.SelectedNotes) {
                 RectanglePrimitiveDrawable rect = new() {
                     RectSize      = new(100, 100),
                     Filled        = false,
@@ -336,9 +336,9 @@ namespace pTyping.Graphics.Editor {
             );
 
             this.Manager.Add(noteDrawable);
-            this.State.Notes.Add(noteDrawable);
+            this.EditorState.Notes.Add(noteDrawable);
             if (isNew) {
-                this.State.Song.Notes.Add(note);
+                this.EditorState.Song.Notes.Add(note);
                 this.SaveNeeded = true;
             }
 
@@ -583,15 +583,15 @@ namespace pTyping.Graphics.Editor {
 
             double timeAtCursor = relativeMousePosition / speed + currentTime;
 
-            TimingPoint timingPoint = this.State.Song.CurrentTimingPoint(timeAtCursor);
+            TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(timeAtCursor);
 
-            double noteLength = this.State.Song.DividedNoteLength(timeAtCursor);
+            double noteLength = this.EditorState.Song.DividedNoteLength(timeAtCursor);
 
             timeAtCursor += noteLength / 2d;
 
             double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
 
-            this.State.MouseTime = roundedTime;
+            this.EditorState.MouseTime = roundedTime;
 
             this.CurrentTool?.OnMouseMove(e.mousePos);
         }
@@ -609,7 +609,7 @@ namespace pTyping.Graphics.Editor {
             FurballGame.InputManager.OnMouseMove   -= this.OnMouseMove;
             FurballGame.InputManager.OnMouseDrag   -= this.OnMouseDrag;
 
-            this.State.SelectedNotes.CollectionChanged -= this.UpdateSelectionRects;
+            this.EditorState.SelectedNotes.CollectionChanged -= this.UpdateSelectionRects;
 
             this._progressBar.OnDrag -= this.ProgressBarOnDrag;
 
@@ -623,11 +623,11 @@ namespace pTyping.Graphics.Editor {
         public void TimelineMove(bool right) {
             double currentTime = pTypingGame.MusicTrack.CurrentTime * 1000d;
 
-            double noteLength = this.State.Song.DividedNoteLength(currentTime);
-            double timeToSeekTo = Math.Round((pTypingGame.MusicTrack.CurrentTime * 1000d - this.State.Song.CurrentTimingPoint(currentTime).Time) / noteLength) *
+            double noteLength = this.EditorState.Song.DividedNoteLength(currentTime);
+            double timeToSeekTo = Math.Round((pTypingGame.MusicTrack.CurrentTime * 1000d - this.EditorState.Song.CurrentTimingPoint(currentTime).Time) / noteLength) *
                                   noteLength;
 
-            timeToSeekTo += this.State.Song.CurrentTimingPoint(currentTime).Time;
+            timeToSeekTo += this.EditorState.Song.CurrentTimingPoint(currentTime).Time;
 
             if (right)
                 timeToSeekTo += noteLength;
@@ -638,12 +638,12 @@ namespace pTyping.Graphics.Editor {
         }
 
         public void DeleteSelectedNotes() {
-            for (int i = 0; i < this.State.SelectedNotes.Count; i++) {
-                NoteDrawable note = this.State.SelectedNotes[i];
+            for (int i = 0; i < this.EditorState.SelectedNotes.Count; i++) {
+                NoteDrawable note = this.EditorState.SelectedNotes[i];
 
                 this.Manager.Remove(note);
-                this.State.Song.Notes.Remove(note.Note);
-                this.State.Notes.Remove(note);
+                this.EditorState.Song.Notes.Remove(note.Note);
+                this.EditorState.Notes.Remove(note);
 
                 this.CurrentTool?.OnNoteDelete(note);
             }
@@ -670,8 +670,8 @@ namespace pTyping.Graphics.Editor {
                 }
                 case Keys.Escape:
                     //If the user has some notes selected, clear them
-                    if (this.State.SelectedNotes.Count != 0) {
-                        this.State.SelectedNotes.Clear();
+                    if (this.EditorState.SelectedNotes.Count != 0) {
+                        this.EditorState.SelectedNotes.Clear();
                         return;
                     }
 
@@ -690,7 +690,7 @@ namespace pTyping.Graphics.Editor {
                         );
 
                         if (responseType == ResponseType.Yes) {
-                            this.State.Song.Save();
+                            this.EditorState.Song.Save();
                             SongManager.UpdateSongs();
                         }
                     }
@@ -703,21 +703,21 @@ namespace pTyping.Graphics.Editor {
                 case Keys.Delete: {
                     // Delete the selected notes
                     this.DeleteSelectedNotes();
-                    this.State.SelectedNotes.Clear();
+                    this.EditorState.SelectedNotes.Clear();
                     break;
                 }
                 case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
                     // Save the song if ctrl+s is pressed
-                    this.State.Song.Save();
+                    this.EditorState.Song.Save();
                     SongManager.UpdateSongs();
 
                     this.SaveNeeded = false;
                     break;
                 }
                 case Keys.C when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
-                    if (this.State.SelectedNotes.Count == 0) return;
+                    if (this.EditorState.SelectedNotes.Count == 0) return;
 
-                    IEnumerable<NoteDrawable> sortedNotes = this.State.SelectedNotes.ToList().OrderBy(x => x.Note.Time).ToList();
+                    IEnumerable<NoteDrawable> sortedNotes = this.EditorState.SelectedNotes.ToList().OrderBy(x => x.Note.Time).ToList();
 
                     double startTime = sortedNotes.First().Note.Time;
 
@@ -739,7 +739,7 @@ namespace pTyping.Graphics.Editor {
                         List<Note> notes = JsonConvert.DeserializeObject<List<Note>>(ClipboardService.GetText());
 
                         foreach (Note note in notes) {
-                            note.Time += this.State.CurrentTime;
+                            note.Time += this.EditorState.CurrentTime;
 
                             this.CreateNote(note, true);
                         }
@@ -767,30 +767,36 @@ namespace pTyping.Graphics.Editor {
 
         private double _lastTime = 0;
         public override void Update(GameTime gameTime) {
-            this.State.CurrentTime = pTypingGame.MusicTrack.GetCurrentTime();
+            this.EditorState.CurrentTime = pTypingGame.MusicTrack.GetCurrentTime();
 
-            if (!this.State.CurrentTime.Equals(this._lastTime))
-                this.CurrentTool?.OnTimeChange(this.State.CurrentTime);
+            if (!this.EditorState.CurrentTime.Equals(this._lastTime))
+                this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
 
-            for (int i = 0; i < this.State.Notes.Count; i++) {
-                NoteDrawable noteDrawable = this.State.Notes[i];
+            for (int i = 0; i < this.EditorState.Notes.Count; i++) {
+                NoteDrawable noteDrawable = this.EditorState.Notes[i];
 
-                if (this.State.CurrentTime > noteDrawable.Note.Time + 10 || this.State.CurrentTime < noteDrawable.Note.Time - ConVars.BaseApproachTime.Value) 
+                if (this.EditorState.CurrentTime > noteDrawable.Note.Time + 10 ||
+                    this.EditorState.CurrentTime < noteDrawable.Note.Time - ConVars.BaseApproachTime.Value) 
                     noteDrawable.Visible = false;
                 else 
                     noteDrawable.Visible = true;
             }
 
-            int milliseconds = (int)Math.Floor(this.State.CurrentTime         % 1000d);
-            int seconds      = (int)Math.Floor(this.State.CurrentTime / 1000d % 60d);
-            int minutes      = (int)Math.Floor(this.State.CurrentTime         / 1000d / 60d);
+            int milliseconds = (int)Math.Floor(this.EditorState.CurrentTime         % 1000d);
+            int seconds      = (int)Math.Floor(this.EditorState.CurrentTime / 1000d % 60d);
+            int minutes      = (int)Math.Floor(this.EditorState.CurrentTime         / 1000d / 60d);
 
             this._currentTimeDrawable.Text = $"Time: {minutes:00}:{seconds:00}:{milliseconds:000}";
-            this._progressBar.Progress     = (float)this.State.CurrentTime / (float)pTypingGame.MusicTrack.Length;
+            this._progressBar.Progress     = (float)this.EditorState.CurrentTime / (float)pTypingGame.MusicTrack.Length;
 
-            this._lastTime = this.State.CurrentTime;
+            this._lastTime = this.EditorState.CurrentTime;
             
             base.Update(gameTime);
         }
+        public override string Name  => "Editor";
+        public override string State => "Editing a map!";
+        public override string Details => ConVars.Username.Value == pTypingGame.CurrentSong.Value.Creator
+                                              ? $"Editing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}"
+                                              : $"Modding {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}";
     }
 }

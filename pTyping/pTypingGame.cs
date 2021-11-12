@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using DiscordRPC;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -16,6 +17,7 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using pTyping.Graphics;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Online;
 using pTyping.Graphics.Player;
@@ -79,6 +81,9 @@ namespace pTyping {
 
         public static List<PlayerMod> SelectedMods = new();
 
+        public static DiscordRpcClient RpcClient;
+        public static RichPresence     RichPresence = new();
+
         public pTypingGame() : base(new MenuScreen()) {
             // this.Window.AllowUserResizing = true;
         }
@@ -108,39 +113,31 @@ namespace pTyping {
         }
 
         public static void UserStatusEditing() {
-            if (OnlineManager.State != ConnectionState.LoggedIn) return;
+            if (ConVars.Username.Value == CurrentSong.Value.Creator) {
+                string text = $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
 
-            if (ConVars.Username.Value == CurrentSong.Value.Creator)
-                OnlineManager.ChangeUserAction(
-                new(
-                UserActionType.Editing,
-                $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"
-                )
-                );
-            else
-                OnlineManager.ChangeUserAction(
-                new(
-                UserActionType.Editing,
-                $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"
-                )
-                );
+                if (OnlineManager.State == ConnectionState.LoggedIn)
+                    OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
+            } else {
+                string text = $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+
+                if (OnlineManager.State == ConnectionState.LoggedIn)
+                    OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
+            }
         }
 
         public static void UserStatusPickingSong() {
             if (OnlineManager.State != ConnectionState.LoggedIn) return;
-
             OnlineManager.ChangeUserAction(new(UserActionType.Idle, "Choosing a song!"));
         }
 
         public static void UserStatusListening() {
             if (OnlineManager.State != ConnectionState.LoggedIn) return;
-
             OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
         }
 
         public static void UserStatusPlaying() {
             if (OnlineManager.State != ConnectionState.LoggedIn) return;
-
             OnlineManager.ChangeUserAction(
             new(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]")
             );
@@ -272,6 +269,9 @@ namespace pTyping {
             else
                 ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
         }
+
+        private double _rpcDelta = 0;
+        
         protected override void Update(GameTime gameTime) {
             base.Update(gameTime);
 
@@ -279,6 +279,21 @@ namespace pTyping {
             if (this._musicTrackSchedulerDelta > 10 && MusicTrack.IsValidHandle) {
                 MusicTrackScheduler.Update(MusicTrack.GetCurrentTime());
                 this._musicTrackSchedulerDelta = 0;
+            }
+
+            if (RpcClient.CurrentUser != null) {
+                this._rpcDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (this._rpcDelta > 1000) {
+                    pScreen screen = Instance.RunningScreen as pScreen;
+
+                    RichPresence.State   = screen?.State;
+                    RichPresence.Details = screen?.Details;
+
+                    RpcClient.SetPresence(RichPresence);
+
+                    RpcClient.Invoke();
+                    this._rpcDelta = 0;
+                }
             }
 
             if (this._userPanelManager.Visible)
@@ -298,6 +313,8 @@ namespace pTyping {
             if (OnlineManager.State == ConnectionState.LoggedIn)
                 OnlineManager.Logout().Wait();
 
+            RpcClient.Dispose();
+            
             base.EndRun();
         }
 
@@ -309,6 +326,10 @@ namespace pTyping {
         }
 
         protected override void Initialize() {
+            RpcClient = new("908631391934222366");
+
+            RpcClient.Initialize();
+            
             DevConsole.AddConVarStore(typeof(ConVars));
 
             CurrentSongBackground =

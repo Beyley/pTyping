@@ -101,9 +101,9 @@ namespace pTyping.Graphics.Editor.Tools {
         private List<Note> GenerateNotes() {
             string[] splitText = this.LyricsToAdd.Value.Split(this.Delimiter.Value);
 
-            double time = this.EditorInstance.State.CurrentTime;
+            double time = this.EditorInstance.EditorState.CurrentTime;
 
-            double spacing = this.EditorInstance.State.Song.CurrentTimingPoint(time).Tempo / this.Spacing.Value;
+            double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / this.Spacing.Value;
 
             List<Note> notes = new();
             

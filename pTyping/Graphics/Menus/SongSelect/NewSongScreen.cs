@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Menus.SongSelect {
-    public class NewSongScreen : Screen {
+    public class NewSongScreen : pScreen {
         private UiTextBoxDrawable _songArtistTextBox;
         private UiTextBoxDrawable _songCreatorTextBox;
         private UiTextBoxDrawable _songDifficultyTextBox;
@@ -137,5 +137,8 @@ namespace pTyping.Graphics.Menus.SongSelect {
             //Change the screen to the song select screen
             ScreenManager.ChangeScreen(new SongSelectionScreen(true));
         }
+        public override string Name    => "New Song";
+        public override string State   => "Getting ready to map!";
+        public override string Details => "";
     }
 }

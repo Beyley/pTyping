@@ -44,8 +44,8 @@ namespace pTyping.Graphics.Editor.Tools {
                 TweenType.Movement,
                 new(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y - 40),
                 new(EditorScreen.RECEPTICLE_POS.X, EditorScreen.RECEPTICLE_POS.Y - 40),
-                (int)(this.EditorInstance.State.MouseTime - ConVars.BaseApproachTime.Value),
-                (int)this.EditorInstance.State.MouseTime
+                (int)(this.EditorInstance.EditorState.MouseTime - ConVars.BaseApproachTime.Value),
+                (int)this.EditorInstance.EditorState.MouseTime
                 )
                 );
             }
@@ -58,7 +58,7 @@ namespace pTyping.Graphics.Editor.Tools {
             if (args.mouseButton != MouseButton.LeftButton) return;
 
             Note noteToAdd = new() {
-                Time  = this.EditorInstance.State.MouseTime,
+                Time  = this.EditorInstance.EditorState.MouseTime,
                 Text  = this.DefaultNoteText.Value.Trim(),
                 Color = this.DefaultNoteColor
             };

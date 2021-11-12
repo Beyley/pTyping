@@ -15,7 +15,7 @@ using pTyping.Online;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Menus {
-    public class MenuScreen : Screen {
+    public class MenuScreen : pScreen {
         private TextDrawable _musicTitle;
 
         public override void Initialize() {
@@ -212,5 +212,8 @@ namespace pTyping.Graphics.Menus {
 
             pTypingGame.UserStatusListening();
         }
+        public override string Name    => "Main Menu";
+        public override string State   => "Vibing on the menu!";
+        public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
     }
 }

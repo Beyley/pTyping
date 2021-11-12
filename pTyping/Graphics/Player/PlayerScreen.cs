@@ -16,7 +16,7 @@ using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Player {
-    public class PlayerScreen : Screen {
+    public class PlayerScreen : pScreen {
         private TextDrawable _accuracyDrawable;
         private TextDrawable _comboDrawable;
         private TextDrawable _scoreDrawable;
@@ -323,5 +323,10 @@ namespace pTyping.Graphics.Player {
                 this._endScheduled = true;
             }
         }
+
+        public override string Name  => "Gameplay";
+        public override string State => "Typing away!";
+        public override string Details
+            => $@"Playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
     }
 }

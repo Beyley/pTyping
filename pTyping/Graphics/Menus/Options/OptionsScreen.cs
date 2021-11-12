@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using pTyping.Engine;
 
 namespace pTyping.Graphics.Menus.Options {
-    public class OptionsScreen : Screen {
+    public class OptionsScreen : pScreen {
         public override void Initialize() {
             base.Initialize();
 
@@ -139,5 +139,8 @@ namespace pTyping.Graphics.Menus.Options {
         private void UsernameInputOnCommit(object sender, string e) {
             ConVars.Username.Value = e;
         }
+        public override string Name    => "Options";
+        public override string State   => "Tweaking the settings!";
+        public override string Details => "";
     }
 }

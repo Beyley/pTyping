@@ -22,7 +22,7 @@ using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Menus.SongSelect {
-    public class SongSelectionScreen : Screen {
+    public class SongSelectionScreen : pScreen {
 
         public static    Bindable<LeaderboardType> LeaderboardType = new(SongSelect.LeaderboardType.Local);
         private readonly bool                      _editor;
@@ -355,6 +355,10 @@ namespace pTyping.Graphics.Menus.SongSelect {
                 _                                 => throw new ArgumentOutOfRangeException(nameof (type), type, "That leaderboard type is not supported!")
             };
         }
+        public override string Name  => "Song Select";
+        public override string State => "Selecting a song!";
+        public override string Details
+            => $"Deciding on playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
     }
 
     public enum LeaderboardType {

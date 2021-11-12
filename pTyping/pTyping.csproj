@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="DiscordRichPresence" Version="1.0.175"/>
         <PackageReference Include="EeveeTools" Version="1.0.0"/>
         <PackageReference Include="Kettu" Version="1.2.1"/>
         <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.2062-develop"/>
