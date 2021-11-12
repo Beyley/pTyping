@@ -12,16 +12,16 @@ using pTyping.Graphics.Player;
 namespace pTyping.Graphics.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class SelectTool : EditorTool {
-        public override string Name    => "Select";
-        public override string Tooltip => "Select, move, and change notes in the timeline.";
+        private bool _isDragging = false;
+
+        private double _lastDragTime = 0;
+        [ToolOption("Note Colour", "The colour tint of the note.")]
+        public Bindable<Color> NoteColour = new(new(255, 0, 0));
 
         [ToolOption("Note Text", "The note's text you are going to type ingame.")]
         public Bindable<string> NoteText = new(string.Empty);
-        [ToolOption("Note Colour", "The colour tint of the note.")]
-        public Bindable<Color> NoteColour = new(new(255, 0, 0));
-        
-        private double _lastDragTime = 0;
-        private bool   _isDragging   = false;
+        public override string Name    => "Select";
+        public override string Tooltip => "Select, move, and change notes in the timeline.";
 
         public override void Initialize() {
             foreach (NoteDrawable note in this.EditorInstance.State.Notes) {
@@ -52,31 +52,30 @@ namespace pTyping.Graphics.Editor.Tools {
         }
 
         private void UpdateNoteText(object __, string _) {
-            if (this.EditorInstance.State.SelectedNotes.Count != 1) {
-                this.NoteText.Value   = "";
-                this.NoteColour.Value = new(255, 0, 0);
-                return;
-            }
-
-            NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
-
-            note.Note.Text              = this.NoteText.Value.Trim();
-            note.LabelTextDrawable.Text = $"{note.Note.Text}";
-
-            this.EditorInstance.SaveNeeded = true;
-        }
-
-        private void UpdateNoteColor(object __, Color _) {
-            if (this.EditorInstance.State.SelectedNotes.Count != 1)// this.NoteText.Value   = "";
+            if (this.EditorInstance.State.SelectedNotes.Count is 0)
+                // this.NoteText.Value   = "";
                 // this.NoteColour.Value = new(255, 0, 0);
                 return;
 
-            NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
+            foreach (NoteDrawable note in this.EditorInstance.State.SelectedNotes) {
+                note.Note.Text              = this.NoteText.Value.Trim();
+                note.LabelTextDrawable.Text = $"{note.Note.Text}";
 
-            note.Note.Color    = this.NoteColour.Value;
-            note.ColorOverride = note.Note.Color;
+                this.EditorInstance.SaveNeeded = true;
+            }
+        }
 
-            this.EditorInstance.SaveNeeded = true;
+        private void UpdateNoteColor(object __, Color _) {
+            if (this.EditorInstance.State.SelectedNotes.Count == 0)// this.NoteText.Value   = "";
+                // this.NoteColour.Value = new(255, 0, 0);
+                return;
+
+            foreach (NoteDrawable note in this.EditorInstance.State.SelectedNotes) {
+                note.Note.Color    = this.NoteColour.Value;
+                note.ColorOverride = note.Note.Color;
+
+                this.EditorInstance.SaveNeeded = true;
+            }
         }
 
         private void OnSelectedNotesChanged(object sender, NotifyCollectionChangedEventArgs e) {
