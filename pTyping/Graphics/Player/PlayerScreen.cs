@@ -53,8 +53,11 @@ namespace pTyping.Graphics.Player {
 
             this.Song = pTypingGame.CurrentSong.Value.Copy();
 
-            if (this.Song.Notes.Count == 0)//TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
+            if (this.Song.Notes.Count == 0) {
+                //TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+                return;
+            }
 
             this._player = new(this.Song) {
                 Position     = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
