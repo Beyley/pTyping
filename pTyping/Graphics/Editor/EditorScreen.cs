@@ -13,6 +13,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
+using Gtk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -43,7 +44,10 @@ namespace pTyping.Graphics.Editor {
 
         public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-        public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+
+        public bool SaveNeeded = false;
+
+        public long LastEscapeTime = 0;
 
         public override void Initialize() {
             base.Initialize();
@@ -319,8 +323,10 @@ namespace pTyping.Graphics.Editor {
 
             this.Manager.Add(noteDrawable);
             this.State.Notes.Add(noteDrawable);
-            if (isNew)
+            if (isNew) {
                 this.State.Song.Notes.Add(note);
+                this.SaveNeeded = true;
+            }
         }
 
         public void ChangeTool(Type type) {
@@ -621,6 +627,8 @@ namespace pTyping.Graphics.Editor {
                 this.State.Song.Notes.Remove(note.Note);
                 this.State.Notes.Remove(note);
             }
+
+            this.SaveNeeded = true;
         }
 
         private void OnKeyPress(object sender, Keys key) {
@@ -645,6 +653,26 @@ namespace pTyping.Graphics.Editor {
                     if (this.State.SelectedNotes.Count != 0) {
                         this.State.SelectedNotes.Clear();
                         return;
+                    }
+
+                    long unixTime = UnixTime.Now();
+                    if (unixTime - this.LastEscapeTime > 5) {
+                        this.LastEscapeTime = unixTime;
+                        return;
+                    }
+
+                    if (this.SaveNeeded) {
+                        ResponseType responseType = GtkHelper.MessageDialog(
+                        "Are you sure?",
+                        "Do you want to save before quitting?",
+                        MessageType.Question,
+                        ButtonsType.YesNo
+                        );
+
+                        if (responseType == ResponseType.Yes) {
+                            this.State.Song.Save();
+                            SongManager.UpdateSongs();
+                        }
                     }
 
                     pTypingGame.MenuClickSound.Play();

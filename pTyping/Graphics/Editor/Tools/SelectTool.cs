@@ -48,6 +48,8 @@ namespace pTyping.Graphics.Editor.Tools {
 
             note.Note.Text              = this.NoteText.Value.Trim();
             note.LabelTextDrawable.Text = $"{note.Note.Text}";
+
+            this.EditorInstance.SaveNeeded = true;
         }
 
         private void UpdateNoteColor(object __, Color _) {
@@ -59,6 +61,8 @@ namespace pTyping.Graphics.Editor.Tools {
 
             note.Note.Color    = this.NoteColour.Value;
             note.ColorOverride = note.Note.Color;
+
+            this.EditorInstance.SaveNeeded = true;
         }
 
         private void OnSelectedNotesChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -125,6 +129,8 @@ namespace pTyping.Graphics.Editor.Tools {
                     KeepAlive = true
                 }
                 );
+
+                this.EditorInstance.SaveNeeded = true;
             } else {
                 foreach (NoteDrawable noteDrawable in this.EditorInstance.State.SelectedNotes) {
                     noteDrawable.Tweens.Clear();
@@ -143,6 +149,8 @@ namespace pTyping.Graphics.Editor.Tools {
                     }
                     );
                 }
+
+                this.EditorInstance.SaveNeeded = true;
             }
 
             this.EditorInstance.UpdateSelectionRects(null, null);
