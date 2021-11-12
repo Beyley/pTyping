@@ -140,6 +140,8 @@ namespace pTyping.Graphics.Editor {
                 OriginType = OriginType.BottomLeft
             };
 
+            this._progressBar.OnDrag += this.ProgressBarOnDrag;
+
             this.Manager.Add(this._progressBar);
 
             #endregion
@@ -250,6 +252,16 @@ namespace pTyping.Graphics.Editor {
             FurballGame.InputManager.OnMouseDrag   += this.OnMouseDrag;
 
             pTypingGame.UserStatusEditing();
+        }
+
+        private void ProgressBarOnDrag(object sender, Point e) {
+            Vector2 adjustedPoint = e.ToVector2() - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
+
+            double value = (double)adjustedPoint.X / this._progressBar.Size.X;
+
+            double time = value * pTypingGame.MusicTrack.Length;
+
+            pTypingGame.MusicTrack.SeekTo(time);
         }
 
         public void UpdateSelectionRects(object _, NotifyCollectionChangedEventArgs __) {
@@ -598,6 +610,8 @@ namespace pTyping.Graphics.Editor {
             FurballGame.InputManager.OnMouseDrag   -= this.OnMouseDrag;
 
             this.State.SelectedNotes.CollectionChanged -= this.UpdateSelectionRects;
+
+            this._progressBar.OnDrag -= this.ProgressBarOnDrag;
 
             base.Dispose(disposing);
         }
