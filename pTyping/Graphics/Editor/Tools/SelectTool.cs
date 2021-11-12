@@ -37,6 +37,20 @@ namespace pTyping.Graphics.Editor.Tools {
             this.NoteColour.OnChange += this.UpdateNoteColor;
         }
 
+        public override void OnNoteCreate(NoteDrawable note, bool isNew) {
+            note.OnClick     += this.OnNoteClick;
+            note.OnDragBegin += this.OnNoteDragBegin;
+            note.OnDrag      += this.OnNoteDrag;
+            note.OnDragEnd   += this.OnNoteDragEnd;
+        }
+
+        public override void OnNoteDelete(NoteDrawable note) {
+            note.OnClick     -= this.OnNoteClick;
+            note.OnDragBegin -= this.OnNoteDragBegin;
+            note.OnDrag      -= this.OnNoteDrag;
+            note.OnDragEnd   -= this.OnNoteDragEnd;
+        }
+
         private void UpdateNoteText(object __, string _) {
             if (this.EditorInstance.State.SelectedNotes.Count != 1) {
                 this.NoteText.Value   = "";

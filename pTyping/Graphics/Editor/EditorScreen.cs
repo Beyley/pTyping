@@ -17,12 +17,14 @@ using Gtk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
+using TextCopy;
 
 namespace pTyping.Graphics.Editor {
 
@@ -327,6 +329,8 @@ namespace pTyping.Graphics.Editor {
                 this.State.Song.Notes.Add(note);
                 this.SaveNeeded = true;
             }
+
+            this.CurrentTool?.OnNoteCreate(noteDrawable, isNew);
         }
 
         public void ChangeTool(Type type) {
@@ -626,6 +630,8 @@ namespace pTyping.Graphics.Editor {
                 this.Manager.Remove(note);
                 this.State.Song.Notes.Remove(note.Note);
                 this.State.Notes.Remove(note);
+
+                this.CurrentTool?.OnNoteDelete(note);
             }
 
             this.SaveNeeded = true;
@@ -690,6 +696,44 @@ namespace pTyping.Graphics.Editor {
                     // Save the song if ctrl+s is pressed
                     this.State.Song.Save();
                     SongManager.UpdateSongs();
+
+                    this.SaveNeeded = false;
+                    break;
+                }
+                case Keys.C when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
+                    if (this.State.SelectedNotes.Count == 0) return;
+
+                    IEnumerable<NoteDrawable> sortedNotes = this.State.SelectedNotes.ToList().OrderBy(x => x.Note.Time).ToList();
+
+                    double startTime = sortedNotes.First().Note.Time;
+
+                    List<Note> notes = new();
+
+                    foreach (NoteDrawable drawable in sortedNotes) {
+                        Note note = drawable.Note.Copy();
+                        note.Time = drawable.Note.Time - startTime;
+
+                        notes.Add(note);
+                    }
+
+                    ClipboardService.SetText(JsonConvert.SerializeObject(notes));
+
+                    break;
+                }
+                case Keys.V when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
+                    try {
+                        List<Note> notes = JsonConvert.DeserializeObject<List<Note>>(ClipboardService.GetText());
+
+                        foreach (Note note in notes) {
+                            note.Time += this.State.CurrentTime;
+
+                            this.CreateNote(note, true);
+                        }
+                    }
+                    catch {
+                        //TODO: Notify the user it failed
+                    }
+
                     break;
                 }
                 case Keys.D1: {

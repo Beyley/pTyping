@@ -9,6 +9,7 @@ using Kettu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
+using pTyping.Graphics.Player;
 
 namespace pTyping.Graphics.Editor {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
@@ -75,6 +76,10 @@ namespace pTyping.Graphics.Editor {
         public virtual void OnKeyPress(Keys key) {}
 
         public virtual void OnTimeChange(double time) {}
+
+        public virtual void OnNoteCreate(NoteDrawable note, bool isNew) {}
+
+        public virtual void OnNoteDelete(NoteDrawable note) {}
 
         public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
     }
