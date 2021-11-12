@@ -351,7 +351,7 @@ namespace pTyping.Graphics.Editor {
                 string tooltip = field.GetCustomAttribute<ToolOptionAttribute>()!.ToolTip;
                 
                 //The drawable that you interact with
-                ManagedDrawable drawable;
+                List<ManagedDrawable> drawables = new();
                 //The label showing what it is
                 TextDrawable labelDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, name, 30) {
                     OriginType = OriginType.TopRight,
@@ -361,6 +361,62 @@ namespace pTyping.Graphics.Editor {
 
                 //Checks the type that the attribute is attatched to
                 switch (field.FieldType.ToString()) {
+                    case "Furball.Engine.Engine.Helpers.Bindable`1[Microsoft.Xna.Framework.Color]": {
+                        //Get the value of the type
+                        Bindable<Color> value = (Bindable<Color>)field.GetValue(toolAsRealType);
+
+                        //The text box you type in
+                        UiTextBoxDrawable textBox = new(
+                        new(FurballGame.DEFAULT_WINDOW_WIDTH - 10 - 40, y),
+                        pTypingGame.JapaneseFont,
+                        value.Value.ToHexString(),
+                        30,
+                        300
+                        ) {
+                            OriginType = OriginType.TopRight
+                        };
+
+                        TexturedDrawable colorPicker = new(FurballGame.WhitePixel, new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y)) {
+                            OriginType    = OriginType.TopRight,
+                            Scale         = new(textBox.Size.Y - 2),
+                            ColorOverride = value.Value
+                        };
+
+                        colorPicker.OnClick += delegate {
+                            Color color = GtkHelper.ColorChooserDialog(name);
+
+                            value.Value = color;
+                            colorPicker.FadeColor(color, 100);
+                        };
+
+                        //When the textbox is updated, update value
+                        void OnUpdate(object sender, string c) {
+                            value.Value = ColorConverter.FromHexString(textBox.Text);
+                            colorPicker.FadeColor(value.Value, 100);
+                        }
+
+                        void OnFocusChange(object sender, bool b) {
+                            if (b) return;
+
+                            textBox.Text = value.Value.ToHexString();
+                        }
+
+                        textBox.OnCommit      += OnUpdate;
+                        textBox.OnFocusChange += OnFocusChange;
+
+                        //When the value changes, update the text box
+                        value.OnChange += delegate(object _, Color s) {
+                            textBox.Text = s.ToHexString();
+                            colorPicker.FadeColor(value.Value, 100);
+                        };
+
+                        y += textBox.Size.Y + 10f;
+
+                        drawables.Add(textBox);
+                        drawables.Add(colorPicker);
+
+                        break;
+                    }
                     //Is it a Bindable<string>
                     case "Furball.Engine.Engine.Helpers.Bindable`1[System.String]": {
                         //Get the value of the type
@@ -372,12 +428,18 @@ namespace pTyping.Graphics.Editor {
                         };
 
                         //When the textbox is updated, update value
-                        void OnUpdate(object sender, char c) {
+                        void OnUpdate(object sender, string c) {
                             value.Value = textBox.Text;
                         }
 
-                        textBox.OnLetterTyped   += OnUpdate;
-                        textBox.OnLetterRemoved += OnUpdate;
+                        void OnFocusChange(object sender, bool b) {
+                            if (b) return;
+
+                            textBox.Text = value.Value;
+                        }
+
+                        textBox.OnCommit      += OnUpdate;
+                        textBox.OnFocusChange += OnFocusChange;
 
                         //When the value changes, update the text box
                         value.OnChange += delegate(object _, string s) {
@@ -385,8 +447,8 @@ namespace pTyping.Graphics.Editor {
                         };
                         
                         y += textBox.Size.Y + 10f;
-                        
-                        drawable = textBox;
+
+                        drawables.Add(textBox);
 
                         break;
                     }
@@ -401,7 +463,7 @@ namespace pTyping.Graphics.Editor {
                         };
 
                         //When the textbox is updated, update value
-                        void OnUpdate(object sender, char c) {
+                        void OnUpdate(object sender, string c) {
                             if (int.TryParse(textBox.Text, out int result)) {
                                 value.Value           = result;
                                 textBox.ColorOverride = Color.White;
@@ -410,8 +472,14 @@ namespace pTyping.Graphics.Editor {
                             }
                         }
 
-                        textBox.OnLetterTyped   += OnUpdate;
-                        textBox.OnLetterRemoved += OnUpdate;
+                        void OnFocusChange(object sender, bool b) {
+                            if (b) return;
+
+                            textBox.Text = value.Value.ToString();
+                        }
+
+                        textBox.OnCommit      += OnUpdate;
+                        textBox.OnFocusChange += OnFocusChange;
 
                         //When the value changes, update the text box
                         value.OnChange += delegate(object _, int s) {
@@ -422,7 +490,7 @@ namespace pTyping.Graphics.Editor {
 
                         y += textBox.Size.Y + 10f;
 
-                        drawable = textBox;
+                        drawables.Add(textBox);
 
                         break;
                     }
@@ -437,7 +505,7 @@ namespace pTyping.Graphics.Editor {
                         };
 
                         //When the textbox is updated, update value
-                        void OnUpdate(object sender, char c) {
+                        void OnUpdate(object sender, string c) {
                             if (double.TryParse(textBox.Text, out double result)) {
                                 value.Value           = result;
                                 textBox.ColorOverride = Color.White;
@@ -446,8 +514,14 @@ namespace pTyping.Graphics.Editor {
                             }
                         }
 
-                        textBox.OnLetterTyped   += OnUpdate;
-                        textBox.OnLetterRemoved += OnUpdate;
+                        void OnFocusChange(object sender, bool b) {
+                            if (b) return;
+
+                            textBox.Text = value.Value.ToString();
+                        }
+
+                        textBox.OnCommit      += OnUpdate;
+                        textBox.OnFocusChange += OnFocusChange;
 
                         //When the value changes, update the text box
                         value.OnChange += delegate(object _, double s) {
@@ -458,21 +532,21 @@ namespace pTyping.Graphics.Editor {
 
                         y += textBox.Size.Y + 10f;
 
-                        drawable = textBox;
+                        drawables.Add(textBox);
 
                         break;
                     }
                     default: {
-                        drawable = new BlankDrawable();
+                        drawables.Add(new BlankDrawable());
 
                         break;
                     }
                 }
 
                 this._toolOptions.Add(labelDrawable);
-                this._toolOptions.Add(drawable);
+                this._toolOptions.AddRange(drawables);
                 this.Manager.Add(labelDrawable);
-                this.Manager.Add(drawable);
+                this.Manager.Add(drawables.ToArray());
             }
         }
 

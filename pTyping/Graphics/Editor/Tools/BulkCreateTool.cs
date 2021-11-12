@@ -22,14 +22,14 @@ namespace pTyping.Graphics.Editor.Tools {
         [ToolOption("Text Delimiter", "Splits the text every this character.")]
         public readonly Bindable<string> Delimiter = new(";");
         [ToolOption("Color", "The color of all the notes.")]
-        public readonly Bindable<string> Color = new("#FF0000");
+        public readonly Bindable<Color> Color = new(new(255, 0, 0));
 
         private readonly List<NoteDrawable> _previewNotes = new();
 
         public override void Initialize() {
             this.LyricsToAdd.OnChange += this.OnTextChange;
             this.Delimiter.OnChange   += this.OnTextChange;
-            this.Color.OnChange       += this.OnTextChange;
+            this.Color.OnChange       += this.OnColorChange;
             this.Spacing.OnChange     += this.OnIntChange;
 
             this.Update();
@@ -38,18 +38,22 @@ namespace pTyping.Graphics.Editor.Tools {
         public override void Deinitialize() {
             this.LyricsToAdd.OnChange -= this.OnTextChange;
             this.Delimiter.OnChange   -= this.OnTextChange;
-            this.Color.OnChange       -= this.OnTextChange;
+            this.Color.OnChange       -= this.OnColorChange;
             this.Spacing.OnChange     -= this.OnIntChange;
 
             this._previewNotes.ForEach(x => this.DrawableManager.Remove(x));
             this._previewNotes.Clear();
         }
 
-        private void OnTextChange(object? sender, string e) {
+        private void OnColorChange(object sender, Color e) {
             this.Update();
         }
 
-        private void OnIntChange(object? sender, int e) {
+        private void OnTextChange(object sender, string e) {
+            this.Update();
+        }
+
+        private void OnIntChange(object sender, int e) {
             this.Update();
         }
 
@@ -101,14 +105,6 @@ namespace pTyping.Graphics.Editor.Tools {
 
             double spacing = this.EditorInstance.State.Song.CurrentTimingPoint(time).Tempo / this.Spacing.Value;
 
-            Color color = Microsoft.Xna.Framework.Color.Red;
-
-            try {
-                color = ColorConverter.FromHexString(this.Color.Value);
-            }
-            catch {/* */
-            }
-
             List<Note> notes = new();
             
             foreach (string text in splitText) {
@@ -121,7 +117,7 @@ namespace pTyping.Graphics.Editor.Tools {
                 Note note = new() {
                     Text  = text.Trim(),
                     Time  = time,
-                    Color = color
+                    Color = this.Color.Value
                 };
 
                 notes.Add(note);

@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
-using WebSocketSharp;
 
 namespace pTyping.Graphics.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -19,7 +18,7 @@ namespace pTyping.Graphics.Editor.Tools {
         [ToolOption("Note Text", "The note's text you are going to type ingame.")]
         public Bindable<string> NoteText = new(string.Empty);
         [ToolOption("Note Colour", "The colour tint of the note.")]
-        public Bindable<string> NoteColour = new(string.Empty);
+        public Bindable<Color> NoteColour = new(new(255, 0, 0));
         
         private double _lastDragTime = 0;
         private bool   _isDragging   = false;
@@ -34,14 +33,14 @@ namespace pTyping.Graphics.Editor.Tools {
 
             this.EditorInstance.State.SelectedNotes.CollectionChanged += this.OnSelectedNotesChanged;
 
-            this.NoteText.OnChange   += this.UpdateNote;
-            this.NoteColour.OnChange += this.UpdateNote;
+            this.NoteText.OnChange   += this.UpdateNoteText;
+            this.NoteColour.OnChange += this.UpdateNoteColor;
         }
 
-        private void UpdateNote(object? sender, string e) {
-            if (this.EditorInstance.State.SelectedNotes.Count is 0 or > 1) {
+        private void UpdateNoteText(object __, string _) {
+            if (this.EditorInstance.State.SelectedNotes.Count != 1) {
                 this.NoteText.Value   = "";
-                this.NoteColour.Value = "";
+                this.NoteColour.Value = new(255, 0, 0);
                 return;
             }
 
@@ -49,31 +48,28 @@ namespace pTyping.Graphics.Editor.Tools {
 
             note.Note.Text              = this.NoteText.Value.Trim();
             note.LabelTextDrawable.Text = $"{note.Note.Text}";
+        }
 
-            try {
-                if (this.NoteColour.Value.Trim().IsNullOrEmpty()) return;
+        private void UpdateNoteColor(object __, Color _) {
+            if (this.EditorInstance.State.SelectedNotes.Count != 1)// this.NoteText.Value   = "";
+                // this.NoteColour.Value = new(255, 0, 0);
+                return;
 
-                // Logger.Log($"{ColorConverter.FromHexString(this.NoteColour.Value)} : {this.NoteColour.Value}");
+            NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
 
-                note.Note.Color = ColorConverter.FromHexString(this.NoteColour.Value);
-
-                note.ColorOverride = note.Note.Color;
-            }
-            catch {/* IGNORED */
-            }
+            note.Note.Color    = this.NoteColour.Value;
+            note.ColorOverride = note.Note.Color;
         }
 
         private void OnSelectedNotesChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if (this.EditorInstance.State.SelectedNotes.Count is 0 or > 1) {
-                this.NoteText.Value   = "";
-                this.NoteColour.Value = "";
+            if (this.EditorInstance.State.SelectedNotes.Count != 1)// this.NoteText.Value   = "";
+                // this.NoteColour.Value = new(255, 0, 0);
                 return;
-            }
 
             NoteDrawable note = this.EditorInstance.State.SelectedNotes.First();
 
             this.NoteText.Value   = note.Note.Text;
-            this.NoteColour.Value = note.Note.Color.ToHexString();
+            this.NoteColour.Value = note.Note.Color;
         }
 
         public override void Deinitialize() {
@@ -86,8 +82,8 @@ namespace pTyping.Graphics.Editor.Tools {
 
             this.EditorInstance.State.SelectedNotes.CollectionChanged -= this.OnSelectedNotesChanged;
 
-            this.NoteText.OnChange   -= this.UpdateNote;
-            this.NoteColour.OnChange -= this.UpdateNote;
+            this.NoteText.OnChange   -= this.UpdateNoteText;
+            this.NoteColour.OnChange -= this.UpdateNoteColor;
         }
 
         private void OnNoteDragBegin(object sender, Point e) {

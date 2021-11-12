@@ -19,7 +19,7 @@ namespace pTyping.Graphics.Editor.Tools {
         [ToolOption("Default Text", "The default text in new notes.")]
         public Bindable<string> DefaultNoteText = new("a");
         [ToolOption("Default Colour", "The default colour in new notes.")]
-        public Bindable<string> DefaultNoteColor = new("#FF0000");
+        public Bindable<Color> DefaultNoteColor = new(new(255, 0, 0));
 
         public override void Initialize() {
             this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
@@ -60,7 +60,7 @@ namespace pTyping.Graphics.Editor.Tools {
             Note noteToAdd = new() {
                 Time  = this.EditorInstance.State.MouseTime,
                 Text  = this.DefaultNoteText.Value.Trim(),
-                Color = ColorConverter.FromHexString(this.DefaultNoteColor)
+                Color = this.DefaultNoteColor
             };
 
             this.EditorInstance.CreateNote(noteToAdd, true);
