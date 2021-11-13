@@ -180,12 +180,7 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         public override async Task ChangeUserAction(UserAction action) {
-            // this.Player.Action.Value = action;
-
-            Logger.Log($"Sending action {action.Action} {action.ActionText}");
-
             await this._client.SendRealAsync(new PacketClientStatusUpdate(action).GetPacket());
-            ;
         }
 
         protected override async Task ClientLogin() {

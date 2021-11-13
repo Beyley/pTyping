@@ -36,4 +36,12 @@
         <None Remove="Content\back-button.kra~"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Remove="gitversion.txt"/>
+    </ItemGroup>
+
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;"/>
+    </Target>
+
 </Project>
