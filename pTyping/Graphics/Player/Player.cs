@@ -366,6 +366,10 @@ namespace pTyping.Graphics.Player {
 
                 int scoreCombo = Math.Min(SCORE_COMBO * this.Score.Combo, SCORE_COMBO_MAX);
                 this.Score.AddScore(scoreToAdd + scoreCombo);
+
+                if (note.HitResult == HitResult.Poor)
+                    this.Score.Combo = 0;
+                
                 this.Score.Combo++;
 
                 if (this.Score.Combo > this.Score.MaxCombo)
