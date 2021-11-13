@@ -46,6 +46,7 @@ namespace pTyping.Graphics.Editor {
 
         public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
+        public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
         public bool SaveNeeded = false;
 
@@ -323,17 +324,7 @@ namespace pTyping.Graphics.Editor {
                 Note       = note
             };
 
-            noteDrawable.Tweens.Add(
-            new VectorTween(
-            TweenType.Movement,
-            new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset),
-            RECEPTICLE_POS,
-            (int)(note.Time - ConVars.BaseApproachTime.Value),
-            (int)note.Time
-            ) {
-                KeepAlive = true
-            }
-            );
+            noteDrawable.CreateTweens(new(ConVars.BaseApproachTime.Value, true, true));
 
             this.Manager.Add(noteDrawable);
             this.EditorState.Notes.Add(noteDrawable);
@@ -772,15 +763,15 @@ namespace pTyping.Graphics.Editor {
             if (!this.EditorState.CurrentTime.Equals(this._lastTime))
                 this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
 
-            for (int i = 0; i < this.EditorState.Notes.Count; i++) {
-                NoteDrawable noteDrawable = this.EditorState.Notes[i];
-
-                if (this.EditorState.CurrentTime > noteDrawable.Note.Time + 10 ||
-                    this.EditorState.CurrentTime < noteDrawable.Note.Time - ConVars.BaseApproachTime.Value) 
-                    noteDrawable.Visible = false;
-                else 
-                    noteDrawable.Visible = true;
-            }
+            // for (int i = 0; i < this.EditorState.Notes.Count; i++) {
+            //     NoteDrawable noteDrawable = this.EditorState.Notes[i];
+            //
+            //     if (this.EditorState.CurrentTime > noteDrawable.Note.Time + 10 ||
+            //         this.EditorState.CurrentTime < noteDrawable.Note.Time - ConVars.BaseApproachTime.Value) 
+            //         noteDrawable.Visible = false;
+            //     else 
+            //         noteDrawable.Visible = true;
+            // }
 
             int milliseconds = (int)Math.Floor(this.EditorState.CurrentTime         % 1000d);
             int seconds      = (int)Math.Floor(this.EditorState.CurrentTime / 1000d % 60d);

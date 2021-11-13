@@ -1,8 +1,6 @@
 using System.Collections.Specialized;
 using System.Linq;
 using Furball.Engine;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -127,40 +125,16 @@ namespace pTyping.Graphics.Editor.Tools {
             if (this.EditorInstance.EditorState.SelectedNotes.Count == 1) {
                 NoteDrawable noteDrawable = this.EditorInstance.EditorState.SelectedNotes[0];
 
-                noteDrawable.Tweens.Clear();
-
                 noteDrawable.Note.Time = this.EditorInstance.EditorState.MouseTime;
 
-                noteDrawable.Tweens.Add(
-                new VectorTween(
-                TweenType.Movement,
-                new Vector2(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
-                EditorScreen.RECEPTICLE_POS,
-                (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
-                (int)noteDrawable.Note.Time
-                ) {
-                    KeepAlive = true
-                }
-                );
+                noteDrawable.CreateTweens(new(ConVars.BaseApproachTime.Value, true, true));
 
                 this.EditorInstance.SaveNeeded = true;
             } else {
                 foreach (NoteDrawable noteDrawable in this.EditorInstance.EditorState.SelectedNotes) {
-                    noteDrawable.Tweens.Clear();
-
                     noteDrawable.Note.Time += difference;
 
-                    noteDrawable.Tweens.Add(
-                    new VectorTween(
-                    TweenType.Movement,
-                    new Vector2(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y + noteDrawable.Note.YOffset),
-                    EditorScreen.RECEPTICLE_POS,
-                    (int)(noteDrawable.Note.Time - ConVars.BaseApproachTime.Value),
-                    (int)noteDrawable.Note.Time
-                    ) {
-                        KeepAlive = true
-                    }
-                    );
+                    noteDrawable.CreateTweens(new(ConVars.BaseApproachTime.Value, true, true));
                 }
 
                 this.EditorInstance.SaveNeeded = true;

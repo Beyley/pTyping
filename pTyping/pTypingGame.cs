@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using DiscordRPC;
 using FontStashSharp;
 using Furball.Engine;
@@ -269,8 +270,6 @@ namespace pTyping {
             else
                 ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
         }
-
-        private double _rpcDelta = 0;
         
         protected override void Update(GameTime gameTime) {
             base.Update(gameTime);
@@ -279,21 +278,6 @@ namespace pTyping {
             if (this._musicTrackSchedulerDelta > 10 && MusicTrack.IsValidHandle) {
                 MusicTrackScheduler.Update(MusicTrack.GetCurrentTime());
                 this._musicTrackSchedulerDelta = 0;
-            }
-
-            if (RpcClient.CurrentUser != null) {
-                this._rpcDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (this._rpcDelta > 1000) {
-                    pScreen screen = Instance.RunningScreen as pScreen;
-
-                    RichPresence.State   = screen?.State;
-                    RichPresence.Details = screen?.Details;
-
-                    RpcClient.SetPresence(RichPresence);
-
-                    RpcClient.Invoke();
-                    this._rpcDelta = 0;
-                }
             }
 
             if (this._userPanelManager.Visible)
@@ -329,7 +313,26 @@ namespace pTyping {
             RpcClient = new("908631391934222366");
 
             RpcClient.Initialize();
-            
+
+            Thread thread = new(
+            () => {
+                while (true) {
+                    if (RpcClient.CurrentUser == null)
+                        return;
+
+                    pScreen screen = Instance.RunningScreen as pScreen;
+
+                    RichPresence.State   = screen?.State;
+                    RichPresence.Details = screen?.Details;
+
+                    RpcClient.SetPresence(RichPresence);
+
+                    RpcClient.Invoke();
+                }
+            }
+            );
+            thread.Start();
+
             DevConsole.AddConVarStore(typeof(ConVars));
 
             CurrentSongBackground =

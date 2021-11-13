@@ -7,14 +7,21 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Graphics.Editor;
 using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Player {
     public struct NoteTweenArgs {
-        public int ApproachTime;
+        public readonly int  ApproachTime;
+        public readonly bool TweenKeepAlive;
+        public readonly bool IsEditor;
 
-        public NoteTweenArgs(int approachTime) => this.ApproachTime = approachTime;
+        public NoteTweenArgs(int approachTime, bool tweenKeepAlive = false, bool isEditor = false) {
+            this.ApproachTime   = approachTime;
+            this.TweenKeepAlive = tweenKeepAlive;
+            this.IsEditor       = isEditor;
+        }
     }
     
     public class NoteDrawable : TexturedDrawable {
@@ -31,29 +38,39 @@ namespace pTyping.Graphics.Player {
         public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
 
         public void CreateTweens(NoteTweenArgs tweenArgs) {
-            float travelDistance = Player.NOTE_START_POS.X - Player.RECEPTICLE_POS.X;
+            this.Tweens.Clear();
+
+            Vector2 noteStartPos  = tweenArgs.IsEditor ? EditorScreen.NOTE_START_POS : Player.NOTE_START_POS;
+            Vector2 noteEndPos    = tweenArgs.IsEditor ? EditorScreen.NOTE_END_POS : Player.NOTE_END_POS;
+            Vector2 recepticlePos = tweenArgs.IsEditor ? EditorScreen.RECEPTICLE_POS : Player.RECEPTICLE_POS;
+
+            float travelDistance = noteStartPos.X - recepticlePos.X;
             float travelRatio    = tweenArgs.ApproachTime / travelDistance;
 
-            float afterTravelTime = (Player.RECEPTICLE_POS.X - Player.NOTE_END_POS.X) * travelRatio;
+            float afterTravelTime = (recepticlePos.X - noteEndPos.X) * travelRatio;
 
             this.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            new(Player.NOTE_START_POS.X, Player.NOTE_START_POS.Y + this.Note.YOffset),
-            Player.RECEPTICLE_POS,
+            new(noteStartPos.X, noteStartPos.Y + this.Note.YOffset),
+            recepticlePos,
             (int)(this.Note.Time - tweenArgs.ApproachTime),
             (int)this.Note.Time
-            )
+            ) {
+                KeepAlive = tweenArgs.TweenKeepAlive
+            }
             );
 
             this.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            Player.RECEPTICLE_POS,
-            new(Player.NOTE_END_POS.X, Player.RECEPTICLE_POS.Y),
+            recepticlePos,
+            new(noteEndPos.X, recepticlePos.Y),
             (int)this.Note.Time,
             (int)(this.Note.Time + afterTravelTime)
-            )
+            ) {
+                KeepAlive = tweenArgs.TweenKeepAlive
+            }
             );
         }
         
