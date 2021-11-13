@@ -233,25 +233,11 @@ namespace pTyping.Graphics.Player {
                 },
                 Scale      = new(0.55f),
                 Depth      = 0f,
-                OriginType = OriginType.Center
+                OriginType = OriginType.Center,
+                Note       = note
             };
 
-            float travelTime = this.BaseApproachTime;
-
-            float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
-            float travelRatio    = travelTime / travelDistance;
-
-            float afterTravelTime = (RECEPTICLE_POS.X - NOTE_END_POS.X) * travelRatio;
-
-            noteDrawable.Tweens.Add(
-            new VectorTween(TweenType.Movement, new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), RECEPTICLE_POS, (int)(note.Time - travelTime), (int)note.Time)
-            );
-
-            noteDrawable.Tweens.Add(
-            new VectorTween(TweenType.Movement, RECEPTICLE_POS, new(NOTE_END_POS.X, RECEPTICLE_POS.Y), (int)note.Time, (int)(note.Time + afterTravelTime))
-            );
-
-            noteDrawable.Note = note;
+            noteDrawable.CreateTweens(new(this.BaseApproachTime));
 
             return noteDrawable;
         }

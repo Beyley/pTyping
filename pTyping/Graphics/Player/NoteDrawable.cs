@@ -3,12 +3,20 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Player {
+    public struct NoteTweenArgs {
+        public int ApproachTime;
+
+        public NoteTweenArgs(int approachTime) => this.ApproachTime = approachTime;
+    }
+    
     public class NoteDrawable : TexturedDrawable {
         public TextDrawable LabelTextDrawable;
 
@@ -22,12 +30,40 @@ namespace pTyping.Graphics.Player {
 
         public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
 
+        public void CreateTweens(NoteTweenArgs tweenArgs) {
+            float travelDistance = Player.NOTE_START_POS.X - Player.RECEPTICLE_POS.X;
+            float travelRatio    = tweenArgs.ApproachTime / travelDistance;
+
+            float afterTravelTime = (Player.RECEPTICLE_POS.X - Player.NOTE_END_POS.X) * travelRatio;
+
+            this.Tweens.Add(
+            new VectorTween(
+            TweenType.Movement,
+            new(Player.NOTE_START_POS.X, Player.NOTE_START_POS.Y + this.Note.YOffset),
+            Player.RECEPTICLE_POS,
+            (int)(this.Note.Time - tweenArgs.ApproachTime),
+            (int)this.Note.Time
+            )
+            );
+
+            this.Tweens.Add(
+            new VectorTween(
+            TweenType.Movement,
+            Player.RECEPTICLE_POS,
+            new(Player.NOTE_END_POS.X, Player.RECEPTICLE_POS.Y),
+            (int)this.Note.Time,
+            (int)(this.Note.Time + afterTravelTime)
+            )
+            );
+        }
+        
         /// <summary>
         ///     Types a character
         /// </summary>
         /// <param name="hiragana">The hiragana being typed</param>
         /// <param name="romaji">The romaji path to take</param>
         /// <param name="timeDifference">The time difference from now to the note</param>
+        /// <param name="score">The current score</param>
         /// <returns>Whether the note has been fully completed</returns>
         public bool TypeCharacter(string hiragana, string romaji, double timeDifference, PlayerScore score) {
             if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {

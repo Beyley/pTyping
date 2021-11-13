@@ -13,10 +13,17 @@ namespace pTyping.Songs {
         NotHit
     }
 
+    public enum NoteType {
+        Normal
+    }
+
     [JsonObject(MemberSerialization.OptIn)]
     public class Note {
         [JsonProperty]
         public Color Color = Color.Red;
+
+        [JsonProperty]
+        public NoteType Type = NoteType.Normal;
 
         /// <summary>
         ///     Whether or not the note has been hit
