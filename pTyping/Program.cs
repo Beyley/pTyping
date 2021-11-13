@@ -28,7 +28,7 @@ namespace pTyping {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             SetReleaseStream();
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("pTyping.gitversion.txt")) {
+            using (Stream stream = Assembly.GetAssembly(typeof(Program)).GetManifestResourceStream("pTyping.gitversion.txt")) {
                 using (StreamReader reader = new(stream)) {
                     GitVersion = reader.ReadToEnd().Trim();
                 }

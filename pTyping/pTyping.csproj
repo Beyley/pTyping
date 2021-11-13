@@ -38,6 +38,9 @@
 
     <ItemGroup>
         <None Remove="gitversion.txt"/>
+        <EmbeddedResource Include="gitversion.txt">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
