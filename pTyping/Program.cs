@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -28,8 +29,8 @@ namespace pTyping {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             SetReleaseStream();
-            using (Stream stream = Assembly.GetAssembly(typeof(Program)).GetManifestResourceStream("pTyping.gitversion.txt")) {
-                using (StreamReader reader = new(stream)) {
+            using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitversion.txt")) {
+                using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
                     GitVersion = reader.ReadToEnd().Trim();
                 }
             }
