@@ -763,16 +763,6 @@ namespace pTyping.Graphics.Editor {
             if (!this.EditorState.CurrentTime.Equals(this._lastTime))
                 this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
 
-            // for (int i = 0; i < this.EditorState.Notes.Count; i++) {
-            //     NoteDrawable noteDrawable = this.EditorState.Notes[i];
-            //
-            //     if (this.EditorState.CurrentTime > noteDrawable.Note.Time + 10 ||
-            //         this.EditorState.CurrentTime < noteDrawable.Note.Time - ConVars.BaseApproachTime.Value) 
-            //         noteDrawable.Visible = false;
-            //     else 
-            //         noteDrawable.Visible = true;
-            // }
-
             int milliseconds = (int)Math.Floor(this.EditorState.CurrentTime         % 1000d);
             int seconds      = (int)Math.Floor(this.EditorState.CurrentTime / 1000d % 60d);
             int minutes      = (int)Math.Floor(this.EditorState.CurrentTime         / 1000d / 60d);

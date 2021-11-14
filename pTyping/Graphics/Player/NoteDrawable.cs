@@ -12,12 +12,12 @@ using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Player {
-    public struct NoteTweenArgs {
+    public struct GameplayDrawableTweenArgs {
         public readonly int  ApproachTime;
         public readonly bool TweenKeepAlive;
         public readonly bool IsEditor;
 
-        public NoteTweenArgs(int approachTime, bool tweenKeepAlive = false, bool isEditor = false) {
+        public GameplayDrawableTweenArgs(int approachTime, bool tweenKeepAlive = false, bool isEditor = false) {
             this.ApproachTime   = approachTime;
             this.TweenKeepAlive = tweenKeepAlive;
             this.IsEditor       = isEditor;
@@ -37,7 +37,7 @@ namespace pTyping.Graphics.Player {
 
         public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
 
-        public void CreateTweens(NoteTweenArgs tweenArgs) {
+        public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
             this.Tweens.Clear();
 
             Vector2 noteStartPos  = tweenArgs.IsEditor ? EditorScreen.NOTE_START_POS : Player.NOTE_START_POS;

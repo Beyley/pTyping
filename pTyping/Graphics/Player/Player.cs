@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Engine;
+using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
@@ -54,8 +55,8 @@ namespace pTyping.Graphics.Player {
 
         private readonly TextDrawable _typingIndicator;
 
-        private readonly List<NoteDrawable>                       _notes    = new();
-        private readonly List<Tuple<LinePrimitiveDrawable, bool>> _beatBars = new();
+        private readonly List<NoteDrawable>                 _notes  = new();
+        private readonly List<Tuple<ManagedDrawable, bool>> _events = new();
 
         public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
 
@@ -120,8 +121,7 @@ namespace pTyping.Graphics.Player {
             this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
 
             this.CreateNotes();
-            this.CreateCutOffIndicators();
-            this.CreateBeatLines();
+            this.CreateEvents();
 
             this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
@@ -136,48 +136,43 @@ namespace pTyping.Graphics.Player {
                 mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
         }
 
-        private void CreateBeatLines() {
+        private void CreateEvents() {
             foreach (Event @event in this.Song.Events) {
-                LinePrimitiveDrawable drawable = @event switch {
-                    BeatLineBarEvent => new LinePrimitiveDrawable(new(0), 100, (float)Math.PI / 2f) {
-                        Thickness = 3f
-                    },
-                    BeatLineBeatEvent => new LinePrimitiveDrawable(new(0), 100, (float)Math.PI / 2f),
-                    _                 => null
-                };
+                ManagedDrawable drawable;
+                switch (@event.Type) {
+                    case EventType.BeatLineBar: {
+                        BeatLineBarEventDrawable tempDrawable = new(@event);
+                        tempDrawable.CreateTweens(new(this.BaseApproachTime));
 
-                float travelTime = this.BaseApproachTime;
+                        drawable = tempDrawable;
 
-                float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
-                float travelRatio    = travelTime / travelDistance;
+                        break;
+                    }
+                    case EventType.BeatLineBeat: {
+                        BeatLineBeatEventDrawable tempDrawable = new(@event);
+                        tempDrawable.CreateTweens(new(this.BaseApproachTime));
 
-                float afterTravelTime = (RECEPTICLE_POS.X - NOTE_END_POS.X) * travelRatio;
+                        drawable = tempDrawable;
 
-                drawable?.Tweens.Add(
-                new VectorTween(
-                TweenType.Movement,
-                new(NOTE_START_POS.X, NOTE_START_POS.Y - drawable.Length / 2f),
-                new(RECEPTICLE_POS.X, RECEPTICLE_POS.Y - drawable.Length / 2f),
-                (int)(@event.Time - travelTime),
-                (int)@event.Time
-                )
-                );
+                        break;
+                    }
+                    case EventType.TypingCutoff: {
+                        TypingCutoffEventDrawable tempDrawable = new(this._noteTexture, @event);
+                        tempDrawable.CreateTweens(new(this.BaseApproachTime));
 
-                drawable?.Tweens.Add(
-                new VectorTween(
-                TweenType.Movement,
-                new(RECEPTICLE_POS.X, RECEPTICLE_POS.Y - drawable.Length / 2f),
-                new(NOTE_END_POS.X, RECEPTICLE_POS.Y   - drawable.Length / 2f),
-                (int)@event.Time,
-                (int)(@event.Time + afterTravelTime)
-                )
-                );
+                        drawable = tempDrawable;
 
-                if (drawable != null) {
-                    drawable.TimeSource = pTypingGame.MusicTrack;
-                    drawable.Depth      = 0.5f;
-                    this._beatBars.Add(new(drawable, false));
+                        break;
+                    }
+                    default: {
+                        continue;
+                    }
                 }
+
+                drawable.TimeSource = pTypingGame.MusicTrack;
+                drawable.Depth      = 0.5f;
+
+                this._events.Add(new(drawable, false));
             }
         }
 
@@ -186,40 +181,6 @@ namespace pTyping.Graphics.Player {
                 NoteDrawable noteDrawable = this.CreateNote(note);
 
                 this._notes.Add(noteDrawable);
-            }
-        }
-
-        private void CreateCutOffIndicators() {
-            foreach (Event @event in this.Song.Events) {
-                if (@event is not TypingCutoffEvent) continue;
-
-                TexturedDrawable cutoffIndicator = new(this._noteTexture, new(NOTE_START_POS.X, NOTE_START_POS.Y)) {
-                    TimeSource    = pTypingGame.MusicTrack,
-                    ColorOverride = Color.LightBlue,
-                    Scale         = new(0.3f),
-                    OriginType    = OriginType.Center
-                };
-
-                #region tweens
-
-                float travelTime = this.BaseApproachTime;
-
-                float travelDistance = NOTE_START_POS.X - RECEPTICLE_POS.X;
-                float travelRatio    = travelTime / travelDistance;
-
-                float afterTravelTime = (RECEPTICLE_POS.X - NOTE_END_POS.X) * travelRatio;
-
-                cutoffIndicator.Tweens.Add(
-                new VectorTween(TweenType.Movement, new(NOTE_START_POS.X, NOTE_START_POS.Y), RECEPTICLE_POS, (int)(@event.Time - travelTime), (int)@event.Time)
-                );
-
-                cutoffIndicator.Tweens.Add(
-                new VectorTween(TweenType.Movement, RECEPTICLE_POS, new(NOTE_END_POS.X, RECEPTICLE_POS.Y), (int)@event.Time, (int)(@event.Time + afterTravelTime))
-                );
-
-                #endregion
-
-                this._drawables.Add(cutoffIndicator);
             }
         }
 
@@ -411,15 +372,15 @@ namespace pTyping.Graphics.Player {
                 note.Added = true;
             }
 
-            for (int i = 0; i < this._beatBars.Count; i++) {
-                Tuple<LinePrimitiveDrawable, bool> note = this._beatBars[i];
+            for (int i = 0; i < this._events.Count; i++) {
+                Tuple<ManagedDrawable, bool> @event = this._events[i];
 
-                if (note.Item2) continue;
+                if (@event.Item2) continue;
 
-                if (currentTime < note.Item1.Tweens[0].StartTime) continue;
+                if (currentTime < @event.Item1.Tweens[0].StartTime) continue;
 
-                this._drawables.Add(note.Item1);
-                this._beatBars[i] = new(note.Item1, true);
+                this._drawables.Add(@event.Item1);
+                this._events[i] = new(@event.Item1, true);
             }
 
             #endregion
