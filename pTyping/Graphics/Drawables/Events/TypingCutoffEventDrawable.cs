@@ -9,10 +9,10 @@ using pTyping.Songs;
 
 namespace pTyping.Graphics.Drawables.Events {
     public class TypingCutoffEventDrawable : TexturedDrawable {
-        private readonly Event _event;
+        public readonly Event Event;
 
         public TypingCutoffEventDrawable(Texture2D texture, Event @event) : base(texture, Vector2.Zero) {
-            this._event        = @event;
+            this.Event         = @event;
             this.TimeSource    = pTypingGame.MusicTrack;
             this.ColorOverride = Color.LightBlue;
             this.Scale         = new(0.3f);
@@ -36,15 +36,15 @@ namespace pTyping.Graphics.Drawables.Events {
             TweenType.Movement,
             new(noteStartPos.X, noteStartPos.Y),
             recepticlePos,
-            (int)(this._event.Time - tweenArgs.ApproachTime),
-            (int)this._event.Time
+            (int)(this.Event.Time - tweenArgs.ApproachTime),
+            (int)this.Event.Time
             ) {
                 KeepAlive = tweenArgs.TweenKeepAlive
             }
             );
 
             this.Tweens.Add(
-            new VectorTween(TweenType.Movement, recepticlePos, new(noteEndPos.X, recepticlePos.Y), (int)this._event.Time, (int)(this._event.Time + afterTravelTime)) {
+            new VectorTween(TweenType.Movement, recepticlePos, new(noteEndPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
                 KeepAlive = tweenArgs.TweenKeepAlive
             }
             );

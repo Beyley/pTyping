@@ -20,6 +20,7 @@ using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
+using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
@@ -75,6 +76,8 @@ namespace pTyping.Graphics.Editor {
 
             foreach (Note note in this.EditorState.Song.Notes)
                 this.CreateNote(note);
+            foreach (Event @event in this.EditorState.Song.Events)
+                this.CreateEvent(@event);
 
             #endregion
 
@@ -122,7 +125,7 @@ namespace pTyping.Graphics.Editor {
 
             #region Visualization drawables
 
-            this.EditorState.SelectedNotes.CollectionChanged += this.UpdateSelectionRects;
+            this.EditorState.SelectedObjects.CollectionChanged += this.UpdateSelectionRects;
 
             #endregion
 
@@ -270,9 +273,9 @@ namespace pTyping.Graphics.Editor {
 
             this._selectionRects.Clear();
 
-            foreach (NoteDrawable selectedNote in this.EditorState.SelectedNotes) {
+            foreach (ManagedDrawable @object in this.EditorState.SelectedObjects) {
                 RectanglePrimitiveDrawable rect = new() {
-                    RectSize      = new(100, 100),
+                    RectSize      = @object.Size + new Vector2(20f),
                     Filled        = false,
                     Thickness     = 2f,
                     ColorOverride = Color.Gray,
@@ -284,18 +287,8 @@ namespace pTyping.Graphics.Editor {
                     TimeSource    = pTypingGame.MusicTrack
                 };
 
-                rect.Tweens.Add(
-                new VectorTween(
-                TweenType.Movement,
-                new(NOTE_START_POS.X, NOTE_START_POS.Y + selectedNote.Note.YOffset),
-                RECEPTICLE_POS,
-                (int)(selectedNote.Note.Time - ConVars.BaseApproachTime.Value),
-                (int)selectedNote.Note.Time
-                ) {
-                    KeepAlive = true
-                }
-                );
-
+                @object.Tweens.ForEach(x => rect.Tweens.Add(x.Copy()));
+                
                 this._selectionRects.Add(rect);
 
                 this.Manager.Add(rect);
@@ -304,6 +297,21 @@ namespace pTyping.Graphics.Editor {
 
         private void OnMouseDrag(object sender, ((Point lastPosition, Point newPosition), string cursorName) e) {
             this.CurrentTool?.OnMouseDrag(e.Item1.newPosition);
+        }
+
+        public void CreateEvent(Event @event, bool isNew = false) {
+            ManagedDrawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new(ConVars.BaseApproachTime.Value, true, true));
+
+            if (eventDrawable == null) return;
+
+            this.Manager.Add(eventDrawable);
+            this.EditorState.Events.Add(eventDrawable);
+            if (isNew) {
+                this.EditorState.Song.Events.Add(@event);
+                this.SaveNeeded = true;
+            }
+
+            this.CurrentTool?.OnEventCreate(eventDrawable, isNew);
         }
 
         public void CreateNote(Note note, bool isNew = false) {
@@ -600,7 +608,7 @@ namespace pTyping.Graphics.Editor {
             FurballGame.InputManager.OnMouseMove   -= this.OnMouseMove;
             FurballGame.InputManager.OnMouseDrag   -= this.OnMouseDrag;
 
-            this.EditorState.SelectedNotes.CollectionChanged -= this.UpdateSelectionRects;
+            this.EditorState.SelectedObjects.CollectionChanged -= this.UpdateSelectionRects;
 
             this._progressBar.OnDrag -= this.ProgressBarOnDrag;
 
@@ -628,17 +636,35 @@ namespace pTyping.Graphics.Editor {
             pTypingGame.MusicTrack.SeekTo(Math.Max(timeToSeekTo, 0));
         }
 
-        public void DeleteSelectedNotes() {
-            for (int i = 0; i < this.EditorState.SelectedNotes.Count; i++) {
-                NoteDrawable note = this.EditorState.SelectedNotes[i];
+        public void DeleteSelectedObjects() {
+            foreach (ManagedDrawable @object in this.EditorState.SelectedObjects)
+                if (@object is NoteDrawable note) {
+                    this.Manager.Remove(note);
+                    this.EditorState.Song.Notes.Remove(note.Note);
+                    this.EditorState.Notes.Remove(note);
 
-                this.Manager.Remove(note);
-                this.EditorState.Song.Notes.Remove(note.Note);
-                this.EditorState.Notes.Remove(note);
+                    this.CurrentTool?.OnNoteDelete(note);
+                } else if (@object is BeatLineBarEventDrawable barEvent) {
+                    this.Manager.Remove(barEvent);
+                    this.EditorState.Song.Events.Remove(barEvent.Event);
+                    this.EditorState.Events.Remove(barEvent);
 
-                this.CurrentTool?.OnNoteDelete(note);
-            }
+                    this.CurrentTool?.OnEventDelete(barEvent);
+                } else if (@object is BeatLineBeatEventDrawable beatEvent) {
+                    this.Manager.Remove(beatEvent);
+                    this.EditorState.Song.Events.Remove(beatEvent.Event);
+                    this.EditorState.Events.Remove(beatEvent);
 
+                    this.CurrentTool?.OnEventDelete(beatEvent);
+                } else if (@object is TypingCutoffEventDrawable cutoffEvent) {
+                    this.Manager.Remove(cutoffEvent);
+                    this.EditorState.Song.Events.Remove(cutoffEvent.Event);
+                    this.EditorState.Events.Remove(cutoffEvent);
+
+                    this.CurrentTool?.OnEventDelete(cutoffEvent);
+                }
+
+            this.EditorState.SelectedObjects.Clear();
             this.SaveNeeded = true;
         }
 
@@ -661,8 +687,8 @@ namespace pTyping.Graphics.Editor {
                 }
                 case Keys.Escape:
                     //If the user has some notes selected, clear them
-                    if (this.EditorState.SelectedNotes.Count != 0) {
-                        this.EditorState.SelectedNotes.Clear();
+                    if (this.EditorState.SelectedObjects.Count != 0) {
+                        this.EditorState.SelectedObjects.Clear();
                         return;
                     }
 
@@ -692,9 +718,8 @@ namespace pTyping.Graphics.Editor {
                     ScreenManager.ChangeScreen(new SongSelectionScreen(true));
                     break;
                 case Keys.Delete: {
-                    // Delete the selected notes
-                    this.DeleteSelectedNotes();
-                    this.EditorState.SelectedNotes.Clear();
+                    // Delete the selected objects
+                    this.DeleteSelectedObjects();
                     break;
                 }
                 case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
@@ -706,9 +731,13 @@ namespace pTyping.Graphics.Editor {
                     break;
                 }
                 case Keys.C when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
-                    if (this.EditorState.SelectedNotes.Count == 0) return;
+                    if (this.EditorState.SelectedObjects.Count == 0) return;
 
-                    IEnumerable<NoteDrawable> sortedNotes = this.EditorState.SelectedNotes.ToList().OrderBy(x => x.Note.Time).ToList();
+                    List<NoteDrawable> sortedNotes = new();
+                    foreach (ManagedDrawable @object in this.EditorState.SelectedObjects)
+                        if (@object is NoteDrawable note)
+                            sortedNotes.Add(note);
+                    sortedNotes = sortedNotes.OrderBy(x => x.Note.Time).ToList();
 
                     double startTime = sortedNotes.First().Note.Time;
 
@@ -760,8 +789,12 @@ namespace pTyping.Graphics.Editor {
         public override void Update(GameTime gameTime) {
             this.EditorState.CurrentTime = pTypingGame.MusicTrack.GetCurrentTime();
 
-            if (!this.EditorState.CurrentTime.Equals(this._lastTime))
+            if (!this.EditorState.CurrentTime.Equals(this._lastTime)) {
                 this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
+
+                foreach (NoteDrawable note in this.EditorState.Notes)
+                    note.Visible = this.EditorState.CurrentTime > note.Note.Time - 2000 && this.EditorState.CurrentTime < note.Note.Time + 1000;
+            }
 
             int milliseconds = (int)Math.Floor(this.EditorState.CurrentTime         % 1000d);
             int seconds      = (int)Math.Floor(this.EditorState.CurrentTime / 1000d % 60d);
@@ -774,6 +807,7 @@ namespace pTyping.Graphics.Editor {
             
             base.Update(gameTime);
         }
+        
         public override string Name  => "Editor";
         public override string State => "Editing a map!";
         public override string Details => ConVars.Username.Value == pTypingGame.CurrentSong.Value.Creator

@@ -11,7 +11,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Engine;
-using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
@@ -137,42 +136,17 @@ namespace pTyping.Graphics.Player {
         }
 
         private void CreateEvents() {
-            foreach (Event @event in this.Song.Events) {
-                ManagedDrawable drawable;
-                switch (@event.Type) {
-                    case EventType.BeatLineBar: {
-                        BeatLineBarEventDrawable tempDrawable = new(@event);
-                        tempDrawable.CreateTweens(new(this.BaseApproachTime));
+            for (int i = 0; i < this.Song.Events.Count; i++) {
+                Event @event = this.Song.Events[i];
 
-                        drawable = tempDrawable;
+                ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new(this.BaseApproachTime));
 
-                        break;
-                    }
-                    case EventType.BeatLineBeat: {
-                        BeatLineBeatEventDrawable tempDrawable = new(@event);
-                        tempDrawable.CreateTweens(new(this.BaseApproachTime));
+                if (drawable != null) {
+                    drawable.TimeSource = pTypingGame.MusicTrack;
+                    drawable.Depth      = 0.5f;
 
-                        drawable = tempDrawable;
-
-                        break;
-                    }
-                    case EventType.TypingCutoff: {
-                        TypingCutoffEventDrawable tempDrawable = new(this._noteTexture, @event);
-                        tempDrawable.CreateTweens(new(this.BaseApproachTime));
-
-                        drawable = tempDrawable;
-
-                        break;
-                    }
-                    default: {
-                        continue;
-                    }
+                    this._events.Add(new(drawable, false));
                 }
-
-                drawable.TimeSource = pTypingGame.MusicTrack;
-                drawable.Depth      = 0.5f;
-
-                this._events.Add(new(drawable, false));
             }
         }
 
@@ -373,14 +347,14 @@ namespace pTyping.Graphics.Player {
             }
 
             for (int i = 0; i < this._events.Count; i++) {
-                Tuple<ManagedDrawable, bool> @event = this._events[i];
+                (ManagedDrawable drawable, bool added) = this._events[i];
 
-                if (@event.Item2) continue;
+                if (added) continue;
 
-                if (currentTime < @event.Item1.Tweens[0].StartTime) continue;
+                if (currentTime < drawable.Tweens[0].StartTime) continue;
 
-                this._drawables.Add(@event.Item1);
-                this._events[i] = new(@event.Item1, true);
+                this._drawables.Add(drawable);
+                this._events[i] = new(drawable, true);
             }
 
             #endregion

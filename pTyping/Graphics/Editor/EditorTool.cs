@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
@@ -80,6 +81,10 @@ namespace pTyping.Graphics.Editor {
         public virtual void OnNoteCreate(NoteDrawable note, bool isNew) {}
 
         public virtual void OnNoteDelete(NoteDrawable note) {}
+
+        public virtual void OnEventCreate(ManagedDrawable @event, bool isNew) {}
+
+        public virtual void OnEventDelete(ManagedDrawable note) {}
 
         public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
     }
