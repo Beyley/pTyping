@@ -39,7 +39,7 @@ namespace pTyping.Graphics.Editor {
         public EditorTool       CurrentTool;
         public List<EditorTool> EditorTools;
 
-        public readonly EditorState EditorState = new();
+        public EditorState EditorState;
 
         private readonly List<ManagedDrawable> _selectionRects = new();
 
@@ -57,8 +57,7 @@ namespace pTyping.Graphics.Editor {
             base.Initialize();
 
             //Create a copy of the song so that we dont edit it globally
-            //TODO: should `Song` be a struct?
-            this.EditorState.Song = pTypingGame.CurrentSong.Value.Copy();
+            this.EditorState = new(pTypingGame.CurrentSong.Value.Copy());
 
             pTypingGame.MusicTrack.Stop();
 
@@ -368,8 +367,9 @@ namespace pTyping.Graphics.Editor {
 
             float y = 10;
             foreach (FieldInfo field in result) {
-                string name    = field.GetCustomAttribute<ToolOptionAttribute>()!.Name;
-                string tooltip = field.GetCustomAttribute<ToolOptionAttribute>()!.ToolTip;
+                string   name    = field.GetCustomAttribute<ToolOptionAttribute>()!.Name;
+                string   tooltip = field.GetCustomAttribute<ToolOptionAttribute>()!.ToolTip;
+                string[] options = field.GetCustomAttribute<ToolOptionAttribute>()!.Options;
                 
                 //The drawable that you interact with
                 List<ManagedDrawable> drawables = new();
@@ -443,33 +443,51 @@ namespace pTyping.Graphics.Editor {
                         //Get the value of the type
                         Bindable<string> value = (Bindable<string>)field.GetValue(toolAsRealType);
 
-                        //The text box you type in
-                        UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value, 30, 300) {
-                            OriginType = OriginType.TopRight
-                        };
+                        if (options.Length == 0) {
+                            //The text box you type in
+                            UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value, 30, 300) {
+                                OriginType = OriginType.TopRight
+                            };
 
-                        //When the textbox is updated, update value
-                        void OnUpdate(object sender, string c) {
-                            value.Value = textBox.Text;
+                            //When the textbox is updated, update value
+                            void OnUpdate(object sender, string c) {
+                                value.Value = textBox.Text;
+                            }
+
+                            void OnFocusChange(object sender, bool b) {
+                                if (b) return;
+
+                                textBox.Text = value.Value;
+                            }
+
+                            textBox.OnCommit      += OnUpdate;
+                            textBox.OnFocusChange += OnFocusChange;
+
+                            //When the value changes, update the text box
+                            value.OnChange += delegate(object _, string s) {
+                                textBox.Text = s;
+                            };
+
+                            y += textBox.Size.Y + 10f;
+
+                            drawables.Add(textBox);
+                        } else {
+                            UiDropdownDrawable dropdown = new(
+                            new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y),
+                            options.ToList(),
+                            new(250, 35),
+                            FurballGame.DEFAULT_FONT,
+                            30
+                            ) {
+                                OriginType = OriginType.TopRight
+                            };
+
+                            dropdown.SelectedItem.OnChange += delegate(object _, string s) {
+                                value.Value = s;
+                            };
+
+                            drawables.Add(dropdown);
                         }
-
-                        void OnFocusChange(object sender, bool b) {
-                            if (b) return;
-
-                            textBox.Text = value.Value;
-                        }
-
-                        textBox.OnCommit      += OnUpdate;
-                        textBox.OnFocusChange += OnFocusChange;
-
-                        //When the value changes, update the text box
-                        value.OnChange += delegate(object _, string s) {
-                            textBox.Text = s;
-                        };
-                        
-                        y += textBox.Size.Y + 10f;
-
-                        drawables.Add(textBox);
 
                         break;
                     }
@@ -775,7 +793,7 @@ namespace pTyping.Graphics.Editor {
                     break;
                 }
                 case Keys.D2: {
-                    this.ChangeTool(typeof(CreateTool));
+                    this.ChangeTool(typeof(CreateNoteTool));
                     break;
                 }
                 case Keys.D3: {
@@ -794,6 +812,16 @@ namespace pTyping.Graphics.Editor {
 
                 foreach (NoteDrawable note in this.EditorState.Notes)
                     note.Visible = this.EditorState.CurrentTime > note.Note.Time - 2000 && this.EditorState.CurrentTime < note.Note.Time + 1000;
+                foreach (ManagedDrawable managedDrawable in this.EditorState.Events) {
+                    double time = managedDrawable switch {
+                        TypingCutoffEventDrawable cutoff       => cutoff.Event.Time,
+                        BeatLineBarEventDrawable beatLineBar   => beatLineBar.Event.Time,
+                        BeatLineBeatEventDrawable beatLineBeat => beatLineBeat.Event.Time,
+                        _                                      => 0
+                    };
+
+                    managedDrawable.Visible = this.EditorState.CurrentTime > time - 2000 && this.EditorState.CurrentTime < time + 1000;
+                }
             }
 
             int milliseconds = (int)Math.Floor(this.EditorState.CurrentTime         % 1000d);

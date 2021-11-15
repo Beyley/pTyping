@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Furball.Engine.Engine.Graphics.Drawables;
+using JetBrains.Annotations;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
 
@@ -14,6 +15,9 @@ namespace pTyping.Graphics.Editor {
         public double CurrentTime;
         public double MouseTime;
 
-        public Song Song;
+        [NotNull]
+        public readonly Song Song;
+
+        public EditorState(Song song) => this.Song = song;
     }
 }

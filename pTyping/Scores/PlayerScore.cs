@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
@@ -59,6 +60,7 @@ namespace pTyping.Scores {
 
         public PlayerScore() {}
 
+        [Pure]
         public static PlayerScore LoadUTypingReplay(string path) {
             FileStream   stream = File.OpenRead(path);
             BinaryReader reader = new(stream);
@@ -88,6 +90,7 @@ namespace pTyping.Scores {
             stream.Close();
         }
 
+        [Pure]
         public static PlayerScore TaikoRsDeserialize(TaikoRsReader reader) {
             PlayerScore score = new();
 
@@ -110,6 +113,7 @@ namespace pTyping.Scores {
             return score;
         }
 
+        [Pure]
         public byte[] TaikoRsSerialize() {
             MemoryStream  stream = new();
             TaikoRsWriter writer = new(stream);
@@ -145,6 +149,7 @@ namespace pTyping.Scores {
 
         public bool Used;
 
+        [Pure]
         public static ReplayFrame UTypingDeserialize(BinaryReader reader) {
             ReplayFrame frame = new();
 

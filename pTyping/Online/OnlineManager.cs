@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using pTyping.Scores;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
@@ -23,6 +24,7 @@ namespace pTyping.Online {
                 await this.ClientSubmitScore(score);
         }
 
+        [Pure]
         public async Task<List<PlayerScore>> GetMapScores(string hash) {
             if (this.State == ConnectionState.LoggedIn)
                 return await this.ClientGetScores(hash);
@@ -39,6 +41,7 @@ namespace pTyping.Online {
         protected abstract Task                    Disconnect();
         public abstract    Task                    SendMessage(string            channel, string message);
         protected abstract Task                    ClientSubmitScore(PlayerScore score);
+        [Pure]
         protected abstract Task<List<PlayerScore>> ClientGetScores(string        hash);
 
         public abstract Task ChangeUserAction(UserAction action);

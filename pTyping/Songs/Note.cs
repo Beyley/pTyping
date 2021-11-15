@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using pTyping.Graphics.Player;
@@ -46,6 +47,7 @@ namespace pTyping.Songs {
         public float YOffset;
         public (string Hiragana, List<string> Romaji) TypableRomaji => this.GetTypableRomaji(this.Typed);
 
+        [Pure]
         public (string Hiragana, List<string> Romaji) GetTypableRomaji(string typed = "") {
             if (this.IsHit)
                 return (string.Empty, new() {

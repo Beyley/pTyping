@@ -38,6 +38,23 @@ namespace pTyping.Graphics.Editor.Tools {
             base.Initialize();
         }
 
+        public override void Deinitialize() {
+            foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
+                note.OnClick     -= this.OnObjectClick;
+                note.OnDragBegin -= this.OnObjectDragBegin;
+                note.OnDrag      -= this.OnObjectDrag;
+                note.OnDragEnd   -= this.OnObjectDragEnd;
+            }
+            foreach (ManagedDrawable @event in this.EditorInstance.EditorState.Events) {
+                @event.OnClick     -= this.OnObjectClick;
+                @event.OnDragBegin -= this.OnObjectDragBegin;
+                @event.OnDrag      -= this.OnObjectDrag;
+                @event.OnDragEnd   -= this.OnObjectDragEnd;
+            }
+
+            base.Deinitialize();
+        }
+
         private void OnObjectDragBegin(object sender, Point e) {
             if (!FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift)) return;
 

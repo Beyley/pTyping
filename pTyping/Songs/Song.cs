@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Furball.Engine.Engine.Helpers;
+using JetBrains.Annotations;
 using Kettu;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -68,8 +69,14 @@ namespace pTyping.Songs {
 
         public double BeatsPerMinute => 60000 / this.TimingPoints[0].Tempo;
 
+        [Pure]
         public static Song LoadFromFile(FileInfo fileInfo) {
-            Song song = JsonConvert.DeserializeObject<Song>(File.ReadAllText(fileInfo.FullName));
+            Song song = JsonConvert.DeserializeObject<Song>(
+            File.ReadAllText(fileInfo.FullName),
+            new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.Auto
+            }
+            );
             song.FileInfo = fileInfo;
 
             song.Notes.Sort((x, y) => (int)((x.Time - y.Time) * 1000));
@@ -84,6 +91,7 @@ namespace pTyping.Songs {
             return song;
         }
 
+        [CanBeNull]
         public static Song LoadUTypingSong(FileInfo fileInfo) {
             Song song = new() {
                 Name       = "",
@@ -226,6 +234,7 @@ namespace pTyping.Songs {
             return song;
         }
 
+        [Pure]
         public TimingPoint CurrentTimingPoint(double currentTime) {
             List<TimingPoint> sortedTimingPoints = this.TimingPoints.ToList();
             sortedTimingPoints.Sort((pair, valuePair) => (int)(pair.Time - valuePair.Time));
@@ -239,6 +248,7 @@ namespace pTyping.Songs {
             return this.TimingPoints.First();
         }
 
+        [Pure]
         public double DividedNoteLength(double currentTime) {
             TimingPoint timingPoint = this.CurrentTimingPoint(currentTime);
 
@@ -249,7 +259,16 @@ namespace pTyping.Songs {
             this.Notes.Sort((x,        y) => (int)(x.Time - y.Time));
             this.TimingPoints.Sort((x, y) => (int)(x.Time - y.Time));
 
-            File.WriteAllText(this.FileInfo.FullName, JsonConvert.SerializeObject(this, Formatting.Indented));
+            File.WriteAllText(
+            this.FileInfo.FullName,
+            JsonConvert.SerializeObject(
+            this,
+            new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting       = Formatting.Indented
+            }
+            )
+            );
 
             Logger.Log($"Saved pTyping song! {this.Artist}-{this.Name} [{this.Difficulty}] by {this.Creator}", LoggerLevelSongInfo.Instance);
         }

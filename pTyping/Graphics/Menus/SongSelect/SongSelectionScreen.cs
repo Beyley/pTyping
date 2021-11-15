@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using JetBrains.Annotations;
 using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -347,6 +348,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             base.Dispose(disposing);
         }
 
+        [Pure]
         public static Texture2D TextureFromLeaderboardType(LeaderboardType type) {
             return type switch {
                 SongSelect.LeaderboardType.Friend => pTypingGame.FriendLeaderboardButtonTexture,

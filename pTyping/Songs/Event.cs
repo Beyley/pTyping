@@ -1,4 +1,5 @@
 using Furball.Engine.Engine.Graphics.Drawables;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using pTyping.Graphics.Drawables.Events;
@@ -12,6 +13,7 @@ namespace pTyping.Songs {
         [JsonProperty]
         public double Time { get; set; }
 
+        [Pure, CanBeNull]
         public static ManagedDrawable CreateEventDrawable(Event @event, Texture2D noteTexture, GameplayDrawableTweenArgs tweenArgs) {
             ManagedDrawable drawable = null;
             switch (@event.Type) {

@@ -6,6 +6,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
+using JetBrains.Annotations;
 using Kettu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -15,19 +16,26 @@ using pTyping.Graphics.Player;
 namespace pTyping.Graphics.Editor {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class ToolOptionAttribute : Attribute {
+        [NotNull]
         public string Name;
+        [NotNull]
         public string ToolTip;
+        [NotNull]
+        public string[] Options;
 
-        public ToolOptionAttribute(string name, string tooltip = "") {
+        public ToolOptionAttribute(string name, string tooltip = "", params string[] dropdownValues) {
             this.Name    = name;
             this.ToolTip = tooltip;
+            this.Options = dropdownValues;
         }
     }
-    
-    public abstract class EditorTool : IComparable<EditorTool> {
 
+    [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
+    public abstract class EditorTool : IComparable<EditorTool> {
         public          UiTickboxDrawable TickBoxDrawable;
+        [NotNull]
         public abstract string            Name    { get; }
+        [NotNull]
         public abstract string            Tooltip { get; }
 
         protected DrawableManager DrawableManager;

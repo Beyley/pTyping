@@ -1,4 +1,5 @@
 using Furball.Engine.Engine.Helpers;
+using JetBrains.Annotations;
 using pTyping.Graphics.Online;
 
 namespace pTyping.Online {
@@ -13,7 +14,8 @@ namespace pTyping.Online {
         public Bindable<long>   TotalScore  = new(0);
         public Bindable<int>    UserId      = new(-1);
         public Bindable<string> Username    = new("Unknown user!");
-        
+
+        [Pure]
         public UserCardDrawable GetUserCard() {
             if (this._userCard is null) {
                 this._userCard = new(new(0), this) {
@@ -34,6 +36,7 @@ namespace pTyping.Online {
             return this._userCard;
         }
 
+        [Pure]
         public override string ToString() => this.Username;
     }
 }

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Player {
     public static class AutoReplayCreator {
+        [Pure]
         public static PlayerScore CreateReplay(Song song) {
             PlayerScore score = new(song.MapHash, "p!auto");
 
