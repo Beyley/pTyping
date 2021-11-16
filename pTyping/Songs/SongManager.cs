@@ -11,7 +11,7 @@ namespace pTyping.Songs {
         public static string SongFolder          = "songs/";
         public static string QualifiedSongFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception(), SongFolder);
 
-        public static readonly ISongHandler PTYPING_SONG_HANDLER = new TypingSongHandler();
+        public static readonly ISongHandler PTYPING_SONG_HANDLER = new pTypingSongHandler();
         public static readonly ISongHandler UTYPING_SONG_HANDLER = new UTypingSongHandler();
         
         public static List<Song> Songs {

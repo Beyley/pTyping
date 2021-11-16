@@ -4,7 +4,8 @@ using Newtonsoft.Json;
 using pTyping.Engine;
 
 namespace pTyping.Songs.SongLoader {
-    public class TypingSongHandler : ISongHandler {
+    // ReSharper disable once InconsistentNaming
+    public class pTypingSongHandler : ISongHandler {
         public SongType Type => SongType.pTyping;
 
         public Song LoadSong(FileInfo fileInfo) {
