@@ -103,25 +103,25 @@ namespace pTyping.Graphics.Menus.Options {
 
             #region 1600x900 res button
 
-            UiButtonDrawable res1600x900button = new(new(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+            UiButtonDrawable res1600X900Button = new(new(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 
-            res1600x900button.OnClick += delegate {
+            res1600X900Button.OnClick += delegate {
                 FurballGame.Instance.ChangeScreenSize(1600, 900);
             };
 
-            this.Manager.Add(res1600x900button);
+            this.Manager.Add(res1600X900Button);
 
             #endregion
 
             #region 1920x1080 res button
 
-            UiButtonDrawable res1920x1080button = new(new(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+            UiButtonDrawable res1920X1080Button = new(new(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 
-            res1920x1080button.OnClick += delegate {
+            res1920X1080Button.OnClick += delegate {
                 FurballGame.Instance.ChangeScreenSize(1920, 1080);
             };
 
-            this.Manager.Add(res1920x1080button);
+            this.Manager.Add(res1920X1080Button);
 
             #endregion
 

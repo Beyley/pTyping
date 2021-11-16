@@ -14,6 +14,7 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Gtk;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -617,6 +618,7 @@ namespace pTyping.Graphics.Editor {
             this.CurrentTool?.OnMouseClick(e.args);
         }
 
+        [Pure]
         public static bool InPlayfield(Point pos) => pos.Y < RECEPTICLE_POS.Y + 40f && pos.Y > RECEPTICLE_POS.Y - 40f;
 
         protected override void Dispose(bool disposing) {
@@ -725,7 +727,7 @@ namespace pTyping.Graphics.Editor {
                         );
 
                         if (responseType == ResponseType.Yes) {
-                            this.EditorState.Song.Save();
+                            SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
                             SongManager.UpdateSongs();
                         }
                     }
@@ -742,7 +744,7 @@ namespace pTyping.Graphics.Editor {
                 }
                 case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
                     // Save the song if ctrl+s is pressed
-                    this.EditorState.Song.Save();
+                    SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
                     SongManager.UpdateSongs();
 
                     this.SaveNeeded = false;

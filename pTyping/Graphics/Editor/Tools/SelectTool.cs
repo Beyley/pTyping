@@ -19,7 +19,7 @@ namespace pTyping.Graphics.Editor.Tools {
 
         private bool _dragging = false;
 
-        private static readonly GameplayDrawableTweenArgs _TweenArgs = new(ConVars.BaseApproachTime.Value, true, true);
+        private static readonly GameplayDrawableTweenArgs TWEEN_ARGS = new(ConVars.BaseApproachTime.Value, true, true);
         
         public override void Initialize() {
             foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
@@ -85,22 +85,22 @@ namespace pTyping.Graphics.Editor.Tools {
                         case NoteDrawable noteDrawable:
                             noteDrawable.Note.Time += timeDifference;
 
-                            noteDrawable.CreateTweens(_TweenArgs);
+                            noteDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                         case BeatLineBarEventDrawable beatLineBarEventDrawable:
                             beatLineBarEventDrawable.Event.Time += timeDifference;
 
-                            beatLineBarEventDrawable.CreateTweens(_TweenArgs);
+                            beatLineBarEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                         case BeatLineBeatEventDrawable beatLineBeatEventDrawable:
                             beatLineBeatEventDrawable.Event.Time += timeDifference;
 
-                            beatLineBeatEventDrawable.CreateTweens(_TweenArgs);
+                            beatLineBeatEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                         case TypingCutoffEventDrawable typingCutoffEventDrawable:
                             typingCutoffEventDrawable.Event.Time += timeDifference;
 
-                            typingCutoffEventDrawable.CreateTweens(_TweenArgs);
+                            typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                     }
 

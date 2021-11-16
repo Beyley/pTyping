@@ -30,6 +30,7 @@ using pTyping.Songs;
 using ConVars=pTyping.Engine.ConVars;
 
 namespace pTyping {
+    // ReSharper disable once InconsistentNaming
     public class pTypingGame : FurballGame {
         public static readonly Vector2 BackButtonScale = new(0.12f);
         

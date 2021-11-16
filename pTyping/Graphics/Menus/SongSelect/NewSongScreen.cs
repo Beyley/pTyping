@@ -127,10 +127,10 @@ namespace pTyping.Graphics.Menus.SongSelect {
             FileStream stream = File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
             // Set the fileinfo for the song
             song.FileInfo = new FileInfo(stream.Name);
-            // Save the template song to the file
-            song.Save(stream);
             // Close the filestream
             stream.Close();
+            // Save the song to the file
+            SongManager.PTYPING_SONG_HANDLER.SaveSong(song);
 
             //Play the menu click sound (since we clicked a button)
             pTypingGame.MenuClickSound.Play();

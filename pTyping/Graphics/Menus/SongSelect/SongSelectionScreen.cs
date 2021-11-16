@@ -95,8 +95,6 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             #region Create new buttons for each song
 
-            float tempY = 50;
-
             IEnumerable<Song> songList = this._editor ? SongManager.Songs.Where(x => x.Type == SongType.pTyping) : SongManager.Songs;
 
             this._songSelectDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10), songList) {
