@@ -1,3 +1,5 @@
+using System.Collections.Specialized;
+using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Helpers;
@@ -35,7 +37,43 @@ namespace pTyping.Graphics.Editor.Tools {
                 @event.OnDragEnd   += this.OnObjectDragEnd;
             }
 
+            this.EditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChanged;
+
+            this.NoteText.OnChange   += this.OnNoteTextChange;
+            this.NoteColour.OnChange += this.OnNoteColourChange;
+
             base.Initialize();
+        }
+
+        private void OnNoteColourChange(object? sender, Color e) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+
+            if (this.EditorInstance.EditorState.SelectedObjects.First() is NoteDrawable noteDrawable) {
+                noteDrawable.Note.Color    = this.NoteColour;
+                noteDrawable.ColorOverride = this.NoteColour;
+
+                this.EditorInstance.SaveNeeded = true;
+            }
+        }
+
+        private void OnNoteTextChange(object? sender, string e) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+
+            if (this.EditorInstance.EditorState.SelectedObjects.First() is NoteDrawable noteDrawable) {
+                noteDrawable.Note.Text              = this.NoteText;
+                noteDrawable.LabelTextDrawable.Text = this.NoteText;
+
+                this.EditorInstance.SaveNeeded = true;
+            }
+        }
+
+        private void OnSelectedObjectsChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+
+            if (this.EditorInstance.EditorState.SelectedObjects.First() is NoteDrawable noteDrawable) {
+                this.NoteColour.Value = noteDrawable.Note.Color;
+                this.NoteText.Value   = noteDrawable.Note.Text;
+            }
         }
 
         public override void Deinitialize() {
@@ -51,6 +89,11 @@ namespace pTyping.Graphics.Editor.Tools {
                 @event.OnDrag      -= this.OnObjectDrag;
                 @event.OnDragEnd   -= this.OnObjectDragEnd;
             }
+
+            this.EditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChanged;
+
+            this.NoteText.OnChange   += this.OnNoteTextChange;
+            this.NoteColour.OnChange += this.OnNoteColourChange;
 
             base.Deinitialize();
         }
@@ -80,29 +123,53 @@ namespace pTyping.Graphics.Editor.Tools {
             if (this.EditorInstance.EditorState.MouseTime != this._lastDragTime) {
                 double timeDifference = this.EditorInstance.EditorState.MouseTime - this._lastDragTime;
 
-                foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
-                    switch (selectedObject) {
+                if (this.EditorInstance.EditorState.SelectedObjects.Count == 1)
+                    switch (this.EditorInstance.EditorState.SelectedObjects[0]) {
                         case NoteDrawable noteDrawable:
-                            noteDrawable.Note.Time += timeDifference;
+                            noteDrawable.Note.Time = this.EditorInstance.EditorState.MouseTime;
 
                             noteDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                         case BeatLineBarEventDrawable beatLineBarEventDrawable:
-                            beatLineBarEventDrawable.Event.Time += timeDifference;
+                            beatLineBarEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
                             beatLineBarEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                         case BeatLineBeatEventDrawable beatLineBeatEventDrawable:
-                            beatLineBeatEventDrawable.Event.Time += timeDifference;
+                            beatLineBeatEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
                             beatLineBeatEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                         case TypingCutoffEventDrawable typingCutoffEventDrawable:
-                            typingCutoffEventDrawable.Event.Time += timeDifference;
+                            typingCutoffEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
                             typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
                     }
+                else
+                    foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+                        switch (selectedObject) {
+                            case NoteDrawable noteDrawable:
+                                noteDrawable.Note.Time += timeDifference;
+
+                                noteDrawable.CreateTweens(TWEEN_ARGS);
+                                break;
+                            case BeatLineBarEventDrawable beatLineBarEventDrawable:
+                                beatLineBarEventDrawable.Event.Time += timeDifference;
+
+                                beatLineBarEventDrawable.CreateTweens(TWEEN_ARGS);
+                                break;
+                            case BeatLineBeatEventDrawable beatLineBeatEventDrawable:
+                                beatLineBeatEventDrawable.Event.Time += timeDifference;
+
+                                beatLineBeatEventDrawable.CreateTweens(TWEEN_ARGS);
+                                break;
+                            case TypingCutoffEventDrawable typingCutoffEventDrawable:
+                                typingCutoffEventDrawable.Event.Time += timeDifference;
+
+                                typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
+                                break;
+                        }
 
                 this.EditorInstance.UpdateSelectionRects(this, null);
 

@@ -36,7 +36,7 @@ namespace pTyping.Songs.SongLoader {
             File.WriteAllText(
             song.FileInfo.FullName,
             JsonConvert.SerializeObject(
-            this,
+            song,
             new JsonSerializerSettings {
                 TypeNameHandling = TypeNameHandling.Auto,
                 Formatting       = Formatting.Indented

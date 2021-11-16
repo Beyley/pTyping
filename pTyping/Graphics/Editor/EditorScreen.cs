@@ -790,18 +790,18 @@ namespace pTyping.Graphics.Editor {
 
                     break;
                 }
-                case Keys.D1: {
-                    this.ChangeTool(typeof(SelectTool));
-                    break;
-                }
-                case Keys.D2: {
-                    this.ChangeTool(typeof(CreateNoteTool));
-                    break;
-                }
-                case Keys.D3: {
-                    this.ChangeTool(typeof(BulkCreateTool));
-                    break;
-                }
+                // case Keys.D1: {
+                //     this.ChangeTool(typeof(SelectTool));
+                //     break;
+                // }
+                // case Keys.D2: {
+                //     this.ChangeTool(typeof(CreateNoteTool));
+                //     break;
+                // }
+                // case Keys.D3: {
+                //     this.ChangeTool(typeof(BulkCreateTool));
+                //     break;
+                // }
             }
         }
 
