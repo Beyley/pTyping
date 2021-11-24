@@ -14,22 +14,6 @@ using pTyping.Engine;
 using pTyping.Graphics.Player;
 
 namespace pTyping.Graphics.Editor {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class ToolOptionAttribute : Attribute {
-        [NotNull]
-        public string Name;
-        [NotNull]
-        public string ToolTip;
-        [NotNull]
-        public string[] Options;
-
-        public ToolOptionAttribute(string name, string tooltip = "", params string[] dropdownValues) {
-            this.Name    = name;
-            this.ToolTip = tooltip;
-            this.Options = dropdownValues;
-        }
-    }
-
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class EditorTool : IComparable<EditorTool> {
         public          UiTickboxDrawable TickBoxDrawable;

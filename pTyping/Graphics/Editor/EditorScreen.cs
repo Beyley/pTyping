@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -43,8 +42,6 @@ namespace pTyping.Graphics.Editor {
         public EditorState EditorState;
 
         private readonly List<ManagedDrawable> _selectionRects = new();
-
-        private readonly List<ManagedDrawable> _toolOptions = new();
 
         public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
@@ -245,6 +242,9 @@ namespace pTyping.Graphics.Editor {
 
             #endregion
 
+            //Add the ui container that tools use 
+            this.Manager.Add(this.EditorState.EditorToolUiContainer);
+
             #endregion
 
             this.ChangeTool(typeof(SelectTool));
@@ -347,8 +347,6 @@ namespace pTyping.Graphics.Editor {
         public void ChangeTool(Type type) {
             EditorTool newTool = this.EditorTools.First(x => x.GetType() == type);
 
-            object toolAsRealType = Convert.ChangeType(newTool, type);
-            
             if (newTool == this.CurrentTool) return;
 
             foreach (EditorTool tool in this.EditorTools)
@@ -359,235 +357,6 @@ namespace pTyping.Graphics.Editor {
             this.CurrentTool = newTool;
 
             newTool?.SelectTool(this, ref this.Manager);
-
-            this._toolOptions.ForEach(x => this.Manager.Remove(x));
-            this._toolOptions.Clear();
-
-            //Gets all fields with the ToolOptionAttribute
-            List<FieldInfo> result = ObjectHelper.GetAllFieldsWithAttribute(type, typeof(ToolOptionAttribute));
-
-            float y = 10;
-            foreach (FieldInfo field in result) {
-                string   name    = field.GetCustomAttribute<ToolOptionAttribute>()!.Name;
-                string   tooltip = field.GetCustomAttribute<ToolOptionAttribute>()!.ToolTip;
-                string[] options = field.GetCustomAttribute<ToolOptionAttribute>()!.Options;
-                
-                //The drawable that you interact with
-                List<ManagedDrawable> drawables = new();
-                //The label showing what it is
-                TextDrawable labelDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, name, 30) {
-                    OriginType = OriginType.TopRight,
-                    ToolTip    = tooltip
-                };
-                y += labelDrawable.Size.Y + 5f;
-
-                //Checks the type that the attribute is attatched to
-                switch (field.FieldType.ToString()) {
-                    case "Furball.Engine.Engine.Helpers.Bindable`1[Microsoft.Xna.Framework.Color]": {
-                        //Get the value of the type
-                        Bindable<Color> value = (Bindable<Color>)field.GetValue(toolAsRealType);
-
-                        //The text box you type in
-                        UiTextBoxDrawable textBox = new(
-                        new(FurballGame.DEFAULT_WINDOW_WIDTH - 10 - 40, y),
-                        pTypingGame.JapaneseFont,
-                        value.Value.ToHexString(),
-                        30,
-                        300
-                        ) {
-                            OriginType = OriginType.TopRight
-                        };
-
-                        TexturedDrawable colorPicker = new(FurballGame.WhitePixel, new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y)) {
-                            OriginType    = OriginType.TopRight,
-                            Scale         = new(textBox.Size.Y - 2),
-                            ColorOverride = value.Value
-                        };
-
-                        colorPicker.OnClick += delegate {
-                            Color color = GtkHelper.ColorChooserDialog(name);
-
-                            value.Value = color;
-                            colorPicker.FadeColor(color, 100);
-                        };
-
-                        //When the textbox is updated, update value
-                        void OnUpdate(object sender, string c) {
-                            value.Value = ColorConverter.FromHexString(textBox.Text);
-                            colorPicker.FadeColor(value.Value, 100);
-                        }
-
-                        void OnFocusChange(object sender, bool b) {
-                            if (b) return;
-
-                            textBox.Text = value.Value.ToHexString();
-                        }
-
-                        textBox.OnCommit      += OnUpdate;
-                        textBox.OnFocusChange += OnFocusChange;
-
-                        //When the value changes, update the text box
-                        value.OnChange += delegate(object _, Color s) {
-                            textBox.Text = s.ToHexString();
-                            colorPicker.FadeColor(value.Value, 100);
-                        };
-
-                        y += textBox.Size.Y + 10f;
-
-                        drawables.Add(textBox);
-                        drawables.Add(colorPicker);
-
-                        break;
-                    }
-                    //Is it a Bindable<string>
-                    case "Furball.Engine.Engine.Helpers.Bindable`1[System.String]": {
-                        //Get the value of the type
-                        Bindable<string> value = (Bindable<string>)field.GetValue(toolAsRealType);
-
-                        if (options.Length == 0) {
-                            //The text box you type in
-                            UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value, 30, 300) {
-                                OriginType = OriginType.TopRight
-                            };
-
-                            //When the textbox is updated, update value
-                            void OnUpdate(object sender, string c) {
-                                value.Value = textBox.Text;
-                            }
-
-                            void OnFocusChange(object sender, bool b) {
-                                if (b) return;
-
-                                textBox.Text = value.Value;
-                            }
-
-                            textBox.OnCommit      += OnUpdate;
-                            textBox.OnFocusChange += OnFocusChange;
-
-                            //When the value changes, update the text box
-                            value.OnChange += delegate(object _, string s) {
-                                textBox.Text = s;
-                            };
-
-                            y += textBox.Size.Y + 10f;
-
-                            drawables.Add(textBox);
-                        } else {
-                            UiDropdownDrawable dropdown = new(
-                            new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y),
-                            options.ToList(),
-                            new(250, 35),
-                            FurballGame.DEFAULT_FONT,
-                            30
-                            ) {
-                                OriginType = OriginType.TopRight
-                            };
-
-                            dropdown.SelectedItem.OnChange += delegate(object _, string s) {
-                                value.Value = s;
-                            };
-
-                            drawables.Add(dropdown);
-                        }
-
-                        break;
-                    }
-                    //Is it a Bindable<int>
-                    case "Furball.Engine.Engine.Helpers.Bindable`1[System.Int32]": {
-                        //Get the value of the type
-                        Bindable<int> value = (Bindable<int>)field.GetValue(toolAsRealType);
-
-                        //The text box you type in
-                        UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value.ToString(), 30, 300) {
-                            OriginType = OriginType.TopRight
-                        };
-
-                        //When the textbox is updated, update value
-                        void OnUpdate(object sender, string c) {
-                            if (int.TryParse(textBox.Text, out int result)) {
-                                value.Value           = result;
-                                textBox.ColorOverride = Color.White;
-                            } else {
-                                textBox.ColorOverride = Color.Red;
-                            }
-                        }
-
-                        void OnFocusChange(object sender, bool b) {
-                            if (b) return;
-
-                            textBox.Text = value.Value.ToString();
-                        }
-
-                        textBox.OnCommit      += OnUpdate;
-                        textBox.OnFocusChange += OnFocusChange;
-
-                        //When the value changes, update the text box
-                        value.OnChange += delegate(object _, int s) {
-                            textBox.Text = s.ToString();
-
-                            textBox.ColorOverride = Color.White;
-                        };
-
-                        y += textBox.Size.Y + 10f;
-
-                        drawables.Add(textBox);
-
-                        break;
-                    }
-                    //Is it a Bindable<double>
-                    case "Furball.Engine.Engine.Helpers.Bindable`1[System.Double]": {
-                        //Get the value of the type
-                        Bindable<double> value = (Bindable<double>)field.GetValue(toolAsRealType);
-
-                        //The text box you type in
-                        UiTextBoxDrawable textBox = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, y), pTypingGame.JapaneseFont, value.Value.ToString(), 30, 300) {
-                            OriginType = OriginType.TopRight
-                        };
-
-                        //When the textbox is updated, update value
-                        void OnUpdate(object sender, string c) {
-                            if (double.TryParse(textBox.Text, out double result)) {
-                                value.Value           = result;
-                                textBox.ColorOverride = Color.White;
-                            } else {
-                                textBox.ColorOverride = Color.Red;
-                            }
-                        }
-
-                        void OnFocusChange(object sender, bool b) {
-                            if (b) return;
-
-                            textBox.Text = value.Value.ToString();
-                        }
-
-                        textBox.OnCommit      += OnUpdate;
-                        textBox.OnFocusChange += OnFocusChange;
-
-                        //When the value changes, update the text box
-                        value.OnChange += delegate(object _, double s) {
-                            textBox.Text = s.ToString();
-
-                            textBox.ColorOverride = Color.White;
-                        };
-
-                        y += textBox.Size.Y + 10f;
-
-                        drawables.Add(textBox);
-
-                        break;
-                    }
-                    default: {
-                        drawables.Add(new BlankDrawable());
-
-                        break;
-                    }
-                }
-
-                this._toolOptions.Add(labelDrawable);
-                this._toolOptions.AddRange(drawables);
-                this.Manager.Add(labelDrawable);
-                this.Manager.Add(drawables.ToArray());
-            }
         }
 
         private void OnMouseMove(object sender, (Point mousePos, string cursorName) e) {

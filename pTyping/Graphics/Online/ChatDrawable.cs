@@ -19,7 +19,7 @@ namespace pTyping.Graphics.Online {
             this.Position = pos;
 
             this._drawables.Add(this._channelContents     = new(new(0), pTypingGame.JapaneseFontStroked, "", 35));
-            this._drawables.Add(this.MessageInputDrawable = new(new(0), pTypingGame.JapaneseFontStroked, "", 35, FurballGame.DEFAULT_WINDOW_WIDTH - 20, true));
+            this._drawables.Add(this.MessageInputDrawable = new(new(0), pTypingGame.JapaneseFontStroked, "", 35, FurballGame.DEFAULT_WINDOW_WIDTH - 20));
 
             this.MessageInputDrawable.OnCommit += delegate {
                 pTypingGame.OnlineManager.SendMessage(this.SelectedChannel, this.MessageInputDrawable.Text);
@@ -50,6 +50,15 @@ namespace pTyping.Graphics.Online {
             pTypingGame.OnlineManager.ChatLog.Skip(pTypingGame.OnlineManager.ChatLog.Count - Math.Min(8, pTypingGame.OnlineManager.ChatLog.Count))
                        .Where(message => message.Channel == this.SelectedChannel).ToList().ForEach(message => final += message + "\n");
 
+            if (final.Contains("trans")) {
+                this._channelContents.Colors = new[] {
+                    Color.Cyan, Color.Pink, Color.White, Color.Pink
+                };
+                this._channelContents.ColorType = TextColorType.Repeating;
+            } else {
+                this._channelContents.ColorType = TextColorType.Solid;
+            }
+            
             this._channelContents.Text         = final.Trim();
             this.MessageInputDrawable.Position = new(0, this._channelContents.Size.Y + 15);
         }

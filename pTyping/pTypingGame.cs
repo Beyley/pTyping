@@ -338,8 +338,12 @@ namespace pTyping {
 
             CurrentSongBackground =
                 new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
-                    Depth      = 1f,
-                    OriginType = OriginType.Center
+                    Depth       = 1f,
+                    OriginType  = OriginType.Center,
+                    Hoverable   = false,
+                    Clickable   = false,
+                    CoverClicks = false,
+                    CoverHovers = false
                 };
 
             ScoreManager.Load();

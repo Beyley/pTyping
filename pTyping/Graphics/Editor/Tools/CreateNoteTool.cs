@@ -2,7 +2,6 @@ using System;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
@@ -15,11 +14,6 @@ namespace pTyping.Graphics.Editor.Tools {
         public override string Tooltip => "Create notes on the timeline.";
 
         private LinePrimitiveDrawable _createLine;
-
-        [ToolOption("Default Text", "The default text in new notes.")]
-        public Bindable<string> DefaultNoteText = new("a");
-        [ToolOption("Default Colour", "The default colour in new notes.")]
-        public Bindable<Color> DefaultNoteColor = new(new(255, 0, 0));
 
         public override void Initialize() {
             this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
@@ -59,8 +53,8 @@ namespace pTyping.Graphics.Editor.Tools {
 
             Note noteToAdd = new() {
                 Time  = this.EditorInstance.EditorState.MouseTime,
-                Text  = this.DefaultNoteText.Value.Trim(),
-                Color = this.DefaultNoteColor
+                // Text  = this.DefaultNoteText.Value.Trim(),
+                // Color = this.DefaultNoteColor
             };
 
             this.EditorInstance.CreateNote(noteToAdd, true);

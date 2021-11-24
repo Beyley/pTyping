@@ -2,12 +2,10 @@ using System;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs;
-using pTyping.Songs.Events;
 
 namespace pTyping.Graphics.Editor.Tools {
     public class CreateEventTool : EditorTool {
@@ -21,8 +19,8 @@ namespace pTyping.Graphics.Editor.Tools {
         private const string LYRIC          = "Lyric Event";
         private const string TYPING_CUTOFF  = "Typing Cutoff Event";
 
-        [ToolOption("Selected Event", "The selected event to create", BEAT_LINE_BEAT, BEAT_LINE_BAR, LYRIC, TYPING_CUTOFF)]
-        public Bindable<string> SelectedEvent = new("");
+        // [ToolOption("Selected Event", "The selected event to create", BEAT_LINE_BEAT, BEAT_LINE_BAR, LYRIC, TYPING_CUTOFF)]
+        // public Bindable<string> SelectedEvent = new("");
 
         public override void Initialize() {
             this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
@@ -41,32 +39,32 @@ namespace pTyping.Graphics.Editor.Tools {
 
             Event @event = null;
 
-            switch (this.SelectedEvent.Value) {
-                case BEAT_LINE_BAR: {
-                    @event = new BeatLineBarEvent {
-                        Time = this.EditorInstance.EditorState.MouseTime
-                    };
-
-                    break;
-                }
-                case BEAT_LINE_BEAT: {
-                    @event = new BeatLineBeatEvent {
-                        Time = this.EditorInstance.EditorState.MouseTime
-                    };
-
-                    break;
-                }
-                case LYRIC: {
-                    break;
-                }
-                case TYPING_CUTOFF: {
-                    @event = new TypingCutoffEvent {
-                        Time = this.EditorInstance.EditorState.MouseTime
-                    };
-
-                    break;
-                }
-            }
+            // switch (this.SelectedEvent.Value) {
+            //     case BEAT_LINE_BAR: {
+            //         @event = new BeatLineBarEvent {
+            //             Time = this.EditorInstance.EditorState.MouseTime
+            //         };
+            //
+            //         break;
+            //     }
+            //     case BEAT_LINE_BEAT: {
+            //         @event = new BeatLineBeatEvent {
+            //             Time = this.EditorInstance.EditorState.MouseTime
+            //         };
+            //
+            //         break;
+            //     }
+            //     case LYRIC: {
+            //         break;
+            //     }
+            //     case TYPING_CUTOFF: {
+            //         @event = new TypingCutoffEvent {
+            //             Time = this.EditorInstance.EditorState.MouseTime
+            //         };
+            //
+            //         break;
+            //     }
+            // }
 
             if (@event != null)
                 this.EditorInstance.CreateEvent(@event, true);

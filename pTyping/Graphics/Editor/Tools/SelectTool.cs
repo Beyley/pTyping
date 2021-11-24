@@ -1,21 +1,20 @@
-using System.Collections.Specialized;
-using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
+using pTyping.UiGenerator;
 
 namespace pTyping.Graphics.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class SelectTool : EditorTool {
-        [ToolOption("Note Colour", "The colour tint of the note.")]
-        public Bindable<Color> NoteColour = new(new(255, 0, 0));
-        [ToolOption("Note Text", "The note's text you are going to type ingame.")]
-        public Bindable<string> NoteText = new(string.Empty);
+        public UiElement ObjectText;
+        public UiElement ObjectTextLabel;
+        public UiElement ObjectColour;
+        public UiElement ObjectColourLabel;
+
         public override string Name    => "Select";
         public override string Tooltip => "Select, move, and change notes in the timeline.";
 
@@ -37,45 +36,20 @@ namespace pTyping.Graphics.Editor.Tools {
                 @event.OnDragEnd   += this.OnObjectDragEnd;
             }
 
-            this.EditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChanged;
+            this.ObjectTextLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", 35);
+            this.ObjectText      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
 
-            this.NoteText.OnChange   += this.OnNoteTextChange;
-            this.NoteColour.OnChange += this.OnNoteColourChange;
+            this.ObjectColourLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", 35);
+            this.ObjectColour      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
 
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectTextLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectText);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColourLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColour);
+            
             base.Initialize();
         }
-
-        private void OnNoteColourChange(object? sender, Color e) {
-            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
-
-            if (this.EditorInstance.EditorState.SelectedObjects.First() is NoteDrawable noteDrawable) {
-                noteDrawable.Note.Color    = this.NoteColour;
-                noteDrawable.ColorOverride = this.NoteColour;
-
-                this.EditorInstance.SaveNeeded = true;
-            }
-        }
-
-        private void OnNoteTextChange(object? sender, string e) {
-            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
-
-            if (this.EditorInstance.EditorState.SelectedObjects.First() is NoteDrawable noteDrawable) {
-                noteDrawable.Note.Text              = this.NoteText;
-                noteDrawable.LabelTextDrawable.Text = this.NoteText;
-
-                this.EditorInstance.SaveNeeded = true;
-            }
-        }
-
-        private void OnSelectedObjectsChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
-
-            if (this.EditorInstance.EditorState.SelectedObjects.First() is NoteDrawable noteDrawable) {
-                this.NoteColour.Value = noteDrawable.Note.Color;
-                this.NoteText.Value   = noteDrawable.Note.Text;
-            }
-        }
-
+        
         public override void Deinitialize() {
             foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
                 note.OnClick     -= this.OnObjectClick;
@@ -90,10 +64,10 @@ namespace pTyping.Graphics.Editor.Tools {
                 @event.OnDragEnd   -= this.OnObjectDragEnd;
             }
 
-            this.EditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChanged;
-
-            this.NoteText.OnChange   += this.OnNoteTextChange;
-            this.NoteColour.OnChange += this.OnNoteColourChange;
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectTextLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectText);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColourLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColour);
 
             base.Deinitialize();
         }

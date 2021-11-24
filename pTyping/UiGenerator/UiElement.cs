@@ -41,7 +41,7 @@ namespace pTyping.UiGenerator {
 
         public static UiElement CreateTextBox(FontSystem font, string text, int size, float width) {
             UiElement element = new(UiElementType.TextBox) {
-                Drawable = new UiTextBoxDrawable(new(0), font, text, size, width, true)
+                Drawable = new UiTextBoxDrawable(new(0), font, text, size, width)
             };
 
             return element;
