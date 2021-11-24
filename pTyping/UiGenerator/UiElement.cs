@@ -63,6 +63,14 @@ namespace pTyping.UiGenerator {
             return element;
         }
 
+        public static UiElement CreateColorPicker(FontSystem font, int size, Color initialColor) {
+            UiElement element = new(UiElementType.ColorPicker) {
+                Drawable = new UiColorPickerDrawable(new(0), font, size, initialColor)
+            };
+
+            return element;
+        }
+
         #region Type Conversions
 
         public UiButtonDrawable AsButton() {
@@ -107,6 +115,13 @@ namespace pTyping.UiGenerator {
             throw new NotSupportedException();
         }
 
+        public UiColorPickerDrawable AsColorPicker() {
+            if (this.Type == UiElementType.ColorPicker)
+                return this.Drawable as UiColorPickerDrawable;
+
+            throw new NotSupportedException();
+        }
+
         #endregion
     }
 
@@ -116,6 +131,7 @@ namespace pTyping.UiGenerator {
         ProgressBar,
         TextBox,
         TickBox,
-        Text
+        Text,
+        ColorPicker
     }
 }

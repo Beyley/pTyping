@@ -73,6 +73,11 @@ namespace pTyping.Graphics.Player {
             }
             );
         }
+
+        public void Reset() {
+            this.LabelTextDrawable.Text = this.Note.Text;
+            this.ColorOverride          = this.Note.Color;
+        }
         
         /// <summary>
         ///     Types a character

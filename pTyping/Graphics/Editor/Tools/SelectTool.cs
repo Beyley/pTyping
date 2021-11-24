@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Microsoft.Xna.Framework;
@@ -40,16 +41,61 @@ namespace pTyping.Graphics.Editor.Tools {
             this.ObjectText      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
 
             this.ObjectColourLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", 35);
-            this.ObjectColour      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
+            this.ObjectColour      = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 30, Color.White);
 
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectTextLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectText);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColourLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColour);
+
+            this.ObjectText.AsTextBox().OnCommit             += this.OnObjectTextCommit;
+            this.ObjectColour.AsColorPicker().Color.OnChange += this.OnObjectColourChange;
+
+            this.EditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChange;
             
             base.Initialize();
         }
-        
+
+        private void OnObjectColourChange(object sender, Color color) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+
+            ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
+
+            if (selectedObject is NoteDrawable note) {
+                note.Note.Color                = color;
+                this.EditorInstance.SaveNeeded = true;
+                note.Reset();
+            }
+        }
+
+        private void OnObjectTextCommit(object sender, string e) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+
+            ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
+
+            if (selectedObject is NoteDrawable note) {
+                note.Note.Text                 = this.ObjectText.AsTextBox().Text;
+                this.EditorInstance.SaveNeeded = true;
+                note.Reset();
+            }
+        }
+
+        private void OnSelectedObjectsChange(object sender, NotifyCollectionChangedEventArgs e) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) {
+                this.ObjectText.AsTextBox().Text              = string.Empty;
+                this.ObjectColour.AsColorPicker().Color.Value = Color.White;
+
+                return;
+            }
+
+            ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
+
+            if (selectedObject is NoteDrawable note) {
+                this.ObjectText.AsTextBox().Text              = note.Note.Text;
+                this.ObjectColour.AsColorPicker().Color.Value = note.Note.Color;
+            }
+        }
+
         public override void Deinitialize() {
             foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
                 note.OnClick     -= this.OnObjectClick;
@@ -68,6 +114,11 @@ namespace pTyping.Graphics.Editor.Tools {
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectText);
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColourLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColour);
+
+            this.ObjectText.AsTextBox().OnCommit             += this.OnObjectTextCommit;
+            this.ObjectColour.AsColorPicker().Color.OnChange -= this.OnObjectColourChange;
+
+            this.EditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChange;
 
             base.Deinitialize();
         }
