@@ -23,7 +23,6 @@ namespace pTyping.Graphics.Editor {
         public EditorState(Song song) => this.Song = song;
 
         public readonly UiContainer EditorToolUiContainer = new(OriginType.TopRight) {
-            // OriginType = OriginType.TopRight,
             Position = new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10),
             Depth    = -1f
         };

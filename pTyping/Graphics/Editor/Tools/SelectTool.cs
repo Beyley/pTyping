@@ -115,7 +115,7 @@ namespace pTyping.Graphics.Editor.Tools {
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColourLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColour);
 
-            this.ObjectText.AsTextBox().OnCommit             += this.OnObjectTextCommit;
+            this.ObjectText.AsTextBox().OnCommit             -= this.OnObjectTextCommit;
             this.ObjectColour.AsColorPicker().Color.OnChange -= this.OnObjectColourChange;
 
             this.EditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChange;

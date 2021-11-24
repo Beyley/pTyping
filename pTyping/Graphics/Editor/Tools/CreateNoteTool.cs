@@ -6,12 +6,18 @@ using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs;
+using pTyping.UiGenerator;
 
 namespace pTyping.Graphics.Editor.Tools {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class CreateNoteTool : EditorTool {
         public override string Name    => "Create Note";
         public override string Tooltip => "Create notes on the timeline.";
+
+        private UiElement _defaultNoteText;
+        private UiElement _defaultNoteTextLabel;
+        private UiElement _defaultNoteColor;
+        private UiElement _defaultNoteColorLabel;
 
         private LinePrimitiveDrawable _createLine;
 
@@ -22,6 +28,17 @@ namespace pTyping.Graphics.Editor.Tools {
             };
 
             this.DrawableManager.Add(this._createLine);
+
+            this._defaultNoteTextLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", 35);
+            this._defaultNoteText      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
+
+            this._defaultNoteColorLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", 35);
+            this._defaultNoteColor      = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 30, Color.Red);
+
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this._defaultNoteTextLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this._defaultNoteText);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this._defaultNoteColorLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this._defaultNoteColor);
 
             base.Initialize();
         }
@@ -53,8 +70,8 @@ namespace pTyping.Graphics.Editor.Tools {
 
             Note noteToAdd = new() {
                 Time  = this.EditorInstance.EditorState.MouseTime,
-                // Text  = this.DefaultNoteText.Value.Trim(),
-                // Color = this.DefaultNoteColor
+                Text  = this._defaultNoteText.AsTextBox().Text.Trim(),
+                Color = this._defaultNoteColor.AsColorPicker().Color
             };
 
             this.EditorInstance.CreateNote(noteToAdd, true);
@@ -64,6 +81,11 @@ namespace pTyping.Graphics.Editor.Tools {
 
         public override void Deinitialize() {
             this.DrawableManager.Remove(this._createLine);
+
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteTextLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteText);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteColorLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteColor);
 
             base.Deinitialize();
         }
