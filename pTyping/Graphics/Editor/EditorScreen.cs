@@ -588,6 +588,7 @@ namespace pTyping.Graphics.Editor {
                         TypingCutoffEventDrawable cutoff       => cutoff.Event.Time,
                         BeatLineBarEventDrawable beatLineBar   => beatLineBar.Event.Time,
                         BeatLineBeatEventDrawable beatLineBeat => beatLineBeat.Event.Time,
+                        LyricEventDrawable lyric               => lyric.Event.Time,
                         _                                      => 0
                     };
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FontStashSharp;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 
 namespace pTyping.UiGenerator {
@@ -14,6 +15,8 @@ namespace pTyping.UiGenerator {
         public bool InUse = false;
 
         public float SpaceAfter = 10;
+
+        public Bindable<bool> Visible = new(true);
 
         private UiElement(UiElementType type) => this.Type = type;
 

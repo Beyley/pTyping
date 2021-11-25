@@ -16,6 +16,7 @@ namespace pTyping.Songs {
         [Pure, CanBeNull]
         public static ManagedDrawable CreateEventDrawable(Event @event, Texture2D noteTexture, GameplayDrawableTweenArgs tweenArgs) {
             ManagedDrawable drawable = null;
+            
             switch (@event.Type) {
                 case EventType.BeatLineBar: {
                     BeatLineBarEventDrawable tempDrawable = new(@event);
@@ -38,6 +39,16 @@ namespace pTyping.Songs {
                     tempDrawable.CreateTweens(tweenArgs);
 
                     drawable = tempDrawable;
+
+                    break;
+                }
+                case EventType.Lyric: {
+                    if (tweenArgs.IsEditor) {
+                        LyricEventDrawable tempDrawable = new(noteTexture, @event);
+                        tempDrawable.CreateTweens(tweenArgs);
+
+                        drawable = tempDrawable;
+                    }
 
                     break;
                 }

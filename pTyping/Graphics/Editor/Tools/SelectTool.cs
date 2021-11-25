@@ -58,6 +58,13 @@ namespace pTyping.Graphics.Editor.Tools {
             base.Initialize();
         }
 
+        private void ShowUiElements(bool text, bool colour) {
+            this.ObjectTextLabel.Visible.Value   = text;
+            this.ObjectText.Visible.Value        = text;
+            this.ObjectColourLabel.Visible.Value = colour;
+            this.ObjectColour.Visible.Value      = colour;
+        }
+
         private void OnObjectColourChange(object sender, Color color) {
             if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
 
@@ -75,10 +82,17 @@ namespace pTyping.Graphics.Editor.Tools {
 
             ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
 
-            if (selectedObject is NoteDrawable note) {
-                note.Note.Text                 = this.ObjectText.AsTextBox().Text;
-                this.EditorInstance.SaveNeeded = true;
-                note.Reset();
+            switch (selectedObject) {
+                case NoteDrawable note:
+                    note.Note.Text                 = this.ObjectText.AsTextBox().Text;
+                    this.EditorInstance.SaveNeeded = true;
+
+                    note.Reset();
+                    break;
+                case LyricEventDrawable lyric:
+                    lyric.Event.Lyric              = this.ObjectText.AsTextBox().Text;
+                    this.EditorInstance.SaveNeeded = true;
+                    break;
             }
         }
 
@@ -92,9 +106,21 @@ namespace pTyping.Graphics.Editor.Tools {
 
             ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
 
-            if (selectedObject is NoteDrawable note) {
-                this.ObjectText.AsTextBox().Text              = note.Note.Text;
-                this.ObjectColour.AsColorPicker().Color.Value = note.Note.Color;
+            switch (selectedObject) {
+                case NoteDrawable note:
+                    this.ObjectText.AsTextBox().Text              = note.Note.Text;
+                    this.ObjectColour.AsColorPicker().Color.Value = note.Note.Color;
+
+                    this.ShowUiElements(true, true);
+                    break;
+                case LyricEventDrawable lyric:
+                    this.ObjectText.AsTextBox().Text = lyric.Event.Lyric;
+
+                    this.ShowUiElements(true, false);
+                    break;
+                default:
+                    this.ShowUiElements(false, false);
+                    break;
             }
         }
 
@@ -172,6 +198,11 @@ namespace pTyping.Graphics.Editor.Tools {
 
                             typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
                             break;
+                        case LyricEventDrawable lyricEventDrawable:
+                            lyricEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
+
+                            lyricEventDrawable.CreateTweens(TWEEN_ARGS);
+                            break;
                     }
                 else
                     foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
@@ -195,6 +226,11 @@ namespace pTyping.Graphics.Editor.Tools {
                                 typingCutoffEventDrawable.Event.Time += timeDifference;
 
                                 typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
+                                break;
+                            case LyricEventDrawable lyricEventDrawable:
+                                lyricEventDrawable.Event.Time += timeDifference;
+
+                                lyricEventDrawable.CreateTweens(TWEEN_ARGS);
                                 break;
                         }
 

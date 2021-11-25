@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Data;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Helpers;
+using JetBrains.Annotations;
 
 namespace pTyping.UiGenerator {
     public class UiContainer : CompositeDrawable {
@@ -32,10 +33,10 @@ namespace pTyping.UiGenerator {
         }
 
         private readonly Queue<UiElement> _queuedForDeletion = new();
-        private void Recalculate(object sender, NotifyCollectionChangedEventArgs e) {
+        private void Recalculate(object sender, [CanBeNull] NotifyCollectionChangedEventArgs e) {
             float y = 0f;
 
-            UiElement removedElement = e.Action == NotifyCollectionChangedAction.Remove ? e.OldItems?[0] as UiElement : null;
+            UiElement removedElement = e?.Action == NotifyCollectionChangedAction.Remove ? e.OldItems?[0] as UiElement : null;
 
             if (removedElement != null)
                 this._drawables.Remove(removedElement.Drawable);
@@ -46,8 +47,16 @@ namespace pTyping.UiGenerator {
                 if (element == null)
                     throw new NoNullAllowedException("UiElement cannot be null!");
 
+                if (!element.Visible.Value) {
+                    element.Drawable.Visible = false;
+                    element.Drawable.Tweens.Clear();
+                    continue;
+                }
+
+                element.Drawable.Visible = true;
+
                 //TODO: support when multiple are added
-                bool elementIsAdded = e.Action == NotifyCollectionChangedAction.Add && e.NewItems?[0] == element;
+                bool elementIsAdded = e?.Action == NotifyCollectionChangedAction.Add && e.NewItems?[0] == element;
 
                 //Update the origin type
                 element.Drawable.OriginType = this.ElementOriginType;
@@ -66,19 +75,34 @@ namespace pTyping.UiGenerator {
             }
         }
 
-        public void RegisterElement(UiElement element) {
-            if (element.InUse || element.Drawable == null)
+        public void RegisterElement(UiElement element, int index = -1) {
+            if (element.InUse)
+                return;
+
+            if (element.Drawable == null)
                 throw new InvalidOperationException();
 
             element.InUse = true;
 
-            this._elements.Add(element);
+            element.Visible.OnChange += this.OnElementVisibleChange;
+
+            if (index != -1)
+                this._elements.Insert(index, element);
+            else
+                this._elements.Add(element);
+        }
+
+        private void OnElementVisibleChange(object sender, bool e) {
+            this.Recalculate(null, null);
         }
 
         public void UnRegisterElement(UiElement element) {
-            element.InUse = false;
+            if (this._elements.Remove(element)) {
+                element.InUse = false;
+                element.Drawable.Tweens.Clear();
 
-            this._elements.Remove(element);
+                element.Visible.OnChange -= this.OnElementVisibleChange;
+            }
         }
 
         public override void Dispose(bool disposing) {
