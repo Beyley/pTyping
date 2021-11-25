@@ -13,6 +13,8 @@ namespace pTyping.UiGenerator {
 
         public bool InUse = false;
 
+        public float SpaceAfter = 10;
+
         private UiElement(UiElementType type) => this.Type = type;
 
         public static UiElement CreateButton(FontSystem font, string text, int size, Color buttonColor, Color textColor, Color outlineColor, Vector2 buttonSize) {

@@ -16,8 +16,6 @@ namespace pTyping.UiGenerator {
 
         public int EasingTime = 100;
 
-        public float ElementDistance = 10f;
-
         /// <summary>
         ///     Creates a UiContainer
         /// </summary>
@@ -60,7 +58,7 @@ namespace pTyping.UiGenerator {
                     element.Drawable.FadeInFromZero(this.EasingTime);
 
                 //Update the global y
-                y += element.Drawable.Size.Y + this.ElementDistance;
+                y += element.Drawable.Size.Y + element.SpaceAfter;
 
                 //Only add the new element
                 if (elementIsAdded)

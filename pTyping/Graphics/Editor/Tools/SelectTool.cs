@@ -37,11 +37,13 @@ namespace pTyping.Graphics.Editor.Tools {
                 @event.OnDragEnd   += this.OnObjectDragEnd;
             }
 
-            this.ObjectTextLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", 35);
-            this.ObjectText      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
+            this.ObjectTextLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", LABELTEXTSIZE);
+            this.ObjectTextLabel.SpaceAfter = LABELAFTERDISTANCE;
+            this.ObjectText                 = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", ITEMTEXTSIZE, TEXTBOXWIDTH);
 
-            this.ObjectColourLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", 35);
-            this.ObjectColour      = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 30, Color.White);
+            this.ObjectColourLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", LABELTEXTSIZE);
+            this.ObjectColourLabel.SpaceAfter = LABELAFTERDISTANCE;
+            this.ObjectColour                 = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Color.White);
 
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectTextLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectText);

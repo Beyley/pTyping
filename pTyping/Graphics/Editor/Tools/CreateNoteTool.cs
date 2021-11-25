@@ -29,11 +29,13 @@ namespace pTyping.Graphics.Editor.Tools {
 
             this.DrawableManager.Add(this._createLine);
 
-            this._defaultNoteTextLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", 35);
-            this._defaultNoteText      = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 30, 200);
+            this._defaultNoteTextLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", LABELTEXTSIZE);
+            this._defaultNoteTextLabel.SpaceAfter = LABELAFTERDISTANCE;
+            this._defaultNoteText                 = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", ITEMTEXTSIZE, TEXTBOXWIDTH);
 
-            this._defaultNoteColorLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", 35);
-            this._defaultNoteColor      = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 30, Color.Red);
+            this._defaultNoteColorLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", LABELTEXTSIZE);
+            this._defaultNoteColorLabel.SpaceAfter = LABELAFTERDISTANCE;
+            this._defaultNoteColor                 = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Color.Red);
 
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this._defaultNoteTextLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this._defaultNoteText);

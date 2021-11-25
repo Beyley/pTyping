@@ -16,6 +16,12 @@ using pTyping.Graphics.Player;
 namespace pTyping.Graphics.Editor {
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class EditorTool : IComparable<EditorTool> {
+        public const           int     ITEMTEXTSIZE       = 30;
+        public const           int     LABELTEXTSIZE      = 35;
+        public const           float   TEXTBOXWIDTH       = 200;
+        public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
+        public const           float   LABELAFTERDISTANCE = 5f;
+        
         public          UiTickboxDrawable TickBoxDrawable;
         [NotNull]
         public abstract string            Name    { get; }

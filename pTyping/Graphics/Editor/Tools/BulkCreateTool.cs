@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
+using pTyping.UiGenerator;
 
 namespace pTyping.Graphics.Editor.Tools {
     public class BulkCreateTool : EditorTool {
@@ -21,38 +22,56 @@ namespace pTyping.Graphics.Editor.Tools {
         // public readonly Bindable<string> Delimiter = new(";");
         // [ToolOption("Color", "The color of all the notes.")]
         // public readonly Bindable<Color> Color = new(new(255, 0, 0));
+        public UiElement LyricsToAdd;
+        public UiElement LyricsToAddLabel;
+        public UiElement Spacing;
+        public UiElement SpacingLabel;
+        public UiElement Delimiter;
+        public UiElement DelimiterLabel;
+        public UiElement Color;
+        public UiElement ColorLabel;
 
         private readonly List<NoteDrawable> _previewNotes = new();
 
         public override void Initialize() {
-            // this.LyricsToAdd.OnChange += this.OnTextChange;
-            // this.Delimiter.OnChange   += this.OnTextChange;
-            // this.Color.OnChange       += this.OnColorChange;
-            // this.Spacing.OnChange     += this.OnIntChange;
+            this.LyricsToAddLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Lyrics", LABELTEXTSIZE);
+            this.LyricsToAddLabel.SpaceAfter = LABELAFTERDISTANCE;
+            this.LyricsToAdd                 = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", ITEMTEXTSIZE, TEXTBOXWIDTH);
+            this.DelimiterLabel              = UiElement.CreateText(pTypingGame.JapaneseFont, "Delimiter", LABELTEXTSIZE);
+            this.DelimiterLabel.SpaceAfter   = LABELAFTERDISTANCE;
+            this.Delimiter                   = UiElement.CreateTextBox(pTypingGame.JapaneseFont, ";", ITEMTEXTSIZE, TEXTBOXWIDTH);
+            this.SpacingLabel                = UiElement.CreateText(pTypingGame.JapaneseFont, "Spacing", LABELTEXTSIZE);
+            this.SpacingLabel.SpaceAfter     = LABELAFTERDISTANCE;
+            this.Spacing                     = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "4", ITEMTEXTSIZE, TEXTBOXWIDTH);
+            this.ColorLabel                  = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", LABELTEXTSIZE);
+            this.ColorLabel.SpaceAfter       = LABELAFTERDISTANCE;
+            this.Color                       = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Microsoft.Xna.Framework.Color.Red);
+
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAddLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAdd);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.DelimiterLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Delimiter);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SpacingLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Spacing);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ColorLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Color);
 
             this.Update();
         }
 
         public override void Deinitialize() {
-            // this.LyricsToAdd.OnChange -= this.OnTextChange;
-            // this.Delimiter.OnChange   -= this.OnTextChange;
-            // this.Color.OnChange       -= this.OnColorChange;
-            // this.Spacing.OnChange     -= this.OnIntChange;
+
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricsToAddLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricsToAdd);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.DelimiterLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Delimiter);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SpacingLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Spacing);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ColorLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Color);
 
             this._previewNotes.ForEach(x => this.DrawableManager.Remove(x));
             this._previewNotes.Clear();
-        }
-
-        private void OnColorChange(object sender, Color e) {
-            this.Update();
-        }
-
-        private void OnTextChange(object sender, string e) {
-            this.Update();
-        }
-
-        private void OnIntChange(object sender, int e) {
-            this.Update();
         }
 
         public override void OnMouseMove(Point position) {
@@ -97,32 +116,32 @@ namespace pTyping.Graphics.Editor.Tools {
         }
 
         private List<Note> GenerateNotes() {
-            // string[] splitText = this.LyricsToAdd.Value.Split(this.Delimiter.Value);
-            //
-            // double time = this.EditorInstance.EditorState.CurrentTime;
-            //
-            // double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / this.Spacing.Value;
-            //
+            string[] splitText = this.LyricsToAdd.AsTextBox().Text.Split(this.Delimiter.AsTextBox().Text);
+
+            double time = this.EditorInstance.EditorState.CurrentTime;
+
+            double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
+            
             List<Note> notes = new();
-            //
-            // foreach (string text in splitText) {
-            //     if (text.Trim().IsNullOrEmpty()) {
-            //         time += spacing;
-            //
-            //         continue;
-            //     }
-            //
-            //     Note note = new() {
-            //         Text  = text.Trim(),
-            //         Time  = time,
-            //         Color = this.Color.Value
-            //     };
-            //
-            //     notes.Add(note);
-            //     
-            //     time += spacing;
-            // }
-            //
+
+            foreach (string text in splitText) {
+                if (string.IsNullOrEmpty(text.Trim())) {
+                    time += spacing;
+
+                    continue;
+                }
+
+                Note note = new() {
+                    Text  = text.Trim(),
+                    Time  = time,
+                    Color = this.Color.AsColorPicker().Color
+                };
+
+                notes.Add(note);
+
+                time += spacing;
+            }
+            
             return notes;
         }
 
