@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using Kettu;
 using pTyping.Engine;
-using pTyping.Songs.SongLoader;
+using pTyping.Songs.SongLoaders;
 
 namespace pTyping.Songs {
     public static class SongManager {

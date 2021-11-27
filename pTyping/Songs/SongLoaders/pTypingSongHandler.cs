@@ -3,7 +3,7 @@ using Kettu;
 using Newtonsoft.Json;
 using pTyping.Engine;
 
-namespace pTyping.Songs.SongLoader {
+namespace pTyping.Songs.SongLoaders {
     // ReSharper disable once InconsistentNaming
     public class pTypingSongHandler : ISongHandler {
         public SongType Type => SongType.pTyping;

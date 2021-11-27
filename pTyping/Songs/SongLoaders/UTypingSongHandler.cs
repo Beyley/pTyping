@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs.Events;
 
-namespace pTyping.Songs.SongLoader {
+namespace pTyping.Songs.SongLoaders {
     public class UTypingSongHandler : ISongHandler {
         public SongType Type => SongType.UTyping;
 
@@ -30,7 +30,7 @@ namespace pTyping.Songs.SongLoader {
             song.Artist     = info[1];
             song.Creator    = info[2];
             song.Difficulty = info[3];
-            song.Type       = SongType.UTyping;
+            song.Type       = this.Type;
 
             string dataFilename = info[4];
 
