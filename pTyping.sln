@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Engine", "Furball\F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Web", "pTyping.Web\pTyping.Web.csproj", "{8FD68BA3-A2E5-4484-A275-83626447DFB0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Tests", "pTyping.Tests\pTyping.Tests.csproj", "{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{8FD68BA3-A2E5-4484-A275-83626447DFB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FD68BA3-A2E5-4484-A275-83626447DFB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FD68BA3-A2E5-4484-A275-83626447DFB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}
