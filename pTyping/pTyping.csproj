@@ -20,22 +20,13 @@
         <PackageReference Include="EeveeTools" Version="1.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
         <PackageReference Include="Kettu" Version="1.2.1"/>
-        <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.2062-develop"/>
-        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.2062-develop"/>
+        <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641"/>
+        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="ParallelExtensionsCore" Version="1.3.0"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0"/>
         <PackageReference Include="TextCopy" Version="4.3.1"/>
         <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Remove="Content\user-card.kra~"/>
-        <None Remove="Content\mode-icons.kra~"/>
-        <None Remove="Content\song-button-background.png~"/>
-        <None Remove="Content\song-button-background.kra~"/>
-        <None Remove="Content\backbutton.png~"/>
-        <None Remove="Content\back-button.kra~"/>
     </ItemGroup>
 
     <ItemGroup>
