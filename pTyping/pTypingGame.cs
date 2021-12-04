@@ -315,6 +315,8 @@ namespace pTyping {
 
             RpcClient.Initialize();
 
+            this.AfterScreenChange += (_, screen) => this.Window.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
+
             Thread thread = new(
             () => {
                 while (true) {
