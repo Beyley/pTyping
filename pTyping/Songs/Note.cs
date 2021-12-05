@@ -15,7 +15,7 @@ namespace pTyping.Songs {
     }
 
     public enum NoteType {
-        Normal
+        UTyping
     }
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -24,7 +24,7 @@ namespace pTyping.Songs {
         public Color Color = Color.Red;
 
         [JsonProperty]
-        public NoteType Type = NoteType.Normal;
+        public NoteType Type = NoteType.UTyping;
 
         /// <summary>
         ///     Whether or not the note has been hit

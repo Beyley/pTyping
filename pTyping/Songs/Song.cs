@@ -5,11 +5,7 @@ using System.Linq;
 using System.Text;
 using Furball.Engine.Engine.Helpers;
 using JetBrains.Annotations;
-using Kettu;
-using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using pTyping.Engine;
-using pTyping.Songs.Events;
 
 namespace pTyping.Songs {
     public enum SongType {
@@ -59,9 +55,9 @@ namespace pTyping.Songs {
                 this.Notes.Sort((x, y) => (int)(x.Time - y.Time));
 
                 StringBuilder notes  = new();
-                const string  format = "{0}:{1}:{2}:{3}";
+                const string  format = "{0}:{1}:{2}:{3}:{4}";
                 foreach (Note note in this.Notes)
-                    notes.AppendFormat(format, note.Time, note.Color, note.Text, note.YOffset);
+                    notes.AppendFormat(format, note.Time, note.Color, note.Text, note.YOffset, note.Type);
 
                 return CryptoHelper.GetSha256(Encoding.Unicode.GetBytes(notes.ToString()));
             }
