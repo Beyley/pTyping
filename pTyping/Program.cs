@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Furball.Engine.Engine.Helpers;
 
 namespace pTyping {
     internal class Program {
@@ -36,7 +37,17 @@ namespace pTyping {
             }
 
             using pTypingGame game = new();
-            game.Run();
+
+            try {
+                game.Run();
+            }
+            catch (Exception ex) {
+                FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
+                StreamWriter writer = new(stream);
+                writer.Write(ex.ToString());
+                writer.Flush();
+                stream.Close();
+            }
         }
     }
 }
