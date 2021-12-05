@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,6 +32,23 @@ namespace pTyping.Graphics.Menus {
             };
 
             this.Manager.Add(gitVersionText);
+
+            UiButtonDrawable changelogButton = new(
+            new(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+            "Changelog",
+            pTypingGame.JapaneseFont,
+            30,
+            Color.Blue,
+            Color.White,
+            Color.White,
+            new(0)
+            ) {
+                OriginType = OriginType.BottomLeft
+            };
+
+            changelogButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new ChangelogScreen());
+
+            this.Manager.Add(changelogButton);
 
             #region Title
 

@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using Furball.Engine.Engine.Helpers;
+using Newtonsoft.Json;
 
 namespace pTyping {
+
     internal class Program {
+        public static List<GitLogEntry> GitLog;
+    
         public static string GitVersion    = "unknown";
         public static string ReleaseStream = "other";
         public static string BuildVersion => $"{GitVersion}-{ReleaseStream}";
@@ -36,17 +41,26 @@ namespace pTyping {
                 }
             }
 
+            using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitlog.json")) {
+                using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
+                    string gitlog = reader.ReadToEnd().Trim();
+
+                    GitLog = JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
+                }
+            }
+
             using pTypingGame game = new();
 
             try {
                 game.Run();
             }
             catch (Exception ex) {
+                string fileName = $"crashlog-{UnixTime.Now()}";
+                
                 FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
-                StreamWriter writer = new(stream);
-                writer.Write(ex.ToString());
-                writer.Flush();
                 stream.Close();
+
+                File.WriteAllText(fileName, ex.ToString());
             }
         }
     }

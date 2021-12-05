@@ -35,10 +35,14 @@
         <EmbeddedResource Include="gitversion.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Remove="gitlog.json"/>
+        <EmbeddedResource Include="gitlog.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;"/>
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  &quot;commit&quot;: &quot;%H&quot;,%n  &quot;author&quot;: &quot;%aN;&quot;,%n  &quot;date&quot;: &quot;%ci&quot;,%n  &quot;message&quot;: &quot;%s&quot;%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;"/>
     </Target>
 
 </Project>
