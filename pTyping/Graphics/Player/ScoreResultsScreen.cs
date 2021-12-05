@@ -47,7 +47,7 @@ namespace pTyping.Graphics.Player {
             y += 20 + score.Size.Y;
             TextDrawable accuracy = new(new(100, y), FurballGame.DEFAULT_FONT, $"Accuracy: {this.Score.Accuracy * 100:0.00}%", 35);
             y += 20 + accuracy.Size.Y;
-            TextDrawable combo = new(new(100, y), FurballGame.DEFAULT_FONT, $"Combo: {this.Score.Combo}x", 35);
+            TextDrawable combo = new(new(100, y), FurballGame.DEFAULT_FONT, $"Combo: {this.Score.MaxCombo}x", 35);
             y += 20 + combo.Size.Y;
             TextDrawable excellent = new(new(100, y), FurballGame.DEFAULT_FONT, $"Excellent: {this.Score.ExcellentHits}x", 35);
             y += 20 + excellent.Size.Y;
