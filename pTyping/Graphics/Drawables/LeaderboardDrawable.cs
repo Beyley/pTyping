@@ -13,6 +13,11 @@ namespace pTyping.Graphics.Drawables {
         private readonly List<PlayerScore> _scores;
 
         public LeaderboardDrawable(List<PlayerScore> scores) {
+            this.Clickable   = false;
+            this.CoverClicks = false;
+            this.Hoverable   = false;
+            this.CoverHovers = false;
+            
             this._scores = scores;
 
             float y = 0;

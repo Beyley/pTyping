@@ -133,7 +133,8 @@ namespace pTyping.Graphics.Menus.SongSelect {
             #region Leaderboard select
 
             this._leaderboardButton = new(TextureFromLeaderboardType(LeaderboardType), new(10, 10)) {
-                Scale = new(0.05f)
+                Scale = new(0.05f),
+                Depth = 0.75f
             };
 
             this._leaderboardButton.OnClick += this.ChangeLeaderboardType;
