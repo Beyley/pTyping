@@ -401,6 +401,8 @@ namespace pTyping.Graphics.Editor {
 
             this._progressBar.OnDrag -= this.ProgressBarOnDrag;
 
+            SongManager.UpdateSongs();
+
             base.Dispose(disposing);
         }
 
