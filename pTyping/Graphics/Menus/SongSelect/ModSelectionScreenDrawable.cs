@@ -62,23 +62,23 @@ namespace pTyping.Graphics.Menus.SongSelect {
         private void OnButtonClick(UiButtonDrawable modButton, PlayerMod mod) {
             if (pTypingGame.SelectedMods.Contains(mod)) {
                 pTypingGame.SelectedMods.Remove(mod);
+                modButton.ButtonColor = this._unselectedColor;
                 modButton.FadeColor(this._unselectedColor, 100);
-                modButton.ButtonColor = this._selectedColor;
             } else {
                 for (int i = 0; i < this._mods.Count; i++) {
                     (PlayerMod playerMod, UiButtonDrawable button) = this._mods[i];
 
                     if (mod.IncompatibleMods().Contains(playerMod.GetType()))
                         if (pTypingGame.SelectedMods.Contains(playerMod)) {
-                            button.FadeColor(this._unselectedColor, 100);
                             button.ButtonColor = this._unselectedColor;
+                            button.FadeColor(this._unselectedColor, 100);
                             pTypingGame.SelectedMods.Remove(playerMod);
                         }
                 }
 
                 pTypingGame.SelectedMods.Add(mod);
-                modButton.FadeColor(this._selectedColor, 100);
                 modButton.ButtonColor = this._selectedColor;
+                modButton.FadeColor(this._selectedColor, 100);
             }
 
             this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
