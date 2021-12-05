@@ -134,6 +134,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             //Play the menu click sound (since we clicked a button)
             pTypingGame.MenuClickSound.Play();
+            SongManager.UpdateSongs();
             //Change the screen to the song select screen
             ScreenManager.ChangeScreen(new SongSelectionScreen(true));
         }
