@@ -16,7 +16,7 @@ jobs:
         # Setup monogame
       - name: Install MGCB tool
         id: mgcb
-        run: dotnet tool update --global dotnet-mgcb-editor --version *-*; mgcb-editor --register;
+        run: dotnet tool update --global dotnet-mgcb-editor --version *-*
 
       - name: Run tests
         id: tests
