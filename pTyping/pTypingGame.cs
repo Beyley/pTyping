@@ -315,13 +315,19 @@ namespace pTyping {
 
             RpcClient.Initialize();
 
+            RpcClient.Invoke();
+
             this.AfterScreenChange += (_, screen) => this.Window.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
 
             Thread thread = new(
             () => {
+                Thread.Sleep(1000);
+            
                 while (true) {
-                    if (RpcClient.CurrentUser == null)
-                        return;
+                    if (RpcClient.CurrentUser == null) {
+                        Thread.Sleep(1000);
+                        continue;
+                    }
 
                     pScreen screen = Instance.RunningScreen as pScreen;
 
@@ -331,6 +337,8 @@ namespace pTyping {
                     RpcClient.SetPresence(RichPresence);
 
                     RpcClient.Invoke();
+
+                    Thread.Sleep(100);
                 }
             }
             );
