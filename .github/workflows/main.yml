@@ -1,0 +1,20 @@
+name: Run Tests
+on:
+  push:
+    branches:
+      - master # Default release branch
+jobs:
+  publish:
+    name: Build, Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+    
+        # Setup monogame
+      - name: Install MGCB tool
+        id: mgcb
+        run: dotnet tool update --global dotnet-mgcb-editor --version *-*; mgcb-editor --register;
+
+      - name: Run tests
+        id: tests
+        run: dotnet test
