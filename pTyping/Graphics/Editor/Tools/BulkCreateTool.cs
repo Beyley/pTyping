@@ -90,14 +90,15 @@ namespace pTyping.Graphics.Editor.Tools {
             foreach (Note note in notes) {
                 NoteDrawable drawable = new(Vector2.Zero, this.EditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
                     TimeSource = pTypingGame.MusicTrack,
-                    LabelTextDrawable = {
-                        Text  = $"{note.Text}",
-                        Scale = new(1f)
+                    RawTextDrawable = {
+                        Text = $"{note.Text}"
                     },
                     Scale         = new(0.55f, 0.55f),
                     OriginType    = OriginType.Center,
                     Note          = note,
-                    ColorOverride = new(255, 255, 255, 100)
+                    NoteTexture = {
+                        ColorOverride = new(255, 255, 255, 100)
+                    }
                 };
 
                 drawable.Tweens.Add(

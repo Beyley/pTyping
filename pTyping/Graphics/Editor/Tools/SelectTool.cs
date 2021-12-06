@@ -58,6 +58,26 @@ namespace pTyping.Graphics.Editor.Tools {
             base.Initialize();
         }
 
+        public override void OnNoteCreate(NoteDrawable note, bool isNew) {
+            if (isNew) {
+                note.OnClick     += this.OnObjectClick;
+                note.OnDragBegin += this.OnObjectDragBegin;
+                note.OnDrag      += this.OnObjectDrag;
+                note.OnDragEnd   += this.OnObjectDragEnd;
+            }
+
+            base.OnNoteCreate(note, isNew);
+        }
+
+        public override void OnNoteDelete(NoteDrawable note) {
+            note.OnClick     -= this.OnObjectClick;
+            note.OnDragBegin -= this.OnObjectDragBegin;
+            note.OnDrag      -= this.OnObjectDrag;
+            note.OnDragEnd   -= this.OnObjectDragEnd;
+
+            base.OnNoteDelete(note);
+        }
+
         private void ShowUiElements(bool text, bool colour) {
             this.ObjectTextLabel.Visible.Value   = text;
             this.ObjectText.Visible.Value        = text;

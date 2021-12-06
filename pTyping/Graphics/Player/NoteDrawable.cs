@@ -1,8 +1,5 @@
 using FontStashSharp;
-using Furball.Engine;
-using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
@@ -23,19 +20,44 @@ namespace pTyping.Graphics.Player {
             this.IsEditor       = isEditor;
         }
     }
-    
-    public class NoteDrawable : TexturedDrawable {
-        public TextDrawable LabelTextDrawable;
+
+    public class NoteDrawable : CompositeDrawable {
+        public TextDrawable     RawTextDrawable;
+        public TextDrawable     ToTypeTextDrawable;
+        public TexturedDrawable NoteTexture;
 
         public Note Note;
         public bool Added = false;
 
-        public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) : base(texture, position) {
-            this.LabelTextDrawable       = new TextDrawable(Vector2.Zero, font, "", size);
-            this.LabelTextDrawable.Scale = new(1);
+        public Texture2D Texture;
+
+        public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) {
+            this.Position = position;
+            this.Texture  = texture;
+
+            this.NoteTexture = new TexturedDrawable(this.Texture, new(0)) {
+                OriginType  = OriginType.TopLeft,
+                Clickable   = false,
+                CoverClicks = false
+            };
+
+            this.RawTextDrawable = new TextDrawable(new(this.NoteTexture.Size.X / 2f, this.NoteTexture.Size.Y + 20), font, "", size) {
+                Scale      = new(1.5f),
+                OriginType = OriginType.TopCenter
+            };
+            this.ToTypeTextDrawable = new TextDrawable(new(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 40), font, "", size) {
+                Scale      = new(1.5f),
+                OriginType = OriginType.TopCenter
+            };
+
+            this._drawables.Add(this.NoteTexture);
+            this._drawables.Add(this.RawTextDrawable);
+            this._drawables.Add(this.ToTypeTextDrawable);
+
+            this.OriginType = OriginType.Center;
         }
 
-        public override Vector2 Size => new Vector2(this.Texture.Width, this.Texture.Height) * this.Scale;
+        public override Vector2 Size => this.NoteTexture.Size * this.Scale;
 
         public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
             this.Tweens.Clear();
@@ -75,8 +97,19 @@ namespace pTyping.Graphics.Player {
         }
 
         public void Reset() {
-            this.LabelTextDrawable.Text = this.Note.Text;
-            this.ColorOverride          = this.Note.Color;
+            this.RawTextDrawable.Text    = this.Note.Text;
+            this.ToTypeTextDrawable.Text = "";
+
+            this.NoteTexture.ColorOverride = this.Note.Color;
+        }
+
+        /// <summary>
+        ///     Updates the positions of the text
+        /// </summary>
+        public void UpdateTextPositions() {
+            this.RawTextDrawable.Position = new(this.NoteTexture.Size.X / 2f, this.NoteTexture.Size.Y + 20);
+
+            this.ToTypeTextDrawable.Position = new(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 80);
         }
         
         /// <summary>
@@ -130,26 +163,27 @@ namespace pTyping.Graphics.Player {
             this.Note.HitResult = HitResult.Poor;
         }
 
-        public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
-            batch.SpriteBatch.Draw(
-            this.Texture,
-            args.Position * FurballGame.VerticalRatio,
-            null,
-            args.Color,
-            args.Rotation,
-            Vector2.Zero,
-            args.Scale * FurballGame.VerticalRatio,
-            args.Effects,
-            0f
-            );
-
-            // FIXME: this is a bit of a hack, it should definitely be done differently
-            args.Scale = new(1f);
-            // tempArgs.Position   -= this.LabelTextDrawable.Size / 2f + this.Size / 2f;
-            args.Position.Y += 100f;
-            args.Position.X += this.LabelTextDrawable.Size.X / 4f;
-            args.Color = new(this.LabelTextDrawable.ColorOverride.R, this.LabelTextDrawable.ColorOverride.G, this.LabelTextDrawable.ColorOverride.B, args.Color.A);
-            this.LabelTextDrawable.Draw(time, batch, args);
-        }
+        // public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+        //     batch.SpriteBatch.Draw(
+        //     this.Texture,
+        //     args.Position * FurballGame.VerticalRatio,
+        //     null,
+        //     args.Color,
+        //     args.Rotation,
+        //     Vector2.Zero,
+        //     args.Scale * FurballGame.VerticalRatio,
+        //     args.Effects,
+        //     0f
+        //     );
+        //
+        //     // FIXME: this is a bit of a hack, it should definitely be done differently
+        //     args.Scale = new(1f);
+        //     // tempArgs.Position   -= this.LabelTextDrawable.Size / 2f + this.Size / 2f;
+        //     args.Position.Y += 100f;
+        //     args.Position.X 
+        //     // args.Position.X += this.RawTextDrawable.Size.X / 4f;
+        //     args.Color = new(this.RawTextDrawable.ColorOverride.R, this.RawTextDrawable.ColorOverride.G, this.RawTextDrawable.ColorOverride.B, args.Color.A);
+        //     this.RawTextDrawable.Draw(time, batch, args);
+        // }
     }
 }

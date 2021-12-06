@@ -322,10 +322,11 @@ namespace pTyping.Graphics.Editor {
             50
             ) {
                 TimeSource    = pTypingGame.MusicTrack,
-                ColorOverride = note.Color,
-                LabelTextDrawable = {
-                    Text  = $"{note.Text}",
-                    Scale = new(1f)
+                NoteTexture = {
+                    ColorOverride = note.Color
+                },
+                RawTextDrawable = {
+                    Text = $"{note.Text}"
                 },
                 Scale      = new(0.55f, 0.55f),
                 OriginType = OriginType.Center,
@@ -401,8 +402,8 @@ namespace pTyping.Graphics.Editor {
 
             this._progressBar.OnDrag -= this.ProgressBarOnDrag;
 
-            SongManager.UpdateSongs();
-
+            // SongManager.UpdateSongs();
+            
             base.Dispose(disposing);
         }
 
@@ -499,6 +500,7 @@ namespace pTyping.Graphics.Editor {
 
                         if (responseType == ResponseType.Yes) {
                             SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                            pTypingGame.CurrentSong.Value = this.EditorState.Song;
                             SongManager.UpdateSongs();
                         }
                     }
@@ -516,6 +518,7 @@ namespace pTyping.Graphics.Editor {
                 case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
                     // Save the song if ctrl+s is pressed
                     SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                    pTypingGame.CurrentSong.Value = this.EditorState.Song;
                     SongManager.UpdateSongs();
 
                     this.SaveNeeded = false;

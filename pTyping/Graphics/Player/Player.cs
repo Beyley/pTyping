@@ -163,16 +163,22 @@ namespace pTyping.Graphics.Player {
         private NoteDrawable CreateNote(Note note) {
             NoteDrawable noteDrawable = new(new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
                 TimeSource    = pTypingGame.MusicTrack,
-                ColorOverride = note.Color,
-                LabelTextDrawable = {
-                    Text  = $"{note.Text}\n{string.Join("\n", note.TypableRomaji.Romaji)}",
-                    Scale = new(1f)
+                NoteTexture = {
+                    ColorOverride = note.Color
+                },
+                RawTextDrawable = {
+                    Text = $"{note.Text}"
+                },
+                ToTypeTextDrawable = {
+                    Text = $"{string.Join("\n", note.TypableRomaji.Romaji)}"
                 },
                 Scale      = new(0.55f),
                 Depth      = 0f,
                 OriginType = OriginType.Center,
                 Note       = note
             };
+
+            noteDrawable.UpdateTextPositions();
 
             noteDrawable.CreateTweens(new(this.BaseApproachTime));
 
@@ -244,8 +250,12 @@ namespace pTyping.Graphics.Player {
         }
 
         private void UpdateNoteText() {
-            foreach (NoteDrawable noteDrawable in this._notes)
-                noteDrawable.LabelTextDrawable.Text = $"{noteDrawable.Note.Text}\n{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
+            foreach (NoteDrawable noteDrawable in this._notes) {
+                noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
+                noteDrawable.ToTypeTextDrawable.Text = $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
+
+                noteDrawable.UpdateTextPositions();
+            }
         }
 
         private void NoteUpdate(bool wasHit, Note note) {
