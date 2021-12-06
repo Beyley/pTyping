@@ -18,6 +18,10 @@ jobs:
         id: mgcb
         run: dotnet tool update --global dotnet-mgcb-editor --version *-*
 
-      - name: Run tests
-        id: tests
-        run: dotnet test
+      - name: Run Tests
+        uses: zyborg/dotnet-tests-report@v1
+        with:
+          # project_path: tests/My.Project.Tests
+          report_name: ptyping_tests
+          report_title: pTyping Tests
+          github_token: ${{ secrets.GITHUB_TOKEN }}
