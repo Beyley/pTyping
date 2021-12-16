@@ -65,8 +65,12 @@ namespace pTyping.Graphics.Editor {
 
             Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
             this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
-                Scale      = new(0.55f),
-                OriginType = OriginType.Center
+                Scale       = new(0.55f),
+                OriginType  = OriginType.Center,
+                Clickable   = false,
+                CoverClicks = false,
+                Hoverable   = false,
+                CoverHovers = false
             };
 
             this.Manager.Add(this._recepticle);
