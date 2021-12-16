@@ -31,6 +31,8 @@ namespace pTyping.Graphics.Player {
 
         public Texture2D Texture;
 
+        public bool EditorHitSoundQueued = false;
+
         public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) {
             this.Position = position;
             this.Texture  = texture;

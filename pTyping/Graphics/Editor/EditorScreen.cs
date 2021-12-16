@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine;
+using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
@@ -14,6 +15,7 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Gtk;
 using JetBrains.Annotations;
+using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -50,6 +52,8 @@ namespace pTyping.Graphics.Editor {
         public bool SaveNeeded = false;
 
         public long LastEscapeTime = 0;
+
+        public SoundEffect HitSoundNormal = new();
 
         public override void Initialize() {
             base.Initialize();
@@ -145,7 +149,8 @@ namespace pTyping.Graphics.Editor {
                 OriginType = OriginType.BottomLeft
             };
 
-            this._progressBar.OnDrag += this.ProgressBarOnDrag;
+            this._progressBar.OnDrag  += this.ProgressBarOnInteract;
+            this._progressBar.OnClick += this.ProgressBarOnInteract;
 
             this.Manager.Add(this._progressBar);
 
@@ -260,9 +265,18 @@ namespace pTyping.Graphics.Editor {
             FurballGame.InputManager.OnMouseDrag   += this.OnMouseDrag;
 
             pTypingGame.UserStatusEditing();
+
+            this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+
+            ConVars.Volume.OnChange    += this.OnVolumeChange;
+            this.HitSoundNormal.Volume =  ConVars.Volume.Value;
         }
 
-        private void ProgressBarOnDrag(object sender, Point e) {
+        private void OnVolumeChange(object sender, EventArgs e) {
+            this.HitSoundNormal.Volume = ConVars.Volume.Value;
+        }
+
+        private void ProgressBarOnInteract(object sender, Point e) {
             Vector2 adjustedPoint = e.ToVector2() - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
 
             double value = (double)adjustedPoint.X / this._progressBar.Size.X;
@@ -270,6 +284,10 @@ namespace pTyping.Graphics.Editor {
             double time = value * pTypingGame.MusicTrack.Length;
 
             pTypingGame.MusicTrack.SeekTo(time);
+
+            if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
+                foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
+                    note.EditorHitSoundQueued = true;
         }
 
         public void UpdateSelectionRects(object _, NotifyCollectionChangedEventArgs __) {
@@ -365,7 +383,7 @@ namespace pTyping.Graphics.Editor {
         }
 
         private void OnMouseMove(object sender, (Point mousePos, string cursorName) e) {
-            double currentTime  = pTypingGame.MusicTrack.GetCurrentTime();
+            double currentTime  = this.EditorState.CurrentTime;
             double reticuleXPos = this._recepticle.Position.X;
             double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 
@@ -404,7 +422,9 @@ namespace pTyping.Graphics.Editor {
 
             this.EditorState.SelectedObjects.CollectionChanged -= this.UpdateSelectionRects;
 
-            this._progressBar.OnDrag -= this.ProgressBarOnDrag;
+            this._progressBar.OnDrag -= this.ProgressBarOnInteract;
+
+            ConVars.Volume.OnChange -= this.OnVolumeChange;
 
             // SongManager.UpdateSongs();
             
@@ -430,6 +450,10 @@ namespace pTyping.Graphics.Editor {
                 timeToSeekTo -= noteLength;
 
             pTypingGame.MusicTrack.SeekTo(Math.Max(timeToSeekTo, 0));
+
+            if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
+                foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
+                    note.EditorHitSoundQueued = true;
         }
 
         public void DeleteSelectedObjects() {
@@ -469,7 +493,7 @@ namespace pTyping.Graphics.Editor {
             
             switch (key) {
                 case Keys.Space:
-                    pTypingGame.PauseResumeMusic();
+                    this.ToggleMusicPlay();
                     break;
                 case Keys.Left: {
                     this.TimelineMove(false);
@@ -568,18 +592,6 @@ namespace pTyping.Graphics.Editor {
 
                     break;
                 }
-                // case Keys.D1: {
-                //     this.ChangeTool(typeof(SelectTool));
-                //     break;
-                // }
-                // case Keys.D2: {
-                //     this.ChangeTool(typeof(CreateNoteTool));
-                //     break;
-                // }
-                // case Keys.D3: {
-                //     this.ChangeTool(typeof(BulkCreateTool));
-                //     break;
-                // }
             }
         }
 
@@ -590,8 +602,14 @@ namespace pTyping.Graphics.Editor {
             if (!this.EditorState.CurrentTime.Equals(this._lastTime)) {
                 this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
 
-                foreach (NoteDrawable note in this.EditorState.Notes)
+                foreach (NoteDrawable note in this.EditorState.Notes) {
                     note.Visible = this.EditorState.CurrentTime > note.Note.Time - 2000 && this.EditorState.CurrentTime < note.Note.Time + 1000;
+
+                    if (note.EditorHitSoundQueued && note.Note.Time < this.EditorState.CurrentTime) {
+                        this.HitSoundNormal.Play();
+                        note.EditorHitSoundQueued = false;
+                    }
+                }
                 foreach (ManagedDrawable managedDrawable in this.EditorState.Events) {
                     double time = managedDrawable switch {
                         TypingCutoffEventDrawable cutoff       => cutoff.Event.Time,
@@ -615,6 +633,26 @@ namespace pTyping.Graphics.Editor {
             this._lastTime = this.EditorState.CurrentTime;
             
             base.Update(gameTime);
+        }
+
+        public void ToggleMusicPlay() {
+            pTypingGame.PauseResumeMusic();
+
+            switch (pTypingGame.MusicTrack.PlaybackState) {
+                case PlaybackState.Playing: {
+                    this.EditorState.Notes.ForEach(x => x.EditorHitSoundQueued = false);
+
+                    foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
+                        note.EditorHitSoundQueued = true;
+
+                    break;
+                }
+                case PlaybackState.Paused: {
+                    this.EditorState.Notes.ForEach(x => x.EditorHitSoundQueued = false);
+
+                    break;
+                }
+            }
         }
         
         public override string Name  => "Editor";
