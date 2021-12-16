@@ -324,6 +324,8 @@ namespace pTyping {
                 Thread.Sleep(1000);
             
                 while (true) {
+                    if (RpcClient.IsDisposed) return;
+                    
                     if (RpcClient.CurrentUser == null) {
                         Thread.Sleep(1000);
                         continue;
@@ -335,7 +337,6 @@ namespace pTyping {
                     RichPresence.Details = screen?.Details;
 
                     RpcClient.SetPresence(RichPresence);
-
                     RpcClient.Invoke();
 
                     Thread.Sleep(100);
@@ -426,8 +427,10 @@ namespace pTyping {
                     drawable.MoveTo(pos);
                     pos.X += drawable.Size.X + 10;
 
-                    if (pos.X + drawable.Size.X > DEFAULT_WINDOW_WIDTH)
-                        pos.X = 10;
+                    if (pos.X + drawable.Size.X > DEFAULT_WINDOW_WIDTH) {
+                        pos.X =  10;
+                        pos.Y += drawable.Size.Y + 10;
+                    }
                     
                     this._userPanelDrawables.Add(drawable);
                     this._userPanelManager.Add(drawable);
