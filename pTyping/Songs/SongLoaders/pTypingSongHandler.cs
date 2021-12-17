@@ -26,6 +26,8 @@ namespace pTyping.Songs.SongLoaders {
 
             song.Type = this.Type;
 
+            song.Notes.ForEach(x => x.Text = x.Text.Trim());
+
             return song;
         }
 
@@ -33,6 +35,8 @@ namespace pTyping.Songs.SongLoaders {
             song.Notes.Sort((x,        y) => (int)(x.Time - y.Time));
             song.TimingPoints.Sort((x, y) => (int)(x.Time - y.Time));
 
+            song.Notes.ForEach(x => x.Text = x.Text.Trim());
+            
             File.WriteAllText(
             song.FileInfo.FullName,
             JsonConvert.SerializeObject(
