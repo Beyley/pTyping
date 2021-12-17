@@ -125,8 +125,8 @@ namespace pTyping.Graphics.Player {
 
             this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            ConVars.Volume.OnChange    += this.OnVolumeChange;
-            this.HitSoundNormal.Volume =  ConVars.Volume.Value;
+            ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
+            this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
 
             //This wont be needed soon
             this._drawables = this._drawables.OrderByDescending(o => o.Depth).ToList();
@@ -137,8 +137,8 @@ namespace pTyping.Graphics.Player {
                 mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
         }
 
-        private void OnVolumeChange(object sender, EventArgs e) {
-            this.HitSoundNormal.Volume = ConVars.Volume.Value;
+        private void OnVolumeChange(object sender, float f) {
+            this.HitSoundNormal.Volume = f;
         }
 
         private void CreateEvents() {
@@ -425,7 +425,7 @@ namespace pTyping.Graphics.Player {
         }
 
         public override void Dispose(bool disposing) {
-            ConVars.Volume.OnChange -= this.OnVolumeChange;
+            ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
 
             base.Dispose(disposing);
         }

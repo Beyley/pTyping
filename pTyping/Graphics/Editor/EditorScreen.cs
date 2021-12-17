@@ -13,7 +13,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
-using Gtk;
 using JetBrains.Annotations;
 using ManagedBass;
 using Microsoft.Xna.Framework;
@@ -268,19 +267,19 @@ namespace pTyping.Graphics.Editor {
 
             this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            ConVars.Volume.OnChange    += this.OnVolumeChange;
-            this.HitSoundNormal.Volume =  ConVars.Volume.Value;
+            ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
+            this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
         }
 
-        private void OnVolumeChange(object sender, EventArgs e) {
-            this.HitSoundNormal.Volume = ConVars.Volume.Value;
+        private void OnVolumeChange(object sender, float f) {
+            this.HitSoundNormal.Volume = f;
         }
 
         private void ProgressBarOnInteract(object sender, Point e) {
             Vector2 adjustedPoint = e.ToVector2() - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
 
             double value = (double)adjustedPoint.X / this._progressBar.Size.X;
-
+            
             double time = value * pTypingGame.MusicTrack.Length;
 
             pTypingGame.MusicTrack.SeekTo(time);
@@ -424,7 +423,7 @@ namespace pTyping.Graphics.Editor {
 
             this._progressBar.OnDrag -= this.ProgressBarOnInteract;
 
-            ConVars.Volume.OnChange -= this.OnVolumeChange;
+            ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
 
             // SongManager.UpdateSongs();
             
@@ -519,18 +518,18 @@ namespace pTyping.Graphics.Editor {
                     }
 
                     if (this.SaveNeeded) {
-                        ResponseType responseType = GtkHelper.MessageDialog(
-                        "Are you sure?",
-                        "Do you want to save before quitting?",
-                        MessageType.Question,
-                        ButtonsType.YesNo
-                        );
-
-                        if (responseType == ResponseType.Yes) {
-                            SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-                            pTypingGame.CurrentSong.Value = this.EditorState.Song;
-                            SongManager.UpdateSongs();
-                        }
+                        // ResponseType responseType = EtoHelper.MessageDialog(
+                        // "Are you sure?",
+                        // "Do you want to save before quitting?",
+                        // MessageType.Question,
+                        // ButtonsType.YesNo
+                        // );
+                        //
+                        // if (responseType == ResponseType.Yes) {
+                        //     SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                        //     pTypingGame.CurrentSong.Value = this.EditorState.Song;
+                        //     SongManager.UpdateSongs();
+                        // }
                     }
 
                     pTypingGame.MenuClickSound.Play();
