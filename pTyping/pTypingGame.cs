@@ -395,7 +395,7 @@ namespace pTyping {
             this._userPanelManager.Visible = false;
             this.UpdateUserPanel(null, null);
 
-            this._chatDrawable = new(new(10, DEFAULT_WINDOW_HEIGHT - 10)) {
+            this._chatDrawable = new(new(10, DEFAULT_WINDOW_HEIGHT - 10), new(DEFAULT_WINDOW_WIDTH - 20, DEFAULT_WINDOW_HEIGHT * 0.4f)) {
                 OriginType = OriginType.BottomLeft
             };
             this._userPanelManager.Add(this._chatDrawable);

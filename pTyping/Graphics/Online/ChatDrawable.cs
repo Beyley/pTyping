@@ -1,25 +1,104 @@
-using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Furball.Engine;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
+using pTyping.Online;
 
 namespace pTyping.Graphics.Online {
+    public class ChatContentsDrawable : CompositeDrawable {
+        public List<ManagedDrawable> PublicDrawables => this._drawables;
+
+        public float TargetScroll = 0;
+
+        public override Vector2 Size {
+            get;
+        }
+
+        public ChatContentsDrawable(Vector2 size) => this.Size = size;
+
+        public void Clear() {
+            this.Drawables.ToList().ForEach(x => this._drawables.Remove(x));
+        }
+
+        public override void Update(GameTime time) {
+            foreach (ManagedDrawable drawable in this.Drawables) {
+                float startY = float.Parse(drawable.Tags.First());
+
+                float targetY = startY + this.TargetScroll;
+
+                float difference = targetY - drawable.Position.Y;
+
+                drawable.Position.Y += (float)(difference * time.ElapsedGameTime.TotalMilliseconds * 0.01);
+            }
+
+            base.Update(time);
+        }
+
+        public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+            batch.End();
+
+            Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
+
+            FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
+            (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
+            (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
+            (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
+            (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
+            );
+
+            batch.Begin();
+            base.Draw(time, batch, args);
+            batch.End();
+
+            FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
+
+            batch.Begin();
+        }
+    }
     public class ChatDrawable : CompositeDrawable {
-        private readonly TextDrawable      _channelContents;
-        public           UiTextBoxDrawable MessageInputDrawable;
+        private readonly ChatContentsDrawable       _channelContents;
+        private readonly RectanglePrimitiveDrawable _background;
+        public readonly  UiTextBoxDrawable          MessageInputDrawable;
 
         public Bindable<string> SelectedChannel = new("#general");
 
-        public ChatDrawable(Vector2 pos) {
-            this.Position = pos;
+        public override Vector2 Size {
+            get;
+        }
 
-            this._drawables.Add(this._channelContents     = new(new(0), pTypingGame.JapaneseFontStroked, "", 35));
-            this._drawables.Add(this.MessageInputDrawable = new(new(0), pTypingGame.JapaneseFontStroked, "", 35, FurballGame.DEFAULT_WINDOW_WIDTH - 20));
+        private readonly float _padding = 5f;
+
+        public ChatDrawable(Vector2 pos, Vector2 size) {
+            this.Position = pos;
+            this.Size     = size;
+
+            this._drawables.Add(
+            this._background = new(Vector2.Zero, size, 2, true) {
+                ColorOverride = new(100, 100, 100, 100)
+            }
+            );
+
+            this._drawables.Add(
+            this.MessageInputDrawable = new(new(0, size.Y), pTypingGame.JapaneseFontStroked, "", 35, size.X) {
+                OriginType       = OriginType.BottomLeft,
+                DeselectOnCommit = false
+            }
+            );
+
+            this._drawables.Add(
+            this._channelContents = new(new(size.X, size.Y - this.MessageInputDrawable.Size.Y - this._padding)) {
+                OriginType = OriginType.BottomLeft,
+                Position   = new(0, size.Y - this.MessageInputDrawable.Size.Y - this._padding)
+            }
+            );
 
             this.MessageInputDrawable.OnCommit += delegate {
                 pTypingGame.OnlineManager.SendMessage(this.SelectedChannel, this.MessageInputDrawable.Text);
@@ -32,7 +111,15 @@ namespace pTyping.Graphics.Online {
 
             this.OnClick += this.OnThisClick;
 
+            FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+
             this.RecalculateAndUpdate_wait_thats_bars();
+        }
+
+        private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
+            if (!this.IsHovered) return;
+
+            this._channelContents.TargetScroll += e.scrollAmount;
         }
 
         private void OnThisClick(object sender, Point e) {
@@ -45,27 +132,38 @@ namespace pTyping.Graphics.Online {
         private void ChatLogOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => this.RecalculateAndUpdate_wait_thats_bars();
 
         private void RecalculateAndUpdate_wait_thats_bars() {
-            string final = "";
+            IEnumerable<ChatMessage> chatMessages = pTypingGame.OnlineManager.ChatLog.Take(100).Where(message => message.Channel == this.SelectedChannel).Reverse();
 
-            pTypingGame.OnlineManager.ChatLog.Skip(pTypingGame.OnlineManager.ChatLog.Count - Math.Min(8, pTypingGame.OnlineManager.ChatLog.Count))
-                       .Where(message => message.Channel == this.SelectedChannel).ToList().ForEach(message => final += message + "\n");
+            // this._channelContents.ForEach(x => this._drawables.Remove(x));
+            // this._channelContents.Clear();
+            this._channelContents.Clear();
 
-            if (final.Contains("trans")) {
-                this._channelContents.Colors = new[] {
-                    Color.Cyan, Color.Pink, Color.White, Color.Pink
+            float y = this.Size.Y - this.MessageInputDrawable.Size.Y - 10;
+            foreach (ChatMessage message in chatMessages) {
+                TextDrawable messageDrawable = new(new(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
+                    OriginType = OriginType.BottomLeft
                 };
-                this._channelContents.ColorType = TextColorType.Repeating;
-            } else {
-                this._channelContents.ColorType = TextColorType.Solid;
+
+                messageDrawable.Tags.Add(messageDrawable.Position.Y.ToString());
+
+                if (message.Message.Contains("trans")) {
+                    messageDrawable.Colors = new[] {
+                        Color.Cyan, Color.Pink, Color.White, Color.Pink
+                    };
+                    messageDrawable.ColorType = TextColorType.Repeating;
+                }
+
+                this._channelContents.PublicDrawables.Add(messageDrawable);
+
+                y -= messageDrawable.Size.Y - 5;
             }
-            
-            this._channelContents.Text         = final.Trim();
-            this.MessageInputDrawable.Position = new(0, this._channelContents.Size.Y + 15);
         }
 
         public override void Dispose(bool disposing) {
             pTypingGame.OnlineManager.ChatLog.CollectionChanged -= this.ChatLogOnCollectionChanged;
             this.SelectedChannel.OnChange                       -= this.SelectedChannelOnChange;
+
+            FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
 
             base.Dispose(disposing);
         }

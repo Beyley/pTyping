@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Furball.Engine.Engine.Helpers;
 using Newtonsoft.Json;
 
 namespace pTyping {
@@ -31,6 +30,7 @@ namespace pTyping {
             ReleaseStream = "release";
         }
 
+        [STAThread]
         private static void Main(string[] args) {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -51,8 +51,11 @@ namespace pTyping {
 
             using pTypingGame game = new();
 
+#if RELEASE
             try {
+#endif
                 game.Run();
+#if RELEASE
             }
             catch (Exception ex) {
                 string fileName = $"crashlog-{UnixTime.Now()}";
@@ -62,6 +65,7 @@ namespace pTyping {
 
                 File.WriteAllText(fileName, ex.ToString());
             }
+#endif
         }
     }
 }
