@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Online.Taiko_rs.Packets;
 using pTyping.Scores;
@@ -24,6 +25,8 @@ namespace pTyping.Online.Taiko_rs {
         private          WebSocket _client;
 
         public bool IsAlive => this._client.IsAlive;
+
+        private readonly Queue<ChatMessage> _chatQueue = new();
 
         public TaikoRsOnlineManager(string wsUri, string httpUri) {
             this._wsUri   = new(wsUri);
@@ -207,7 +210,7 @@ namespace pTyping.Online.Taiko_rs {
 
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
                 ChatMessage message = new(player, packet.Channel, packet.Message);
-                this.ChatLog.Add(message);
+                this._chatQueue.Enqueue(message);
 
                 Logger.Log(
                 $"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}",
@@ -291,6 +294,13 @@ namespace pTyping.Online.Taiko_rs {
             this._client.SendRealAsync(new PacketClientNotifyScoreUpdate().GetPacket()).Wait();
             
             return true;
+        }
+
+        public override void Update(GameTime time) {
+            while (this._chatQueue.TryDequeue(out ChatMessage message))
+                this.ChatLog.Add(message);
+
+            base.Update(time);
         }
 
         private bool HandleServerUserJoinedPacket(TaikoRsReader reader) {
