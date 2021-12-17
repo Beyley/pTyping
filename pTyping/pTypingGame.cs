@@ -281,6 +281,8 @@ namespace pTyping {
                 this._musicTrackSchedulerDelta = 0;
             }
 
+            OnlineManager.Update(gameTime);
+            
             if (this._userPanelManager.Visible)
                 this._userPanelManager.Update(gameTime);
         }
