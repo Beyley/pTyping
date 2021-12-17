@@ -30,6 +30,7 @@ namespace pTyping.Online {
         Catch    = 2,
         Mania    = 3,
         [SuppressMessage("ReSharper", "InconsistentNaming")]
-        pTyping = 4
+        pTyping = 4,
+        Adofai = 5
     }
 }
