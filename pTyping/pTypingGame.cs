@@ -403,6 +403,7 @@ namespace pTyping {
 
         private void OnKeyDown(object sender, Keys e) {
             switch (e) {
+                case Keys.Escape:
                 case Keys.F8:
                 case Keys.F9:
                     this._userPanelManager.Visible = !this._userPanelManager.Visible;
