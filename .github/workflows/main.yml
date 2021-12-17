@@ -1,8 +1,7 @@
 name: Run Tests
 on:
   push:
-    branches:
-      - master # Default release branch
+  pull_request:
 jobs:
   publish:
     name: Build, Run Tests
