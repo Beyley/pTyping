@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -29,14 +30,18 @@ namespace pTyping.Graphics.Online {
         }
 
         public override void Update(GameTime time) {
-            foreach (ManagedDrawable drawable in this.Drawables) {
-                float startY = float.Parse(drawable.Tags.First());
+            if (this._drawables.Count != 0) {
+                this.TargetScroll = Math.Max(this.TargetScroll, 0);
 
-                float targetY = startY + this.TargetScroll;
+                foreach (ManagedDrawable drawable in this.Drawables) {
+                    float startY = float.Parse(drawable.Tags.First());
 
-                float difference = targetY - drawable.Position.Y;
+                    float targetY = startY + this.TargetScroll;
 
-                drawable.Position.Y += (float)(difference * time.ElapsedGameTime.TotalMilliseconds * 0.01);
+                    float difference = targetY - drawable.Position.Y;
+
+                    drawable.Position.Y += (float)(difference * time.ElapsedGameTime.TotalMilliseconds * 0.01);
+                }
             }
 
             base.Update(time);
@@ -157,6 +162,8 @@ namespace pTyping.Graphics.Online {
 
                 y -= messageDrawable.Size.Y - 5;
             }
+
+            this._channelContents.TargetScroll = 0;
         }
 
         public override void Dispose(bool disposing) {
