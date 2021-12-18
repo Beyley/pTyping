@@ -166,6 +166,10 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         public override async Task SendMessage(string channel, string message) {
+            message = message.Trim();
+
+            if (string.IsNullOrWhiteSpace(message)) return;
+            
             await this._client.SendRealAsync(new PacketClientSendMessage(channel, message).GetPacket());
         }
 
