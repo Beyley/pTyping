@@ -410,6 +410,8 @@ namespace pTyping {
                     goto case Keys.F8;
                 case Keys.F8:
                 case Keys.F9:
+                    if (OnlineManager.State != ConnectionState.LoggedIn) return;
+                    
                     this._userPanelManager.Visible = !this._userPanelManager.Visible;
 
                     this._chatDrawable.MessageInputDrawable.Selected = false;
