@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Gopher;
 
 public struct GopherResponse {
     public List<GopherItem> Items;

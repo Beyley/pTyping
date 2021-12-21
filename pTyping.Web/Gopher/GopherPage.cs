@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Gopher;
 
 public abstract class GopherPage {
     public abstract List<GopherItem> Items { get; }

@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using EeveeTools.Servers.TCP;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Gopher;
 
 public class GopherClient : TcpClientHandler {
     protected override void HandleData(byte[] data) {
