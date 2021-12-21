@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Gopher;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class GopherLineType {

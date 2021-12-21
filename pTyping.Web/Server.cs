@@ -3,6 +3,8 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using EeveeTools.Servers.TCP;
+using pTyping.Web.Gopher;
+using pTyping.Web.Http;
 
 namespace pTyping.Web;
 

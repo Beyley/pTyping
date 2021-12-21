@@ -2,7 +2,7 @@ using System.IO;
 using System.Text;
 using EeveeTools.Servers.TCP;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Http;
 
 public class HttpClient : TcpClientHandler {
     protected override void HandleData(byte[] data) {

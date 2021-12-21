@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Http;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum HttpMethod {
