@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Gopher;
 
 public struct GopherRequest {
     public string Location;

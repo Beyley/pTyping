@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace pTyping.Web;
+namespace pTyping.Web.Http;
 
 public class HttpResponse {
     public static string LineTerminator = "\r\n";
