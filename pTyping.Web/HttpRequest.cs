@@ -1,55 +1,55 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
-namespace pTyping.Web {
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum HttpMethod {
-        OPTIONS,
-        GET,
-        HEAD,
-        POST,
-        PUT,
-        DELETE,
-        TRACE,
-        CONNECT
-    }
+namespace pTyping.Web;
 
-    public class HttpRequest {
-        public static string LineTerminator = "\r\n";
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum HttpMethod {
+    OPTIONS,
+    GET,
+    HEAD,
+    POST,
+    PUT,
+    DELETE,
+    TRACE,
+    CONNECT
+}
 
-        public HttpMethod Method;
-        public string     RequestUri;
-        public string     HttpVersion;
+public class HttpRequest {
+    public static string LineTerminator = "\r\n";
 
-        public Dictionary<string, string> Headers = new();
+    public Dictionary<string, string> Headers = new();
+    public string                     HttpVersion;
 
-        public static HttpRequest ParseHttpRequest(byte[] data) {
-            if (data.Length == 0)
-                return null;
+    public HttpMethod Method;
+    public string     RequestUri;
 
-            HttpRequest request = new();
+    public static HttpRequest ParseHttpRequest(byte[] data) {
+        if (data.Length == 0)
+            return null;
 
-            string   requestString = Encoding.UTF8.GetString(data);
-            string[] splitRequest  = requestString.Split("\r\n");
+        HttpRequest request = new();
 
-            string[] firstLine = splitRequest[0].Split(" ");
+        string   requestString = Encoding.UTF8.GetString(data);
+        string[] splitRequest  = requestString.Split("\r\n");
 
-            request.Method      = Enum.Parse<HttpMethod>(firstLine[0]);
-            request.RequestUri  = firstLine[1];
-            request.HttpVersion = firstLine[2];
+        string[] firstLine = splitRequest[0].Split(" ");
 
-            for (int i = 1; i < splitRequest.Length; i++) {
-                string requestLine = splitRequest[i];
-                if (requestLine.Trim().Length == 0) continue;
+        request.Method      = Enum.Parse<HttpMethod>(firstLine[0]);
+        request.RequestUri  = firstLine[1];
+        request.HttpVersion = firstLine[2];
 
-                string[] splitLine = requestLine.Split(": ", 2);
+        for (int i = 1; i < splitRequest.Length; i++) {
+            string requestLine = splitRequest[i];
+            if (requestLine.Trim().Length == 0) continue;
 
-                request.Headers.Add(splitLine[0], splitLine[1]);
-            }
+            string[] splitLine = requestLine.Split(": ", 2);
 
-            return request;
+            request.Headers.Add(splitLine[0], splitLine[1]);
         }
+
+        return request;
     }
 }
