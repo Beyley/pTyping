@@ -1,7 +1,7 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:5.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/runtime:latest AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
 COPY ["pTyping.Web/pTyping.Web.csproj", "pTyping.Web/"]
 RUN dotnet restore "pTyping.Web/pTyping.Web.csproj"
