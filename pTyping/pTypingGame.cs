@@ -40,8 +40,8 @@ namespace pTyping {
 
         public static AudioStream           MusicTrack           = null;
         public static AudioStreamTimeSource MusicTrackTimeSource = null;
+        public static SoundEffectPlayer     MenuClickSound       = null;
         public static Scheduler             MusicTrackScheduler;
-        // public static readonly SoundEffect MenuClickSound = new();
 
         public static Bindable<Song> CurrentSong = new(null);
 
@@ -211,15 +211,15 @@ namespace pTyping {
         protected override void LoadContent() {
             base.LoadContent();
 
-            // byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
-            // MenuClickSound.Load(menuClickSoundData);
+            byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
+            MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
-            // MenuClickSound.Volume = ConVars.Volume.Value;
+            MenuClickSound.Volume = ConVars.Volume.Value;
             // if (MusicTrack.IsValidHandle)
             // MusicTrack.Volume = ConVars.Volume.Value;
 
             ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
-                // MenuClickSound.Volume = volume;
+                MenuClickSound.Volume = volume;
                 // if (MusicTrack.IsValidHandle)
                 MusicTrack.Volume = ConVars.Volume.Value;
 

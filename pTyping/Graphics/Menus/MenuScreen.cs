@@ -102,22 +102,22 @@ namespace pTyping.Graphics.Menus {
             };
 
             playButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             };
 
             editButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(true));
             };
 
             exitButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 FurballGame.Instance.Exit();
             };
 
             optionsButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new OptionsScreen());
             };
 

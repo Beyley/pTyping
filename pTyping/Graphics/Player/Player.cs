@@ -15,6 +15,7 @@ using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using pTyping.Songs.Events;
+using sowelipisona;
 // using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player {
@@ -68,13 +69,13 @@ namespace pTyping.Graphics.Player {
 
         private int _noteToType;
 
-        // public SoundEffect HitSoundNormal = new();
+        public SoundEffectPlayer HitSoundNormal = null;
 
         public bool RecordReplay = true;
 
         // private          bool              _playingReplay;
         // private readonly PlayerScore       _playingScoreReplay = new();
-        public readonly  List<ReplayFrame> ReplayFrames        = new();
+        public readonly List<ReplayFrame> ReplayFrames = new();
 
         public event EventHandler<Color> OnComboUpdate;
         public event EventHandler        OnAllNotesComplete;
@@ -123,10 +124,10 @@ namespace pTyping.Graphics.Player {
             this.CreateNotes();
             this.CreateEvents();
 
-            // this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+            this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            // ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
-            // this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
+            ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
+            this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
 
             //This wont be needed soon
             this._drawables = this._drawables.OrderByDescending(o => o.Depth).ToList();
@@ -138,7 +139,7 @@ namespace pTyping.Graphics.Player {
         }
 
         private void OnVolumeChange(object sender, float f) {
-            // this.HitSoundNormal.Volume = f;
+            this.HitSoundNormal.Volume = f;
         }
 
         private void CreateEvents() {
@@ -225,7 +226,7 @@ namespace pTyping.Graphics.Player {
                     if (romaji[note.TypedRomaji.Length] == args.Character) {
                         //If true, then we finished the note, if false, then we continue
                         if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this.Score)) {
-                            // this.HitSoundNormal.Play();
+                            this.HitSoundNormal.PlayNew();
                             this.NoteUpdate(true, note);
 
                             this._noteToType++;

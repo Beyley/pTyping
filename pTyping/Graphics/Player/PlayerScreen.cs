@@ -219,19 +219,23 @@ namespace pTyping.Graphics.Player {
         }
 
         private void ResumeButtonClick(object sender, Point e) {
+            pTypingGame.MenuClickSound.PlayNew();
             pTypingGame.PauseResumeMusic();
         }
 
         private void RestartButtonClick(object sender, Point e) {
+            pTypingGame.MenuClickSound.PlayNew();
             pTypingGame.MusicTrack.CurrentPosition = 0;
             ScreenManager.ChangeScreen(new PlayerScreen());
         }
 
         private void QuitButtonClick(object sender, Point e) {
+            pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
         }
 
         private void SkipButtonClick(object sender, Point e) {
+            pTypingGame.MenuClickSound.PlayNew();
             pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
         }
 

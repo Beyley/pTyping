@@ -57,7 +57,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             };
 
             backButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new MenuScreen());
             };
 
@@ -69,7 +69,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             if (this._editor) {
                 EventHandler<Point> newSongOnClick = delegate {
-                    // pTypingGame.MenuClickSound.Play();
+                    pTypingGame.MenuClickSound.PlayNew();
                     ScreenManager.ChangeScreen(new NewSongScreen());
                 };
 
@@ -276,7 +276,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
         }
 
         public void PlaySelectedMap() {
-            // pTypingGame.MenuClickSound.Play();
+            pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(this._editor ? new EditorScreen() : new PlayerScreen());
         }
 
