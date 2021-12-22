@@ -89,7 +89,7 @@ namespace pTyping.Graphics.Editor.Tools {
             List<Note> notes = this.GenerateNotes();
             foreach (Note note in notes) {
                 NoteDrawable drawable = new(Vector2.Zero, this.EditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
-                    TimeSource = pTypingGame.MusicTrack,
+                    TimeSource = pTypingGame.MusicTrackTimeSource,
                     RawTextDrawable = {
                         Text = $"{note.Text}"
                     },

@@ -223,7 +223,7 @@ namespace pTyping.Graphics.Player {
         }
 
         private void RestartButtonClick(object sender, Point e) {
-            pTypingGame.MusicTrack.SeekTo(0);
+            pTypingGame.MusicTrack.CurrentPosition = 0;
             ScreenManager.ChangeScreen(new PlayerScreen());
         }
 
@@ -232,7 +232,7 @@ namespace pTyping.Graphics.Player {
         }
 
         private void SkipButtonClick(object sender, Point e) {
-            pTypingGame.MusicTrack.SeekTo(this.Song.Notes.First().Time - 2999);
+            pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
         }
 
         
@@ -255,7 +255,7 @@ namespace pTyping.Graphics.Player {
         }
 
         public override void Update(GameTime gameTime) {
-            int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+            int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             #region update UI
 
@@ -279,7 +279,7 @@ namespace pTyping.Graphics.Player {
 
             #region skip button visibility
 
-            if (this.Song.Notes.First().Time - pTypingGame.MusicTrack.GetCurrentTime() > 3000)
+            if (this.Song.Notes.First().Time - currentTime > 3000)
                 this._skipButton.Visible = true;
             else
                 this._skipButton.Visible = false;

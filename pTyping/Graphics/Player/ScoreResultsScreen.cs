@@ -76,7 +76,7 @@ namespace pTyping.Graphics.Player {
             #region Buttons
 
             EventHandler<Point> exitOnClick = delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             };
 
@@ -115,8 +115,8 @@ namespace pTyping.Graphics.Player {
 
             #endregion
 
-            if (pTypingGame.MusicTrack.IsValidHandle)
-                pTypingGame.MusicTrack.AudioRate = 1f;
+            // if (pTypingGame.MusicTrack.IsValidHandle)
+            pTypingGame.MusicTrack.SetSpeed(1f);
 
             pTypingGame.UserStatusListening();
         }

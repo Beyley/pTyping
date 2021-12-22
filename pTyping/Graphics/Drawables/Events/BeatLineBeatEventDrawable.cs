@@ -16,7 +16,7 @@ namespace pTyping.Graphics.Drawables.Events {
 
         public BeatLineBeatEventDrawable(Event @event) : base(Vector2.Zero, 100, (float)Math.PI / 2f) {
             this.Event      = @event;
-            this.TimeSource = pTypingGame.MusicTrack;
+            this.TimeSource = pTypingGame.MusicTrackTimeSource;
             this.OriginType = OriginType.Center;
         }
 

@@ -27,7 +27,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             };
 
             backButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(true));
             };
 
@@ -133,7 +133,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             SongManager.PTYPING_SONG_HANDLER.SaveSong(song);
 
             //Play the menu click sound (since we clicked a button)
-            pTypingGame.MenuClickSound.Play();
+            // pTypingGame.MenuClickSound.Play();
             SongManager.UpdateSongs();
             //Change the screen to the song select screen
             ScreenManager.ChangeScreen(new SongSelectionScreen(true));

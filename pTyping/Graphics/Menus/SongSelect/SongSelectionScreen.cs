@@ -57,7 +57,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             };
 
             backButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 ScreenManager.ChangeScreen(new MenuScreen());
             };
 
@@ -69,7 +69,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             if (this._editor) {
                 EventHandler<Point> newSongOnClick = delegate {
-                    pTypingGame.MenuClickSound.Play();
+                    // pTypingGame.MenuClickSound.Play();
                     ScreenManager.ChangeScreen(new NewSongScreen());
                 };
 
@@ -215,8 +215,8 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
 
-            if (pTypingGame.MusicTrack.IsValidHandle)
-                pTypingGame.MusicTrack.AudioRate = 1f;
+            // if (pTypingGame.MusicTrack.IsValidHandle)
+            pTypingGame.MusicTrack.SetSpeed(1f);
 
             pTypingGame.UserStatusPickingSong();
         }
@@ -276,7 +276,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
         }
 
         public void PlaySelectedMap() {
-            pTypingGame.MenuClickSound.Play();
+            // pTypingGame.MenuClickSound.Play();
             ScreenManager.ChangeScreen(this._editor ? new EditorScreen() : new PlayerScreen());
         }
 

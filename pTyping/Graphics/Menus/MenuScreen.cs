@@ -6,7 +6,6 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Graphics.Drawables;
@@ -103,22 +102,22 @@ namespace pTyping.Graphics.Menus {
             };
 
             playButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             };
 
             editButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(true));
             };
 
             exitButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 FurballGame.Instance.Exit();
             };
 
             optionsButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.Play();
+                // pTypingGame.MenuClickSound.Play();
                 ScreenManager.ChangeScreen(new OptionsScreen());
             };
 
@@ -223,12 +222,13 @@ namespace pTyping.Graphics.Menus {
 
             string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
 
-            if (pTypingGame.MusicTrack.IsValidHandle && chooseNewOne) {
-                if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
-                    pTypingGame.StopMusic();
-
-                pTypingGame.MusicTrack.Free();
-            }
+            // if (chooseNewOne) {
+            //     if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
+            //         pTypingGame.StopMusic();
+            //
+            //     pTypingGame
+            //     pTypingGame.MusicTrack.Free();
+            // }
 
             if (chooseNewOne) {
                 pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
