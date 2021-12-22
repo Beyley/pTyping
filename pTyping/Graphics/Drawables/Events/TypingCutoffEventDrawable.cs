@@ -13,7 +13,7 @@ namespace pTyping.Graphics.Drawables.Events {
 
         public TypingCutoffEventDrawable(Texture2D texture, Event @event) : base(texture, Vector2.Zero) {
             this.Event         = @event;
-            this.TimeSource    = pTypingGame.MusicTrack;
+            this.TimeSource    = pTypingGame.MusicTrackTimeSource;
             this.ColorOverride = Color.LightBlue;
             this.Scale         = new(0.3f);
             this.OriginType    = OriginType.Center;
