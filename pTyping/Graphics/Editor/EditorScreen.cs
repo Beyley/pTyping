@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -11,12 +13,9 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
+using Furball.Vixie.Graphics;
 using JetBrains.Annotations;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
@@ -25,15 +24,17 @@ using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
+using Silk.NET.Input;
 using sowelipisona;
 using TextCopy;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Editor {
 
     public class EditorScreen : pScreen {
         private TextDrawable _currentTimeDrawable;
 
-        public  Texture2D             NoteTexture;
+        public  Texture               NoteTexture;
         private UiProgressBarDrawable _progressBar;
         private TexturedDrawable      _recepticle;
 
@@ -64,7 +65,7 @@ namespace pTyping.Graphics.Editor {
 
             #region Gameplay preview
 
-            this.NoteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+            this.NoteTexture = ContentManager.LoadTextureFromFile("note.png");
 
             Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
             this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
@@ -87,18 +88,18 @@ namespace pTyping.Graphics.Editor {
 
             #region Playfield decorations
 
-            LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, recepticlePos.Y - 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-                ColorOverride = Color.Gray,
-                Clickable     = false,
-                CoverClicks   = false
-            };
-            LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-                ColorOverride = Color.Gray,
-                Clickable     = false,
-                CoverClicks   = false
-            };
-            this.Manager.Add(playfieldTopLine);
-            this.Manager.Add(playfieldBottomLine);
+            // LinePrimitiveDrawable playfieldTopLine = new(new Vector2(1, recepticlePos.Y - 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+            //     ColorOverride = Color.Gray,
+            //     Clickable     = false,
+            //     CoverClicks   = false
+            // };
+            // LinePrimitiveDrawable playfieldBottomLine = new(new Vector2(1, recepticlePos.Y + 50), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+            //     ColorOverride = Color.Gray,
+            //     Clickable     = false,
+            //     CoverClicks   = false
+            // };
+            // this.Manager.Add(playfieldTopLine);
+            // this.Manager.Add(playfieldBottomLine);
 
             RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
                 ColorOverride = new(100, 100, 100, 100),
@@ -167,10 +168,10 @@ namespace pTyping.Graphics.Editor {
 
             #region Playback buttons
 
-            Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
+            Texture editorButtonsTexture = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
             TexturedDrawable playButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 150, FurballGame.DEFAULT_WINDOW_HEIGHT),
             TexturePositions.EDITOR_PLAY
             ) {
@@ -178,7 +179,7 @@ namespace pTyping.Graphics.Editor {
                 OriginType = OriginType.BottomRight
             };
             TexturedDrawable pauseButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 100, FurballGame.DEFAULT_WINDOW_HEIGHT),
             TexturePositions.EDITOR_PAUSE
             ) {
@@ -186,7 +187,7 @@ namespace pTyping.Graphics.Editor {
                 OriginType = OriginType.BottomRight
             };
             TexturedDrawable rightButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
             TexturePositions.EDITOR_RIGHT
             ) {
@@ -194,7 +195,7 @@ namespace pTyping.Graphics.Editor {
                 OriginType = OriginType.BottomRight
             };
             TexturedDrawable leftButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, FurballGame.DEFAULT_WINDOW_HEIGHT),
             TexturePositions.EDITOR_LEFT
             ) {
@@ -275,7 +276,7 @@ namespace pTyping.Graphics.Editor {
             this.HitSoundNormal.Volume = f;
         }
 
-        private void ProgressBarOnInteract(object sender, Point e) {
+        private void ProgressBarOnInteract(object? sender, Point e) {
             Vector2 adjustedPoint = e.ToVector2() - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
 
             double value = (double)adjustedPoint.X / this._progressBar.Size.X;
@@ -316,8 +317,8 @@ namespace pTyping.Graphics.Editor {
             }
         }
 
-        private void OnMouseDrag(object sender, ((Point lastPosition, Point newPosition), string cursorName) e) {
-            this.CurrentTool?.OnMouseDrag(e.Item1.newPosition);
+        private void OnMouseDrag(object? sender, ((Vector2 lastPosition, Vector2 newPosition), string cursorName) valueTuple) {
+            this.CurrentTool?.OnMouseDrag(valueTuple.Item1.newPosition);
         }
 
         public void CreateEvent(Event @event, bool isNew = false) {
@@ -381,14 +382,14 @@ namespace pTyping.Graphics.Editor {
             newTool?.SelectTool(this, ref this.Manager);
         }
 
-        private void OnMouseMove(object sender, (Point mousePos, string cursorName) e) {
+        private void OnMouseMove(object? sender, (Vector2 position, string cursorName) valueTuple) {
             double currentTime  = this.EditorState.CurrentTime;
             double reticuleXPos = this._recepticle.Position.X;
             double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 
             double speed = (noteStartPos - reticuleXPos) / ConVars.BaseApproachTime.Value;
 
-            double relativeMousePosition = (e.mousePos.X - reticuleXPos) * 0.925;
+            double relativeMousePosition = (valueTuple.position.X - reticuleXPos) * 0.925;
 
             double timeAtCursor = relativeMousePosition / speed + currentTime;
 
@@ -402,17 +403,17 @@ namespace pTyping.Graphics.Editor {
 
             this.EditorState.MouseTime = roundedTime;
 
-            this.CurrentTool?.OnMouseMove(e.mousePos);
+            this.CurrentTool?.OnMouseMove(valueTuple.position);
         }
 
-        private void OnClick(object sender, ((MouseButton mouseButton, Point position) args, string cursorName) e) {
-            this.CurrentTool?.OnMouseClick(e.args);
+        private void OnClick(object? sender, ((MouseButton mouseButton, Vector2 position) args, string cursorName) valueTuple) {
+            this.CurrentTool?.OnMouseClick(valueTuple.args);
         }
 
         [Pure]
-        public static bool InPlayfield(Point pos) => pos.Y < RECEPTICLE_POS.Y + 40f && pos.Y > RECEPTICLE_POS.Y - 40f;
+        public static bool InPlayfield(Vector2 pos) => pos.Y < RECEPTICLE_POS.Y + 40f && pos.Y > RECEPTICLE_POS.Y - 40f;
 
-        protected override void Dispose(bool disposing) {
+        public override void Dispose() {
             FurballGame.InputManager.OnKeyDown     -= this.OnKeyPress;
             FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
             FurballGame.InputManager.OnMouseDown   -= this.OnClick;
@@ -426,12 +427,12 @@ namespace pTyping.Graphics.Editor {
             ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
 
             // SongManager.UpdateSongs();
-            
-            base.Dispose(disposing);
+
+            base.Dispose();
         }
 
-        private void OnMouseScroll(object sender, (int scrollAmount, string) args) {
-            this.TimelineMove(args.scrollAmount <= 0);
+        private void OnMouseScroll(object? sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) valueTuple) {
+            this.TimelineMove(valueTuple.scroll.scrollAmount <= 0);
         }
 
         public void TimelineMove(bool right) {
@@ -487,24 +488,24 @@ namespace pTyping.Graphics.Editor {
             this.SaveNeeded = true;
         }
 
-        private void OnKeyPress(object sender, Keys key) {
+        private void OnKeyPress(object? sender, Key key) {
             this.CurrentTool?.OnKeyPress(key);
             
             switch (key) {
-                case Keys.Space:
+                case Key.Space:
                     this.ToggleMusicPlay();
                     break;
-                case Keys.Left: {
+                case Key.Left: {
                     this.TimelineMove(false);
 
                     break;
                 }
-                case Keys.Right: {
+                case Key.Right: {
                     this.TimelineMove(true);
 
                     break;
                 }
-                case Keys.Escape:
+                case Key.Escape:
                     //If the user has some notes selected, clear them
                     if (this.EditorState.SelectedObjects.Count != 0) {
                         this.EditorState.SelectedObjects.Clear();
@@ -537,12 +538,12 @@ namespace pTyping.Graphics.Editor {
                     // Exit the editor
                     ScreenManager.ChangeScreen(new SongSelectionScreen(true));
                     break;
-                case Keys.Delete: {
+                case Key.Delete: {
                     // Delete the selected objects
                     this.DeleteSelectedObjects();
                     break;
                 }
-                case Keys.S when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
+                case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
                     // Save the song if ctrl+s is pressed
                     SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
                     pTypingGame.CurrentSong.Value = this.EditorState.Song;
@@ -551,7 +552,7 @@ namespace pTyping.Graphics.Editor {
                     this.SaveNeeded = false;
                     break;
                 }
-                case Keys.C when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
+                case Key.C when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
                     if (this.EditorState.SelectedObjects.Count == 0) return;
 
                     List<NoteDrawable> sortedNotes = new();
@@ -575,7 +576,7 @@ namespace pTyping.Graphics.Editor {
 
                     break;
                 }
-                case Keys.V when FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl): {
+                case Key.V when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
                     try {
                         List<Note> notes = JsonConvert.DeserializeObject<List<Note>>(ClipboardService.GetText());
 
@@ -595,7 +596,7 @@ namespace pTyping.Graphics.Editor {
         }
 
         private double _lastTime = 0;
-        public override void Update(GameTime gameTime) {
+        public override void Update(double gameTime) {
             this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             if (!this.EditorState.CurrentTime.Equals(this._lastTime)) {

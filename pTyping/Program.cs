@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
+using Silk.NET.Windowing;
 
 namespace pTyping {
 
@@ -54,7 +55,7 @@ namespace pTyping {
 #if RELEASE
             try {
 #endif
-                game.Run();
+            game.Run(WindowOptions.Default);
 #if RELEASE
             }
             catch (Exception ex) {

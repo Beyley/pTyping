@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -6,8 +8,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Furball.Vixie.Graphics;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
@@ -66,7 +67,7 @@ namespace pTyping.Graphics.Menus {
 
             #region Main buttons
 
-            Texture2D menuButtonsTexture = ContentManager.LoadMonogameAsset<Texture2D>("menubuttons", ContentSource.User);
+            Texture menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
 
             float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
@@ -113,7 +114,8 @@ namespace pTyping.Graphics.Menus {
 
             exitButton.OnClick += delegate {
                 pTypingGame.MenuClickSound.PlayNew();
-                FurballGame.Instance.Exit();
+                throw new NotImplementedException();
+                // FurballGame.Instance.Exit();
             };
 
             optionsButton.OnClick += delegate {
@@ -134,10 +136,10 @@ namespace pTyping.Graphics.Menus {
                 OriginType = OriginType.TopRight
             };
 
-            Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
+            Texture editorButtonsTexture = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
             TexturedDrawable musicPlayButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._musicTitle.Size.Y + 10),
             TexturePositions.EDITOR_PLAY
             ) {
@@ -145,7 +147,7 @@ namespace pTyping.Graphics.Menus {
                 OriginType = OriginType.TopRight
             };
             TexturedDrawable musicPauseButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._musicTitle.Size.Y + 10),
             TexturePositions.EDITOR_PAUSE
             ) {
@@ -153,7 +155,7 @@ namespace pTyping.Graphics.Menus {
                 OriginType = OriginType.TopRight
             };
             TexturedDrawable musicNextButton = new(
-            editorButtonsTexture2D,
+            editorButtonsTexture,
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Size.Y + 10),
             TexturePositions.EDITOR_RIGHT
             ) {

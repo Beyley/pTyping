@@ -1,5 +1,7 @@
 using System;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -8,12 +10,12 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Scores;
 using pTyping.Songs;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Player {
     public class PlayerScreen : pScreen {
@@ -193,7 +195,7 @@ namespace pTyping.Graphics.Player {
 
             FurballGame.InputManager.OnKeyDown    += this.OnKeyPress;
             if (!this._playingReplay)
-                FurballGame.Instance.Window.TextInput += this._player.TypeCharacter;
+                FurballGame.InputManager.OnCharInput += this._player.TypeCharacter;
 
             pTypingGame.UserStatusPlaying();
         }
@@ -239,26 +241,26 @@ namespace pTyping.Graphics.Player {
             pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
         }
 
-        
-        protected override void Dispose(bool disposing) {
-            FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
-            FurballGame.Instance.Window.TextInput -= this._player.TypeCharacter;
+
+        public override void Dispose() {
+            FurballGame.InputManager.OnKeyDown   -= this.OnKeyPress;
+            FurballGame.InputManager.OnCharInput -= this._player.TypeCharacter;
 
             this._player.OnAllNotesComplete -= this.EndScore;
             this._player.OnComboUpdate      -= this.OnComboUpdate;
 
-            base.Dispose(disposing);
+            base.Dispose();
         }
 
-        private void OnKeyPress(object sender, Keys key) {
-            if (key == Keys.Escape) {
+        private void OnKeyPress(object? sender, Key key) {
+            if (key == Key.Escape) {
                 if (this._endScheduled) return;
                 
                 pTypingGame.PauseResumeMusic();
             }
         }
 
-        public override void Update(GameTime gameTime) {
+        public override void Update(double gameTime) {
             int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             #region update UI
@@ -298,7 +300,7 @@ namespace pTyping.Graphics.Player {
                     ref ReplayFrame currentFrame = ref this._playingScoreReplay.ReplayFrames[i];
 
                     if (currentTime > currentFrame.Time && !currentFrame.Used) {
-                        this._player.TypeCharacter(this, new TextInputEventArgs(currentFrame.Character));
+                        this._player.TypeCharacter(this, (null, currentFrame.Character));
 
                         currentFrame.Used = true;
                         break;

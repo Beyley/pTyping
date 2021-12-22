@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using FontStashSharp;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Microsoft.Xna.Framework;
+using Furball.Vixie.Graphics;
 
 namespace pTyping.UiGenerator {
     public class UiElement {

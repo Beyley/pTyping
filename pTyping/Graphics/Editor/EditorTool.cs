@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
 using JetBrains.Annotations;
 using Kettu;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
+using Silk.NET.Input;
 
 namespace pTyping.Graphics.Editor {
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
@@ -66,13 +65,13 @@ namespace pTyping.Graphics.Editor {
         /// </summary>
         public virtual void Deinitialize() {}
 
-        public virtual void OnMouseClick((MouseButton mouseButton, Point position) args) {}
+        public virtual void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {}
 
-        public virtual void OnMouseDrag(Point position) {}
+        public virtual void OnMouseDrag(Vector2 position) {}
 
-        public virtual void OnMouseMove(Point position) {}
+        public virtual void OnMouseMove(Vector2 position) {}
 
-        public virtual void OnKeyPress(Keys key) {}
+        public virtual void OnKeyPress(Key key) {}
 
         public virtual void OnTimeChange(double time) {}
 

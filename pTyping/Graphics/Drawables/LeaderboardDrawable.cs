@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Microsoft.Xna.Framework;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 

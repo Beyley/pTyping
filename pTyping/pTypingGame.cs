@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Threading;
 using DiscordRPC;
 using FontStashSharp;
@@ -14,10 +15,8 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Timing;
+using Furball.Vixie.Graphics;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Graphics;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Online;
@@ -27,6 +26,7 @@ using pTyping.Online;
 using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
 using pTyping.Songs;
+using Silk.NET.Input;
 using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
 
@@ -34,9 +34,9 @@ namespace pTyping {
     // ReSharper disable once InconsistentNaming
     public class pTypingGame : FurballGame {
         public static readonly Vector2 BackButtonScale = new(0.12f);
-        
-        public static Texture2D BackButtonTexture;
-        public static Texture2D DefaultBackground;
+
+        public static Texture BackButtonTexture;
+        public static Texture DefaultBackground;
 
         public static AudioStream           MusicTrack           = null;
         public static AudioStreamTimeSource MusicTrackTimeSource = null;
@@ -73,9 +73,9 @@ namespace pTyping {
 
         public static UserCardDrawable MenuPlayerUserCard;
 
-        public static Texture2D LocalLeaderboardButtonTexture;
-        public static Texture2D FriendLeaderboardButtonTexture;
-        public static Texture2D GlobalLeaderboardButtonTexture;
+        public static Texture LocalLeaderboardButtonTexture;
+        public static Texture FriendLeaderboardButtonTexture;
+        public static Texture GlobalLeaderboardButtonTexture;
 
         private          double                _musicTrackSchedulerDelta = 0;
         private readonly List<ManagedDrawable> _userPanelDrawables       = new();
@@ -179,26 +179,25 @@ namespace pTyping {
         }
 
         public static void LoadBackButtonTexture() {
-            BackButtonTexture ??= ContentManager.LoadMonogameAsset<Texture2D>("backbutton", ContentSource.User);
+            BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
         }
 
-        public static void SetBackgroundTexture(Texture2D tex) {
+        public static void SetBackgroundTexture(Texture tex) {
             CurrentSongBackground.SetTexture(tex);
 
-            CurrentSongBackground.Scale = new(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
+            CurrentSongBackground.Scale = new(1f / (CurrentSongBackground.Texture.Size.Y / DEFAULT_WINDOW_HEIGHT));
         }
 
         public static void LoadBackgroundFromSong(Song song) {
-            Texture2D backgroundTex;
+            Texture backgroundTex;
             if (song.BackgroundPath == null) {
-                DefaultBackground ??= ContentManager.LoadMonogameAsset<Texture2D>("background");
+                DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png");
 
                 backgroundTex = DefaultBackground;
             } else {
                 string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
                 if (File.Exists(qualifiedBackgroundPath))
-                    backgroundTex = Texture2D.FromStream(
-                    Instance.GraphicsDevice,
+                    backgroundTex = new Texture(
                     new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External))
                     );
                 else
@@ -227,7 +226,7 @@ namespace pTyping {
                     VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
             };
 
-            DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
+            DefaultBackground = ContentManager.LoadTextureFromFile("background.png");
 
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
 
@@ -260,9 +259,9 @@ namespace pTyping {
                 JapaneseFontStroked.AddFont(JapaneseFontData);
             }
 
-            LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
-            FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
-            GlobalLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
+            LocalLeaderboardButtonTexture  = new Texture(new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
+            FriendLeaderboardButtonTexture = new Texture(new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
+            GlobalLeaderboardButtonTexture = new Texture(new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
         }
 
         public static void ChangeGlobalVolume(int mouseScroll) {
@@ -277,11 +276,11 @@ namespace pTyping {
             else
                 ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
         }
-        
-        protected override void Update(GameTime gameTime) {
+
+        protected override void Update(double gameTime) {
             base.Update(gameTime);
 
-            this._musicTrackSchedulerDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
+            this._musicTrackSchedulerDelta += gameTime * 1000;
             if (this._musicTrackSchedulerDelta > 10) {
                 MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
                 this._musicTrackSchedulerDelta = 0;
@@ -293,22 +292,22 @@ namespace pTyping {
                 this._userPanelManager.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime) {
+        protected override void Draw(double gameTime) {
             base.Draw(gameTime);
 
             if (this._userPanelManager.Visible)
                 this._userPanelManager.Draw(gameTime, DrawableBatch, new());
         }
 
-        protected override void EndRun() {
+        protected override void OnClosing() {
             MusicTrackScheduler.Dispose(0);
 
             if (OnlineManager.State == ConnectionState.LoggedIn)
                 OnlineManager.Logout().Wait();
 
             RpcClient.Dispose();
-            
-            base.EndRun();
+
+            base.OnClosing();
         }
 
         public static void SubmitScore(Song song, PlayerScore score) {
@@ -325,7 +324,8 @@ namespace pTyping {
 
             RpcClient.Invoke();
 
-            this.AfterScreenChange += (_, screen) => this.Window.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
+            this.AfterScreenChange += (_, screen)
+                => this.WindowManager.SetWindowTitle(screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}");
 
             Thread thread = new(
             () => {
@@ -355,8 +355,7 @@ namespace pTyping {
 
             DevConsole.AddConVarStore(typeof(ConVars));
 
-            CurrentSongBackground =
-                new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+            CurrentSongBackground = new TexturedDrawable(new Texture(1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
                     Depth       = 1f,
                     OriginType  = OriginType.Center,
                     Hoverable   = false,
@@ -382,9 +381,9 @@ namespace pTyping {
             //Set the opacity to 0
             VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 0f, 0f, 0, 0));
 
-            InputManager.OnMouseScroll += delegate(object _, (int, string) eventArgs) {
-                if (InputManager.HeldKeys.Contains(Keys.LeftAlt))
-                    ChangeGlobalVolume(eventArgs.Item1);
+            InputManager.OnMouseScroll += delegate(object? sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) tuple) {
+                if (InputManager.HeldKeys.Contains(Key.AltLeft))
+                    ChangeGlobalVolume((int)tuple.scroll.scrollAmount);
             };
 
             DrawableManager.Add(VolumeSelector);
@@ -409,13 +408,13 @@ namespace pTyping {
             InputManager.OnKeyDown += this.OnKeyDown;
         }
 
-        private void OnKeyDown(object sender, Keys e) {
+        private void OnKeyDown(object sender, Key e) {
             switch (e) {
-                case Keys.Escape:
+                case Key.Escape:
                     if (!this._userPanelManager.Visible) break;
-                    goto case Keys.F8;
-                case Keys.F8:
-                case Keys.F9:
+                    goto case Key.F8;
+                case Key.F8:
+                case Key.F9:
                     if (OnlineManager.State != ConnectionState.LoggedIn) return;
                     
                     this._userPanelManager.Visible = !this._userPanelManager.Visible;

@@ -1,14 +1,16 @@
 using System;
+using System.Drawing;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Microsoft.Xna.Framework;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Player {
     public class ScoreResultsScreen : pScreen {

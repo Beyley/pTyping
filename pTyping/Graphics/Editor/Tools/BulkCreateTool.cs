@@ -1,13 +1,13 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
 using pTyping.UiGenerator;
+using Silk.NET.Input;
 
 namespace pTyping.Graphics.Editor.Tools {
     public class BulkCreateTool : EditorTool {
@@ -45,7 +45,7 @@ namespace pTyping.Graphics.Editor.Tools {
             this.Spacing                     = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "4", ITEMTEXTSIZE, TEXTBOXWIDTH);
             this.ColorLabel                  = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", LABELTEXTSIZE);
             this.ColorLabel.SpaceAfter       = LABELAFTERDISTANCE;
-            this.Color                       = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Microsoft.Xna.Framework.Color.Red);
+            this.Color                       = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Furball.Vixie.Graphics.Color.Red);
 
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAddLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAdd);
@@ -74,7 +74,7 @@ namespace pTyping.Graphics.Editor.Tools {
             this._previewNotes.Clear();
         }
 
-        public override void OnMouseMove(Point position) {
+        public override void OnMouseMove(Vector2 position) {
             this.Update();
         }
 
@@ -146,7 +146,7 @@ namespace pTyping.Graphics.Editor.Tools {
             return notes;
         }
 
-        public override void OnMouseClick((MouseButton mouseButton, Point position) args) {
+        public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
             if (!EditorScreen.InPlayfield(args.position)) return;
 
             List<Note> notes = this.GenerateNotes();

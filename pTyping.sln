@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Web", "pTyping.Web\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Tests", "pTyping.Tests\pTyping.Tests.csproj", "{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie", "Furball\Furball.Vixie\Furball.Vixie\Furball.Vixie.csproj", "{4C9946B4-EC41-4278-AFE0-156A21C0BB50}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +34,13 @@ Global
 		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8ADE7BD-D2E4-48F6-82A1-037F6EA66456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C9946B4-EC41-4278-AFE0-156A21C0BB50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C9946B4-EC41-4278-AFE0-156A21C0BB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C9946B4-EC41-4278-AFE0-156A21C0BB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C9946B4-EC41-4278-AFE0-156A21C0BB50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}
+		{4C9946B4-EC41-4278-AFE0-156A21C0BB50} = {84B29531-51EB-4F10-9560-E175C00B0A62}
 	EndGlobalSection
 EndGlobal

@@ -1,9 +1,9 @@
+using System.Numerics;
 using FontStashSharp;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Furball.Vixie.Graphics;
 using pTyping.Graphics.Editor;
 using pTyping.Scores;
 using pTyping.Songs;
@@ -29,11 +29,11 @@ namespace pTyping.Graphics.Player {
         public Note Note;
         public bool Added = false;
 
-        public Texture2D Texture;
+        public Texture Texture;
 
         public bool EditorHitSoundQueued = false;
 
-        public NoteDrawable(Vector2 position, Texture2D texture, FontSystem font, int size) {
+        public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size) {
             this.Position = position;
             this.Texture  = texture;
 
@@ -165,7 +165,7 @@ namespace pTyping.Graphics.Player {
             this.Note.HitResult = HitResult.Poor;
         }
 
-        // public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+        // public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
         //     batch.SpriteBatch.Draw(
         //     this.Texture,
         //     args.Position * FurballGame.VerticalRatio,

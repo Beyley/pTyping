@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Online.Taiko_rs.Packets;
 using pTyping.Scores;
@@ -300,7 +299,7 @@ namespace pTyping.Online.Taiko_rs {
             return true;
         }
 
-        public override void Update(GameTime time) {
+        public override void Update(double time) {
             while (this._chatQueue.TryDequeue(out ChatMessage message))
                 this.ChatLog.Add(message);
 

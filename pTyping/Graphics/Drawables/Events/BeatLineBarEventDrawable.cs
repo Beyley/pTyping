@@ -1,11 +1,11 @@
-using System;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Microsoft.Xna.Framework;
+using Furball.Vixie.Graphics;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
@@ -16,7 +16,7 @@ namespace pTyping.Graphics.Drawables.Events {
 
         public override Vector2 Size => new(5, 100);
 
-        public BeatLineBarEventDrawable(Event @event) : base(Vector2.Zero, 100, (float)Math.PI / 2f) {
+        public BeatLineBarEventDrawable(Event @event) : base(Vector2.Zero, Vector2.Zero, Color.White) {
             this.Event      = @event;
             this.Thickness  = 3f;
             this.TimeSource = pTypingGame.MusicTrackTimeSource;
@@ -48,7 +48,7 @@ namespace pTyping.Graphics.Drawables.Events {
             );
         }
 
-        public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+        public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
             args.Position.X += this.Size.X;
 
             base.Draw(time, batch, args);

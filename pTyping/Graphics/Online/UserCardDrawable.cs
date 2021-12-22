@@ -1,11 +1,12 @@
 using System;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
-using Microsoft.Xna.Framework;
+using Furball.Vixie.Graphics;
 using pTyping.Online;
 
 namespace pTyping.Graphics.Online {
@@ -64,7 +65,7 @@ namespace pTyping.Graphics.Online {
 
         public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
-        public override void Update(GameTime time) {
+        public override void Update(double time) {
             this._mainTextDrawable.Visible   = !this.IsHovered;
             this._statusTextDrawable.Visible = this.IsHovered;
 

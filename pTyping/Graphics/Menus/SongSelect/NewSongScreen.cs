@@ -1,11 +1,13 @@
 using System;
+using System.Drawing;
 using System.IO;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Microsoft.Xna.Framework;
 using pTyping.Songs;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect {
     public class NewSongScreen : pScreen {

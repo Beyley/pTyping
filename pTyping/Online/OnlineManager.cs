@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
 using pTyping.Scores;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
@@ -83,7 +82,7 @@ namespace pTyping.Online {
 
         public virtual void Initialize() {}
 
-        public virtual void Update(GameTime time) {}
+        public virtual void Update(double time) {}
     }
 
     public enum ConnectionState {

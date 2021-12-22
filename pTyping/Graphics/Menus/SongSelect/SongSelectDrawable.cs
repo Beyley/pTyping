@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Furball.Vixie.Graphics;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Menus.SongSelect {
@@ -17,7 +17,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
         public SongSelectDrawable(Vector2 pos, IEnumerable<Song> songList) {
             this.Position = pos;
 
-            Texture2D backgroundTexture = ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User);
+            Texture backgroundTexture = ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User);
 
             float y = 0;
             foreach (Song song in songList) {
@@ -32,13 +32,13 @@ namespace pTyping.Graphics.Menus.SongSelect {
             }
         }
 
-        public override void Update(GameTime time) {
+        public override void Update(double time) {
             for (int i = 0; i < this._buttonDrawables.Count; i++) {
                 SongButtonDrawable drawable = this._buttonDrawables[i];
 
                 float distanceToTravel = this.TargetScroll - drawable.Position.Y + float.Parse(drawable.Tags[0]);
 
-                drawable.Position += new Vector2(0f, distanceToTravel / 200 * (time.ElapsedGameTime.Ticks / 10000f));
+                drawable.Position += new Vector2(0f, (float)(distanceToTravel / 200 * (time * 1000d)));
             }
         }
 
@@ -50,7 +50,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             public override Vector2 Size => this._backgroundDrawable.Size;
 
-            public SongButtonDrawable(Vector2 pos, Song song, Texture2D backgroundTexture) {
+            public SongButtonDrawable(Vector2 pos, Song song, Texture backgroundTexture) {
                 this.Song     = song;
                 this.Position = pos;
 

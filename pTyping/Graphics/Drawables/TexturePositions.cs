@@ -1,4 +1,6 @@
-using Microsoft.Xna.Framework;
+
+
+using System.Drawing;
 
 namespace pTyping.Graphics.Drawables {
     public static class TexturePositions {

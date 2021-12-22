@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -9,9 +11,8 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
 using pTyping.Online;
+using Silk.NET.Input;
 
 namespace pTyping.Graphics.Online {
     public class ChatContentsDrawable : CompositeDrawable {
@@ -29,7 +30,7 @@ namespace pTyping.Graphics.Online {
             this.Drawables.ToList().ForEach(x => this._drawables.Remove(x));
         }
 
-        public override void Update(GameTime time) {
+        public override void Update(double time) {
             if (this._drawables.Count != 0) {
                 this.TargetScroll = Math.Max(this.TargetScroll, 0);
 
@@ -40,32 +41,32 @@ namespace pTyping.Graphics.Online {
 
                     float difference = targetY - drawable.Position.Y;
 
-                    drawable.Position.Y += (float)(difference * time.ElapsedGameTime.TotalMilliseconds * 0.01);
+                    drawable.Position.Y += (float)(difference * time * 1000 * 0.01);
                 }
             }
 
             base.Update(time);
         }
 
-        public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
-            batch.End();
-
-            Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
-
-            FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
-            (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
-            (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
-            (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
-            (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
-            );
-
-            batch.Begin();
-            base.Draw(time, batch, args);
-            batch.End();
-
-            FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
-
-            batch.Begin();
+        public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
+            // batch.End();
+            //
+            // Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
+            //
+            // FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
+            // (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
+            // (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
+            // (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
+            // (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
+            // );
+            //
+            // batch.Begin();
+            // base.Draw(time, batch, args);
+            // batch.End();
+            //
+            // FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
+            //
+            // batch.Begin();
         }
     }
     public class ChatDrawable : CompositeDrawable {
@@ -121,15 +122,15 @@ namespace pTyping.Graphics.Online {
             this.RecalculateAndUpdate_wait_thats_bars();
         }
 
-        private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
+        private void OnMouseScroll(object? sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) valueTuple) {
             if (!this.IsHovered) return;
 
-            this._channelContents.TargetScroll += e.scrollAmount;
+            this._channelContents.TargetScroll += valueTuple.scroll.scrollAmount;
         }
 
         private void OnThisClick(object sender, Point e) {
             if (this.Visible)
-                this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.LeftButton, e - this.Position.ToPoint() + this.LastCalculatedOrigin.ToPoint()), ""));
+                this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.Left, e.ToVector2() - this.Position + this.LastCalculatedOrigin), ""));
         }
 
         private void SelectedChannelOnChange(object sender, string e) => this.RecalculateAndUpdate_wait_thats_bars();
@@ -166,13 +167,13 @@ namespace pTyping.Graphics.Online {
             this._channelContents.TargetScroll = 0;
         }
 
-        public override void Dispose(bool disposing) {
+        public override void Dispose() {
             pTypingGame.OnlineManager.ChatLog.CollectionChanged -= this.ChatLogOnCollectionChanged;
             this.SelectedChannel.OnChange                       -= this.SelectedChannelOnChange;
 
             FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
 
-            base.Dispose(disposing);
+            base.Dispose();
         }
     }
 }

@@ -1,8 +1,8 @@
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using Furball.Vixie.Graphics;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
@@ -12,7 +12,7 @@ namespace pTyping.Graphics.Drawables.Events {
     public class LyricEventDrawable : TexturedDrawable {
         public readonly LyricEvent Event;
 
-        public LyricEventDrawable(Texture2D texture, Event @event) : base(texture, new(0)) {
+        public LyricEventDrawable(Texture texture, Event @event) : base(texture, new(0)) {
             this.Scale         = new(0.3f, 0.6f);
             this.OriginType    = OriginType.Center;
             this.ColorOverride = Color.CornflowerBlue;

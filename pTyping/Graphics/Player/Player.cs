@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Vixie.Graphics;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using pTyping.Engine;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using pTyping.Songs.Events;
+using Silk.NET.Input;
 using sowelipisona;
+
+
 // using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player {
@@ -61,7 +64,7 @@ namespace pTyping.Graphics.Player {
 
         public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
 
-        private readonly Texture2D _noteTexture;
+        private readonly Texture _noteTexture;
 
         public Song Song;
 
@@ -87,14 +90,14 @@ namespace pTyping.Graphics.Player {
             this.Score.Mods       = pTypingGame.SelectedMods;
             this.Score.ModsString = string.Join(',', this.Score.Mods);
 
-            this._playfieldTopLine = new(new Vector2(0, 0), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-                ColorOverride = Color.Gray
-            };
-            this._playfieldBottomLine = new(new Vector2(0, 100), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-                ColorOverride = Color.Gray
-            };
-            this._drawables.Add(this._playfieldTopLine);
-            this._drawables.Add(this._playfieldBottomLine);
+            // this._playfieldTopLine = new(new Vector2(0, 0), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+            //     ColorOverride = Color.Gray
+            // };
+            // this._playfieldBottomLine = new(new Vector2(0, 100), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
+            //     ColorOverride = Color.Gray
+            // };
+            // this._drawables.Add(this._playfieldTopLine);
+            // this._drawables.Add(this._playfieldBottomLine);
 
             this._playfieldBackground = new(new(0, 0), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
                 ColorOverride = new(100, 100, 100, 100),
@@ -109,7 +112,7 @@ namespace pTyping.Graphics.Player {
 
             this._drawables.Add(this._typingIndicator);
 
-            this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+            this._noteTexture = ContentManager.LoadTextureFromFile("note.png");
 
             this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
                 Scale      = new(0.55f),
@@ -191,7 +194,7 @@ namespace pTyping.Graphics.Player {
             return noteDrawable;
         }
 
-        public void TypeCharacter(object sender, TextInputEventArgs args) {
+        public void TypeCharacter(object? sender, (IKeyboard keyboard, char Character) args) {
             if (char.IsControl(args.Character))
                 return;
 
@@ -348,7 +351,7 @@ namespace pTyping.Graphics.Player {
             this.OnComboUpdate?.Invoke(this, hitColor);
         }
 
-        public override void Update(GameTime time) {
+        public override void Update(double time) {
             int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             #region spawn notes and bars as needed
@@ -425,10 +428,10 @@ namespace pTyping.Graphics.Player {
 
         }
 
-        public override void Dispose(bool disposing) {
+        public override void Dispose() {
             ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
 
-            base.Dispose(disposing);
+            base.Dispose();
         }
 
         public void CallMapEnd() {

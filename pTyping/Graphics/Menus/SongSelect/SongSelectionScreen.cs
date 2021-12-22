@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -11,16 +13,16 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Vixie.Graphics;
 using JetBrains.Annotations;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Scores;
 using pTyping.Songs;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect {
     public class SongSelectionScreen : pScreen {
@@ -240,34 +242,34 @@ namespace pTyping.Graphics.Menus.SongSelect {
             this.UpdateScores();
         }
 
-        private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
-            this._songSelectDrawable.TargetScroll += e.scrollAmount;
+        private void OnMouseScroll(object? sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) valueTuple) {
+            this._songSelectDrawable.TargetScroll += valueTuple.scroll.scrollAmount;
         }
 
-        public override void Update(GameTime gameTime) {
+        public override void Update(double gameTime) {
             if (this._movingDirection != 0f)
-                this._songSelectDrawable.TargetScroll += this._movingDirection * (gameTime.ElapsedGameTime.Ticks / 10000f);
+                this._songSelectDrawable.TargetScroll += (float)(this._movingDirection * (gameTime * 1000f));
 
             base.Update(gameTime);
         }
 
-        private void OnKeyDown(object sender, Keys e) {
-            this._movingDirection = e switch {
-                Keys.Up   => 1f,
-                Keys.Down => -1f,
-                _         => this._movingDirection
+        private void OnKeyDown(object? sender, Key key) {
+            this._movingDirection = key switch {
+                Key.Up   => 1f,
+                Key.Down => -1f,
+                _        => this._movingDirection
             };
 
-            if (e == Keys.F5) {
+            if (key == Key.F5) {
                 SongManager.UpdateSongs();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor));
             }
         }
 
-        private void OnKeyUp(object sender, Keys e) {
-            this._movingDirection = e switch {
-                Keys.Up or Keys.Down => 0f,
-                _                    => this._movingDirection
+        private void OnKeyUp(object? sender, Key key) {
+            this._movingDirection = key switch {
+                Key.Up or Key.Down => 0f,
+                _                  => this._movingDirection
             };
         }
 
@@ -334,7 +336,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             this.Manager.Add(this._leaderboardDrawable);
         }
 
-        protected override void Dispose(bool disposing) {
+        public override void Dispose() {
             pTypingGame.CurrentSong.OnChange -= this.OnSongChange;
 
             FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
@@ -344,11 +346,11 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             LeaderboardType.OnChange -= this.OnLeaderboardTypeChange;
 
-            base.Dispose(disposing);
+            base.Dispose();
         }
 
         [Pure]
-        public static Texture2D TextureFromLeaderboardType(LeaderboardType type) {
+        public static Texture TextureFromLeaderboardType(LeaderboardType type) {
             return type switch {
                 SongSelect.LeaderboardType.Friend => pTypingGame.FriendLeaderboardButtonTexture,
                 SongSelect.LeaderboardType.Global => pTypingGame.GlobalLeaderboardButtonTexture,
