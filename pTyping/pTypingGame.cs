@@ -38,8 +38,8 @@ namespace pTyping {
         public static Texture2D BackButtonTexture;
         public static Texture2D DefaultBackground;
 
-        public static AudioStream           MusicTrack;
-        public static AudioStreamTimeSource MusicTrackTimeSource;
+        public static AudioStream           MusicTrack           = null;
+        public static AudioStreamTimeSource MusicTrackTimeSource = null;
         public static Scheduler             MusicTrackScheduler;
         // public static readonly SoundEffect MenuClickSound = new();
 
@@ -166,8 +166,10 @@ namespace pTyping {
 
         public static void LoadMusic(byte[] data) {
             // if (MusicTrack.IsValidHandle) {
-            MusicTrack.Stop();
-            AudioEngine.DisposeStream(MusicTrack);
+            if (MusicTrack != null) {
+                MusicTrack.Stop();
+                AudioEngine.DisposeStream(MusicTrack);
+            }
             // MusicTrack.Free();
             // }
             MusicTrack           = AudioEngine.CreateStream(data);
@@ -214,7 +216,7 @@ namespace pTyping {
 
             // MenuClickSound.Volume = ConVars.Volume.Value;
             // if (MusicTrack.IsValidHandle)
-            MusicTrack.Volume = ConVars.Volume.Value;
+            // MusicTrack.Volume = ConVars.Volume.Value;
 
             ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
                 // MenuClickSound.Volume = volume;
