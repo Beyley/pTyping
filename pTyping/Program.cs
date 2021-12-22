@@ -55,7 +55,10 @@ namespace pTyping {
 #if RELEASE
             try {
 #endif
-            game.Run(WindowOptions.Default);
+            WindowOptions options = WindowOptions.Default;
+            options.VSync        = false;
+            options.WindowBorder = WindowBorder.Fixed;
+            game.Run(options);
 #if RELEASE
             }
             catch (Exception ex) {

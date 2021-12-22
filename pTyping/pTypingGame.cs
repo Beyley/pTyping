@@ -209,11 +209,7 @@ namespace pTyping {
 
         protected override void LoadContent() {
             base.LoadContent();
-
-            byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
-            MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
-
-            MenuClickSound.Volume = ConVars.Volume.Value;
+            
             // if (MusicTrack.IsValidHandle)
             // MusicTrack.Volume = ConVars.Volume.Value;
 
@@ -282,7 +278,8 @@ namespace pTyping {
 
             this._musicTrackSchedulerDelta += gameTime * 1000;
             if (this._musicTrackSchedulerDelta > 10) {
-                MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
+                if (MusicTrack != null)
+                    MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
                 this._musicTrackSchedulerDelta = 0;
             }
 
@@ -370,7 +367,13 @@ namespace pTyping {
             OnlineManager.Initialize();
             OnlineManager.Login().Wait();
 
+            SongManager.UpdateSongs();
             base.Initialize();
+
+            byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
+            MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
+
+            MenuClickSound.Volume = ConVars.Volume.Value;
 
             VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
                 OriginType  = OriginType.BottomRight,
@@ -390,7 +393,6 @@ namespace pTyping {
 
             HiraganaConversion.LoadConversion();
             ScreenManager.SetBlankTransition();
-            SongManager.UpdateSongs();
 
             MusicTrackScheduler = new();
 
@@ -406,6 +408,8 @@ namespace pTyping {
             this._userPanelManager.Add(this._chatDrawable);
 
             InputManager.OnKeyDown += this.OnKeyDown;
+
+            // this.SetTargetFps(1000);
         }
 
         private void OnKeyDown(object sender, Key e) {
