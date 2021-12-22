@@ -30,7 +30,7 @@ namespace pTyping.Graphics.Editor.Tools {
         public override void Initialize() {
             this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
                 Visible    = false,
-                TimeSource = pTypingGame.MusicTrack
+                TimeSource = pTypingGame.MusicTrackTimeSource
             };
 
             this.DrawableManager.Add(this._createLine);

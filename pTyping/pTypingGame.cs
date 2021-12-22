@@ -6,7 +6,6 @@ using DiscordRPC;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.DevConsole;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -14,6 +13,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Timing;
 using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -27,6 +27,7 @@ using pTyping.Online;
 using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
 using pTyping.Songs;
+using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
 
 namespace pTyping {
@@ -37,9 +38,10 @@ namespace pTyping {
         public static Texture2D BackButtonTexture;
         public static Texture2D DefaultBackground;
 
-        public static readonly AudioStream MusicTrack = new();
-        public static          Scheduler   MusicTrackScheduler;
-        public static readonly SoundEffect MenuClickSound = new();
+        public static AudioStream           MusicTrack           = null;
+        public static AudioStreamTimeSource MusicTrackTimeSource = null;
+        public static SoundEffectPlayer     MenuClickSound       = null;
+        public static Scheduler             MusicTrackScheduler;
 
         public static Bindable<Song> CurrentSong = new(null);
 
@@ -147,8 +149,8 @@ namespace pTyping {
 
         public static void PlayMusic() {
             MusicTrack.Play();
-            if (MusicTrack.IsValidHandle)
-                MusicTrack.Volume = ConVars.Volume.Value;
+            // if (MusicTrack.IsValidHandle)
+            MusicTrack.Volume = ConVars.Volume.Value;
         }
 
         public static void PauseResumeMusic() {
@@ -163,13 +165,17 @@ namespace pTyping {
         }
 
         public static void LoadMusic(byte[] data) {
-            if (MusicTrack.IsValidHandle) {
+            // if (MusicTrack.IsValidHandle) {
+            if (MusicTrack != null) {
                 MusicTrack.Stop();
-                MusicTrack.Free();
+                AudioEngine.DisposeStream(MusicTrack);
             }
-            MusicTrack.Load(data);
+            // MusicTrack.Free();
+            // }
+            MusicTrack           = AudioEngine.CreateStream(data);
+            MusicTrackTimeSource = new(MusicTrack);
 
-            MusicTrack.TempoFrequencyLock = true;
+            // MusicTrack.TempoFrequencyLock = true;
         }
 
         public static void LoadBackButtonTexture() {
@@ -206,16 +212,16 @@ namespace pTyping {
             base.LoadContent();
 
             byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
-            MenuClickSound.Load(menuClickSoundData);
+            MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
             MenuClickSound.Volume = ConVars.Volume.Value;
-            if (MusicTrack.IsValidHandle)
-                MusicTrack.Volume = ConVars.Volume.Value;
+            // if (MusicTrack.IsValidHandle)
+            // MusicTrack.Volume = ConVars.Volume.Value;
 
             ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
                 MenuClickSound.Volume = volume;
-                if (MusicTrack.IsValidHandle)
-                    MusicTrack.Volume = ConVars.Volume.Value;
+                // if (MusicTrack.IsValidHandle)
+                MusicTrack.Volume = ConVars.Volume.Value;
 
                 if (VolumeSelector is not null)
                     VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
@@ -276,8 +282,8 @@ namespace pTyping {
             base.Update(gameTime);
 
             this._musicTrackSchedulerDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (this._musicTrackSchedulerDelta > 10 && MusicTrack.IsValidHandle) {
-                MusicTrackScheduler.Update(MusicTrack.GetCurrentTime());
+            if (this._musicTrackSchedulerDelta > 10) {
+                MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
                 this._musicTrackSchedulerDelta = 0;
             }
 

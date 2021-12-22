@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Furball.Engine;
-using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
@@ -16,6 +15,8 @@ using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using pTyping.Songs.Events;
+using sowelipisona;
+// using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player {
     public class Player : CompositeDrawable {
@@ -68,13 +69,13 @@ namespace pTyping.Graphics.Player {
 
         private int _noteToType;
 
-        public SoundEffect HitSoundNormal = new();
+        public SoundEffectPlayer HitSoundNormal = null;
 
         public bool RecordReplay = true;
 
         // private          bool              _playingReplay;
         // private readonly PlayerScore       _playingScoreReplay = new();
-        public readonly  List<ReplayFrame> ReplayFrames        = new();
+        public readonly List<ReplayFrame> ReplayFrames = new();
 
         public event EventHandler<Color> OnComboUpdate;
         public event EventHandler        OnAllNotesComplete;
@@ -123,7 +124,7 @@ namespace pTyping.Graphics.Player {
             this.CreateNotes();
             this.CreateEvents();
 
-            this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+            this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
             ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
             this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
@@ -148,7 +149,7 @@ namespace pTyping.Graphics.Player {
                 ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new(this.BaseApproachTime));
 
                 if (drawable != null) {
-                    drawable.TimeSource = pTypingGame.MusicTrack;
+                    drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
                     drawable.Depth      = 0.5f;
 
                     this._events.Add(new(drawable, false));
@@ -167,7 +168,7 @@ namespace pTyping.Graphics.Player {
         [Pure]
         private NoteDrawable CreateNote(Note note) {
             NoteDrawable noteDrawable = new(new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
-                TimeSource    = pTypingGame.MusicTrack,
+                TimeSource = pTypingGame.MusicTrackTimeSource,
                 NoteTexture = {
                     ColorOverride = note.Color
                 },
@@ -198,7 +199,7 @@ namespace pTyping.Graphics.Player {
                 this.ReplayFrames.Add(
                 new() {
                     Character = args.Character,
-                    Time      = pTypingGame.MusicTrack.GetCurrentTime()
+                    Time      = pTypingGame.MusicTrackTimeSource.GetCurrentTime()
                 }
                 );
 
@@ -213,7 +214,7 @@ namespace pTyping.Graphics.Player {
             if (note.IsHit)
                 return;
 
-            int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+            int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             if (currentTime > note.Time - TIMING_POOR) {
                 (string hiragana, List<string> romajiToType) = note.TypableRomaji;
@@ -225,7 +226,7 @@ namespace pTyping.Graphics.Player {
                     if (romaji[note.TypedRomaji.Length] == args.Character) {
                         //If true, then we finished the note, if false, then we continue
                         if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this.Score)) {
-                            this.HitSoundNormal.Play();
+                            this.HitSoundNormal.PlayNew();
                             this.NoteUpdate(true, note);
 
                             this._noteToType++;
@@ -348,7 +349,7 @@ namespace pTyping.Graphics.Player {
         }
 
         public override void Update(GameTime time) {
-            int currentTime = pTypingGame.MusicTrack.GetCurrentTime();
+            int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             #region spawn notes and bars as needed
 

@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Audio;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
@@ -26,6 +25,7 @@ using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
+using sowelipisona;
 using TextCopy;
 
 namespace pTyping.Graphics.Editor {
@@ -52,7 +52,7 @@ namespace pTyping.Graphics.Editor {
 
         public long LastEscapeTime = 0;
 
-        public SoundEffect HitSoundNormal = new();
+        public SoundEffectPlayer HitSoundNormal = null;
 
         public override void Initialize() {
             base.Initialize();
@@ -212,12 +212,12 @@ namespace pTyping.Graphics.Editor {
 
             leftButton.OnClick += delegate {
                 if (this.EditorState.Song.Notes.Count > 0)
-                    pTypingGame.MusicTrack.SeekTo(this.EditorState.Song.Notes.First().Time);
+                    pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.First().Time;
             };
 
             rightButton.OnClick += delegate {
                 if (this.EditorState.Song.Notes.Count > 0)
-                    pTypingGame.MusicTrack.SeekTo(this.EditorState.Song.Notes.Last().Time);
+                    pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.Last().Time;
             };
 
             this.Manager.Add(playButton);
@@ -265,7 +265,7 @@ namespace pTyping.Graphics.Editor {
 
             pTypingGame.UserStatusEditing();
 
-            this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+            this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
             ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
             this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
@@ -282,7 +282,7 @@ namespace pTyping.Graphics.Editor {
             
             double time = value * pTypingGame.MusicTrack.Length;
 
-            pTypingGame.MusicTrack.SeekTo(time);
+            pTypingGame.MusicTrack.CurrentPosition = time;
 
             if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
                 foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
@@ -305,7 +305,7 @@ namespace pTyping.Graphics.Editor {
                     CoverClicks   = false,
                     CoverHovers   = false,
                     OriginType    = OriginType.Center,
-                    TimeSource    = pTypingGame.MusicTrack
+                    TimeSource    = pTypingGame.MusicTrackTimeSource
                 };
 
                 @object.Tweens.ForEach(x => rect.Tweens.Add(x.Copy()));
@@ -342,7 +342,7 @@ namespace pTyping.Graphics.Editor {
             pTypingGame.JapaneseFont,
             50
             ) {
-                TimeSource    = pTypingGame.MusicTrack,
+                TimeSource = pTypingGame.MusicTrackTimeSource,
                 NoteTexture = {
                     ColorOverride = note.Color
                 },
@@ -435,10 +435,10 @@ namespace pTyping.Graphics.Editor {
         }
 
         public void TimelineMove(bool right) {
-            double currentTime = pTypingGame.MusicTrack.CurrentTime * 1000d;
+            double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             double noteLength = this.EditorState.Song.DividedNoteLength(currentTime);
-            double timeToSeekTo = Math.Round((pTypingGame.MusicTrack.CurrentTime * 1000d - this.EditorState.Song.CurrentTimingPoint(currentTime).Time) / noteLength) *
+            double timeToSeekTo = Math.Round((currentTime - this.EditorState.Song.CurrentTimingPoint(currentTime).Time) / noteLength) *
                                   noteLength;
 
             timeToSeekTo += this.EditorState.Song.CurrentTimingPoint(currentTime).Time;
@@ -448,7 +448,7 @@ namespace pTyping.Graphics.Editor {
             else
                 timeToSeekTo -= noteLength;
 
-            pTypingGame.MusicTrack.SeekTo(Math.Max(timeToSeekTo, 0));
+            pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
 
             if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
                 foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
@@ -532,7 +532,7 @@ namespace pTyping.Graphics.Editor {
                         // }
                     }
 
-                    pTypingGame.MenuClickSound.Play();
+                    pTypingGame.MenuClickSound.PlayNew();
 
                     // Exit the editor
                     ScreenManager.ChangeScreen(new SongSelectionScreen(true));
@@ -596,7 +596,7 @@ namespace pTyping.Graphics.Editor {
 
         private double _lastTime = 0;
         public override void Update(GameTime gameTime) {
-            this.EditorState.CurrentTime = pTypingGame.MusicTrack.GetCurrentTime();
+            this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             if (!this.EditorState.CurrentTime.Equals(this._lastTime)) {
                 this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
@@ -605,7 +605,7 @@ namespace pTyping.Graphics.Editor {
                     note.Visible = this.EditorState.CurrentTime > note.Note.Time - 2000 && this.EditorState.CurrentTime < note.Note.Time + 1000;
 
                     if (note.EditorHitSoundQueued && note.Note.Time < this.EditorState.CurrentTime) {
-                        this.HitSoundNormal.Play();
+                        this.HitSoundNormal.PlayNew();
                         note.EditorHitSoundQueued = false;
                     }
                 }

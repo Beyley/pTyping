@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Furball.Engine.Engine.Audio;
+using sowelipisona;
+// using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player.Mods {
     public class HalfTimeMod : PlayerMod {
@@ -13,13 +14,13 @@ namespace pTyping.Graphics.Player.Mods {
         public override double ScoreMultiplier() => 0.75d;
 
         public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
-            musicTrack.AudioRate = 0.5f;
+            musicTrack.SetSpeed(0.5f);
 
             base.OnMapStart(musicTrack, notes, player);
         }
 
         public override void OnMapEnd(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
-            musicTrack.AudioRate = 1f;
+            musicTrack.SetSpeed(1f);
 
             base.OnMapEnd(musicTrack, notes, player);
         }

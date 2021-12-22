@@ -17,7 +17,7 @@ namespace pTyping.Graphics.Drawables.Events {
             this.OriginType    = OriginType.Center;
             this.ColorOverride = Color.CornflowerBlue;
             this.Event         = @event as LyricEvent;
-            this.TimeSource    = pTypingGame.MusicTrack;
+            this.TimeSource    = pTypingGame.MusicTrackTimeSource;
         }
 
         public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
