@@ -76,7 +76,7 @@ namespace pTyping.Graphics.Player {
             #region Buttons
 
             EventHandler<Point> exitOnClick = delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             };
 

@@ -23,7 +23,7 @@ namespace pTyping.Graphics.Menus.Options {
             };
 
             backButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new MenuScreen());
             };
 

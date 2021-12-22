@@ -147,7 +147,7 @@ namespace pTyping.Graphics.Menus {
             };
 
             backButton.OnClick += delegate {
-                // pTypingGame.MenuClickSound.Play();
+                pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new MenuScreen());
             };
 

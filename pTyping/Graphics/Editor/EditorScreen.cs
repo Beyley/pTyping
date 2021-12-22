@@ -25,6 +25,7 @@ using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
+using sowelipisona;
 using TextCopy;
 
 namespace pTyping.Graphics.Editor {
@@ -51,7 +52,7 @@ namespace pTyping.Graphics.Editor {
 
         public long LastEscapeTime = 0;
 
-        // public SoundEffect HitSoundNormal = new();
+        public SoundEffectPlayer HitSoundNormal = null;
 
         public override void Initialize() {
             base.Initialize();
@@ -264,14 +265,14 @@ namespace pTyping.Graphics.Editor {
 
             pTypingGame.UserStatusEditing();
 
-            // this.HitSoundNormal.Load(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+            this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            // ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
-            // this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
+            ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
+            this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
         }
 
         private void OnVolumeChange(object sender, float f) {
-            // this.HitSoundNormal.Volume = f;
+            this.HitSoundNormal.Volume = f;
         }
 
         private void ProgressBarOnInteract(object sender, Point e) {
@@ -531,7 +532,7 @@ namespace pTyping.Graphics.Editor {
                         // }
                     }
 
-                    // pTypingGame.MenuClickSound.Play();
+                    pTypingGame.MenuClickSound.PlayNew();
 
                     // Exit the editor
                     ScreenManager.ChangeScreen(new SongSelectionScreen(true));
@@ -604,7 +605,7 @@ namespace pTyping.Graphics.Editor {
                     note.Visible = this.EditorState.CurrentTime > note.Note.Time - 2000 && this.EditorState.CurrentTime < note.Note.Time + 1000;
 
                     if (note.EditorHitSoundQueued && note.Note.Time < this.EditorState.CurrentTime) {
-                        // this.HitSoundNormal.Play();
+                        this.HitSoundNormal.PlayNew();
                         note.EditorHitSoundQueued = false;
                     }
                 }
