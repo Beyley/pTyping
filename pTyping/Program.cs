@@ -45,6 +45,10 @@ namespace pTyping {
                 using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
                     string gitlog = reader.ReadToEnd().Trim();
 
+                    //evil hack to get around evil commit messages
+                    gitlog = gitlog.Replace("\"",         "\\\"");
+                    gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
+
                     GitLog = JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
                 }
             }
@@ -64,6 +68,8 @@ namespace pTyping {
                 stream.Close();
 
                 File.WriteAllText(fileName, ex.ToString());
+
+                game.Dispose();
             }
 #endif
         }
