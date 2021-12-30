@@ -77,9 +77,8 @@ namespace pTyping.Online.Taiko_rs {
 
         private void PacketSendMain() {
             while (this._sendPackets) {
-                if (this.PacketQueue.TryDequeue(out byte[] data))
-                    if (this._client.IsAlive)
-                        this._client.Send(data);
+                if (this.PacketQueue.TryDequeue(out byte[] data) && this._client.IsAlive)
+                    this._client.Send(data);
 
                 Thread.Sleep(50);
             }

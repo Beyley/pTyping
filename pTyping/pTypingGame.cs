@@ -303,8 +303,8 @@ namespace pTyping {
         protected override void EndRun() {
             MusicTrackScheduler.Dispose(0);
 
-            if (OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.Logout();
+            // if (OnlineManager.State == ConnectionState.LoggedIn)
+            OnlineManager.Logout();
 
             RpcClient.Dispose();
             
