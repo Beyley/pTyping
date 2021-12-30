@@ -26,6 +26,8 @@ namespace pTyping.Graphics.Editor.Tools {
         // public Bindable<string> SelectedEvent = new("");
         public UiElement SelectedEvent;
         public UiElement SelectedEventLabel;
+        public UiElement LyricInput;
+        public UiElement LyricInputLabel;
 
         public override void Initialize() {
             this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
@@ -48,11 +50,33 @@ namespace pTyping.Graphics.Editor.Tools {
             pTypingGame.JapaneseFont,
             ITEMTEXTSIZE
             );
-
+            this.LyricInputLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Lyric", LABELTEXTSIZE);
+            this.LyricInputLabel.SpaceAfter = LABELAFTERDISTANCE;
+            this.LyricInput                 = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "lyric", ITEMTEXTSIZE, TEXTBOXWIDTH);
+            
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SelectedEventLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SelectedEvent);
 
+            this.SelectedEvent.AsDropdown().SelectedItem.OnChange += this.OnSelectedEventChange;
+
+            this.OnSelectedEventChange(null, this.SelectedEvent.AsDropdown().SelectedItem);
+
             base.Initialize();
+        }
+
+        private void OnSelectedEventChange(object? sender, string e) {
+            switch (e) {
+                case LYRIC: {
+                    this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInputLabel);
+                    this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInput);
+                    break;
+                }
+                default: {
+                    this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInputLabel);
+                    this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInput);
+                    break;
+                }
+            }
         }
 
         public override void OnMouseClick((MouseButton mouseButton, Point position) args) {
@@ -77,6 +101,11 @@ namespace pTyping.Graphics.Editor.Tools {
                     break;
                 }
                 case LYRIC: {
+                    @event = new LyricEvent {
+                        Time  = this.EditorInstance.EditorState.MouseTime,
+                        Lyric = this.LyricInput.AsTextBox().Text
+                    };
+                    
                     break;
                 }
                 case TYPING_CUTOFF: {
@@ -120,7 +149,11 @@ namespace pTyping.Graphics.Editor.Tools {
 
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEventLabel);
             this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEvent);
-            
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInputLabel);
+            this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInput);
+
+            this.SelectedEvent.AsDropdown().SelectedItem.OnChange -= this.OnSelectedEventChange;
+
             base.Deinitialize();
         }
     }

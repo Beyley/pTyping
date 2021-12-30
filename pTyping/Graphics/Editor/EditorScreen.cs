@@ -481,6 +481,12 @@ namespace pTyping.Graphics.Editor {
                     this.EditorState.Events.Remove(cutoffEvent);
 
                     this.CurrentTool?.OnEventDelete(cutoffEvent);
+                } else if (@object is LyricEventDrawable lyricEvent) {
+                    this.Manager.Remove(lyricEvent);
+                    this.EditorState.Song.Events.Remove(lyricEvent.Event);
+                    this.EditorState.Events.Remove(lyricEvent);
+
+                    this.CurrentTool?.OnEventDelete(lyricEvent);
                 }
 
             this.EditorState.SelectedObjects.Clear();
@@ -560,6 +566,8 @@ namespace pTyping.Graphics.Editor {
                             sortedNotes.Add(note);
                     sortedNotes = sortedNotes.OrderBy(x => x.Note.Time).ToList();
 
+                    if (sortedNotes.Count == 0) return;
+                    
                     double startTime = sortedNotes.First().Note.Time;
 
                     List<Note> notes = new();
