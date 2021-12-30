@@ -52,7 +52,7 @@ namespace pTyping.Engine {
         public Logout() : base("sv_logout") {}
 
         public override ConsoleResult Run(string[] consoleInput) {
-            pTypingGame.OnlineManager.Logout().Wait();
+            pTypingGame.OnlineManager.Logout();
 
             if (pTypingGame.OnlineManager.State != ConnectionState.Disconnected)
                 return new(ExecutionResult.Error, "Logout not successful!");
@@ -66,7 +66,7 @@ namespace pTyping.Engine {
         public Login() : base("sv_login") {}
 
         public override ConsoleResult Run(string[] consoleInput) {
-            pTypingGame.OnlineManager.Login().Wait();
+            pTypingGame.OnlineManager.Login();
 
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
                 return new(ExecutionResult.Error, "Login not successful!");
@@ -81,7 +81,7 @@ namespace pTyping.Engine {
             if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
                 return new(ExecutionResult.Warning, "You are not logged in!");
 
-            pTypingGame.OnlineManager.SendMessage(consoleInput[0], consoleInput[1]).Wait();
+            pTypingGame.OnlineManager.SendMessage(consoleInput[0], consoleInput[1]);
 
             return new(ExecutionResult.Success, "Message sent!");
         }

@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
@@ -38,9 +40,11 @@ namespace pTyping.Online.Taiko_rs {
         public override string Username() => ConVars.Username.Value;
         public override string Password() => ConVars.Password.Value;
 
-        protected override async Task Connect() {
+        private Thread _sendThread;
+
+        protected override void Connect() {
             if (this.State != ConnectionState.Disconnected)
-                await this.Disconnect();
+                this.Disconnect();
 
             this.InvokeOnConnectStart(this);
 
@@ -58,9 +62,27 @@ namespace pTyping.Online.Taiko_rs {
             this._client.OnError   += this.ClientOnError;
             this._client.OnOpen    += this.ClientOnOpen;
 
-            await Task.Run(() => this._client.Connect());
+            this._client.Connect();
 
             this.InvokeOnConnect(this);
+
+            this._sendPackets = true;
+            this._sendThread  = new Thread(this.PacketSendMain);
+            this._sendThread.Start();
+        }
+
+        public ConcurrentQueue<byte[]> PacketQueue = new();
+
+        private bool _sendPackets;
+
+        private void PacketSendMain() {
+            while (this._sendPackets) {
+                if (this.PacketQueue.TryDequeue(out byte[] data))
+                    if (this._client.IsAlive)
+                        this._client.Send(data);
+
+                Thread.Sleep(50);
+            }
         }
 
         private void ClientOnOpen(object sender, EventArgs e) {
@@ -69,16 +91,16 @@ namespace pTyping.Online.Taiko_rs {
 
         private void ClientOnError(object sender, ErrorEventArgs e) {
             this.State = ConnectionState.Disconnected;
-            this.Disconnect().Wait();
+            this.Disconnect();
         }
 
         private void ClientOnClose(object sender, CloseEventArgs e) {
             this.State = ConnectionState.Disconnected;
-            this.Disconnect().Wait();
+            this.Disconnect();
         }
 
-        private async Task SendUpdateScoreRequest() {
-            await this._client.SendRealAsync(new PacketClientNotifyScoreUpdate().GetPacket());
+        private void SendUpdateScoreRequest() {
+            this.PacketQueue.Enqueue(new PacketClientNotifyScoreUpdate().GetPacket());
         }
 
         protected override async Task ClientSubmitScore(PlayerScore score) {
@@ -101,7 +123,7 @@ namespace pTyping.Online.Taiko_rs {
                 //TODO tell the user the score submission failed
             }
 
-            await this.SendUpdateScoreRequest();
+            this.SendUpdateScoreRequest();
         }
         protected override async Task<List<PlayerScore>> ClientGetScores(string hash) {
             List<PlayerScore> scores = new();
@@ -165,20 +187,20 @@ namespace pTyping.Online.Taiko_rs {
             if (!success) throw new Exception($"Error reading packet with PID: {pid}");
         }
 
-        public override async Task SendMessage(string channel, string message) {
+        public override void SendMessage(string channel, string message) {
             message = message.Trim();
 
             if (string.IsNullOrWhiteSpace(message)) return;
-            
-            await this._client.SendRealAsync(new PacketClientSendMessage(channel, message).GetPacket());
+
+            this.PacketQueue.Enqueue(new PacketClientSendMessage(channel, message).GetPacket());
         }
 
-        protected override async Task Disconnect() {
-            await Task.Run(
-            () => {
-                if (this._client.IsAlive) this._client.Close(CloseStatusCode.Normal, "Client Disconnecting");
-            }
-            );
+        protected override void Disconnect() {
+            this._sendPackets = false;
+
+            this.PacketQueue.Clear();
+
+            if (this._client.IsAlive) this._client.Close(CloseStatusCode.Normal, "Client Disconnecting");
 
             this.InvokeOnDisconnect(this);
             this.State = ConnectionState.Disconnected;
@@ -186,21 +208,21 @@ namespace pTyping.Online.Taiko_rs {
             Logger.Log("Disconnected from the server!", LoggerLevelOnlineInfo.Instance);
         }
 
-        public override async Task ChangeUserAction(UserAction action) {
-            await this._client.SendRealAsync(new PacketClientStatusUpdate(action).GetPacket());
+        public override void ChangeUserAction(UserAction action) {
+            this.PacketQueue.Enqueue(new PacketClientStatusUpdate(action).GetPacket());
         }
 
-        protected override async Task ClientLogin() {
-            await this._client.SendRealAsync(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket());
+        protected override void ClientLogin() {
+            this.PacketQueue.Enqueue(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket());
 
             this.InvokeOnLoginStart(this);
             this.State = ConnectionState.LoggingIn;
         }
 
-        protected override async Task ClientLogout() {
+        protected override void ClientLogout() {
             if (this._client.ReadyState != WebSocketState.Open) return;
 
-            await this._client.SendRealAsync(new PacketClientUserLogout().GetPacket());
+            this.PacketQueue.Enqueue(new PacketClientUserLogout().GetPacket());
 
             this.InvokeOnLogout(this);
             this.State = ConnectionState.Connected;
@@ -276,12 +298,12 @@ namespace pTyping.Online.Taiko_rs {
                 switch (packet.UserId) {
                     case -1: {
                         Logger.Log("Login failed! User not found.", LoggerLevelOnlineInfo.Instance);
-                        this.Disconnect().Wait();
+                        this.Disconnect();
                         return true;
                     }
                     case -2: {
                         Logger.Log("Login failed! Password incorrect!", LoggerLevelOnlineInfo.Instance);
-                        this.Disconnect().Wait();
+                        this.Disconnect();
                         return true;
                     }
                 }
@@ -294,8 +316,8 @@ namespace pTyping.Online.Taiko_rs {
 
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);
 
-            this._client.SendRealAsync(new PacketClientStatusUpdate(new UserAction(UserActionType.Idle, "")).GetPacket()).Wait();
-            this._client.SendRealAsync(new PacketClientNotifyScoreUpdate().GetPacket()).Wait();
+            this.PacketQueue.Enqueue(new PacketClientStatusUpdate(new UserAction(UserActionType.Idle, "")).GetPacket());
+            this.PacketQueue.Enqueue(new PacketClientNotifyScoreUpdate().GetPacket());
             
             return true;
         }

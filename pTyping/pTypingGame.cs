@@ -304,7 +304,7 @@ namespace pTyping {
             MusicTrackScheduler.Dispose(0);
 
             if (OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.Logout().Wait();
+                OnlineManager.Logout();
 
             RpcClient.Dispose();
             
@@ -369,7 +369,7 @@ namespace pTyping {
 
             OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
             OnlineManager.Initialize();
-            OnlineManager.Login().Wait();
+            OnlineManager.Login();
 
             base.Initialize();
 

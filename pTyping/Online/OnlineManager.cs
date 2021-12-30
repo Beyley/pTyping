@@ -36,16 +36,17 @@ namespace pTyping.Online {
         public abstract string Username();
         public abstract string Password();
 
-        protected abstract Task                    ClientLogin();
-        protected abstract Task                    ClientLogout();
-        protected abstract Task                    Connect();
-        protected abstract Task                    Disconnect();
-        public abstract    Task                    SendMessage(string            channel, string message);
-        protected abstract Task                    ClientSubmitScore(PlayerScore score);
+        protected abstract void ClientLogin();
+        protected abstract void ClientLogout();
+        protected abstract void Connect();
+        protected abstract void Disconnect();
+        public abstract    void SendMessage(string channel, string message);
+
+        protected abstract Task ClientSubmitScore(PlayerScore score);
         [Pure]
         protected abstract Task<List<PlayerScore>> ClientGetScores(string        hash);
 
-        public abstract Task ChangeUserAction(UserAction action);
+        public abstract void ChangeUserAction(UserAction action);
 
         protected void            InvokeOnLoginStart(object sender) => this.OnLoginStart?.Invoke(sender, null);
         public event EventHandler OnLoginStart;
@@ -61,24 +62,24 @@ namespace pTyping.Online {
         protected void            InvokeOnDisconnect(object sender) => this.OnDisconnect?.Invoke(sender, null);
         public event EventHandler OnDisconnect;
 
-        public async Task Login() {
+        public void Login() {
             foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers)
                 this.OnlinePlayers.Remove(keyValuePair.Key);
 
             if (this.State == ConnectionState.Disconnected)
-                await this.Connect();
+                this.Connect();
 
             if (this.State != ConnectionState.Disconnected)
-                await this.ClientLogin();
+                this.ClientLogin();
         }
 
-        public async Task Logout() {
+        public void Logout() {
             foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers)
                 this.OnlinePlayers.Remove(keyValuePair.Key);
 
-            await this.ClientLogout();
+            this.ClientLogout();
 
-            await this.Disconnect();
+            this.Disconnect();
         }
 
         public virtual void Initialize() {}
