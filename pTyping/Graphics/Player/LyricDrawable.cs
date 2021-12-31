@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Microsoft.Xna.Framework;
 using pTyping.Songs;
@@ -11,12 +12,12 @@ namespace pTyping.Graphics.Player {
         private readonly TextDrawable _currentLyricText;
         private readonly TextDrawable _nextLyricText;
 
-        private double _lastTime = 0;
-
         public LyricDrawable(Vector2 pos, Song song) {
             foreach (Event e in song.Events)
                 if (e is LyricEvent le)
                     this._lyrics.Add(le);
+
+            this._lyrics.Reverse();
 
             this.Position = pos;
 
@@ -37,28 +38,27 @@ namespace pTyping.Graphics.Player {
                 Lyric = string.Empty
             };
 
-            if (this._lastTime is not 0 && this._lyrics.Count != 0) {
-                if (time < this._lyrics[0].Time)
-                    thisLyric = this._lyrics[0];
+            if (this._lyrics.Count == 0) goto end;
 
-                for (int i = 0; i < this._lyrics.Count; i++) {
-                    LyricEvent lyric = this._lyrics[i];
-                    if (lyric.Time < time) {
-                        thisLyric = lyric;
-
-                        if (i != this._lyrics.Count - 1)
-                            nextLyric = this._lyrics[i + 1];
-                    }
-                }
+            if (time < this._lyrics[^1].Time) {
+                nextLyric = this._lyrics[^1];
+                goto end;
             }
 
+            thisLyric = this._lyrics.First(x => x.Time < time);
+            int thisIndex = this._lyrics.IndexOf(thisLyric);
+
+            if (thisIndex != 0)
+                nextLyric = this._lyrics[thisIndex - 1];
+
+        end:
+            
             this._currentLyricText.Text = $"{thisLyric.Lyric}";
             this._nextLyricText.Text    = $"{nextLyric.Lyric}";
 
-            this._currentLyricText.MoveTo(new(0, 0));
-            this._nextLyricText.MoveTo(new(0, this._currentLyricText.Size.Y + 10));
+            this._nextLyricText.MoveTo(new(0, this._currentLyricText.Font.LineHeight * this._currentLyricText.RealScale.Y + 10));
 
-            this._lastTime = time;
+            // this._lastUpdate = time;
         }
     }
 }
