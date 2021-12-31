@@ -64,7 +64,7 @@ namespace pTyping.Graphics.Editor {
 
             #region Gameplay preview
 
-            this.NoteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+            this.NoteTexture = ContentManager.LoadTextureFromFile("note.png", ContentSource.User);
 
             Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
             this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
@@ -167,7 +167,7 @@ namespace pTyping.Graphics.Editor {
 
             #region Playback buttons
 
-            Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
+            Texture2D editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
             TexturedDrawable playButton = new(
             editorButtonsTexture2D,

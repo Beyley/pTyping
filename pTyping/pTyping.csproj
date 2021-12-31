@@ -9,10 +9,16 @@
         <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
     </ItemGroup>
 
+    <!--    <ItemGroup>-->
+    <!--        <MonoGameContentReference Include="Content\Content.mgcb">-->
+    <!--            <Link>Content/%(RecursiveDir)%(Filename)%(Extension)</Link>-->
+    <!--        </MonoGameContentReference>-->
+    <!--    </ItemGroup>-->
+
     <ItemGroup>
-        <MonoGameContentReference Include="Content\Content.mgcb">
-            <Link>Content/%(RecursiveDir)%(Filename)%(Extension)</Link>
-        </MonoGameContentReference>
+        <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
+        <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
+        <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +28,7 @@
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
         <PackageReference Include="Kettu" Version="1.2.1"/>
         <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641"/>
-        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641"/>
+        <!--        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641"/>-->
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
         <PackageReference Include="ParallelExtensionsCore" Version="1.3.0"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
@@ -44,5 +50,4 @@
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;"/>
     </Target>
-
 </Project>

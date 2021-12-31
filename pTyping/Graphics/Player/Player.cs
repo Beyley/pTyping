@@ -109,7 +109,7 @@ namespace pTyping.Graphics.Player {
 
             this._drawables.Add(this._typingIndicator);
 
-            this._noteTexture = ContentManager.LoadMonogameAsset<Texture2D>("note");
+            this._noteTexture = ContentManager.LoadTextureFromFile("note.png", ContentSource.User);
 
             this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
                 Scale      = new(0.55f),

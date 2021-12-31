@@ -179,7 +179,7 @@ namespace pTyping {
         }
 
         public static void LoadBackButtonTexture() {
-            BackButtonTexture ??= ContentManager.LoadMonogameAsset<Texture2D>("backbutton", ContentSource.User);
+            BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
         }
 
         public static void SetBackgroundTexture(Texture2D tex) {
@@ -191,7 +191,7 @@ namespace pTyping {
         public static void LoadBackgroundFromSong(Song song) {
             Texture2D backgroundTex;
             if (song.BackgroundPath == null) {
-                DefaultBackground ??= ContentManager.LoadMonogameAsset<Texture2D>("background");
+                DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
 
                 backgroundTex = DefaultBackground;
             } else {
@@ -227,7 +227,7 @@ namespace pTyping {
                     VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
             };
 
-            DefaultBackground = ContentManager.LoadMonogameAsset<Texture2D>("background");
+            DefaultBackground = ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
 
             JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
 

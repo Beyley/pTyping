@@ -66,7 +66,7 @@ namespace pTyping.Graphics.Menus {
 
             #region Main buttons
 
-            Texture2D menuButtonsTexture = ContentManager.LoadMonogameAsset<Texture2D>("menubuttons", ContentSource.User);
+            Texture2D menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
 
             float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
@@ -134,7 +134,7 @@ namespace pTyping.Graphics.Menus {
                 OriginType = OriginType.TopRight
             };
 
-            Texture2D editorButtonsTexture2D = ContentManager.LoadMonogameAsset<Texture2D>("editorbuttons", ContentSource.User);
+            Texture2D editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
             TexturedDrawable musicPlayButton = new(
             editorButtonsTexture2D,
