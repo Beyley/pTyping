@@ -211,13 +211,21 @@ namespace pTyping.Graphics.Editor {
             };
 
             leftButton.OnClick += delegate {
-                if (this.EditorState.Song.Notes.Count > 0)
+                if (this.EditorState.Song.Notes.Count > 0) {
                     pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.First().Time;
-            };
 
+                    foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
+                        note.EditorHitSoundQueued = true;
+                }
+            };
+ 
             rightButton.OnClick += delegate {
-                if (this.EditorState.Song.Notes.Count > 0)
+                if (this.EditorState.Song.Notes.Count > 0) {
                     pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.Last().Time;
+
+                    foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
+                        note.EditorHitSoundQueued = true;
+                }
             };
 
             this.Manager.Add(playButton);
