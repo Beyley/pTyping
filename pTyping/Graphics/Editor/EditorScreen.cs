@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -64,7 +65,10 @@ namespace pTyping.Graphics.Editor {
 
             #region Gameplay preview
 
-            this.NoteTexture = ContentManager.LoadTextureFromFile("note.png", ContentSource.User);
+            FileInfo[] noteFiles = this.EditorState.Song.FileInfo.Directory?.GetFiles("note.png");
+
+            this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
+                                   : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,                             ContentSource.External);
 
             Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
             this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {

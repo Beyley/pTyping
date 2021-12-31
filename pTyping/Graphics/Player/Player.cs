@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -109,7 +110,11 @@ namespace pTyping.Graphics.Player {
 
             this._drawables.Add(this._typingIndicator);
 
-            this._noteTexture = ContentManager.LoadTextureFromFile("note.png", ContentSource.User);
+            FileInfo[] noteFiles = this.Song.FileInfo.Directory?.GetFiles("note.png");
+
+            this._noteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
+                                    : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,                             ContentSource.External);
+
 
             this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
                 Scale      = new(0.55f),
