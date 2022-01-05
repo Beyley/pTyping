@@ -18,6 +18,7 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using pTyping.Engine;
 using pTyping.Graphics;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Online;
@@ -87,6 +88,8 @@ namespace pTyping {
 
         public static DiscordRpcClient RpcClient;
         public static RichPresence     RichPresence = new();
+
+        public static NotificationManager NotificationManager;
 
         public pTypingGame() : base(new MenuScreen()) {
             // this.Window.AllowUserResizing = true;
@@ -291,6 +294,8 @@ namespace pTyping {
             
             if (this._userPanelManager.Visible)
                 this._userPanelManager.Update(gameTime);
+
+            NotificationManager.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime) {
@@ -298,6 +303,8 @@ namespace pTyping {
 
             if (this._userPanelManager.Visible)
                 this._userPanelManager.Draw(gameTime, DrawableBatch, new());
+
+            NotificationManager.Draw(gameTime, DrawableBatch, new());
         }
 
         protected override void EndRun() {
@@ -371,6 +378,8 @@ namespace pTyping {
             OnlineManager.Initialize();
             OnlineManager.Login();
 
+            NotificationManager = new();
+            
             base.Initialize();
 
             VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {

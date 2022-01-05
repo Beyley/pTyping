@@ -20,7 +20,7 @@ namespace pTyping.Graphics.Menus {
 
         public override void Initialize() {
             base.Initialize();
-
+            
             TextDrawable gitVersionText = new(
             new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
             pTypingGame.JapaneseFont,
