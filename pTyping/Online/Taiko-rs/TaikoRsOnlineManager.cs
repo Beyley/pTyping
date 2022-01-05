@@ -119,7 +119,7 @@ namespace pTyping.Online.Taiko_rs {
                 await this._httpClient.PostAsync(finalUri, content);
             }
             catch {
-                //TODO tell the user the score submission failed
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Score submission failed!");
             }
 
             this.SendUpdateScoreRequest();
@@ -150,7 +150,7 @@ namespace pTyping.Online.Taiko_rs {
                     scores.Add(PlayerScore.TaikoRsDeserialize(reader));
             }
             catch {
-                //TODO tell the user that getting the scores failed
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Loading leaderboards failed!");
             }
 
             return scores;
@@ -292,16 +292,19 @@ namespace pTyping.Online.Taiko_rs {
             PacketServerLoginResponse packet = new();
             packet.ReadPacket(reader);
 
-            //TODO notify user when login failed properly
             if ((packet.UserId & (1 << 31)) != 0)
                 switch (packet.UserId) {
                     case -1: {
                         Logger.Log("Login failed! User not found.", LoggerLevelOnlineInfo.Instance);
+                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed!\n(user not found)");
+                        
                         this.Disconnect();
                         return true;
                     }
                     case -2: {
                         Logger.Log("Login failed! Password incorrect!", LoggerLevelOnlineInfo.Instance);
+                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed!\n(incorrect password)");
+                        
                         this.Disconnect();
                         return true;
                     }
@@ -315,6 +318,8 @@ namespace pTyping.Online.Taiko_rs {
 
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);
 
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Login complete!\nWelcome {this.Player.Username}!");
+            
             this.PacketQueue.Enqueue(new PacketClientStatusUpdate(new UserAction(UserActionType.Idle, "")).GetPacket());
             this.PacketQueue.Enqueue(new PacketClientNotifyScoreUpdate().GetPacket());
             

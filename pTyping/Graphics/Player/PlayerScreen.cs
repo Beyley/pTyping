@@ -54,7 +54,7 @@ namespace pTyping.Graphics.Player {
             this.Song = pTypingGame.CurrentSong.Value.Copy();
 
             if (this.Song.Notes.Count == 0) {
-                //TODO notify the user the map did not load correctly, for now, we just send back to the song selection menu
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "The map did not load correctly!");
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
                 return;
             }

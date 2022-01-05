@@ -16,6 +16,7 @@ using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
@@ -43,6 +44,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             base.Initialize();
 
             if (!this._editor && SongManager.Songs.Count == 0) {
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "You have no songs downloaded!");
                 ScreenManager.ChangeScreen(new MenuScreen());
                 return;
             }
@@ -260,6 +262,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
 
             if (e == Keys.F5) {
                 SongManager.UpdateSongs();
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
                 ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor));
             }
         }
@@ -306,6 +309,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             switch (LeaderboardType.Value) {
                 case SongSelect.LeaderboardType.Friend: {
                     //TODO: implement friend leaderboards
+                    pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "Friend leaderboards are not implemented!");
                     break;
                 }
                 case SongSelect.LeaderboardType.Global: {

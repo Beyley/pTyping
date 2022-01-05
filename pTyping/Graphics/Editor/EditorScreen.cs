@@ -606,7 +606,7 @@ namespace pTyping.Graphics.Editor {
                         }
                     }
                     catch {
-                        //TODO: Notify the user it failed
+                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Pasting of notes failed!");
                     }
 
                     break;

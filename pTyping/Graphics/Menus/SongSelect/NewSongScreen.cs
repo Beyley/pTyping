@@ -5,6 +5,7 @@ using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Microsoft.Xna.Framework;
+using pTyping.Engine;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Menus.SongSelect {
@@ -115,8 +116,14 @@ namespace pTyping.Graphics.Menus.SongSelect {
             $"{song.Artist.Replace(" ", "")}-{song.Name.Replace(" ", "")}-by-{song.Creator.Replace(" ", "")}/"
             );
 
-            if (Directory.Exists(newSongFolder))//TODO: Add error message here to tell them that the metadata is too close to an existing song
+            if (Directory.Exists(newSongFolder)) {
+                pTypingGame.NotificationManager.CreateNotification(
+                NotificationManager.NotificationImportance.Error,
+                "Creation of song failed!\n(song too similar to existing one)"
+                );
+
                 return;
+            }
 
             // Create the directory
             Directory.CreateDirectory(newSongFolder);
