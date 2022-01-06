@@ -31,14 +31,18 @@ namespace pTyping.Graphics.Menus.SongSelect {
         private          TexturedDrawable          _leaderboardButton;
         private          LeaderboardDrawable       _leaderboardDrawable;
 
+        private ModSelectionScreenDrawable _modScreen;
+
         private float _movingDirection;
 
-        private TextDrawable _songInfo;
-
-        private ModSelectionScreenDrawable _modScreen;
-        private SongSelectDrawable         _songSelectDrawable;
+        private TextDrawable       _songInfo;
+        private SongSelectDrawable _songSelectDrawable;
 
         public SongSelectionScreen(bool editor) => this._editor = editor;
+        public override string Name  => "Song Select";
+        public override string State => "Selecting a song!";
+        public override string Details
+            => $"Deciding on playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
 
         public override void Initialize() {
             base.Initialize();
@@ -202,7 +206,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             }
 
             #endregion
-            
+
             if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0)
                 pTypingGame.CurrentSong.Value = SongManager.Songs[0];
             else if (pTypingGame.CurrentSong?.Value != null)
@@ -284,8 +288,9 @@ namespace pTyping.Graphics.Menus.SongSelect {
         }
 
         public void UpdateSelectedSong(bool fromPrevScreen = false) {
-            this._songInfo.Text =
-                $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]\nCreated by {pTypingGame.CurrentSong.Value.Creator}\nBPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
+            this._songInfo.Text = $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
+Created by {pTypingGame.CurrentSong.Value.Creator}
+BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
 
             string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
 
@@ -360,10 +365,6 @@ namespace pTyping.Graphics.Menus.SongSelect {
                 _                                 => throw new ArgumentOutOfRangeException(nameof (type), type, "That leaderboard type is not supported!")
             };
         }
-        public override string Name  => "Song Select";
-        public override string State => "Selecting a song!";
-        public override string Details
-            => $"Deciding on playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
     }
 
     public enum LeaderboardType {

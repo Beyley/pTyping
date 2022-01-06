@@ -119,7 +119,8 @@ namespace pTyping.Graphics.Menus.SongSelect {
             if (Directory.Exists(newSongFolder)) {
                 pTypingGame.NotificationManager.CreateNotification(
                 NotificationManager.NotificationImportance.Error,
-                "Creation of song failed!\n(song too similar to existing one)"
+                @"Creation of song failed!
+(song too similar to existing one)"
                 );
 
                 return;

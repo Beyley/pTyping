@@ -2,6 +2,7 @@ using System;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
@@ -71,6 +72,27 @@ namespace pTyping.Graphics.Online {
             base.Update(time);
         }
 
+        public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+            batch.End();
+
+            Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
+
+            FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
+            (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
+            (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
+            (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
+            (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
+            );
+
+            batch.Begin();
+            base.Draw(time, batch, args);
+            batch.End();
+
+            FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
+
+            batch.Begin();
+        }
+
         public static string GetFilenameForModeIcon(PlayMode mode) {
             return mode switch {
                 PlayMode.Standard => "standard-mode-icon.png",
@@ -84,8 +106,9 @@ namespace pTyping.Graphics.Online {
 
         public void UpdateDrawable() {
             this._usernameDrawable.Text = $@"{this.Player.Value.Username}";
-            this._mainTextDrawable.Text =
-                $"Total Score: {this.Player.Value.TotalScore}\nRanked Score: {this.Player.Value.RankedScore}\nAccuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Value.PlayCount}";
+            this._mainTextDrawable.Text = $@"Total Score: {this.Player.Value.TotalScore}
+Ranked Score: {this.Player.Value.RankedScore}
+Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Value.PlayCount}";
             this._statusTextDrawable.Text = $"{this.Player.Value.Action.Value.ActionText}";
             this._rankDrawable.Text       = this.Player.Value.Rank == 0 ? "" : $"#{this.Player.Value.Rank.Value}";
 

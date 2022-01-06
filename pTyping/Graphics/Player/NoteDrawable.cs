@@ -5,16 +5,15 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using pTyping.Graphics.Editor;
-using pTyping.Scores;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Player {
     public struct GameplayDrawableTweenArgs {
-        public readonly int  ApproachTime;
-        public readonly bool TweenKeepAlive;
-        public readonly bool IsEditor;
+        public readonly double ApproachTime;
+        public readonly bool   TweenKeepAlive;
+        public readonly bool   IsEditor;
 
-        public GameplayDrawableTweenArgs(int approachTime, bool tweenKeepAlive = false, bool isEditor = false) {
+        public GameplayDrawableTweenArgs(double approachTime, bool tweenKeepAlive = false, bool isEditor = false) {
             this.ApproachTime   = approachTime;
             this.TweenKeepAlive = tweenKeepAlive;
             this.IsEditor       = isEditor;
@@ -69,7 +68,7 @@ namespace pTyping.Graphics.Player {
             Vector2 recepticlePos = tweenArgs.IsEditor ? EditorScreen.RECEPTICLE_POS : Player.RECEPTICLE_POS;
 
             float travelDistance = noteStartPos.X - recepticlePos.X;
-            float travelRatio    = tweenArgs.ApproachTime / travelDistance;
+            float travelRatio    = (float)(tweenArgs.ApproachTime / travelDistance);
 
             float afterTravelTime = (recepticlePos.X - noteEndPos.X) * travelRatio;
 
@@ -122,15 +121,24 @@ namespace pTyping.Graphics.Player {
         /// <param name="timeDifference">The time difference from now to the note</param>
         /// <param name="score">The current score</param>
         /// <returns>Whether the note has been fully completed</returns>
-        public bool TypeCharacter(string hiragana, string romaji, double timeDifference, PlayerScore score) {
+        public bool TypeCharacter(string hiragana, string romaji, double timeDifference, Player player) {
             if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
-                this.Note.HitResult = timeDifference switch {
-                    < Player.TIMING_EXCELLENT => HitResult.Excellent,
-                    < Player.TIMING_GOOD      => HitResult.Good,
-                    < Player.TIMING_FAIR      => HitResult.Fair,
-                    < Player.TIMING_POOR      => HitResult.Poor,
-                    _                         => this.Note.HitResult
-                };
+                if (timeDifference < player.TIMING_EXCELLENT)
+                    this.Note.HitResult = HitResult.Excellent;
+                else if (timeDifference < player.TIMING_GOOD)
+                    this.Note.HitResult = HitResult.Good;
+                else if (timeDifference < player.TIMING_FAIR)
+                    this.Note.HitResult = HitResult.Fair;
+                else if (timeDifference < player.TIMING_POOR)
+                    this.Note.HitResult = HitResult.Poor;
+
+                // this.Note.HitResult = timeDifference switch {
+                //     < player.TIMING_EXCELLENT => ,
+                //     < player.TIMING_GOOD      => HitResult.Good,
+                //     < player.TIMING_FAIR      => HitResult.Fair,
+                //     < player.TIMING_POOR      => HitResult.Poor,
+                //     _                         => this.Note.HitResult
+                // };
             }
 
             //Types the next character
@@ -139,7 +147,7 @@ namespace pTyping.Graphics.Player {
             //Checks if we have finished typing the current romaji
             if (string.Equals(this.Note.TypedRomaji, romaji)) {
                 this.Note.Typed += hiragana;
-                score.AddScore(Player.SCORE_PER_CHARACTER);
+                player.Score.AddScore(Player.SCORE_PER_CHARACTER);
                 //Clear the typed romaji
                 this.Note.TypedRomaji = string.Empty;
 

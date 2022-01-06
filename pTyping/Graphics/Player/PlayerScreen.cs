@@ -45,7 +45,7 @@ namespace pTyping.Graphics.Player {
         /// <param name="replay">The score to get the replay from</param>
         public PlayerScreen(PlayerScore replay) {
             this._playingReplay      = true;
-            this._playingScoreReplay = replay;
+            this._playingScoreReplay = replay.Copy();
         }
 
         public override void Initialize() {
@@ -53,11 +53,29 @@ namespace pTyping.Graphics.Player {
 
             this.Song = pTypingGame.CurrentSong.Value.Copy();
 
+            #region song validation
             if (this.Song.Notes.Count == 0) {
-                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "The map did not load correctly!");
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "That map has 0 notes!");
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
                 return;
             }
+
+            if (this.Song.Settings.Strictness <= 0) {
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "That map has an invalid Strictness!");
+                ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+                return;
+            }
+
+            if (this.Song.Settings.GlobalApproachMultiplier <= 0) {
+                pTypingGame.NotificationManager.CreateNotification(
+                NotificationManager.NotificationImportance.Error,
+                "That map has an invalid global approach multiplier!"
+                );
+                ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+                return;
+            }
+
+            #endregion
 
             this._player = new(this.Song) {
                 Position     = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),

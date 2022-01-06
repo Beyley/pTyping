@@ -28,7 +28,7 @@ namespace pTyping.Graphics.Drawables.Events {
             Vector2 recepticlePos = tweenArgs.IsEditor ? EditorScreen.RECEPTICLE_POS : Player.Player.RECEPTICLE_POS;
 
             float travelDistance = startPos.X - recepticlePos.X;
-            float travelRatio    = tweenArgs.ApproachTime / travelDistance;
+            float travelRatio    = (float)(tweenArgs.ApproachTime / travelDistance);
 
             float afterTravelTime = (recepticlePos.X - endPos.X) * travelRatio;
 

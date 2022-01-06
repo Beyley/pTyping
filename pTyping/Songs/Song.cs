@@ -16,7 +16,6 @@ namespace pTyping.Songs {
 
     [JsonObject(MemberSerialization.OptIn)]
     public class Song {
-
         public FileInfo FileInfo;
 
         [JsonProperty]
@@ -50,16 +49,36 @@ namespace pTyping.Songs {
         [JsonProperty]
         public string BackgroundPath { get; set; }
 
+        [JsonObject(MemberSerialization.OptIn)]
+        public class SongSettings {
+            [JsonProperty]
+            public int Strictness = 5;
+            [JsonProperty]
+            public double GlobalApproachMultiplier = 1d;
+        }
+
+        [JsonProperty]
+        public SongSettings Settings { get; set; } = new();
+        
         public string MapHash {
             get {
                 this.Notes.Sort((x, y) => (int)(x.Time - y.Time));
 
-                StringBuilder notes  = new();
-                const string  format = "{0}:{1}:{2}:{3}:{4}";
-                foreach (Note note in this.Notes)
-                    notes.AppendFormat(format, note.Time, note.Color, note.Text, note.YOffset, note.Type);
+                StringBuilder hash = new();
 
-                return CryptoHelper.GetSha256(Encoding.Unicode.GetBytes(notes.ToString()));
+                const string noteFormat        = "{0}:{1}:{2}:{3}:{4}";
+                const string eventFormat       = "{0}:{1}";
+                const string timingPointFormat = "{0}:{1}:{2}";
+                
+                foreach (Note note in this.Notes)
+                    hash.AppendFormat(noteFormat, note.Time, note.Color, note.Text, note.YOffset, note.Type);
+                foreach (Event @event in this.Events)
+                    hash.AppendFormat(eventFormat, @event.Time, @event.Type);
+                foreach (TimingPoint timingPoint in this.TimingPoints)
+                    hash.AppendFormat(timingPointFormat, timingPoint.Tempo, timingPoint.Time, timingPoint.ApproachMultiplier);
+                hash.AppendFormat("{0}:{1}", this.Settings.Strictness, this.Settings.GlobalApproachMultiplier);
+
+                return CryptoHelper.GetSha256(Encoding.Unicode.GetBytes(hash.ToString()));
             }
         }
 
@@ -67,11 +86,8 @@ namespace pTyping.Songs {
 
         [Pure]
         public TimingPoint CurrentTimingPoint(double currentTime) {
-            List<TimingPoint> sortedTimingPoints = this.TimingPoints.ToList();
-            sortedTimingPoints.Sort((pair, valuePair) => (int)(pair.Time - valuePair.Time));
-
-            for (int i = 0; i < sortedTimingPoints.Count; i++) {
-                TimingPoint timingPoint = sortedTimingPoints[i];
+            for (int i = 0; i < this.TimingPoints.Count; i++) {
+                TimingPoint timingPoint = this.TimingPoints[i];
                 if (timingPoint.Time < currentTime)
                     return timingPoint;
             }

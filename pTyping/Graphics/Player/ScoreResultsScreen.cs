@@ -96,6 +96,27 @@ namespace pTyping.Graphics.Player {
 
             this.Manager.Add(exitButton);
 
+            EventHandler<Point> watchReplayOnClick = delegate {
+                pTypingGame.MenuClickSound.PlayNew();
+                ScreenManager.ChangeScreen(new PlayerScreen(this.Score));
+            };
+
+            UiButtonDrawable watchReplayButton = new(
+            new(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 80f),
+            "Watch Replay",
+            FurballGame.DEFAULT_FONT,
+            40,
+            Color.Blue,
+            Color.White,
+            Color.White,
+            Vector2.Zero,
+            watchReplayOnClick
+            ) {
+                OriginType = OriginType.BottomRight
+            };
+
+            this.Manager.Add(watchReplayButton);
+
             #endregion
 
             #region background image

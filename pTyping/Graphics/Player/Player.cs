@@ -32,10 +32,10 @@ namespace pTyping.Graphics.Player {
         public const int SCORE_COMBO         = 10;
         public const int SCORE_COMBO_MAX     = 1000;
 
-        public const int TIMING_EXCELLENT = 20;
-        public const int TIMING_GOOD      = 50;
-        public const int TIMING_FAIR      = 100;
-        public const int TIMING_POOR      = 200;
+        public float TIMING_EXCELLENT => 20  / (this.Song.Settings.Strictness / 5f);
+        public float TIMING_GOOD      => 50  / (this.Song.Settings.Strictness / 5f);
+        public float TIMING_FAIR      => 100 / (this.Song.Settings.Strictness / 5f);
+        public float TIMING_POOR      => 200 / (this.Song.Settings.Strictness / 5f);
 
         public static readonly Color COLOR_EXCELLENT = new(255, 255, 0);
         public static readonly Color COLOR_GOOD      = new(0, 255, 0);
@@ -47,7 +47,8 @@ namespace pTyping.Graphics.Player {
         public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, NOTE_HEIGHT);
         public static readonly Vector2 NOTE_END_POS   = new(-100, NOTE_HEIGHT);
 
-        public int BaseApproachTime = ConVars.BaseApproachTime.Value;
+        public double BaseApproachTime = ConVars.BaseApproachTime.Value;
+        public double CurrentApproachTime(double time) => this.BaseApproachTime / this.Song.CurrentTimingPoint(time).ApproachMultiplier;
 
         private readonly TexturedDrawable _recepticle;
 
@@ -83,6 +84,8 @@ namespace pTyping.Graphics.Player {
 
         public Player(Song song) {
             this.Song = song;
+
+            this.BaseApproachTime /= song.Settings.GlobalApproachMultiplier;
 
             this.Score            = new(this.Song.MapHash, ConVars.Username.Value);
             this.Score.Mods       = pTypingGame.SelectedMods;
@@ -151,7 +154,7 @@ namespace pTyping.Graphics.Player {
             for (int i = 0; i < this.Song.Events.Count; i++) {
                 Event @event = this.Song.Events[i];
 
-                ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new(this.BaseApproachTime));
+                ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new(this.CurrentApproachTime(@event.Time)));
 
                 if (drawable != null) {
                     drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
@@ -191,7 +194,7 @@ namespace pTyping.Graphics.Player {
 
             noteDrawable.UpdateTextPositions();
 
-            noteDrawable.CreateTweens(new(this.BaseApproachTime));
+            noteDrawable.CreateTweens(new(this.CurrentApproachTime(note.Time)));
 
             return noteDrawable;
         }
@@ -230,7 +233,7 @@ namespace pTyping.Graphics.Player {
                     double timeDifference = Math.Abs(currentTime - note.Time);
                     if (romaji[note.TypedRomaji.Length] == args.Character) {
                         //If true, then we finished the note, if false, then we continue
-                        if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this.Score)) {
+                        if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this)) {
                             this.HitSoundNormal.PlayNew();
                             this.NoteUpdate(true, note);
 
@@ -363,7 +366,7 @@ namespace pTyping.Graphics.Player {
 
                 if (note.Added) continue;
 
-                if (currentTime < note.Note.Time - this.BaseApproachTime) continue;
+                if (currentTime < note.Note.Time - this.CurrentApproachTime(note.Note.Time)) continue;
 
                 this._drawables.Add(note);
                 note.Added = true;
