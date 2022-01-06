@@ -13,6 +13,7 @@ using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
 using pTyping.Songs;
+using static Furball.Engine.Engine.Localization.LocalizationManager;
 
 namespace pTyping.Graphics.Menus {
     public class MenuScreen : pScreen {
@@ -24,7 +25,7 @@ namespace pTyping.Graphics.Menus {
             TextDrawable gitVersionText = new(
             new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
             pTypingGame.JapaneseFont,
-            $"Revision {Program.BuildVersion}",
+            string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion),
             30
             ) {
                 OriginType = OriginType.BottomRight
@@ -34,7 +35,7 @@ namespace pTyping.Graphics.Menus {
 
             UiButtonDrawable changelogButton = new(
             new(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
-            "Changelog",
+            GetLocalizedString(Localizations.Changelog),
             pTypingGame.JapaneseFont,
             30,
             Color.Blue,

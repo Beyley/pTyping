@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -5,11 +6,15 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Localization;
+using Furball.Engine.Engine.Localization.Languages;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 
 namespace pTyping.Graphics.Menus.Options {
     public class OptionsScreen : pScreen {
+        private readonly Dictionary<string, Language> _languageDictionary = new();
+
         public override void Initialize() {
             base.Initialize();
 
@@ -125,7 +130,34 @@ namespace pTyping.Graphics.Menus.Options {
 
             #endregion
 
+            #region Language dropdown
+
+            List<string> languages = new();
+
+            foreach (ISO639_2Code code in LocalizationManager.GetSupportedLanguages()) {
+                Language language = LocalizationManager.GetLanguageFromCode(code)!;
+
+                string languageName = language.ToString();
+
+                languages.Add(languageName);
+                this._languageDictionary.Add(languageName, language);
+            }
+
+            UiDropdownDrawable languageDropdown = new(new(800, 100), languages, new(175, 40), pTypingGame.JapaneseFontStroked, 20);
+            languageDropdown.SelectedItem.Value = LocalizationManager.CurrentLanguage.ToString();
+            languageDropdown.Update();
+
+            languageDropdown.SelectedItem.OnChange += this.OnLanguageChange;
+
+            this.Manager.Add(languageDropdown);
+
+            #endregion
+
             pTypingGame.UserStatusListening();
+        }
+
+        private void OnLanguageChange(object _, string s) {
+            LocalizationManager.CurrentLanguage = this._languageDictionary[s];
         }
 
         private void BackgroundDimInputOnCommit(object sender, string e) {

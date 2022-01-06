@@ -13,6 +13,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
 using ManagedBass;
 using Microsoft.Xna.Framework;
@@ -32,6 +33,11 @@ using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
 
 namespace pTyping {
+    public enum Localizations {
+        MenuRevision,
+        Changelog
+    }
+    
     // ReSharper disable once InconsistentNaming
     public class pTypingGame : FurballGame {
         public static readonly Vector2 BackButtonScale = new(0.12f);
@@ -416,6 +422,17 @@ namespace pTyping {
             this._userPanelManager.Add(this._chatDrawable);
 
             InputManager.OnKeyDown += this.OnKeyDown;
+        }
+
+
+
+        public override void InitializeLocalizations() {
+            //default language is already english, and im an english speaker, so no need to set it here
+
+            LocalizationManager.AddDefaultTranslation(Localizations.MenuRevision, "Revision {0}");
+            LocalizationManager.AddDefaultTranslation(Localizations.Changelog,    "Changelog");
+
+            base.InitializeLocalizations();
         }
 
         private void OnKeyDown(object sender, Keys e) {

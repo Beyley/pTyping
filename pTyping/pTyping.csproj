@@ -19,6 +19,7 @@
         <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
         <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
         <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
+        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always"/>
     </ItemGroup>
 
     <ItemGroup>
