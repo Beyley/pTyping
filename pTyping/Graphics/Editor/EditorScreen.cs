@@ -157,6 +157,12 @@ namespace pTyping.Graphics.Editor {
 
             this.Manager.Add(this._progressBar);
 
+            #region Update timing points
+
+            this.UpdateTimingPointDisplay();
+
+            #endregion
+
             #endregion
 
             #region Current time
@@ -611,6 +617,31 @@ namespace pTyping.Graphics.Editor {
 
                     break;
                 }
+            }
+        }
+
+        private readonly List<ManagedDrawable> _timingPoints = new();
+
+        public void UpdateTimingPointDisplay() {
+            this._timingPoints.ForEach(x => this.Manager.Remove(x));
+            this._timingPoints.Clear();
+
+            float startX = this._progressBar.Position.X;
+            float length = this._progressBar.BarSize.X;
+
+            foreach (TimingPoint timingPoint in this.EditorState.Song.TimingPoints) {
+                float x = (float)(timingPoint.Time / pTypingGame.MusicTrack.Length * length + startX);
+
+                TexturedDrawable drawable = new(FurballGame.WhitePixel, new(x, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+                    Scale         = new(3, this._progressBar.BarSize.Y + 10),
+                    OriginType    = OriginType.BottomCenter,
+                    ColorOverride = new(50, 200, 50, 100),
+                    ToolTip = $@"BPM:{60000d / timingPoint.Tempo:#.##}
+ApproachMult:{timingPoint.ApproachMultiplier}"
+                };
+
+                this._timingPoints.Add(drawable);
+                this.Manager.Add(drawable);
             }
         }
 

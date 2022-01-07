@@ -1,9 +1,12 @@
 using FontStashSharp;
+using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using pTyping.Engine;
 using pTyping.Graphics.Editor;
 using pTyping.Songs;
 
@@ -132,13 +135,13 @@ namespace pTyping.Graphics.Player {
                 else if (timeDifference < player.TIMING_POOR)
                     this.Note.HitResult = HitResult.Poor;
 
-                // this.Note.HitResult = timeDifference switch {
-                //     < player.TIMING_EXCELLENT => ,
-                //     < player.TIMING_GOOD      => HitResult.Good,
-                //     < player.TIMING_FAIR      => HitResult.Fair,
-                //     < player.TIMING_POOR      => HitResult.Poor,
-                //     _                         => this.Note.HitResult
-                // };
+                Color     finalColor      = Helpers.RotateColor(this.Note.Color, 150);
+                const int toFinalFadeTime = 100;
+                this.NoteTexture.ColorOverride = finalColor;
+                this.NoteTexture.Tweens.Add(
+                new ColorTween(TweenType.Color, this.NoteTexture.ColorOverride, finalColor, FurballGame.Time, FurballGame.Time + toFinalFadeTime)
+                );
+                // this.NoteTexture.Tweens.Add(new ColorTween(TweenType.Color, finalColor,                     new((int)finalColor.R, finalColor.G, finalColor.B, 100), FurballGame.Time + toFinalFadeTime, FurballGame.Time + toFinalFadeTime + 200));
             }
 
             //Types the next character
@@ -162,13 +165,58 @@ namespace pTyping.Graphics.Player {
         }
 
         public void Hit() {
-            this.Visible    = false;
+            this.ToTypeTextDrawable.Visible = false;
+            this.RawTextDrawable.Visible    = false;
+
+            Color     finalColor = Helpers.RotateColor(this.Note.Color, 150);
+            const int timeToDie  = 250;
+
+            //random bool
+            bool right = FurballGame.Random.Next(-1, 2) == 1;
+
+            this.Tweens.Clear();
+
+            this.NoteTexture.Tweens.Add(
+            new ColorTween(
+            TweenType.Color,
+            new((int)finalColor.R, finalColor.G, finalColor.B, 127),
+            new((int)this.NoteTexture.ColorOverride.R, this.NoteTexture.ColorOverride.G, this.NoteTexture.ColorOverride.B, 0),
+            FurballGame.Time,
+            FurballGame.Time + timeToDie
+            )
+            );
+            this.NoteTexture.Tweens.Add(
+            new PathTween(
+            new Path(
+            new PathSegment(
+            this.NoteTexture.Position,
+            this.NoteTexture.Position + new Vector2(FurballGame.Random.Next(0, 30) * (right ? 1 : -1), -FurballGame.Random.Next(80, 120)),
+            this.NoteTexture.Position + new Vector2(FurballGame.Random.Next(0, 60) * (right ? 1 : -1), 150)
+            )
+            ),
+            FurballGame.Time,
+            FurballGame.Time + timeToDie
+            )
+            );
+            // this.NoteTexture.Tweens.Add(new VectorTween(TweenType.Scale, this.NoteTexture.Scale, this.NoteTexture.Scale + new Vector2((float)(FurballGame.Random.NextDouble() / 4d + 1d)), (int)(FurballGame.Time + timeToDie / 2d), FurballGame.Time + timeToDie));
             this.Note.Typed = this.Note.Text;
-            // this.Note.HitResult = HitResult.Excellent;
+
+            FurballGame.GameTimeScheduler.ScheduleMethod(
+            delegate {
+                this.Visible = false;
+            },
+            FurballGame.Time + timeToDie
+            );
         }
 
         public void Miss() {
-            this.Visible        = false;
+            // this.Visible        = false;
+            pTypingGame.MusicTrackScheduler.ScheduleMethod(
+            delegate {
+                this.Visible = false;
+            },
+            pTypingGame.MusicTrackTimeSource.GetCurrentTime() + 1000
+            );
             this.Note.Typed     = this.Note.Text;
             this.Note.HitResult = HitResult.Poor;
         }

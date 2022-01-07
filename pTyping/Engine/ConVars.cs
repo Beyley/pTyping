@@ -22,8 +22,10 @@ namespace pTyping.Engine {
 
         /// <summary>
         ///     The time it takes the notes to go from the right side of the screen to the left
+        ///
+        /// this weird calculation converts the UTyping value over to a 16/9 aspect ratio to maintain the speed
         /// </summary>
-        public static IntConVar BaseApproachTime = new("cl_base_approach_time", 2000) {
+        public static DoubleConVar BaseApproachTime = new("cl_base_approach_time", 2000d / (4d / 3d) * (16d / 9d)) {
             Protected = true
         };
     }

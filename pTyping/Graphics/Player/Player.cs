@@ -8,6 +8,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,6 +18,7 @@ using pTyping.Scores;
 using pTyping.Songs;
 using pTyping.Songs.Events;
 using sowelipisona;
+using Path=Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween.Path;
 // using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player {
@@ -56,7 +58,12 @@ namespace pTyping.Graphics.Player {
         private readonly LinePrimitiveDrawable      _playfieldBottomLine;
         private readonly RectanglePrimitiveDrawable _playfieldBackground;
 
-        private readonly TextDrawable _typingIndicator;
+        private readonly TextDrawable[] _typingIndicators = new TextDrawable[8];
+        private          int            _currentTypingIndicatorIndex;
+        private TextDrawable _currentTypingIndicator {
+            get => this._typingIndicators[this._currentTypingIndicatorIndex];
+            set => this._typingIndicators[this._currentTypingIndicatorIndex] = value;
+        }
 
         private readonly List<NoteDrawable>                 _notes  = new();
         private readonly List<Tuple<ManagedDrawable, bool>> _events = new();
@@ -106,12 +113,6 @@ namespace pTyping.Graphics.Player {
             };
 
             this._drawables.Add(this._playfieldBackground);
-
-            this._typingIndicator = new(RECEPTICLE_POS, pTypingGame.JapaneseFont, "", 60) {
-                OriginType = OriginType.Center
-            };
-
-            this._drawables.Add(this._typingIndicator);
 
             FileInfo[] noteFiles = this.Song.FileInfo.Directory?.GetFiles("note.png");
 
@@ -247,6 +248,8 @@ namespace pTyping.Graphics.Player {
                         break;
                     }
 
+                    this.ShowTypingIndicator(args.Character, true);
+
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnCharacterTyped(note, args.Character.ToString(), false);
                 }
@@ -256,11 +259,49 @@ namespace pTyping.Graphics.Player {
             this.UpdateNoteText();
         }
 
-        private void ShowTypingIndicator(char character) {
-            this._typingIndicator.Text = character.ToString();
+        private void ShowTypingIndicator(char character, bool miss = false) {
+            if (this._currentTypingIndicator != null)
+                this._drawables.Remove(this._currentTypingIndicator);
 
-            this._typingIndicator.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(255, 255, 255, 0), FurballGame.Time, FurballGame.Time + 400));
-            this._typingIndicator.Tweens.Add(new VectorTween(TweenType.Scale, new(1.5f), new(3), FurballGame.Time, FurballGame.Time                 + 400));
+            if (this._currentTypingIndicator == null) {
+                this._currentTypingIndicator = new(RECEPTICLE_POS, pTypingGame.JapaneseFont, character.ToString(), 60) {
+                    OriginType = OriginType.Center
+                };
+            } else {
+                this._currentTypingIndicator.Tweens.Clear();
+                this._currentTypingIndicator.Position = RECEPTICLE_POS;
+                this._currentTypingIndicator.Text     = character.ToString();
+            }
+
+            this._drawables.Add(this._currentTypingIndicator);
+
+            if (miss) {
+                //random bool
+                bool right = FurballGame.Random.Next(-1, 2) == 1;
+
+                this._currentTypingIndicator.Tweens.Add(
+                new ColorTween(TweenType.Color, new(200, 0, 0, 255), new(200, 0, 0, 0), FurballGame.Time, FurballGame.Time + 400)
+                );
+                this._currentTypingIndicator.Tweens.Add(
+                new PathTween(
+                new Path(
+                new PathSegment(
+                this._currentTypingIndicator.Position,
+                this._currentTypingIndicator.Position + new Vector2(FurballGame.Random.Next(9,  26) * (right ? 1 : -1), -FurballGame.Random.Next(9, 31)),
+                this._currentTypingIndicator.Position + new Vector2(FurballGame.Random.Next(24, 46) * (right ? 1 : -1), FurballGame.Random.Next(29, 51))
+                )
+                ),
+                FurballGame.Time,
+                FurballGame.Time + 400
+                )
+                );
+            } else {
+                this._currentTypingIndicator.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(255, 255, 255, 0), FurballGame.Time, FurballGame.Time + 400));
+                this._currentTypingIndicator.Tweens.Add(new VectorTween(TweenType.Scale, new(1f), new(1.5f), FurballGame.Time, FurballGame.Time                + 400));
+            }
+
+            this._currentTypingIndicatorIndex++;
+            this._currentTypingIndicatorIndex %= this._typingIndicators.Length;
         }
 
         private void UpdateNoteText() {
