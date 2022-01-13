@@ -4,7 +4,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
-using pTyping.Engine;
 using pTyping.Songs;
 using pTyping.UiGenerator;
 
@@ -57,7 +56,7 @@ namespace pTyping.Graphics.Editor.Tools {
                 TweenType.Movement,
                 new(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y - 40),
                 new(EditorScreen.RECEPTICLE_POS.X, EditorScreen.RECEPTICLE_POS.Y - 40),
-                (int)(this.EditorInstance.EditorState.MouseTime - ConVars.BaseApproachTime.Value),
+                (int)(this.EditorInstance.EditorState.MouseTime - this.EditorInstance.CurrentApproachTime(this.EditorInstance.EditorState.MouseTime)),
                 (int)this.EditorInstance.EditorState.MouseTime
                 )
                 );

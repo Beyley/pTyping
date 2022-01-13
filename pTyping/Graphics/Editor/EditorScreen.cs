@@ -452,7 +452,7 @@ namespace pTyping.Graphics.Editor {
             double reticuleXPos = this._recepticle.Position.X;
             double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 
-            double speed = (noteStartPos - reticuleXPos) / ConVars.BaseApproachTime.Value;
+            double speed = (noteStartPos - reticuleXPos) / this.CurrentApproachTime(currentTime);
 
             double relativeMousePosition = (e.mousePos.X - reticuleXPos) * 0.925;
 
