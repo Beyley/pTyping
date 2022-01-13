@@ -85,38 +85,36 @@ namespace pTyping.Graphics.Editor.Tools {
         }
 
         private void OnObjectColourChange(object sender, Color color) {
-            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+            if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-            ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
-
-            if (selectedObject is NoteDrawable note) {
-                note.Note.Color                = color;
-                this.EditorInstance.SaveNeeded = true;
-                note.Reset();
-            }
+            foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+                if (selectedObject is NoteDrawable note) {
+                    note.Note.Color                = color;
+                    this.EditorInstance.SaveNeeded = true;
+                    note.Reset();
+                }
         }
 
         private void OnObjectTextCommit(object sender, string e) {
-            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) return;
+            if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-            ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
+            foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+                switch (selectedObject) {
+                    case NoteDrawable note:
+                        note.Note.Text                 = this.ObjectText.AsTextBox().Text;
+                        this.EditorInstance.SaveNeeded = true;
 
-            switch (selectedObject) {
-                case NoteDrawable note:
-                    note.Note.Text                 = this.ObjectText.AsTextBox().Text;
-                    this.EditorInstance.SaveNeeded = true;
-
-                    note.Reset();
-                    break;
-                case LyricEventDrawable lyric:
-                    lyric.Event.Lyric              = this.ObjectText.AsTextBox().Text;
-                    this.EditorInstance.SaveNeeded = true;
-                    break;
-            }
+                        note.Reset();
+                        break;
+                    case LyricEventDrawable lyric:
+                        lyric.Event.Lyric              = this.ObjectText.AsTextBox().Text;
+                        this.EditorInstance.SaveNeeded = true;
+                        break;
+                }
         }
 
         private void OnSelectedObjectsChange(object sender, NotifyCollectionChangedEventArgs e) {
-            if (this.EditorInstance.EditorState.SelectedObjects.Count != 1) {
+            if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) {
                 this.ObjectText.AsTextBox().Text              = string.Empty;
                 this.ObjectColour.AsColorPicker().Color.Value = Color.White;
 
