@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using DiscordRPC;
 using FontStashSharp;
@@ -95,7 +96,8 @@ namespace pTyping {
         public static DiscordRpcClient RpcClient;
         public static RichPresence     RichPresence = new();
 
-        public static NotificationManager NotificationManager;
+        public static  NotificationManager NotificationManager;
+        private static TextDrawable        _OnlineUsersText;
 
         public pTypingGame() : base(new MenuScreen()) {
             // this.Window.AllowUserResizing = true;
@@ -380,13 +382,14 @@ namespace pTyping {
 
             ScoreManager.Load();
 
-            OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
-            OnlineManager.Initialize();
-            OnlineManager.Login();
-
             NotificationManager = new();
             
             base.Initialize();
+
+            // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
+            OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
+            OnlineManager.Initialize();
+            OnlineManager.Login();
 
             VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
                 OriginType  = OriginType.BottomRight,
@@ -413,6 +416,18 @@ namespace pTyping {
             OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
 
             this._userPanelManager         = new();
+            this._userPanelManager.Add(
+            new TexturedDrawable(WhitePixel, new(0)) {
+                Scale         = new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+                Depth         = 1.5f,
+                ColorOverride = new(0, 0, 0, 100)
+            }
+            );
+            this._userPanelManager.Add(
+            _OnlineUsersText = new TextDrawable(new(10), JapaneseFontStroked, "Online Users: 0", 50) {
+                Depth = 0f
+            }
+            );
             this._userPanelManager.Visible = false;
             this.UpdateUserPanel(null, null);
 
@@ -457,11 +472,13 @@ namespace pTyping {
 
         private void UpdateUserPanel(object sender, object e) {
             lock (this._userPanelDrawables) {
+                _OnlineUsersText.Text = $"Online Users: {OnlineManager.OnlinePlayers.Count(x => !x.Value.Bot)} ({OnlineManager.OnlinePlayers.Count()})";
+                
                 this._userPanelDrawables.ForEach(x => this._userPanelManager.Remove(x));
                 this._userPanelDrawables.Clear();
 
-                Vector2 pos = new(10);
-                foreach (KeyValuePair<int, OnlinePlayer> player in OnlineManager.OnlinePlayers) {
+                Vector2 pos = new(10, 10 + _OnlineUsersText.Size.Y + 10);
+                foreach (KeyValuePair<uint, OnlinePlayer> player in OnlineManager.OnlinePlayers) {
                     UserCardDrawable drawable = player.Value.GetUserCard();
                     drawable.MoveTo(pos);
                     pos.X += drawable.Size.X + 10;

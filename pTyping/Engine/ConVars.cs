@@ -12,7 +12,7 @@ namespace pTyping.Engine {
         public static StringConVar Username      = new("username", "beyley");
         public static StringConVar Password = new(
         "password",
-        "ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff"
+        "test"
         );
 
         public static ConFunc LoadUTypingReplay = new LoadUTypingReplay();
@@ -70,10 +70,7 @@ namespace pTyping.Engine {
         public override ConsoleResult Run(string[] consoleInput) {
             pTypingGame.OnlineManager.Login();
 
-            if (pTypingGame.OnlineManager.State != ConnectionState.LoggedIn)
-                return new(ExecutionResult.Error, "Login not successful!");
-
-            return new(ExecutionResult.Success, "Logged in!");
+            return new(ExecutionResult.Success, "Logging in!");
         }
     }
 

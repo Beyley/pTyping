@@ -30,6 +30,11 @@ namespace pTyping.Graphics.Online {
                 Scale = new(1.7f)
             }
             );
+            this._drawables.Add(
+            this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
+                Scale = new(0.175f)
+            }
+            );
 
             this._drawables.Add(
             this._rankDrawable = new(new(0, 0), FurballGame.DEFAULT_FONT_STROKED, "", 175) {
@@ -50,11 +55,6 @@ namespace pTyping.Graphics.Online {
             this._statusTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFontStroked, "", 45) {
                 Scale   = new(1.7f),
                 Visible = true
-            }
-            );
-            this._drawables.Add(
-            this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
-                Scale = new(0.175f)
             }
             );
 

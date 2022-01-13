@@ -86,7 +86,7 @@ namespace pTyping.Songs {
 
         [Pure]
         public TimingPoint CurrentTimingPoint(double currentTime) {
-            for (int i = 0; i < this.TimingPoints.Count; i++) {
+            for (int i = this.TimingPoints.Count - 1; i >= 0; i--) {
                 TimingPoint timingPoint = this.TimingPoints[i];
                 if (timingPoint.Time < currentTime)
                     return timingPoint;

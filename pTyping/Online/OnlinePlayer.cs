@@ -9,10 +9,11 @@ namespace pTyping.Online {
         public  Bindable<UserAction> Action    = new(new(UserActionType.Idle, "Idling."));
         public  Bindable<int>        PlayCount = new(0);
         public  Bindable<int>        Rank      = new(0);
+        public  Bindable<bool>       Bot       = new(false);
 
         public Bindable<long>   RankedScore = new(0);
         public Bindable<long>   TotalScore  = new(0);
-        public Bindable<int>    UserId      = new(-1);
+        public Bindable<uint>   UserId      = new(uint.MaxValue);
         public Bindable<string> Username    = new("Unknown user!");
 
         [Pure]
@@ -24,6 +25,7 @@ namespace pTyping.Online {
 
                 this._userCard.Player.OnChange                               += (_, _) => this._userCard.UpdateDrawable();
                 this._userCard.Player.Value.TotalScore.OnChange              += (_, _) => this._userCard.UpdateDrawable();
+                this._userCard.Player.Value.Bot.OnChange                     += (_, _) => this._userCard.UpdateDrawable();
                 this._userCard.Player.Value.RankedScore.OnChange             += (_, _) => this._userCard.UpdateDrawable();
                 this._userCard.Player.Value.Accuracy.OnChange                += (_, _) => this._userCard.UpdateDrawable();
                 this._userCard.Player.Value.PlayCount.OnChange               += (_, _) => this._userCard.UpdateDrawable();

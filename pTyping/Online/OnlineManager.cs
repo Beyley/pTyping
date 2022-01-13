@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
@@ -10,8 +11,8 @@ using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online {
     public abstract class OnlineManager {
-        public ObservableCollection<ChatMessage>                 ChatLog       = new();
-        public ObservableConcurrentDictionary<int, OnlinePlayer> OnlinePlayers = new();
+        public ObservableCollection<ChatMessage>                  ChatLog       = new();
+        public ObservableConcurrentDictionary<uint, OnlinePlayer> OnlinePlayers = new();
 
         public OnlinePlayer Player = new();
 
@@ -63,18 +64,22 @@ namespace pTyping.Online {
         public event EventHandler OnDisconnect;
 
         public void Login() {
-            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers)
+            foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
                 this.OnlinePlayers.Remove(keyValuePair.Key);
 
-            if (this.State == ConnectionState.Disconnected)
-                this.Connect();
+            new Thread(
+            () => {
+                if (this.State == ConnectionState.Disconnected)
+                    this.Connect();
 
-            if (this.State != ConnectionState.Disconnected)
-                this.ClientLogin();
+                if (this.State != ConnectionState.Disconnected)
+                    this.ClientLogin();
+            }
+            ).Start();
         }
 
         public void Logout() {
-            foreach (KeyValuePair<int, OnlinePlayer> keyValuePair in this.OnlinePlayers)
+            foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
                 this.OnlinePlayers.Remove(keyValuePair.Key);
 
             this.ClientLogout();

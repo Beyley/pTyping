@@ -6,13 +6,13 @@ namespace pTyping.Online.Taiko_rs.Packets {
         public int    PlayCount;
         public long   RankedScore;
         public long   TotalScore;
-        public int    UserId;
+        public uint   UserId;
         public int    Rank;
         
         protected override byte[] GetData() => throw new NotImplementedException();
 
         protected override void ReadData(TaikoRsReader reader) {
-            this.UserId      = reader.ReadInt32();
+            this.UserId      = reader.ReadUInt32();
             this.TotalScore  = reader.ReadInt64();
             this.RankedScore = reader.ReadInt64();
             this.Accuracy    = reader.ReadDouble();

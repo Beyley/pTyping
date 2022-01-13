@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Furball.Engine.Engine.Helpers;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Online.Taiko_rs.Packets;
@@ -38,7 +40,7 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         public override string Username() => ConVars.Username.Value;
-        public override string Password() => ConVars.Password.Value;
+        public override string Password() => CryptoHelper.GetSha512(Encoding.UTF8.GetBytes(ConVars.Password.Value));
 
         private Thread _sendThread;
 
@@ -61,6 +63,8 @@ namespace pTyping.Online.Taiko_rs {
             this._client.OnClose   += this.ClientOnClose;
             this._client.OnError   += this.ClientOnError;
             this._client.OnOpen    += this.ClientOnOpen;
+
+            this._client.SslConfiguration.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
 
             this._client.Connect();
 
@@ -171,17 +175,24 @@ namespace pTyping.Online.Taiko_rs {
             TaikoRsPacketId pid = reader.ReadPacketId();
 
             bool success = pid switch {
-                TaikoRsPacketId.ServerLoginResponse    => this.HandleServerLoginResponsePacket(reader),
-                TaikoRsPacketId.ServerUserStatusUpdate => this.HandleServerUserStatusUpdatePacket(reader),
-                TaikoRsPacketId.ServerUserJoined       => this.HandleServerUserJoinedPacket(reader),
-                TaikoRsPacketId.ServerUserLeft         => this.HandleServerUserLeftPacket(reader),
-                TaikoRsPacketId.ServerSendMessage      => this.HandleServerSendMessagePacket(reader),
-                TaikoRsPacketId.ServerScoreUpdate      => this.HandleServerScoreUpdatePacket(reader),
-                TaikoRsPacketId.ServerSpectatorJoined  => throw new NotImplementedException(),
-                TaikoRsPacketId.ServerSpectatorFrames  => throw new NotImplementedException(),
-                TaikoRsPacketId.Unknown                => throw new Exception("Got Unknown packet id?"),
-                _                                      => throw new Exception("Recieved client packet?")
+                TaikoRsPacketId.ServerLoginResponse           => this.HandleServerLoginResponsePacket(reader),
+                TaikoRsPacketId.ServerUserStatusUpdate        => this.HandleServerUserStatusUpdatePacket(reader),
+                TaikoRsPacketId.ServerUserJoined              => this.HandleServerUserJoinedPacket(reader),
+                TaikoRsPacketId.ServerUserLeft                => this.HandleServerUserLeftPacket(reader),
+                TaikoRsPacketId.ServerSendMessage             => this.HandleServerSendMessagePacket(reader),
+                TaikoRsPacketId.ServerScoreUpdate             => this.HandleServerScoreUpdatePacket(reader),
+                TaikoRsPacketId.ServerSpectatorJoined         => throw new NotImplementedException(),
+                TaikoRsPacketId.ServerSpectatorFrames         => throw new NotImplementedException(),
+                TaikoRsPacketId.ServerSpectatorLeft           => throw new NotImplementedException(),
+                TaikoRsPacketId.ServerSpectatorPlayingRequest => throw new NotImplementedException(),
+                TaikoRsPacketId.Ping                          => throw new NotImplementedException(),
+                TaikoRsPacketId.Pong                          => throw new NotImplementedException(),
+                TaikoRsPacketId.Unknown                       => throw new Exception("Got Unknown packet id?"),
+                _                                             => throw new Exception("Recieved client packet?")
             };
+
+            if (reader.BaseStream.Position != reader.BaseStream.Length)
+                throw new Exception("you didnt handle the packet all the way smh");
 
             if (!success) throw new Exception($"Error reading packet with PID: {pid}");
         }
@@ -296,14 +307,14 @@ namespace pTyping.Online.Taiko_rs {
                 switch (packet.UserId) {
                     case -1: {
                         Logger.Log("Login failed! User not found.", LoggerLevelOnlineInfo.Instance);
-                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed!\n(user not found)");
+                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed! (user not found)");
                         
                         this.Disconnect();
                         return true;
                     }
                     case -2: {
                         Logger.Log("Login failed! Password incorrect!", LoggerLevelOnlineInfo.Instance);
-                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed!\n(incorrect password)");
+                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed! (incorrect password)");
                         
                         this.Disconnect();
                         return true;
@@ -311,14 +322,14 @@ namespace pTyping.Online.Taiko_rs {
                 }
 
             this.Player.Username.Value = this.Username();
-            this.Player.UserId.Value   = packet.UserId;
+            this.Player.UserId.Value   = (uint)packet.UserId;
             this.State                 = ConnectionState.LoggedIn;
             
             this.InvokeOnLoginComplete(this);
 
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);
 
-            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Login complete!\nWelcome {this.Player.Username}!");
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Login complete! Welcome {this.Player.Username}!");
             
             this.PacketQueue.Enqueue(new PacketClientStatusUpdate(new UserAction(UserActionType.Idle, "")).GetPacket());
             this.PacketQueue.Enqueue(new PacketClientNotifyScoreUpdate().GetPacket());

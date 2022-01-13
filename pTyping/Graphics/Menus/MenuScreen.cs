@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -11,7 +12,6 @@ using Microsoft.Xna.Framework.Graphics;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
-using pTyping.Online;
 using pTyping.Songs;
 using static Furball.Engine.Engine.Localization.LocalizationManager;
 
@@ -19,6 +19,8 @@ namespace pTyping.Graphics.Menus {
     public class MenuScreen : pScreen {
         private TextDrawable _musicTitle;
 
+        private ManagedDrawable _userCard = null;
+        
         public override void Initialize() {
             base.Initialize();
             
@@ -197,16 +199,34 @@ namespace pTyping.Graphics.Menus {
 
             #endregion
 
-            if (pTypingGame.OnlineManager.State == ConnectionState.LoggedIn) {
-                this.Manager.Add(pTypingGame.GetUserCard());
+            this.UpdateUserCard(this, null);
 
-                pTypingGame.MenuPlayerUserCard.MoveTo(new(10f));
-            }
-
+            pTypingGame.OnlineManager.OnLoginComplete += this.UpdateUserCard;
+            pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
+            
             if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
                 this.LoadSong(true);
             else
                 this.LoadSong(false);
+        }
+
+        protected override void Dispose(bool disposing) {
+            pTypingGame.OnlineManager.OnLoginComplete -= this.UpdateUserCard;
+            pTypingGame.OnlineManager.OnLogout        -= this.UpdateUserCard;
+
+            base.Dispose(disposing);
+        }
+
+        public void UpdateUserCard(object sender, EventArgs e) {
+            // if(pTypingGame.OnlineManager.State is ConnectionState.Disconnected or ConnectionState.Connected )
+            this.Manager.Remove(this._userCard);
+
+            this.Manager.Add(this._userCard = pTypingGame.GetUserCard());
+
+            this._userCard.MoveTo(new(10f));
+
+            if (sender != this)
+                this._userCard.FadeInFromZero(100);
         }
 
         public void LoadSong(bool chooseNewOne) {

@@ -214,6 +214,7 @@ namespace pTyping.Graphics.Editor {
 
             playButton.OnClick += delegate {
                 pTypingGame.PlayMusic();
+                ChangeSpeed(null, this._speedDropdown.SelectedItem);
             };
 
             pauseButton.OnClick += delegate {
@@ -271,6 +272,28 @@ namespace pTyping.Graphics.Editor {
             //Add the ui container that tools use 
             this.Manager.Add(this.EditorState.EditorToolUiContainer);
 
+            #region Speed dropdown
+
+            this._speedDropdown = new UiDropdownDrawable(
+            new(10, 200),
+            new List<string> {
+                x025,
+                x050,
+                x075,
+                x100
+            },
+            new(100, 20),
+            pTypingGame.JapaneseFont,
+            20
+            );
+            this._speedDropdown.SelectedItem.Value = x100;
+
+            this._speedDropdown.SelectedItem.OnChange += ChangeSpeed;
+
+            this.Manager.Add(this._speedDropdown);
+
+            #endregion
+
             #endregion
 
             this.ChangeTool(typeof(SelectTool));
@@ -287,6 +310,31 @@ namespace pTyping.Graphics.Editor {
 
             ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
             this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
+        }
+
+        private const string x025 = "x0.25";
+        private const string x050 = "x0.50";
+        private const string x075 = "x0.75";
+        private const string x100 = "x1.00";
+        private static void ChangeSpeed(object _, string s) {
+            switch (s) {
+                case x025: {
+                    pTypingGame.MusicTrack.SetSpeed(0.25);
+                    break;
+                }
+                case x050: {
+                    pTypingGame.MusicTrack.SetSpeed(0.50);
+                    break;
+                }
+                case x075: {
+                    pTypingGame.MusicTrack.SetSpeed(0.75);
+                    break;
+                }
+                case x100: {
+                    pTypingGame.MusicTrack.SetSpeed(1);
+                    break;
+                }
+            }
         }
 
         private void OnVolumeChange(object sender, float f) {
@@ -645,7 +693,10 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
             }
         }
 
-        private double _lastTime = 0;
+        public double CurrentApproachTime(double time) => ConVars.BaseApproachTime.Value / this.EditorState.Song.CurrentTimingPoint(time).ApproachMultiplier;
+
+        private double             _lastTime = 0;
+        private UiDropdownDrawable _speedDropdown;
         public override void Update(GameTime gameTime) {
             this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
@@ -653,7 +704,8 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
                 this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
 
                 foreach (NoteDrawable note in this.EditorState.Notes) {
-                    note.Visible = this.EditorState.CurrentTime > note.Note.Time - 2000 && this.EditorState.CurrentTime < note.Note.Time + 1000;
+                    note.Visible = this.EditorState.CurrentTime > note.Note.Time - this.CurrentApproachTime(note.Note.Time) &&
+                                   this.EditorState.CurrentTime < note.Note.Time + 1000;
 
                     if (note.EditorHitSoundQueued && note.Note.Time < this.EditorState.CurrentTime) {
                         this.HitSoundNormal.PlayNew();
