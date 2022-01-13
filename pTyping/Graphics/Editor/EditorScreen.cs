@@ -387,7 +387,7 @@ namespace pTyping.Graphics.Editor {
         }
 
         public void CreateEvent(Event @event, bool isNew = false) {
-            ManagedDrawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new(ConVars.BaseApproachTime.Value, true, true));
+            ManagedDrawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new(this.CurrentApproachTime(@event.Time), true, true));
 
             if (eventDrawable == null) return;
 
@@ -420,7 +420,7 @@ namespace pTyping.Graphics.Editor {
                 Note       = note
             };
 
-            noteDrawable.CreateTweens(new(ConVars.BaseApproachTime.Value, true, true));
+            noteDrawable.CreateTweens(new(this.CurrentApproachTime(note.Time), true, true));
 
             this.Manager.Add(noteDrawable);
             this.EditorState.Notes.Add(noteDrawable);

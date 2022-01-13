@@ -3,7 +3,6 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using pTyping.Engine;
 using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
 using pTyping.UiGenerator;
@@ -21,7 +20,7 @@ namespace pTyping.Graphics.Editor.Tools {
 
         private bool _dragging = false;
 
-        private static readonly GameplayDrawableTweenArgs TWEEN_ARGS = new(ConVars.BaseApproachTime.Value, true, true);
+        private GameplayDrawableTweenArgs GetTweenArgs(double time) => new(this.EditorInstance.CurrentApproachTime(time), true, true);
         
         public override void Initialize() {
             foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
@@ -201,27 +200,27 @@ namespace pTyping.Graphics.Editor.Tools {
                         case NoteDrawable noteDrawable:
                             noteDrawable.Note.Time = this.EditorInstance.EditorState.MouseTime;
 
-                            noteDrawable.CreateTweens(TWEEN_ARGS);
+                            noteDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
                             break;
                         case BeatLineBarEventDrawable beatLineBarEventDrawable:
                             beatLineBarEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
-                            beatLineBarEventDrawable.CreateTweens(TWEEN_ARGS);
+                            beatLineBarEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
                             break;
                         case BeatLineBeatEventDrawable beatLineBeatEventDrawable:
                             beatLineBeatEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
-                            beatLineBeatEventDrawable.CreateTweens(TWEEN_ARGS);
+                            beatLineBeatEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
                             break;
                         case TypingCutoffEventDrawable typingCutoffEventDrawable:
                             typingCutoffEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
-                            typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
+                            typingCutoffEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
                             break;
                         case LyricEventDrawable lyricEventDrawable:
                             lyricEventDrawable.Event.Time = this.EditorInstance.EditorState.MouseTime;
 
-                            lyricEventDrawable.CreateTweens(TWEEN_ARGS);
+                            lyricEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
                             break;
                     }
                 else
@@ -230,27 +229,27 @@ namespace pTyping.Graphics.Editor.Tools {
                             case NoteDrawable noteDrawable:
                                 noteDrawable.Note.Time += timeDifference;
 
-                                noteDrawable.CreateTweens(TWEEN_ARGS);
+                                noteDrawable.CreateTweens(this.GetTweenArgs(noteDrawable.Note.Time));
                                 break;
                             case BeatLineBarEventDrawable beatLineBarEventDrawable:
                                 beatLineBarEventDrawable.Event.Time += timeDifference;
 
-                                beatLineBarEventDrawable.CreateTweens(TWEEN_ARGS);
+                                beatLineBarEventDrawable.CreateTweens(this.GetTweenArgs(beatLineBarEventDrawable.Event.Time));
                                 break;
                             case BeatLineBeatEventDrawable beatLineBeatEventDrawable:
                                 beatLineBeatEventDrawable.Event.Time += timeDifference;
 
-                                beatLineBeatEventDrawable.CreateTweens(TWEEN_ARGS);
+                                beatLineBeatEventDrawable.CreateTweens(this.GetTweenArgs(beatLineBeatEventDrawable.Event.Time));
                                 break;
                             case TypingCutoffEventDrawable typingCutoffEventDrawable:
                                 typingCutoffEventDrawable.Event.Time += timeDifference;
 
-                                typingCutoffEventDrawable.CreateTweens(TWEEN_ARGS);
+                                typingCutoffEventDrawable.CreateTweens(this.GetTweenArgs(typingCutoffEventDrawable.Event.Time));
                                 break;
                             case LyricEventDrawable lyricEventDrawable:
                                 lyricEventDrawable.Event.Time += timeDifference;
 
-                                lyricEventDrawable.CreateTweens(TWEEN_ARGS);
+                                lyricEventDrawable.CreateTweens(this.GetTweenArgs(lyricEventDrawable.Event.Time));
                                 break;
                         }
 
