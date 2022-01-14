@@ -16,7 +16,7 @@ namespace pTyping.Online {
         public UserAction() {}
     }
 
-    public enum UserActionType {
+    public enum UserActionType : ushort {
         Unknown = 0,
         Idle,
         Ingame,

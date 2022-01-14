@@ -19,6 +19,8 @@ using Logger=Kettu.Logger;
 
 namespace pTyping.Online.Taiko_rs {
     public class TaikoRsOnlineManager : OnlineManager {
+        public const ushort PROTOCOL_VERSION = 1;
+        
         private readonly string     _getScoresUrl = "/get_scores";
         private readonly HttpClient _httpClient;
         private readonly Uri        _httpUri;
@@ -67,6 +69,7 @@ namespace pTyping.Online.Taiko_rs {
             this._client.SslConfiguration.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
 
             this._client.Connect();
+            Logger.Log("Connection established", LoggerLevelOnlineInfo.Instance);
 
             this.InvokeOnConnect(this);
 
@@ -75,14 +78,18 @@ namespace pTyping.Online.Taiko_rs {
             this._sendThread.Start();
         }
 
-        public ConcurrentQueue<byte[]> PacketQueue = new();
+        public ConcurrentQueue<Packet> PacketQueue = new();
 
         private bool _sendPackets;
 
         private void PacketSendMain() {
             while (this._sendPackets) {
-                if (this.PacketQueue.TryDequeue(out byte[] data) && this._client.IsAlive)
-                    this._client.Send(data);
+                if (this.PacketQueue.TryDequeue(out Packet packet) && this._client.IsAlive) {
+                    MemoryStream  s = new();
+                    TaikoRsWriter w = new(s);
+                    packet.WriteDataToStream(w);
+                    this._client.Send(s.ToArray());
+                }
 
                 Thread.Sleep(50);
             }
@@ -103,7 +110,7 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         private void SendUpdateScoreRequest() {
-            this.PacketQueue.Enqueue(new PacketClientNotifyScoreUpdate().GetPacket());
+            this.PacketQueue.Enqueue(new ClientNotifyScoreUpdatePacket());
         }
 
         protected override async Task ClientSubmitScore(PlayerScore score) {
@@ -172,23 +179,23 @@ namespace pTyping.Online.Taiko_rs {
             MemoryStream  stream = new(args.RawData);
             TaikoRsReader reader = new(stream);
 
-            TaikoRsPacketId pid = reader.ReadPacketId();
+            PacketId pid = reader.ReadPacketId();
 
             bool success = pid switch {
-                TaikoRsPacketId.ServerLoginResponse           => this.HandleServerLoginResponsePacket(reader),
-                TaikoRsPacketId.ServerUserStatusUpdate        => this.HandleServerUserStatusUpdatePacket(reader),
-                TaikoRsPacketId.ServerUserJoined              => this.HandleServerUserJoinedPacket(reader),
-                TaikoRsPacketId.ServerUserLeft                => this.HandleServerUserLeftPacket(reader),
-                TaikoRsPacketId.ServerSendMessage             => this.HandleServerSendMessagePacket(reader),
-                TaikoRsPacketId.ServerScoreUpdate             => this.HandleServerScoreUpdatePacket(reader),
-                TaikoRsPacketId.ServerSpectatorJoined         => throw new NotImplementedException(),
-                TaikoRsPacketId.ServerSpectatorFrames         => throw new NotImplementedException(),
-                TaikoRsPacketId.ServerSpectatorLeft           => throw new NotImplementedException(),
-                TaikoRsPacketId.ServerSpectatorPlayingRequest => throw new NotImplementedException(),
-                TaikoRsPacketId.Ping                          => throw new NotImplementedException(),
-                TaikoRsPacketId.Pong                          => throw new NotImplementedException(),
-                TaikoRsPacketId.Unknown                       => throw new Exception("Got Unknown packet id?"),
-                _                                             => throw new Exception("Recieved client packet?")
+                PacketId.ServerLoginResponse           => this.HandleServerLoginResponsePacket(reader),
+                PacketId.ServerUserStatusUpdate        => this.HandleServerUserStatusUpdatePacket(reader),
+                PacketId.ServerUserJoined              => this.HandleServerUserJoinedPacket(reader),
+                PacketId.ServerUserLeft                => this.HandleServerUserLeftPacket(reader),
+                PacketId.ServerSendMessage             => this.HandleServerSendMessagePacket(reader),
+                PacketId.ServerScoreUpdate             => this.HandleServerScoreUpdatePacket(reader),
+                PacketId.ServerSpectatorJoined         => throw new NotImplementedException(),
+                PacketId.ServerSpectatorFrames         => throw new NotImplementedException(),
+                PacketId.ServerSpectatorLeft           => throw new NotImplementedException(),
+                PacketId.ServerSpectatorPlayingRequest => throw new NotImplementedException(),
+                PacketId.Ping                          => true,
+                PacketId.Pong                          => true,
+                PacketId.Unknown                       => throw new Exception("Got Unknown packet id?"),
+                _                                      => throw new Exception("Recieved client packet?")
             };
 
             if (reader.BaseStream.Position != reader.BaseStream.Length)
@@ -202,7 +209,7 @@ namespace pTyping.Online.Taiko_rs {
 
             if (string.IsNullOrWhiteSpace(message)) return;
 
-            this.PacketQueue.Enqueue(new PacketClientSendMessage(channel, message).GetPacket());
+            this.PacketQueue.Enqueue(new ClientSendMessagePacket(channel, message));
         }
 
         protected override void Disconnect() {
@@ -219,11 +226,11 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         public override void ChangeUserAction(UserAction action) {
-            this.PacketQueue.Enqueue(new PacketClientStatusUpdate(action).GetPacket());
+            this.PacketQueue.Enqueue(new ClientStatusUpdatePacket(action));
         }
 
         protected override void ClientLogin() {
-            this.PacketQueue.Enqueue(new PacketClientUserLogin(this.Username(), this.Password()).GetPacket());
+            this.PacketQueue.Enqueue(new ClientUserLoginPacket(this.Username(), this.Password()));
 
             this.InvokeOnLoginStart(this);
             this.State = ConnectionState.LoggingIn;
@@ -232,19 +239,20 @@ namespace pTyping.Online.Taiko_rs {
         protected override void ClientLogout() {
             if (this._client.ReadyState != WebSocketState.Open) return;
 
-            this.PacketQueue.Enqueue(new PacketClientUserLogout().GetPacket());
+            this.PacketQueue.Enqueue(new ClientLogOutPacket());
 
             this.InvokeOnLogout(this);
+            //Note we set to connected because we didnt actually *disconnect* yet, just log out
             this.State = ConnectionState.Connected;
         }
 
         #region Handle packets
 
         private bool HandleServerSendMessagePacket(TaikoRsReader reader) {
-            PacketServerSendMessage packet = new();
-            packet.ReadPacket(reader);
+            ServerSendMessagePacket packet = new();
+            packet.ReadDataFromStream(reader);
 
-            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+            if (this.OnlinePlayers.TryGetValue(packet.SenderId, out OnlinePlayer player)) {
                 ChatMessage message = new(player, packet.Channel, packet.Message);
                 this._chatQueue.Enqueue(message);
 
@@ -258,14 +266,14 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         private bool HandleServerScoreUpdatePacket(TaikoRsReader reader) {
-            PacketServerScoreUpdate packet = new();
-            packet.ReadPacket(reader);
+            ServerScoreUpdatePacket packet = new();
+            packet.ReadDataFromStream(reader);
 
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
                 player.TotalScore.Value  = packet.TotalScore;
                 player.RankedScore.Value = packet.RankedScore;
                 player.Accuracy.Value    = packet.Accuracy;
-                player.PlayCount.Value   = packet.PlayCount;
+                player.PlayCount.Value   = packet.Playcount;
                 player.Rank.Value        = packet.Rank;
 
                 Logger.Log(
@@ -278,8 +286,8 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         private bool HandleServerUserStatusUpdatePacket(TaikoRsReader reader) {
-            PacketServerUserStatusUpdate packet = new();
-            packet.ReadPacket(reader);
+            ServerUserStatusUpdatePacket packet = new();
+            packet.ReadDataFromStream(reader);
 
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
                 player.Action.Value = packet.Action;
@@ -290,8 +298,8 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         private bool HandleServerUserLeftPacket(TaikoRsReader reader) {
-            PacketServerUserLeft packet = new();
-            packet.ReadPacket(reader);
+            ServerUserLeftPacket packet = new();
+            packet.ReadDataFromStream(reader);
 
             if (this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
                 Logger.Log($"{playerLeft.Username} has gone offline!", LoggerLevelOnlineInfo.Instance);
@@ -300,29 +308,38 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         private bool HandleServerLoginResponsePacket(TaikoRsReader reader) {
-            PacketServerLoginResponse packet = new();
-            packet.ReadPacket(reader);
+            ServerLoginResponsePacket packet = new();
+            packet.ReadDataFromStream(reader);
 
-            if ((packet.UserId & (1 << 31)) != 0)
-                switch (packet.UserId) {
-                    case -1: {
-                        Logger.Log("Login failed! User not found.", LoggerLevelOnlineInfo.Instance);
-                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed! (user not found)");
-                        
-                        this.Disconnect();
-                        return true;
-                    }
-                    case -2: {
-                        Logger.Log("Login failed! Password incorrect!", LoggerLevelOnlineInfo.Instance);
-                        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed! (incorrect password)");
-                        
-                        this.Disconnect();
-                        return true;
-                    }
+            switch (packet.LoginStatus) {
+                case LoginStatus.NoUser: {
+                    Logger.Log("Login failed! User not found.", LoggerLevelOnlineInfo.Instance);
+                    pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed! (user not found)");
+
+                    this.Disconnect();
+                    return true;
                 }
+                case LoginStatus.BadPassword: {
+                    Logger.Log("Login failed! Password incorrect!", LoggerLevelOnlineInfo.Instance);
+                    pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Login failed! (incorrect password)");
+
+                    this.Disconnect();
+                    return true;
+                }
+                case LoginStatus.UnknownError: {
+                    Logger.Log("Login failed! Unknown reason", LoggerLevelOnlineInfo.Instance);
+                    pTypingGame.NotificationManager.CreateNotification(
+                    NotificationManager.NotificationImportance.Error,
+                    "Login failed! (unknown reason, contact eve)"
+                    );
+
+                    this.Disconnect();
+                    return true;
+                }
+            }
 
             this.Player.Username.Value = this.Username();
-            this.Player.UserId.Value   = (uint)packet.UserId;
+            this.Player.UserId.Value   = packet.UserId;
             this.State                 = ConnectionState.LoggedIn;
             
             this.InvokeOnLoginComplete(this);
@@ -330,9 +347,9 @@ namespace pTyping.Online.Taiko_rs {
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);
 
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Login complete! Welcome {this.Player.Username}!");
-            
-            this.PacketQueue.Enqueue(new PacketClientStatusUpdate(new UserAction(UserActionType.Idle, "")).GetPacket());
-            this.PacketQueue.Enqueue(new PacketClientNotifyScoreUpdate().GetPacket());
+
+            this.PacketQueue.Enqueue(new ClientStatusUpdatePacket(new UserAction(UserActionType.Idle, "")));
+            this.PacketQueue.Enqueue(new ClientNotifyScoreUpdatePacket());
             
             return true;
         }
@@ -345,13 +362,22 @@ namespace pTyping.Online.Taiko_rs {
         }
 
         private bool HandleServerUserJoinedPacket(TaikoRsReader reader) {
-            PacketServerUserJoined packet = new();
-            packet.ReadPacket(reader);
+            ServerUserJoinedPacket packet = new();
+            packet.ReadDataFromStream(reader);
 
-            if (this.OnlinePlayers.ContainsKey(packet.Player.UserId)) return true;
+            OnlinePlayer player = new() {
+                Username = {
+                    Value = packet.Username
+                },
+                UserId = {
+                    Value = packet.UserId
+                }
+            };
 
-            this.OnlinePlayers.Add(packet.Player.UserId, packet.Player);
-            Logger.Log($"{packet.Player.Username} is online!", LoggerLevelOnlineInfo.Instance);
+            if (this.OnlinePlayers.ContainsKey(packet.UserId)) return true;
+
+            this.OnlinePlayers.Add(packet.UserId, player);
+            Logger.Log($"{player.Username} is online!", LoggerLevelOnlineInfo.Instance);
 
             return true;
         }
@@ -371,8 +397,8 @@ namespace pTyping.Online.Taiko_rs {
             return Encoding.UTF8.GetString(data);
         }
 
-        public TaikoRsPacketId ReadPacketId() {
-            TaikoRsPacketId pid = (TaikoRsPacketId)this.ReadUInt16();
+        public PacketId ReadPacketId() {
+            PacketId pid = (PacketId)this.ReadUInt16();
 
             return pid;
         }
