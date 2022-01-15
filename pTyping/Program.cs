@@ -6,59 +6,59 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace pTyping {
+namespace pTyping;
 
-    internal class Program {
-        public static List<GitLogEntry> GitLog;
-    
-        public static string GitVersion    = "unknown";
-        public static string ReleaseStream = "other";
-        public static string BuildVersion => $"{GitVersion}-{ReleaseStream}";
+internal class Program {
+    public static List<GitLogEntry> GitLog;
 
-        private static void SetReleaseStream() {
-            StreamDebug();
-            StreamRelease();
-        }
+    public static string GitVersion    = "unknown";
+    public static string ReleaseStream = "other";
+    public static string BuildVersion => $"{GitVersion}-{ReleaseStream}";
 
-        [Conditional("DEBUG")]
-        private static void StreamDebug() {
-            ReleaseStream = "debug";
-        }
+    private static void SetReleaseStream() {
+        StreamDebug();
+        StreamRelease();
+    }
 
-        [Conditional("RELEASE")]
-        private static void StreamRelease() {
-            ReleaseStream = "release";
-        }
+    [Conditional("DEBUG")]
+    private static void StreamDebug() {
+        ReleaseStream = "debug";
+    }
 
-        [STAThread]
-        private static void Main(string[] args) {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    [Conditional("RELEASE")]
+    private static void StreamRelease() {
+        ReleaseStream = "release";
+    }
 
-            SetReleaseStream();
-            using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitversion.txt")) {
-                using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
-                    GitVersion = reader.ReadToEnd().Trim();
-                }
+    [STAThread]
+    private static void Main(string[] args) {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        SetReleaseStream();
+        using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitversion.txt")) {
+            using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
+                GitVersion = reader.ReadToEnd().Trim();
             }
+        }
 
-            using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitlog.json")) {
-                using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
-                    string gitlog = reader.ReadToEnd().Trim();
+        using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitlog.json")) {
+            using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
+                string gitlog = reader.ReadToEnd().Trim();
 
-                    //evil hack to get around evil commit messages
-                    gitlog = gitlog.Replace("\"",         "\\\"");
-                    gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
+                //evil hack to get around evil commit messages
+                gitlog = gitlog.Replace("\"",         "\\\"");
+                gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
 
-                    GitLog = JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
-                }
+                GitLog = JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
             }
+        }
 
-            using pTypingGame game = new();
+        using pTypingGame game = new();
 
 #if RELEASE
             try {
 #endif
-                game.Run();
+        game.Run();
 #if RELEASE
             }
             catch (Exception ex) {
@@ -72,6 +72,5 @@ namespace pTyping {
                 game.Dispose();
             }
 #endif
-        }
     }
 }

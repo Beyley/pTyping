@@ -1,50 +1,50 @@
 using Kettu;
 
-namespace pTyping.Engine {
-    public class LoggerLevelSongInfo : LoggerLevel {
-        private LoggerLevelSongInfo() {}
-        public override string Name => "SongInfo";
+namespace pTyping.Engine;
 
-        public static LoggerLevelSongInfo Instance = new();
-    }
+public class LoggerLevelSongInfo : LoggerLevel {
+    private LoggerLevelSongInfo() {}
+    public override string Name => "SongInfo";
 
-    public class LoggerLevelSongManagerUpdateInfo : LoggerLevel {
-        private LoggerLevelSongManagerUpdateInfo() {}
-        
-        public override string Name => "SongManagerInfo";
+    public static LoggerLevelSongInfo Instance = new();
+}
 
-        public static LoggerLevelSongManagerUpdateInfo Instance = new();
-    }
+public class LoggerLevelSongManagerUpdateInfo : LoggerLevel {
+    private LoggerLevelSongManagerUpdateInfo() {}
 
-    public class LoggerLevelOnlineInfo : LoggerLevel {
-        private LoggerLevelOnlineInfo() {}
+    public override string Name => "SongManagerInfo";
 
-        public override string Name => "OnlineInfo";
+    public static LoggerLevelSongManagerUpdateInfo Instance = new();
+}
 
-        public static LoggerLevelOnlineInfo Instance = new();
-    }
+public class LoggerLevelOnlineInfo : LoggerLevel {
+    private LoggerLevelOnlineInfo() {}
 
-    public class LoggerLevelChatMessage : LoggerLevel {
-        private LoggerLevelChatMessage() {}
+    public override string Name => "OnlineInfo";
 
-        public override string Name => "ChatMessage";
+    public static LoggerLevelOnlineInfo Instance = new();
+}
 
-        public static LoggerLevelChatMessage Instance = new();
-    }
+public class LoggerLevelChatMessage : LoggerLevel {
+    private LoggerLevelChatMessage() {}
 
-    public class LoggerLevelModInfo : LoggerLevel {
-        private LoggerLevelModInfo() {}
+    public override string Name => "ChatMessage";
 
-        public override string Name => "ModInfo";
+    public static LoggerLevelChatMessage Instance = new();
+}
 
-        public static LoggerLevelModInfo Instance = new();
-    }
+public class LoggerLevelModInfo : LoggerLevel {
+    private LoggerLevelModInfo() {}
 
-    public class LoggerLevelEditorInfo : LoggerLevel {
-        private LoggerLevelEditorInfo() {}
+    public override string Name => "ModInfo";
 
-        public override string Name => "EditorInfo";
+    public static LoggerLevelModInfo Instance = new();
+}
 
-        public static LoggerLevelEditorInfo Instance = new();
-    }
+public class LoggerLevelEditorInfo : LoggerLevel {
+    private LoggerLevelEditorInfo() {}
+
+    public override string Name => "EditorInfo";
+
+    public static LoggerLevelEditorInfo Instance = new();
 }

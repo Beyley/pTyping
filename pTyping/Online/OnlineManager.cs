@@ -4,98 +4,137 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Furball.Engine;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
+using pTyping.Engine;
+using pTyping.Graphics.Player;
 using pTyping.Scores;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
-namespace pTyping.Online {
-    public abstract class OnlineManager {
-        public ObservableCollection<ChatMessage>                  ChatLog       = new();
-        public ObservableConcurrentDictionary<uint, OnlinePlayer> OnlinePlayers = new();
+namespace pTyping.Online;
 
-        public OnlinePlayer Player = new();
+public enum SpectatorState {
+    Playing,
+    Paused,
+    Stopped,
+    ChangingMap
+}
 
-        public ConnectionState State {
-            get;
-            protected set;
-        } = ConnectionState.Disconnected;
+public abstract class OnlineManager {
+    public ObservableCollection<ChatMessage>                  ChatLog       = new();
+    public ObservableConcurrentDictionary<uint, OnlinePlayer> OnlinePlayers = new();
+    /// <summary>
+    ///     If you are host, this is your spectators, otherwise it is the other spectators
+    /// </summary>
+    public Dictionary<uint, OnlinePlayer> Spectators = new();
+    /// <summary>
+    ///     The host you are spectating
+    /// </summary>
+    public OnlinePlayer Host;
+    public OnlinePlayer Player = new();
 
-        public async Task SubmitScore(PlayerScore score) {
-            if (this.State == ConnectionState.LoggedIn)
-                await this.ClientSubmitScore(score);
-        }
+    public SpectatorState SpectatorState = SpectatorState.Stopped;
 
-        [Pure]
-        public async Task<List<PlayerScore>> GetMapScores(string hash) {
-            if (this.State == ConnectionState.LoggedIn)
-                return await this.ClientGetScores(hash);
+    public float LastSpectatorTime = 0f;
 
-            return new();
-        }
+    public PlayerScreen GameScene;
 
-        public abstract string Username();
-        public abstract string Password();
+    public ConnectionState State {
+        get;
+        protected set;
+    } = ConnectionState.Disconnected;
 
-        protected abstract void ClientLogin();
-        protected abstract void ClientLogout();
-        protected abstract void Connect();
-        protected abstract void Disconnect();
-        public abstract    void SendMessage(string channel, string message);
-
-        protected abstract Task ClientSubmitScore(PlayerScore score);
-        [Pure]
-        protected abstract Task<List<PlayerScore>> ClientGetScores(string        hash);
-
-        public abstract void ChangeUserAction(UserAction action);
-
-        protected void            InvokeOnLoginStart(object sender) => this.OnLoginStart?.Invoke(sender, null);
-        public event EventHandler OnLoginStart;
-        protected void            InvokeOnLoginComplete(object sender) => this.OnLoginComplete?.Invoke(sender, null);
-        public event EventHandler OnLoginComplete;
-        protected void            InvokeOnLogout(object sender) => this.OnLogout?.Invoke(sender, null);
-        public event EventHandler OnLogout;
-
-        protected void            InvokeOnConnect(object sender) => this.OnConnect?.Invoke(sender, null);
-        public event EventHandler OnConnect;
-        protected void            InvokeOnConnectStart(object sender) => this.OnConnectStart?.Invoke(sender, null);
-        public event EventHandler OnConnectStart;
-        protected void            InvokeOnDisconnect(object sender) => this.OnDisconnect?.Invoke(sender, null);
-        public event EventHandler OnDisconnect;
-
-        public void Login() {
-            foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
-                this.OnlinePlayers.Remove(keyValuePair.Key);
-
-            new Thread(
-            () => {
-                if (this.State == ConnectionState.Disconnected)
-                    this.Connect();
-
-                if (this.State != ConnectionState.Disconnected)
-                    this.ClientLogin();
-            }
-            ).Start();
-        }
-
-        public void Logout() {
-            foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
-                this.OnlinePlayers.Remove(keyValuePair.Key);
-
-            this.ClientLogout();
-
-            this.Disconnect();
-        }
-
-        public virtual void Initialize() {}
-
-        public virtual void Update(GameTime time) {}
+    public async Task SubmitScore(PlayerScore score) {
+        if (this.State == ConnectionState.LoggedIn)
+            await this.ClientSubmitScore(score);
     }
 
-    public enum ConnectionState {
-        LoggedIn,
-        LoggingIn,
-        Connected,
-        Disconnected
+    [Pure]
+    public async Task<List<PlayerScore>> GetMapScores(string hash) {
+        if (this.State == ConnectionState.LoggedIn)
+            return await this.ClientGetScores(hash);
+
+        return new();
     }
+
+    public abstract string Username();
+    public abstract string Password();
+
+    protected abstract void ClientLogin();
+    protected abstract void ClientLogout();
+    protected abstract void Connect();
+    protected abstract void Disconnect();
+    public abstract    void SendMessage(string channel, string message);
+
+    public abstract void SpectatorPause(double  time);
+    public abstract void SpectatorResume(double time);
+
+    public abstract void SpectatePlayer(OnlinePlayer player);
+
+    protected abstract Task ClientSubmitScore(PlayerScore score);
+    [Pure]
+    protected abstract Task<List<PlayerScore>> ClientGetScores(string hash);
+
+    public abstract void ChangeUserAction(UserAction action);
+
+    protected void            InvokeOnLoginStart(object sender) => this.OnLoginStart?.Invoke(sender, null);
+    public event EventHandler OnLoginStart;
+    protected void            InvokeOnLoginComplete(object sender) => this.OnLoginComplete?.Invoke(sender, null);
+    public event EventHandler OnLoginComplete;
+    protected void            InvokeOnLogout(object sender) => this.OnLogout?.Invoke(sender, null);
+    public event EventHandler OnLogout;
+
+    protected void            InvokeOnConnect(object sender) => this.OnConnect?.Invoke(sender, null);
+    public event EventHandler OnConnect;
+    protected void            InvokeOnConnectStart(object sender) => this.OnConnectStart?.Invoke(sender, null);
+    public event EventHandler OnConnectStart;
+    protected void            InvokeOnDisconnect(object sender) => this.OnDisconnect?.Invoke(sender, null);
+    public event EventHandler OnDisconnect;
+
+    public void Login() {
+        foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
+            this.OnlinePlayers.Remove(keyValuePair.Key);
+
+        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Logging in...");
+        new Thread(
+        () => {
+            if (this.State == ConnectionState.Disconnected)
+                this.Connect();
+
+            if (this.State != ConnectionState.Disconnected)
+                this.ClientLogin();
+        }
+        ).Start();
+    }
+
+    public void ScheduleAutomaticReconnect() {
+        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Reconnecting to the server in 15 seconds!");
+        FurballGame.GameTimeScheduler.ScheduleMethod(
+        delegate {
+            this.Login();
+        },
+        FurballGame.Time + 15000
+        );
+    }
+
+    public void Logout() {
+        foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
+            this.OnlinePlayers.Remove(keyValuePair.Key);
+
+        this.ClientLogout();
+
+        this.Disconnect();
+    }
+
+    public virtual void Initialize() {}
+
+    public virtual void Update(GameTime time) {}
+}
+
+public enum ConnectionState {
+    LoggedIn,
+    LoggingIn,
+    Connected,
+    Disconnected
 }

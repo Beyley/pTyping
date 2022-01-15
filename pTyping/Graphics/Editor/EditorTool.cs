@@ -13,77 +13,77 @@ using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
 
-namespace pTyping.Graphics.Editor {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
-    public abstract class EditorTool : IComparable<EditorTool> {
-        public const           int     ITEMTEXTSIZE       = 30;
-        public const           int     LABELTEXTSIZE      = 35;
-        public const           float   TEXTBOXWIDTH       = 300;
-        public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
-        public const           float   LABELAFTERDISTANCE = 5f;
-        
-        public          UiTickboxDrawable TickBoxDrawable;
-        [NotNull]
-        public abstract string            Name    { get; }
-        [NotNull]
-        public abstract string            Tooltip { get; }
+namespace pTyping.Graphics.Editor;
 
-        protected DrawableManager DrawableManager;
-        protected EditorScreen    EditorInstance;
+[UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
+public abstract class EditorTool : IComparable<EditorTool> {
+    public const           int     ITEMTEXTSIZE       = 30;
+    public const           int     LABELTEXTSIZE      = 35;
+    public const           float   TEXTBOXWIDTH       = 300;
+    public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
+    public const           float   LABELAFTERDISTANCE = 5f;
 
-        public int CompareTo(EditorTool other) {
-            if (ReferenceEquals(this, other))
-                return 0;
-            if (ReferenceEquals(null, other))
-                return 1;
-            int nameComparison = string.Compare(this.Name, other.Name, StringComparison.Ordinal);
-            if (nameComparison != 0)
-                return nameComparison;
-            return string.Compare(this.Tooltip, other.Tooltip, StringComparison.Ordinal);
-        }
+    public UiTickboxDrawable TickBoxDrawable;
+    [NotNull]
+    public abstract string Name { get; }
+    [NotNull]
+    public abstract string Tooltip { get; }
 
-        public void SelectTool(EditorScreen editor, ref DrawableManager drawableManager) {
-            this.DrawableManager = drawableManager;
-            this.EditorInstance  = editor;
+    protected DrawableManager DrawableManager;
+    protected EditorScreen    EditorInstance;
 
-            this.Initialize();
-
-            Logger.Log($"EditorTool {this.GetType().Name} has been initialized!", LoggerLevelEditorInfo.Instance);
-        }
-
-        public void DeselectTool(EditorScreen editor) {
-            this.Deinitialize();
-
-            Logger.Log($"EditorTool {this.GetType().Name} has been deinitialized!", LoggerLevelEditorInfo.Instance);
-        }
-
-        /// <summary>
-        ///     Register handlers and such here
-        /// </summary>
-        public virtual void Initialize()   {}
-        /// <summary>
-        ///     Unregister your handlers and such here
-        /// </summary>
-        public virtual void Deinitialize() {}
-
-        public virtual void OnMouseClick((MouseButton mouseButton, Point position) args) {}
-
-        public virtual void OnMouseDrag(Point position) {}
-
-        public virtual void OnMouseMove(Point position) {}
-
-        public virtual void OnKeyPress(Keys key) {}
-
-        public virtual void OnTimeChange(double time) {}
-
-        public virtual void OnNoteCreate(NoteDrawable note, bool isNew) {}
-
-        public virtual void OnNoteDelete(NoteDrawable note) {}
-
-        public virtual void OnEventCreate(ManagedDrawable @event, bool isNew) {}
-
-        public virtual void OnEventDelete(ManagedDrawable note) {}
-
-        public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
+    public int CompareTo(EditorTool other) {
+        if (ReferenceEquals(this, other))
+            return 0;
+        if (ReferenceEquals(null, other))
+            return 1;
+        int nameComparison = string.Compare(this.Name, other.Name, StringComparison.Ordinal);
+        if (nameComparison != 0)
+            return nameComparison;
+        return string.Compare(this.Tooltip, other.Tooltip, StringComparison.Ordinal);
     }
+
+    public void SelectTool(EditorScreen editor, ref DrawableManager drawableManager) {
+        this.DrawableManager = drawableManager;
+        this.EditorInstance  = editor;
+
+        this.Initialize();
+
+        Logger.Log($"EditorTool {this.GetType().Name} has been initialized!", LoggerLevelEditorInfo.Instance);
+    }
+
+    public void DeselectTool(EditorScreen editor) {
+        this.Deinitialize();
+
+        Logger.Log($"EditorTool {this.GetType().Name} has been deinitialized!", LoggerLevelEditorInfo.Instance);
+    }
+
+    /// <summary>
+    ///     Register handlers and such here
+    /// </summary>
+    public virtual void Initialize() {}
+    /// <summary>
+    ///     Unregister your handlers and such here
+    /// </summary>
+    public virtual void Deinitialize() {}
+
+    public virtual void OnMouseClick((MouseButton mouseButton, Point position) args) {}
+
+    public virtual void OnMouseDrag(Point position) {}
+
+    public virtual void OnMouseMove(Point position) {}
+
+    public virtual void OnKeyPress(Keys key) {}
+
+    public virtual void OnTimeChange(double time) {}
+
+    public virtual void OnNoteCreate(NoteDrawable note, bool isNew) {}
+
+    public virtual void OnNoteDelete(NoteDrawable note) {}
+
+    public virtual void OnEventCreate(ManagedDrawable @event, bool isNew) {}
+
+    public virtual void OnEventDelete(ManagedDrawable note) {}
+
+    public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
 }

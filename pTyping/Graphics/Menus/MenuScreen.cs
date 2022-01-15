@@ -15,210 +15,213 @@ using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Songs;
 using static Furball.Engine.Engine.Localization.LocalizationManager;
 
-namespace pTyping.Graphics.Menus {
-    public class MenuScreen : pScreen {
-        private TextDrawable _musicTitle;
+namespace pTyping.Graphics.Menus;
 
-        private ManagedDrawable _userCard = null;
-        
-        public override void Initialize() {
-            base.Initialize();
-            
-            TextDrawable gitVersionText = new(
-            new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
-            pTypingGame.JapaneseFont,
-            string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion),
-            30
-            ) {
-                OriginType = OriginType.BottomRight
-            };
+public class MenuScreen : pScreen {
+    private TextDrawable _musicTitle;
 
-            this.Manager.Add(gitVersionText);
+    private ManagedDrawable _userCard = null;
 
-            UiButtonDrawable changelogButton = new(
-            new(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
-            GetLocalizedString(Localizations.Changelog),
-            pTypingGame.JapaneseFont,
-            30,
-            Color.Blue,
-            Color.White,
-            Color.White,
-            new(0)
-            ) {
-                OriginType = OriginType.BottomLeft
-            };
+    public override void Initialize() {
+        base.Initialize();
 
-            changelogButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new ChangelogScreen());
+        TextDrawable gitVersionText = new(
+        new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        pTypingGame.JapaneseFont,
+        string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion),
+        30
+        ) {
+            OriginType = OriginType.BottomRight
+        };
 
-            this.Manager.Add(changelogButton);
+        this.Manager.Add(gitVersionText);
 
-            #region Title
+        UiButtonDrawable changelogButton = new(
+        new(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        GetLocalizedString(Localizations.Changelog),
+        pTypingGame.JapaneseFont,
+        30,
+        Color.Blue,
+        Color.White,
+        Color.White,
+        new(0)
+        ) {
+            OriginType = OriginType.BottomLeft
+        };
 
-            TextDrawable titleText = new(
-            new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
-            FurballGame.DEFAULT_FONT,
-            "pTyping",
-            75
-            ) {
-                OriginType = OriginType.Center
-            };
+        changelogButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new ChangelogScreen());
 
-            this.Manager.Add(titleText);
+        this.Manager.Add(changelogButton);
 
-            #endregion
+        #region Title
 
-            #region Main buttons
+        TextDrawable titleText = new(
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
+        FurballGame.DEFAULT_FONT,
+        "pTyping",
+        75
+        ) {
+            OriginType = OriginType.Center
+        };
 
-            Texture2D menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
+        this.Manager.Add(titleText);
 
-            float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
+        #endregion
 
-            TexturedDrawable playButton = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
-                OriginType = OriginType.Center,
-                Scale      = new(0.75f),
-                ToolTip    = "gordon this is a tool tip"
-            };
-            TexturedDrawable editButton = new(
-            menuButtonsTexture,
-            new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += playButton.Size.Y + 10),
-            TexturePositions.MENU_EDIT_BUTTON
-            ) {
-                OriginType = OriginType.Center,
-                Scale      = new(0.75f),
-                ToolTip    = "you can use it to get across big pits!"
-            };
-            TexturedDrawable optionsButton = new(
-            menuButtonsTexture,
-            new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += editButton.Size.Y + 10),
-            TexturePositions.MENU_OPTIONS_BUTTON
-            ) {
-                OriginType = OriginType.Center,
-                Scale      = new(0.75f)
-            };
-            TexturedDrawable exitButton = new(
-            menuButtonsTexture,
-            new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += optionsButton.Size.Y + 10),
-            TexturePositions.MENU_EXIT_BUTTON
-            ) {
-                OriginType = OriginType.Center,
-                Scale      = new(0.75f)
-            };
+        #region Main buttons
 
-            playButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.PlayNew();
-                ScreenManager.ChangeScreen(new SongSelectionScreen(false));
-            };
+        Texture2D menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
 
-            editButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.PlayNew();
-                ScreenManager.ChangeScreen(new SongSelectionScreen(true));
-            };
+        float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
-            exitButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.PlayNew();
-                FurballGame.Instance.Exit();
-            };
+        TexturedDrawable playButton = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
+            OriginType = OriginType.Center,
+            Scale      = new(0.75f),
+            ToolTip    = "gordon this is a tool tip"
+        };
+        TexturedDrawable editButton = new(
+        menuButtonsTexture,
+        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += playButton.Size.Y + 10),
+        TexturePositions.MENU_EDIT_BUTTON
+        ) {
+            OriginType = OriginType.Center,
+            Scale      = new(0.75f),
+            ToolTip    = "you can use it to get across big pits!"
+        };
+        TexturedDrawable optionsButton = new(
+        menuButtonsTexture,
+        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += editButton.Size.Y + 10),
+        TexturePositions.MENU_OPTIONS_BUTTON
+        ) {
+            OriginType = OriginType.Center,
+            Scale      = new(0.75f)
+        };
+        TexturedDrawable exitButton = new(
+        menuButtonsTexture,
+        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += optionsButton.Size.Y + 10),
+        TexturePositions.MENU_EXIT_BUTTON
+        ) {
+            OriginType = OriginType.Center,
+            Scale      = new(0.75f)
+        };
 
-            optionsButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.PlayNew();
-                ScreenManager.ChangeScreen(new OptionsScreen());
-            };
+        playButton.OnClick += delegate {
+            pTypingGame.MenuClickSound.PlayNew();
+            ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+        };
 
-            this.Manager.Add(playButton);
-            this.Manager.Add(editButton);
-            this.Manager.Add(optionsButton);
-            this.Manager.Add(exitButton);
+        editButton.OnClick += delegate {
+            pTypingGame.MenuClickSound.PlayNew();
+            ScreenManager.ChangeScreen(new SongSelectionScreen(true));
+        };
 
-            #endregion
+        exitButton.OnClick += delegate {
+            pTypingGame.MenuClickSound.PlayNew();
+            FurballGame.Instance.Exit();
+        };
 
-            #region Menu music
+        optionsButton.OnClick += delegate {
+            pTypingGame.MenuClickSound.PlayNew();
+            ScreenManager.ChangeScreen(new OptionsScreen());
+        };
 
-            this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, "None", 40) {
-                OriginType = OriginType.TopRight
-            };
+        this.Manager.Add(playButton);
+        this.Manager.Add(editButton);
+        this.Manager.Add(optionsButton);
+        this.Manager.Add(exitButton);
 
-            Texture2D editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
+        #endregion
 
-            TexturedDrawable musicPlayButton = new(
-            editorButtonsTexture2D,
-            new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._musicTitle.Size.Y + 10),
-            TexturePositions.EDITOR_PLAY
-            ) {
-                Scale      = new(0.5f, 0.5f),
-                OriginType = OriginType.TopRight
-            };
-            TexturedDrawable musicPauseButton = new(
-            editorButtonsTexture2D,
-            new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._musicTitle.Size.Y + 10),
-            TexturePositions.EDITOR_PAUSE
-            ) {
-                Scale      = new(0.5f, 0.5f),
-                OriginType = OriginType.TopRight
-            };
-            TexturedDrawable musicNextButton = new(
-            editorButtonsTexture2D,
-            new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Size.Y + 10),
-            TexturePositions.EDITOR_RIGHT
-            ) {
-                Scale      = new(0.5f, 0.5f),
-                OriginType = OriginType.TopRight
-            };
+        #region Menu music
 
-            musicPlayButton.OnClick += delegate {
-                pTypingGame.PlayMusic();
-            };
+        this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, "None", 40) {
+            OriginType = OriginType.TopRight
+        };
 
-            musicPauseButton.OnClick += delegate {
-                pTypingGame.PauseResumeMusic();
-            };
+        Texture2D editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
-            musicNextButton.OnClick += delegate {
-                this.LoadSong(true);
-            };
+        TexturedDrawable musicPlayButton = new(
+        editorButtonsTexture2D,
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._musicTitle.Size.Y + 10),
+        TexturePositions.EDITOR_PLAY
+        ) {
+            Scale      = new(0.5f, 0.5f),
+            OriginType = OriginType.TopRight
+        };
+        TexturedDrawable musicPauseButton = new(
+        editorButtonsTexture2D,
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._musicTitle.Size.Y + 10),
+        TexturePositions.EDITOR_PAUSE
+        ) {
+            Scale      = new(0.5f, 0.5f),
+            OriginType = OriginType.TopRight
+        };
+        TexturedDrawable musicNextButton = new(
+        editorButtonsTexture2D,
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Size.Y + 10),
+        TexturePositions.EDITOR_RIGHT
+        ) {
+            Scale      = new(0.5f, 0.5f),
+            OriginType = OriginType.TopRight
+        };
 
-            this.Manager.Add(this._musicTitle);
+        musicPlayButton.OnClick += delegate {
+            pTypingGame.PlayMusic();
+        };
 
-            this.Manager.Add(musicPlayButton);
-            this.Manager.Add(musicPauseButton);
-            this.Manager.Add(musicNextButton);
+        musicPauseButton.OnClick += delegate {
+            pTypingGame.PauseResumeMusic();
+        };
 
-            #endregion
+        musicNextButton.OnClick += delegate {
+            this.LoadSong(true);
+        };
 
-            #region Background image
+        this.Manager.Add(this._musicTitle);
 
-            this.Manager.Add(pTypingGame.CurrentSongBackground);
-            pTypingGame.CurrentSongBackground.Tweens.Add(
-            new ColorTween(
-            TweenType.Color,
-            pTypingGame.CurrentSongBackground.ColorOverride,
-            new Color(175, 175, 175),
-            pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-            pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
-            )
-            );
+        this.Manager.Add(musicPlayButton);
+        this.Manager.Add(musicPauseButton);
+        this.Manager.Add(musicNextButton);
 
-            #endregion
+        #endregion
 
-            this.UpdateUserCard(this, null);
+        #region Background image
 
-            pTypingGame.OnlineManager.OnLoginComplete += this.UpdateUserCard;
-            pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
-            
-            if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
-                this.LoadSong(true);
-            else
-                this.LoadSong(false);
-        }
+        this.Manager.Add(pTypingGame.CurrentSongBackground);
+        pTypingGame.CurrentSongBackground.Tweens.Add(
+        new ColorTween(
+        TweenType.Color,
+        pTypingGame.CurrentSongBackground.ColorOverride,
+        new Color(175, 175, 175),
+        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
+        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
+        )
+        );
 
-        protected override void Dispose(bool disposing) {
-            pTypingGame.OnlineManager.OnLoginComplete -= this.UpdateUserCard;
-            pTypingGame.OnlineManager.OnLogout        -= this.UpdateUserCard;
+        #endregion
 
-            base.Dispose(disposing);
-        }
+        this.UpdateUserCard(this, null);
 
-        public void UpdateUserCard(object sender, EventArgs e) {
-            // if(pTypingGame.OnlineManager.State is ConnectionState.Disconnected or ConnectionState.Connected )
+        pTypingGame.OnlineManager.OnLoginComplete += this.UpdateUserCard;
+        pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
+
+        if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
+            this.LoadSong(true);
+        else
+            this.LoadSong(false);
+    }
+
+    protected override void Dispose(bool disposing) {
+        pTypingGame.OnlineManager.OnLoginComplete -= this.UpdateUserCard;
+        pTypingGame.OnlineManager.OnLogout        -= this.UpdateUserCard;
+
+        base.Dispose(disposing);
+    }
+
+    public void UpdateUserCard(object sender, EventArgs e) {
+        // if(pTypingGame.OnlineManager.State is ConnectionState.Disconnected or ConnectionState.Connected )
+        FurballGame.GameTimeScheduler.ScheduleMethod(
+        _ => {
             this.Manager.Remove(this._userCard);
 
             this.Manager.Add(this._userCard = pTypingGame.GetUserCard());
@@ -227,43 +230,45 @@ namespace pTyping.Graphics.Menus {
 
             if (sender != this)
                 this._userCard.FadeInFromZero(100);
-        }
-
-        public void LoadSong(bool chooseNewOne) {
-            if (SongManager.Songs.Count == 0) return;
-
-            if (chooseNewOne) {
-                int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
-
-                if (pTypingGame.CurrentSong == null)
-                    pTypingGame.CurrentSong = new(SongManager.Songs[songToChoose]);
-                else
-                    pTypingGame.CurrentSong.Value = SongManager.Songs[songToChoose];
-            }
-
-            string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
-
-            // if (chooseNewOne) {
-            //     if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
-            //         pTypingGame.StopMusic();
-            //
-            //     pTypingGame
-            //     pTypingGame.MusicTrack.Free();
-            // }
-
-            if (chooseNewOne) {
-                pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-                pTypingGame.PlayMusic();
-            }
-
-            pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
-
-            this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
-
-            pTypingGame.UserStatusListening();
-        }
-        public override string Name    => "Main Menu";
-        public override string State   => "Vibing on the menu!";
-        public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+        },
+        FurballGame.Time
+        );
     }
+
+    public void LoadSong(bool chooseNewOne) {
+        if (SongManager.Songs.Count == 0) return;
+
+        if (chooseNewOne) {
+            int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
+
+            if (pTypingGame.CurrentSong == null)
+                pTypingGame.CurrentSong = new(SongManager.Songs[songToChoose]);
+            else
+                pTypingGame.CurrentSong.Value = SongManager.Songs[songToChoose];
+        }
+
+        string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
+
+        // if (chooseNewOne) {
+        //     if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
+        //         pTypingGame.StopMusic();
+        //
+        //     pTypingGame
+        //     pTypingGame.MusicTrack.Free();
+        // }
+
+        if (chooseNewOne) {
+            pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+            pTypingGame.PlayMusic();
+        }
+
+        pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
+
+        this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+
+        pTypingGame.UserStatusListening();
+    }
+    public override string Name    => "Main Menu";
+    public override string State   => "Vibing on the menu!";
+    public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
 }

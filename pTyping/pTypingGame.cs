@@ -33,465 +33,478 @@ using pTyping.Songs;
 using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
 
-namespace pTyping {
-    public enum Localizations {
-        MenuRevision,
-        Changelog
+namespace pTyping;
+
+public enum Localizations {
+    MenuRevision,
+    Changelog
+}
+
+// ReSharper disable once InconsistentNaming
+public class pTypingGame : FurballGame {
+    public static readonly Vector2 BackButtonScale = new(0.12f);
+
+    public static Texture2D BackButtonTexture;
+    public static Texture2D DefaultBackground;
+
+    public static AudioStream           MusicTrack           = null;
+    public static AudioStreamTimeSource MusicTrackTimeSource = null;
+    public static SoundEffectPlayer     MenuClickSound       = null;
+    public static Scheduler             MusicTrackScheduler;
+
+    public static Bindable<Song> CurrentSong = new(null);
+
+    public static TextDrawable     VolumeSelector;
+    public static TexturedDrawable CurrentSongBackground;
+
+    public static ScoreManager ScoreManager = new();
+
+    public static OnlineManager OnlineManager;
+
+    public static byte[] JapaneseFontData;
+    public static FontSystem JapaneseFont = new(
+    new FontSystemSettings {
+        FontResolutionFactor = 2f,
+        KernelWidth          = 1,
+        KernelHeight         = 1,
+        Effect               = FontSystemEffect.None,
+        TextureWidth         = 2048,
+        TextureHeight        = 2048
     }
-    
-    // ReSharper disable once InconsistentNaming
-    public class pTypingGame : FurballGame {
-        public static readonly Vector2 BackButtonScale = new(0.12f);
-        
-        public static Texture2D BackButtonTexture;
-        public static Texture2D DefaultBackground;
+    );
+    public static FontSystem JapaneseFontStroked = new(
+    new FontSystemSettings {
+        FontResolutionFactor = 2f,
+        KernelWidth          = 1,
+        KernelHeight         = 1,
+        Effect               = FontSystemEffect.Stroked,
+        EffectAmount         = 2,
+        TextureWidth         = 2048,
+        TextureHeight        = 2048
+    }
+    );
 
-        public static AudioStream           MusicTrack           = null;
-        public static AudioStreamTimeSource MusicTrackTimeSource = null;
-        public static SoundEffectPlayer     MenuClickSound       = null;
-        public static Scheduler             MusicTrackScheduler;
+    public static UserCardDrawable MenuPlayerUserCard;
 
-        public static Bindable<Song> CurrentSong = new(null);
+    public static Texture2D LocalLeaderboardButtonTexture;
+    public static Texture2D FriendLeaderboardButtonTexture;
+    public static Texture2D GlobalLeaderboardButtonTexture;
 
-        public static TextDrawable     VolumeSelector;
-        public static TexturedDrawable CurrentSongBackground;
+    private          double                _musicTrackSchedulerDelta = 0;
+    private readonly List<ManagedDrawable> _userPanelDrawables       = new();
 
-        public static ScoreManager ScoreManager = new();
+    private DrawableManager _userPanelManager;
+    private ChatDrawable    _chatDrawable;
 
-        public static OnlineManager OnlineManager;
+    public static List<PlayerMod> SelectedMods = new();
 
-        public static byte[] JapaneseFontData;
-        public static FontSystem JapaneseFont = new(
-        new FontSystemSettings {
-            FontResolutionFactor = 2f,
-            KernelWidth          = 1,
-            KernelHeight         = 1,
-            Effect               = FontSystemEffect.None
-        }
-        );
-        public static FontSystem JapaneseFontStroked = new(
-        new FontSystemSettings {
-            FontResolutionFactor = 2f,
-            KernelWidth          = 1,
-            KernelHeight         = 1,
-            Effect               = FontSystemEffect.Stroked,
-            EffectAmount         = 2
-        }
-        );
+    public static DiscordRpcClient RpcClient;
+    public static RichPresence     RichPresence = new();
 
-        public static UserCardDrawable MenuPlayerUserCard;
+    public static  NotificationManager NotificationManager;
+    private static TextDrawable        _OnlineUsersText;
 
-        public static Texture2D LocalLeaderboardButtonTexture;
-        public static Texture2D FriendLeaderboardButtonTexture;
-        public static Texture2D GlobalLeaderboardButtonTexture;
+    public pTypingGame() : base(new MenuScreen()) {
+        // this.Window.AllowUserResizing = true;
+    }
 
-        private          double                _musicTrackSchedulerDelta = 0;
-        private readonly List<ManagedDrawable> _userPanelDrawables       = new();
+    public static ManagedDrawable GetUserCard() {
+        if (OnlineManager.State != ConnectionState.LoggedIn)
+            return new BlankDrawable();
 
-        private DrawableManager _userPanelManager;
-        private ChatDrawable    _chatDrawable;
-
-        public static List<PlayerMod> SelectedMods = new();
-
-        public static DiscordRpcClient RpcClient;
-        public static RichPresence     RichPresence = new();
-
-        public static  NotificationManager NotificationManager;
-        private static TextDrawable        _OnlineUsersText;
-
-        public pTypingGame() : base(new MenuScreen()) {
-            // this.Window.AllowUserResizing = true;
-        }
-
-        public static ManagedDrawable GetUserCard() {
-            if (OnlineManager.State != ConnectionState.LoggedIn)
-                return new BlankDrawable();
-
-            if (MenuPlayerUserCard is not null)
-                return MenuPlayerUserCard;
-
-            MenuPlayerUserCard = new(Vector2.Zero, OnlineManager.Player) {
-                Scale = new(0.3f)
-            };
-
-            MenuPlayerUserCard.Player.OnChange                               += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.TotalScore.OnChange              += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.RankedScore.OnChange             += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.Accuracy.OnChange                += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.PlayCount.OnChange               += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.Action.OnChange                  += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.Action.Value.Action.OnChange     += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.Action.Value.Mode.OnChange       += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-            MenuPlayerUserCard.Player.Value.Action.Value.ActionText.OnChange += (_, _) => MenuPlayerUserCard.UpdateDrawable();
-
+        if (MenuPlayerUserCard is not null)
             return MenuPlayerUserCard;
+
+        MenuPlayerUserCard = new(Vector2.Zero, OnlineManager.Player) {
+            Scale = new(0.3f)
+        };
+
+        MenuPlayerUserCard.Player.OnChange                               += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.TotalScore.OnChange              += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.RankedScore.OnChange             += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.Accuracy.OnChange                += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.PlayCount.OnChange               += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.Action.OnChange                  += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.Action.Value.Action.OnChange     += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.Action.Value.Mode.OnChange       += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+        MenuPlayerUserCard.Player.Value.Action.Value.ActionText.OnChange += (_, _) => MenuPlayerUserCard.UpdateDrawable();
+
+        return MenuPlayerUserCard;
+    }
+
+    public static void UserStatusEditing() {
+        if (ConVars.Username.Value == CurrentSong.Value.Creator) {
+            string text = $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+
+            if (OnlineManager.State == ConnectionState.LoggedIn)
+                OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
+        } else {
+            string text = $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+
+            if (OnlineManager.State == ConnectionState.LoggedIn)
+                OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
+        }
+    }
+
+    public static void UserStatusPickingSong() {
+        if (OnlineManager.State != ConnectionState.LoggedIn) return;
+        OnlineManager.ChangeUserAction(new(UserActionType.Idle, "Choosing a song!"));
+    }
+
+    public static void UserStatusListening() {
+        if (OnlineManager.State != ConnectionState.LoggedIn) return;
+        OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
+    }
+
+    public static void UserStatusPlaying() {
+        if (OnlineManager.State != ConnectionState.LoggedIn) return;
+        OnlineManager.ChangeUserAction(new(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]"));
+    }
+
+    public static void PlayMusic() {
+        MusicTrack.Play();
+        // if (MusicTrack.IsValidHandle)
+        MusicTrack.Volume = ConVars.Volume.Value;
+    }
+
+    public static void PauseResumeMusic() {
+        if (MusicTrack.PlaybackState == PlaybackState.Playing)
+            MusicTrack.Pause();
+        else
+            MusicTrack.Resume();
+    }
+
+    public static void StopMusic() {
+        MusicTrack.Stop();
+    }
+
+    public static void LoadMusic(byte[] data) {
+        // if (MusicTrack.IsValidHandle) {
+        if (MusicTrack != null) {
+            MusicTrack.Stop();
+            AudioEngine.DisposeStream(MusicTrack);
+        }
+        // MusicTrack.Free();
+        // }
+        MusicTrack           = AudioEngine.CreateStream(data);
+        MusicTrackTimeSource = new(MusicTrack);
+
+        // MusicTrack.TempoFrequencyLock = true;
+    }
+
+    public static void LoadBackButtonTexture() {
+        BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
+    }
+
+    public static void SetBackgroundTexture(Texture2D tex) {
+        CurrentSongBackground.SetTexture(tex);
+
+        CurrentSongBackground.Scale = new(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
+    }
+
+    public static void LoadBackgroundFromSong(Song song) {
+        Texture2D backgroundTex;
+        if (song.BackgroundPath == null) {
+            DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
+
+            backgroundTex = DefaultBackground;
+        } else {
+            string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
+            if (File.Exists(qualifiedBackgroundPath))
+                backgroundTex = Texture2D.FromStream(
+                Instance.GraphicsDevice,
+                new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External))
+                );
+            else
+                backgroundTex = DefaultBackground;
         }
 
-        public static void UserStatusEditing() {
-            if (ConVars.Username.Value == CurrentSong.Value.Creator) {
-                string text = $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+        SetBackgroundTexture(backgroundTex);
+    }
 
-                if (OnlineManager.State == ConnectionState.LoggedIn)
-                    OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
-            } else {
-                string text = $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+    protected override void LoadContent() {
+        base.LoadContent();
 
-                if (OnlineManager.State == ConnectionState.LoggedIn)
-                    OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
-            }
-        }
+        byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
+        MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
-        public static void UserStatusPickingSong() {
-            if (OnlineManager.State != ConnectionState.LoggedIn) return;
-            OnlineManager.ChangeUserAction(new(UserActionType.Idle, "Choosing a song!"));
-        }
+        MenuClickSound.Volume = ConVars.Volume.Value;
+        // if (MusicTrack.IsValidHandle)
+        // MusicTrack.Volume = ConVars.Volume.Value;
 
-        public static void UserStatusListening() {
-            if (OnlineManager.State != ConnectionState.LoggedIn) return;
-            OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
-        }
-
-        public static void UserStatusPlaying() {
-            if (OnlineManager.State != ConnectionState.LoggedIn) return;
-            OnlineManager.ChangeUserAction(
-            new(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]")
-            );
-        }
-
-        public static void PlayMusic() {
-            MusicTrack.Play();
+        ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
+            MenuClickSound.Volume = volume;
             // if (MusicTrack.IsValidHandle)
             MusicTrack.Volume = ConVars.Volume.Value;
-        }
 
-        public static void PauseResumeMusic() {
-            if (MusicTrack.PlaybackState == PlaybackState.Playing)
-                MusicTrack.Pause();
-            else
-                MusicTrack.Resume();
-        }
+            if (VolumeSelector is not null)
+                VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
+        };
 
-        public static void StopMusic() {
-            MusicTrack.Stop();
-        }
+        DefaultBackground = ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
 
-        public static void LoadMusic(byte[] data) {
-            // if (MusicTrack.IsValidHandle) {
-            if (MusicTrack != null) {
-                MusicTrack.Stop();
-                AudioEngine.DisposeStream(MusicTrack);
-            }
-            // MusicTrack.Free();
-            // }
-            MusicTrack           = AudioEngine.CreateStream(data);
-            MusicTrackTimeSource = new(MusicTrack);
+        JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
 
-            // MusicTrack.TempoFrequencyLock = true;
-        }
-
-        public static void LoadBackButtonTexture() {
-            BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
-        }
-
-        public static void SetBackgroundTexture(Texture2D tex) {
-            CurrentSongBackground.SetTexture(tex);
-
-            CurrentSongBackground.Scale = new(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
-        }
-
-        public static void LoadBackgroundFromSong(Song song) {
-            Texture2D backgroundTex;
-            if (song.BackgroundPath == null) {
-                DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
-
-                backgroundTex = DefaultBackground;
-            } else {
-                string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
-                if (File.Exists(qualifiedBackgroundPath))
-                    backgroundTex = Texture2D.FromStream(
-                    Instance.GraphicsDevice,
-                    new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External))
-                    );
-                else
-                    backgroundTex = DefaultBackground;
-            }
-
-            SetBackgroundTexture(backgroundTex);
-        }
-
-        protected override void LoadContent() {
-            base.LoadContent();
-
-            byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
-            MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
-
-            MenuClickSound.Volume = ConVars.Volume.Value;
-            // if (MusicTrack.IsValidHandle)
-            // MusicTrack.Volume = ConVars.Volume.Value;
-
-            ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
-                MenuClickSound.Volume = volume;
-                // if (MusicTrack.IsValidHandle)
-                MusicTrack.Volume = ConVars.Volume.Value;
-
-                if (VolumeSelector is not null)
-                    VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
-            };
-
-            DefaultBackground = ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
-
-            JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
-
-            try {
-                JapaneseFont = ContentManager.LoadSystemFont(
-                "Aller",
-                new FontSystemSettings {
-                    FontResolutionFactor = 2f,
-                    KernelWidth          = 1,
-                    KernelHeight         = 1,
-                    Effect               = FontSystemEffect.None
-                }
-                );
-                JapaneseFont.AddFont(JapaneseFontData);
-
-                JapaneseFontStroked = ContentManager.LoadSystemFont(
-                "Aller",
-                new FontSystemSettings {
-                    FontResolutionFactor = 2f,
-                    KernelWidth          = 1,
-                    KernelHeight         = 1,
-                    Effect               = FontSystemEffect.Stroked,
-                    EffectAmount         = 2
-                }
-                );
-                JapaneseFontStroked.AddFont(JapaneseFontData);
-            }
-            catch {
-                JapaneseFont.AddFont(JapaneseFontData);
-                JapaneseFontStroked.AddFont(JapaneseFontData);
-            }
-
-            LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
-            FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
-            GlobalLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
-        }
-
-        public static void ChangeGlobalVolume(int mouseScroll) {
-            VolumeSelector.Tweens.Clear();
-
-            VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, VolumeSelector.ColorOverride.A / 255f, 1f, Time, Time + 200));
-
-            VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
-
-            if (mouseScroll > 0)
-                ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value + 0.05f, 0f, 1f);
-            else
-                ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
-        }
-        
-        protected override void Update(GameTime gameTime) {
-            base.Update(gameTime);
-
-            this._musicTrackSchedulerDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (this._musicTrackSchedulerDelta > 10) {
-                MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
-                this._musicTrackSchedulerDelta = 0;
-            }
-
-            OnlineManager.Update(gameTime);
-            
-            if (this._userPanelManager.Visible)
-                this._userPanelManager.Update(gameTime);
-
-            NotificationManager.Update(gameTime);
-        }
-
-        protected override void Draw(GameTime gameTime) {
-            base.Draw(gameTime);
-
-            if (this._userPanelManager.Visible)
-                this._userPanelManager.Draw(gameTime, DrawableBatch, new());
-
-            NotificationManager.Draw(gameTime, DrawableBatch, new());
-        }
-
-        protected override void EndRun() {
-            MusicTrackScheduler.Dispose(0);
-
-            // if (OnlineManager.State == ConnectionState.LoggedIn)
-            OnlineManager.Logout();
-
-            RpcClient.Dispose();
-            
-            base.EndRun();
-        }
-
-        public static void SubmitScore(Song song, PlayerScore score) {
-            ScoreManager.AddScore(score);
-
-            if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0 && score.Username == OnlineManager.Username())
-                OnlineManager.SubmitScore(score).Wait();
-        }
-
-        protected override void Initialize() {
-            RpcClient = new("908631391934222366");
-
-            RpcClient.Initialize();
-
-            RpcClient.Invoke();
-
-            this.AfterScreenChange += (_, screen) => this.Window.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
-
-            Thread thread = new(
-            () => {
-                Thread.Sleep(1000);
-            
-                while (true) {
-                    if (RpcClient.IsDisposed) return;
-                    
-                    if (RpcClient.CurrentUser == null) {
-                        Thread.Sleep(1000);
-                        continue;
-                    }
-
-                    pScreen screen = Instance.RunningScreen as pScreen;
-
-                    RichPresence.State   = screen?.State;
-                    RichPresence.Details = screen?.Details;
-
-                    RpcClient.SetPresence(RichPresence);
-                    RpcClient.Invoke();
-
-                    Thread.Sleep(100);
-                }
+        try {
+            JapaneseFont = ContentManager.LoadSystemFont(
+            "Aller",
+            new FontSystemSettings {
+                FontResolutionFactor = 2f,
+                KernelWidth          = 1,
+                KernelHeight         = 1,
+                Effect               = FontSystemEffect.None
             }
             );
-            thread.Start();
+            JapaneseFont.AddFont(JapaneseFontData);
 
-            DevConsole.AddConVarStore(typeof(ConVars));
+            JapaneseFontStroked = ContentManager.LoadSystemFont(
+            "Aller",
+            new FontSystemSettings {
+                FontResolutionFactor = 2f,
+                KernelWidth          = 1,
+                KernelHeight         = 1,
+                Effect               = FontSystemEffect.Stroked,
+                EffectAmount         = 2
+            }
+            );
+            JapaneseFontStroked.AddFont(JapaneseFontData);
+        }
+        catch {
+            JapaneseFont.AddFont(JapaneseFontData);
+            JapaneseFontStroked.AddFont(JapaneseFontData);
+        }
 
-            CurrentSongBackground =
-                new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
-                    Depth       = 1f,
-                    OriginType  = OriginType.Center,
-                    Hoverable   = false,
-                    Clickable   = false,
-                    CoverClicks = false,
-                    CoverHovers = false
+        LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
+        FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
+        GlobalLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
+    }
+
+    public static void ChangeGlobalVolume(int mouseScroll) {
+        VolumeSelector.Tweens.Clear();
+
+        VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, VolumeSelector.ColorOverride.A / 255f, 1f, Time, Time + 200));
+
+        VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
+
+        if (mouseScroll > 0)
+            ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value + 0.05f, 0f, 1f);
+        else
+            ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
+    }
+
+    protected override void Update(GameTime gameTime) {
+        base.Update(gameTime);
+
+        this._musicTrackSchedulerDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
+        if (this._musicTrackSchedulerDelta > 10) {
+            MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
+            this._musicTrackSchedulerDelta = 0;
+        }
+
+        OnlineManager.Update(gameTime);
+
+        if (this._userPanelManager.Visible)
+            this._userPanelManager.Update(gameTime);
+
+        NotificationManager.Update(gameTime);
+    }
+
+    protected override void Draw(GameTime gameTime) {
+        base.Draw(gameTime);
+
+        if (this._userPanelManager.Visible)
+            this._userPanelManager.Draw(gameTime, DrawableBatch, new());
+
+        NotificationManager.Draw(gameTime, DrawableBatch, new());
+    }
+
+    protected override void EndRun() {
+        MusicTrackScheduler.Dispose(0);
+
+        // if (OnlineManager.State == ConnectionState.LoggedIn)
+        OnlineManager.Logout();
+
+        RpcClient.Dispose();
+
+        base.EndRun();
+    }
+
+    public static void SubmitScore(Song song, PlayerScore score) {
+        ScoreManager.AddScore(score);
+
+        if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0 && score.Username == OnlineManager.Username())
+            OnlineManager.SubmitScore(score).Wait();
+    }
+
+    protected override void Initialize() {
+        RpcClient = new("908631391934222366");
+
+        RpcClient.Initialize();
+
+        RpcClient.Invoke();
+
+        this.AfterScreenChange += (_, screen) => this.Window.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
+
+        Thread thread = new(
+        () => {
+            Thread.Sleep(1000);
+
+            while (true) {
+                if (RpcClient.IsDisposed) return;
+
+                if (RpcClient.CurrentUser == null) {
+                    Thread.Sleep(1000);
+                    continue;
+                }
+
+                pScreen screen = Instance.RunningScreen as pScreen;
+
+                RichPresence.State   = screen?.State;
+                RichPresence.Details = screen?.Details;
+
+                RpcClient.SetPresence(RichPresence);
+                RpcClient.Invoke();
+
+                Thread.Sleep(100);
+            }
+        }
+        );
+        thread.Start();
+
+        DevConsole.AddConVarStore(typeof(ConVars));
+
+        CurrentSongBackground = new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+            Depth       = 1f,
+            OriginType  = OriginType.Center,
+            Hoverable   = false,
+            Clickable   = false,
+            CoverClicks = false,
+            CoverHovers = false
+        };
+
+        ScoreManager.Load();
+
+        NotificationManager = new();
+
+        base.Initialize();
+
+        // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
+        OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
+        OnlineManager.Initialize();
+
+        OnlineManager.OnLogout += delegate {
+            this._userPanelManager.Visible = false;
+        };
+
+        // OnlineManager.Login();
+
+        VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
+            OriginType  = OriginType.BottomRight,
+            Clickable   = false,
+            CoverClicks = false
+        };
+
+        //Set the opacity to 0
+        VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 0f, 0f, 0, 0));
+
+        InputManager.OnMouseScroll += delegate(object _, (int, string) eventArgs) {
+            if (InputManager.HeldKeys.Contains(Keys.LeftAlt))
+                ChangeGlobalVolume(eventArgs.Item1);
+        };
+
+        DrawableManager.Add(VolumeSelector);
+
+        HiraganaConversion.LoadConversion();
+        ScreenManager.SetBlankTransition();
+        SongManager.UpdateSongs();
+
+        MusicTrackScheduler = new();
+
+        OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
+
+        this._userPanelManager = new();
+        this._userPanelManager.Add(
+        new TexturedDrawable(WhitePixel, new(0)) {
+            Scale         = new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+            Depth         = 1.5f,
+            ColorOverride = new(0, 0, 0, 100)
+        }
+        );
+        this._userPanelManager.Add(
+        _OnlineUsersText = new TextDrawable(new(10), JapaneseFontStroked, "Online Users: 0", 50) {
+            Depth = 0f
+        }
+        );
+        this._userPanelManager.Visible = false;
+        this.UpdateUserPanel(null, null);
+
+        this._chatDrawable = new(new(10, DEFAULT_WINDOW_HEIGHT - 10), new(DEFAULT_WINDOW_WIDTH - 20, DEFAULT_WINDOW_HEIGHT * 0.4f)) {
+            OriginType = OriginType.BottomLeft
+        };
+        this._userPanelManager.Add(this._chatDrawable);
+
+        InputManager.OnKeyDown += this.OnKeyDown;
+    }
+
+
+
+    public override void InitializeLocalizations() {
+        //default language is already english, and im an english speaker, so no need to set it here
+
+        LocalizationManager.AddDefaultTranslation(Localizations.MenuRevision, "Revision {0}");
+        LocalizationManager.AddDefaultTranslation(Localizations.Changelog,    "Changelog");
+
+        base.InitializeLocalizations();
+    }
+
+    private void OnKeyDown(object sender, Keys e) {
+        switch (e) {
+            case Keys.Escape:
+                if (!this._userPanelManager.Visible) break;
+                goto case Keys.F8;
+            case Keys.F8:
+            case Keys.F9:
+                if (OnlineManager.State != ConnectionState.LoggedIn) return;
+
+                this._userPanelManager.Visible = !this._userPanelManager.Visible;
+
+                this._chatDrawable.MessageInputDrawable.Selected = false;
+
+                foreach (BaseDrawable drawable in this._userPanelManager.Drawables)
+                    drawable.Visible = this._userPanelManager.Visible;
+
+                break;
+        }
+    }
+
+    private void UpdateUserPanel(object sender, object e) {
+        GameTimeScheduler.ScheduleMethod(
+        _ => {
+            _OnlineUsersText.Text = $"Online Users: {OnlineManager.OnlinePlayers.Count(x => !x.Value.Bot)} ({OnlineManager.OnlinePlayers.Count()})";
+
+            this._userPanelDrawables.ForEach(x => this._userPanelManager.Remove(x));
+            this._userPanelDrawables.Clear();
+
+            Vector2 pos = new(10, 10 + _OnlineUsersText.Size.Y + 10);
+            foreach ((uint _, OnlinePlayer player) in OnlineManager.OnlinePlayers) {
+                UserCardDrawable drawable = player.GetUserCard();
+                drawable.MoveTo(pos);
+                pos.X += drawable.Size.X + 10;
+
+                if (pos.X + drawable.Size.X > DEFAULT_WINDOW_WIDTH) {
+                    pos.X =  10;
+                    pos.Y += drawable.Size.Y + 10;
+                }
+
+                drawable.OnClick += delegate {
+                    OnlineManager.SpectatePlayer(player);
                 };
 
-            ScoreManager.Load();
-
-            NotificationManager = new();
-            
-            base.Initialize();
-
-            // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
-            OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
-            OnlineManager.Initialize();
-            OnlineManager.Login();
-
-            VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
-                OriginType  = OriginType.BottomRight,
-                Clickable   = false,
-                CoverClicks = false
-            };
-
-            //Set the opacity to 0
-            VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 0f, 0f, 0, 0));
-
-            InputManager.OnMouseScroll += delegate(object _, (int, string) eventArgs) {
-                if (InputManager.HeldKeys.Contains(Keys.LeftAlt))
-                    ChangeGlobalVolume(eventArgs.Item1);
-            };
-
-            DrawableManager.Add(VolumeSelector);
-
-            HiraganaConversion.LoadConversion();
-            ScreenManager.SetBlankTransition();
-            SongManager.UpdateSongs();
-
-            MusicTrackScheduler = new();
-
-            OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
-
-            this._userPanelManager         = new();
-            this._userPanelManager.Add(
-            new TexturedDrawable(WhitePixel, new(0)) {
-                Scale         = new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
-                Depth         = 1.5f,
-                ColorOverride = new(0, 0, 0, 100)
+                this._userPanelDrawables.Add(drawable);
+                this._userPanelManager.Add(drawable);
             }
-            );
-            this._userPanelManager.Add(
-            _OnlineUsersText = new TextDrawable(new(10), JapaneseFontStroked, "Online Users: 0", 50) {
-                Depth = 0f
-            }
-            );
-            this._userPanelManager.Visible = false;
-            this.UpdateUserPanel(null, null);
-
-            this._chatDrawable = new(new(10, DEFAULT_WINDOW_HEIGHT - 10), new(DEFAULT_WINDOW_WIDTH - 20, DEFAULT_WINDOW_HEIGHT * 0.4f)) {
-                OriginType = OriginType.BottomLeft
-            };
-            this._userPanelManager.Add(this._chatDrawable);
-
-            InputManager.OnKeyDown += this.OnKeyDown;
-        }
-
-
-
-        public override void InitializeLocalizations() {
-            //default language is already english, and im an english speaker, so no need to set it here
-
-            LocalizationManager.AddDefaultTranslation(Localizations.MenuRevision, "Revision {0}");
-            LocalizationManager.AddDefaultTranslation(Localizations.Changelog,    "Changelog");
-
-            base.InitializeLocalizations();
-        }
-
-        private void OnKeyDown(object sender, Keys e) {
-            switch (e) {
-                case Keys.Escape:
-                    if (!this._userPanelManager.Visible) break;
-                    goto case Keys.F8;
-                case Keys.F8:
-                case Keys.F9:
-                    if (OnlineManager.State != ConnectionState.LoggedIn) return;
-                    
-                    this._userPanelManager.Visible = !this._userPanelManager.Visible;
-
-                    this._chatDrawable.MessageInputDrawable.Selected = false;
-
-                    foreach (BaseDrawable drawable in this._userPanelManager.Drawables)
-                        drawable.Visible = this._userPanelManager.Visible;
-
-                    break;
-            }
-        }
-
-        private void UpdateUserPanel(object sender, object e) {
-            lock (this._userPanelDrawables) {
-                _OnlineUsersText.Text = $"Online Users: {OnlineManager.OnlinePlayers.Count(x => !x.Value.Bot)} ({OnlineManager.OnlinePlayers.Count()})";
-                
-                this._userPanelDrawables.ForEach(x => this._userPanelManager.Remove(x));
-                this._userPanelDrawables.Clear();
-
-                Vector2 pos = new(10, 10 + _OnlineUsersText.Size.Y + 10);
-                foreach (KeyValuePair<uint, OnlinePlayer> player in OnlineManager.OnlinePlayers) {
-                    UserCardDrawable drawable = player.Value.GetUserCard();
-                    drawable.MoveTo(pos);
-                    pos.X += drawable.Size.X + 10;
-
-                    if (pos.X + drawable.Size.X > DEFAULT_WINDOW_WIDTH) {
-                        pos.X =  10;
-                        pos.Y += drawable.Size.Y + 10;
-                    }
-                    
-                    this._userPanelDrawables.Add(drawable);
-                    this._userPanelManager.Add(drawable);
-                }
-            }
-        }
+        },
+        Time
+        );
     }
 }

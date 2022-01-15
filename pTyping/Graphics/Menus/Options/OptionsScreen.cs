@@ -11,168 +11,168 @@ using Furball.Engine.Engine.Localization.Languages;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 
-namespace pTyping.Graphics.Menus.Options {
-    public class OptionsScreen : pScreen {
-        private readonly Dictionary<string, Language> _languageDictionary = new();
+namespace pTyping.Graphics.Menus.Options;
 
-        public override void Initialize() {
-            base.Initialize();
+public class OptionsScreen : pScreen {
+    private readonly Dictionary<string, Language> _languageDictionary = new();
 
-            #region Back button
+    public override void Initialize() {
+        base.Initialize();
 
-            pTypingGame.LoadBackButtonTexture();
+        #region Back button
 
-            TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
-                OriginType = OriginType.BottomLeft,
-                Scale      = pTypingGame.BackButtonScale
-            };
+        pTypingGame.LoadBackButtonTexture();
 
-            backButton.OnClick += delegate {
-                pTypingGame.MenuClickSound.PlayNew();
-                ScreenManager.ChangeScreen(new MenuScreen());
-            };
+        TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+            OriginType = OriginType.BottomLeft,
+            Scale      = pTypingGame.BackButtonScale
+        };
 
-            this.Manager.Add(backButton);
+        backButton.OnClick += delegate {
+            pTypingGame.MenuClickSound.PlayNew();
+            ScreenManager.ChangeScreen(new MenuScreen());
+        };
 
-            #endregion
+        this.Manager.Add(backButton);
 
-            #region Background image
+        #endregion
 
-            this.Manager.Add(pTypingGame.CurrentSongBackground);
+        #region Background image
 
-            pTypingGame.CurrentSongBackground.Tweens.Add(
-            new ColorTween(
-            TweenType.Color,
-            pTypingGame.CurrentSongBackground.ColorOverride,
-            new(100, 100, 100),
-            pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-            pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
-            )
-            );
+        this.Manager.Add(pTypingGame.CurrentSongBackground);
 
-            #endregion
+        pTypingGame.CurrentSongBackground.Tweens.Add(
+        new ColorTween(
+        TweenType.Color,
+        pTypingGame.CurrentSongBackground.ColorOverride,
+        new(100, 100, 100),
+        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
+        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
+        )
+        );
 
-            #region Background Dim
+        #endregion
 
-            TextDrawable backgroundDimInputLabel = new(new Vector2(100, 150), FurballGame.DEFAULT_FONT, "Background Dim:", 30);
-            UiTextBoxDrawable backgroundDimInput = new(
-            new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
-            FurballGame.DEFAULT_FONT,
-            ConVars.BackgroundDim.Value.ToString(CultureInfo.InvariantCulture),
-            30,
-            200
-            );
+        #region Background Dim
 
-            backgroundDimInput.OnCommit += this.BackgroundDimInputOnCommit;
+        TextDrawable backgroundDimInputLabel = new(new Vector2(100, 150), FurballGame.DEFAULT_FONT, "Background Dim:", 30);
+        UiTextBoxDrawable backgroundDimInput = new(
+        new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
+        FurballGame.DEFAULT_FONT,
+        ConVars.BackgroundDim.Value.ToString(CultureInfo.InvariantCulture),
+        30,
+        200
+        );
 
-            this.Manager.Add(backgroundDimInputLabel);
-            this.Manager.Add(backgroundDimInput);
+        backgroundDimInput.OnCommit += this.BackgroundDimInputOnCommit;
 
-            #endregion
+        this.Manager.Add(backgroundDimInputLabel);
+        this.Manager.Add(backgroundDimInput);
 
-            #region Target FPS
+        #endregion
 
-            // TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
-            // UiTextBoxDrawable targetFPSInput = new(
-            // new Vector2(110 + targetFPSInputLabel.Size.X, 200),
-            // FurballGame.DEFAULT_FONT,
-            // ConVars.TargetFPS.Value.Value.ToString(CultureInfo.InvariantCulture),
-            // 30,
-            // 200
-            // );
-            //
-            // targetFPSInput.OnCommit += this.TargetFpsInputOnCommit;
-            //
-            // this.Manager.Add(targetFPSInputLabel);
-            // this.Manager.Add(targetFPSInput);
+        #region Target FPS
 
-            #endregion
+        // TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
+        // UiTextBoxDrawable targetFPSInput = new(
+        // new Vector2(110 + targetFPSInputLabel.Size.X, 200),
+        // FurballGame.DEFAULT_FONT,
+        // ConVars.TargetFPS.Value.Value.ToString(CultureInfo.InvariantCulture),
+        // 30,
+        // 200
+        // );
+        //
+        // targetFPSInput.OnCommit += this.TargetFpsInputOnCommit;
+        //
+        // this.Manager.Add(targetFPSInputLabel);
+        // this.Manager.Add(targetFPSInput);
 
-            #region Username
+        #endregion
 
-            TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DEFAULT_FONT, "Username:", 30);
-            UiTextBoxDrawable usernameInput = new(
-            new Vector2(360 + usernameInputLabel.Size.X, 200),
-            FurballGame.DEFAULT_FONT,
-            ConVars.Username.Value.ToString(CultureInfo.InvariantCulture),
-            30,
-            200
-            );
+        #region Username
 
-            usernameInput.OnCommit += this.UsernameInputOnCommit;
+        TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DEFAULT_FONT, "Username:", 30);
+        UiTextBoxDrawable usernameInput = new(
+        new Vector2(360 + usernameInputLabel.Size.X, 200),
+        FurballGame.DEFAULT_FONT,
+        ConVars.Username.Value.ToString(CultureInfo.InvariantCulture),
+        30,
+        200
+        );
 
-            this.Manager.Add(usernameInputLabel);
-            this.Manager.Add(usernameInput);
+        usernameInput.OnCommit += this.UsernameInputOnCommit;
 
-            #endregion
+        this.Manager.Add(usernameInputLabel);
+        this.Manager.Add(usernameInput);
 
-            #region 1600x900 res button
+        #endregion
 
-            UiButtonDrawable res1600X900Button = new(new(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        #region 1600x900 res button
 
-            res1600X900Button.OnClick += delegate {
-                FurballGame.Instance.ChangeScreenSize(1600, 900);
-            };
+        UiButtonDrawable res1600X900Button = new(new(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 
-            this.Manager.Add(res1600X900Button);
+        res1600X900Button.OnClick += delegate {
+            FurballGame.Instance.ChangeScreenSize(1600, 900);
+        };
 
-            #endregion
+        this.Manager.Add(res1600X900Button);
 
-            #region 1920x1080 res button
+        #endregion
 
-            UiButtonDrawable res1920X1080Button = new(new(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        #region 1920x1080 res button
 
-            res1920X1080Button.OnClick += delegate {
-                FurballGame.Instance.ChangeScreenSize(1920, 1080);
-            };
+        UiButtonDrawable res1920X1080Button = new(new(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 
-            this.Manager.Add(res1920X1080Button);
+        res1920X1080Button.OnClick += delegate {
+            FurballGame.Instance.ChangeScreenSize(1920, 1080);
+        };
 
-            #endregion
+        this.Manager.Add(res1920X1080Button);
 
-            #region Language dropdown
+        #endregion
 
-            List<string> languages = new();
+        #region Language dropdown
 
-            foreach (ISO639_2Code code in LocalizationManager.GetSupportedLanguages()) {
-                Language language = LocalizationManager.GetLanguageFromCode(code)!;
+        List<string> languages = new();
 
-                string languageName = language.ToString();
+        foreach (ISO639_2Code code in LocalizationManager.GetSupportedLanguages()) {
+            Language language = LocalizationManager.GetLanguageFromCode(code)!;
 
-                languages.Add(languageName);
-                this._languageDictionary.Add(languageName, language);
-            }
+            string languageName = language.ToString();
 
-            UiDropdownDrawable languageDropdown = new(new(800, 100), languages, new(175, 40), pTypingGame.JapaneseFontStroked, 20);
-            languageDropdown.SelectedItem.Value = LocalizationManager.CurrentLanguage.ToString();
-            languageDropdown.Update();
-
-            languageDropdown.SelectedItem.OnChange += this.OnLanguageChange;
-
-            this.Manager.Add(languageDropdown);
-
-            #endregion
-
-            pTypingGame.UserStatusListening();
+            languages.Add(languageName);
+            this._languageDictionary.Add(languageName, language);
         }
 
-        private void OnLanguageChange(object _, string s) {
-            LocalizationManager.CurrentLanguage = this._languageDictionary[s];
-        }
+        UiDropdownDrawable languageDropdown = new(new(800, 100), languages, new(175, 40), pTypingGame.JapaneseFontStroked, 20);
+        languageDropdown.SelectedItem.Value = LocalizationManager.CurrentLanguage.ToString();
+        languageDropdown.Update();
 
-        private void BackgroundDimInputOnCommit(object sender, string e) {
-            ConVars.BackgroundDim.Value = float.Parse(e);
-        }
+        languageDropdown.SelectedItem.OnChange += this.OnLanguageChange;
 
-        // private void TargetFpsInputOnCommit(object sender, string e) {
-        //     Config.TargetFPS.Value = int.Parse(e);
-        // }
+        this.Manager.Add(languageDropdown);
 
-        private void UsernameInputOnCommit(object sender, string e) {
-            ConVars.Username.Value = e;
-        }
-        public override string Name    => "Options";
-        public override string State   => "Tweaking the settings!";
-        public override string Details => "";
+        #endregion
+
+        pTypingGame.UserStatusListening();
     }
+
+    private void OnLanguageChange(object _, string s) {
+        LocalizationManager.CurrentLanguage = this._languageDictionary[s];
+    }
+
+    private void BackgroundDimInputOnCommit(object sender, string e) {
+        ConVars.BackgroundDim.Value = float.Parse(e);
+    }
+
+    // private void TargetFpsInputOnCommit(object sender, string e) {
+    //     Config.TargetFPS.Value = int.Parse(e);
+    // }
+
+    private void UsernameInputOnCommit(object sender, string e) {
+        ConVars.Username.Value = e;
+    }
+    public override string Name    => "Options";
+    public override string State   => "Tweaking the settings!";
+    public override string Details => "";
 }

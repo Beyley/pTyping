@@ -8,154 +8,154 @@ using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs.Events;
 
-namespace pTyping.Songs.SongLoaders {
-    public class UTypingSongHandler : ISongHandler {
-        public SongType Type => SongType.UTyping;
+namespace pTyping.Songs.SongLoaders;
 
-        public Song LoadSong(FileInfo fileInfo) {
-            Song song = new() {
-                Name       = "",
-                Artist     = "",
-                Creator    = "",
-                Difficulty = "",
-                FileInfo   = fileInfo
-            };
+public class UTypingSongHandler : ISongHandler {
+    public SongType Type => SongType.UTyping;
 
-            string infoData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(fileInfo.FullName));
+    public Song LoadSong(FileInfo fileInfo) {
+        Song song = new() {
+            Name       = "",
+            Artist     = "",
+            Creator    = "",
+            Difficulty = "",
+            FileInfo   = fileInfo
+        };
 
-            infoData = infoData.Replace("\r", "");
-            string[] info = infoData.Split("\n");
+        string infoData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(fileInfo.FullName));
 
-            song.Name       = info[0];
-            song.Artist     = info[1];
-            song.Creator    = info[2];
-            song.Difficulty = info[3];
-            song.Type       = this.Type;
+        infoData = infoData.Replace("\r", "");
+        string[] info = infoData.Split("\n");
 
-            string dataFilename = info[4];
+        song.Name       = info[0];
+        song.Artist     = info[1];
+        song.Creator    = info[2];
+        song.Difficulty = info[3];
+        song.Type       = this.Type;
 
-            string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, dataFilename)));
+        string dataFilename = info[4];
 
-            if (mapData[0] != '@') return null;
+        string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, dataFilename)));
 
-            using StringReader reader = new(mapData);
-            string             line;
-            do {
-                line = reader.ReadLine();
+        if (mapData[0] != '@') return null;
 
-                if (line == null || line.Trim() == string.Empty)
-                    continue;
+        using StringReader reader = new(mapData);
+        string             line;
+        do {
+            line = reader.ReadLine();
 
-                string firstChar = line[0].ToString();
+            if (line == null || line.Trim() == string.Empty)
+                continue;
 
-                line = line[1..];
+            string firstChar = line[0].ToString();
 
-                switch (firstChar) {
-                    //Contains the relative path to the song file in the format of
-                    //@path
-                    //ex. @animariot.ogg
-                    case "@": {
-                        song.AudioPath = line;
-                        break;
-                    }
-                    //Contains a note in the format of
-                    //TimeInSeconds CharacterToType
-                    //ex. +109.041176 だい
-                    case "+": {
-                        string[] splitLine = line.Split(" ");
+            line = line[1..];
 
-                        double time = double.Parse(splitLine[0]) * 1000;
-                        string text = splitLine[1];
-
-                        song.Notes.Add(
-                        new() {
-                            Time  = time,
-                            Text  = text.Trim(),
-                            Color = Color.Red
-                        }
-                        );
-
-                        break;
-                    }
-                    //Contains the next set of lyrics in the format of
-                    //*TimeInSeconds Lyrics
-                    //ex. *16.100000 だいてだいてだいてだいて　もっと
-                    case "*": {
-                        string[] splitLine = line.Split(" ");
-
-                        double time = double.Parse(splitLine[0]) * 1000d;
-                        string text = splitLine[1];
-
-                        song.Events.Add(
-                        new LyricEvent {
-                            Lyric = text.Trim(),
-                            Time  = time
-                        }
-                        );
-
-                        break;
-                    }
-                    //Prevents you from typing the previous note in the format of
-                    // /TimeInSeconds
-                    //ex. /17.982353
-                    case "/": {
-                        song.Events.Add(
-                        new TypingCutoffEvent {
-                            Time = double.Parse(line) * 1000d
-                        }
-                        );
-
-                        break;
-                    }
-                    //A beatline beat (happens every 1/4th beat except for full beats)
-                    //-TimeInSeconds
-                    //ex. -17.747059
-                    case "-": {
-                        song.Events.Add(
-                        new BeatLineBeatEvent {
-                            Time = double.Parse(line) * 1000d
-                        }
-                        );
-
-                        break;
-                    }
-                    //A beatline bar (happens every full beat)
-                    //=TimeInSeconds
-                    //ex. =4.544444
-                    case "=": {
-                        song.Events.Add(
-                        new BeatLineBarEvent {
-                            Time = double.Parse(line) * 1000d
-                        }
-                        );
-
-                        break;
-                    }
+            switch (firstChar) {
+                //Contains the relative path to the song file in the format of
+                //@path
+                //ex. @animariot.ogg
+                case "@": {
+                    song.AudioPath = line;
+                    break;
                 }
+                //Contains a note in the format of
+                //TimeInSeconds CharacterToType
+                //ex. +109.041176 だい
+                case "+": {
+                    string[] splitLine = line.Split(" ");
 
-            } while (line != null);
+                    double time = double.Parse(splitLine[0]) * 1000;
+                    string text = splitLine[1];
 
-            List<BeatLineBarEvent> beatLineBarEvents = song.Events.Where(x => x is BeatLineBarEvent).Cast<BeatLineBarEvent>().ToList();
+                    song.Notes.Add(
+                    new() {
+                        Time  = time,
+                        Text  = text.Trim(),
+                        Color = Color.Red
+                    }
+                    );
 
-            double tempo = beatLineBarEvents[1].Time - beatLineBarEvents[0].Time;
+                    break;
+                }
+                //Contains the next set of lyrics in the format of
+                //*TimeInSeconds Lyrics
+                //ex. *16.100000 だいてだいてだいてだいて　もっと
+                case "*": {
+                    string[] splitLine = line.Split(" ");
 
-            song.TimingPoints.Add(
-            new TimingPoint {
-                Time  = song.Events.First(x => x is BeatLineBarEvent).Time,
-                Tempo = tempo / 4d
+                    double time = double.Parse(splitLine[0]) * 1000d;
+                    string text = splitLine[1];
+
+                    song.Events.Add(
+                    new LyricEvent {
+                        Lyric = text.Trim(),
+                        Time  = time
+                    }
+                    );
+
+                    break;
+                }
+                //Prevents you from typing the previous note in the format of
+                // /TimeInSeconds
+                //ex. /17.982353
+                case "/": {
+                    song.Events.Add(
+                    new TypingCutoffEvent {
+                        Time = double.Parse(line) * 1000d
+                    }
+                    );
+
+                    break;
+                }
+                //A beatline beat (happens every 1/4th beat except for full beats)
+                //-TimeInSeconds
+                //ex. -17.747059
+                case "-": {
+                    song.Events.Add(
+                    new BeatLineBeatEvent {
+                        Time = double.Parse(line) * 1000d
+                    }
+                    );
+
+                    break;
+                }
+                //A beatline bar (happens every full beat)
+                //=TimeInSeconds
+                //ex. =4.544444
+                case "=": {
+                    song.Events.Add(
+                    new BeatLineBarEvent {
+                        Time = double.Parse(line) * 1000d
+                    }
+                    );
+
+                    break;
+                }
             }
-            );
 
-            Logger.Log(
-            $"UTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} diff:{song.Difficulty} creator:{song.Creator}",
-            LoggerLevelSongInfo.Instance
-            );
+        } while (line != null);
 
-            return song;
+        List<BeatLineBarEvent> beatLineBarEvents = song.Events.Where(x => x is BeatLineBarEvent).Cast<BeatLineBarEvent>().ToList();
+
+        double tempo = beatLineBarEvents[1].Time - beatLineBarEvents[0].Time;
+
+        song.TimingPoints.Add(
+        new TimingPoint {
+            Time  = song.Events.First(x => x is BeatLineBarEvent).Time,
+            Tempo = tempo / 4d
         }
+        );
 
-        public void SaveSong(Song song) {
-            throw new NotImplementedException();
-        }
+        Logger.Log(
+        $"UTyping song loaded! notecount:{song.Notes.Count} eventcount:{song.Events.Count} {song.Artist}-{song.Name} diff:{song.Difficulty} creator:{song.Creator}",
+        LoggerLevelSongInfo.Instance
+        );
+
+        return song;
+    }
+
+    public void SaveSong(Song song) {
+        throw new NotImplementedException();
     }
 }

@@ -5,21 +5,21 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using sowelipisona;
 // using Furball.Engine.Engine.Audio;
 
-namespace pTyping.Graphics.Player.Mods {
-    public class EaseOutMod : PlayerMod {
-        public override List<Type> IncompatibleMods() => new() {
-            typeof(EaseInMod)
-        };
+namespace pTyping.Graphics.Player.Mods;
 
-        public override string Name()            => "Ease Out";
-        public override string ShorthandName()   => "EO";
-        public override double ScoreMultiplier() => 1.025d;
+public class EaseOutMod : PlayerMod {
+    public override List<Type> IncompatibleMods() => new() {
+        typeof(EaseInMod)
+    };
 
-        public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
-            foreach (Tween noteTween in notes.SelectMany(note => note.Tweens.Where(noteTween => noteTween.TweenType == TweenType.Movement)))
-                noteTween.Easing = Easing.Out;
+    public override string Name()            => "Ease Out";
+    public override string ShorthandName()   => "EO";
+    public override double ScoreMultiplier() => 1.025d;
 
-            base.OnMapStart(musicTrack, notes, player);
-        }
+    public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
+        foreach (Tween noteTween in notes.SelectMany(note => note.Tweens.Where(noteTween => noteTween.TweenType == TweenType.Movement)))
+            noteTween.Easing = Easing.Out;
+
+        base.OnMapStart(musicTrack, notes, player);
     }
 }

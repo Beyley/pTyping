@@ -5,63 +5,63 @@ using Newtonsoft.Json;
 using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
 
-namespace pTyping.Songs {
-    [JsonObject(MemberSerialization.OptIn)]
-    public abstract class Event {
-        [JsonProperty]
-        public abstract EventType Type { get; }
-        [JsonProperty]
-        public double Time { get; set; }
+namespace pTyping.Songs;
 
-        [Pure, CanBeNull]
-        public static ManagedDrawable CreateEventDrawable(Event @event, Texture2D noteTexture, GameplayDrawableTweenArgs tweenArgs) {
-            ManagedDrawable drawable = null;
-            
-            switch (@event.Type) {
-                case EventType.BeatLineBar: {
-                    BeatLineBarEventDrawable tempDrawable = new(@event);
-                    tempDrawable.CreateTweens(tweenArgs);
+[JsonObject(MemberSerialization.OptIn)]
+public abstract class Event {
+    [JsonProperty]
+    public abstract EventType Type { get; }
+    [JsonProperty]
+    public double Time { get; set; }
 
-                    drawable = tempDrawable;
+    [Pure, CanBeNull]
+    public static ManagedDrawable CreateEventDrawable(Event @event, Texture2D noteTexture, GameplayDrawableTweenArgs tweenArgs) {
+        ManagedDrawable drawable = null;
 
-                    break;
-                }
-                case EventType.BeatLineBeat: {
-                    BeatLineBeatEventDrawable tempDrawable = new(@event);
-                    tempDrawable.CreateTweens(tweenArgs);
+        switch (@event.Type) {
+            case EventType.BeatLineBar: {
+                BeatLineBarEventDrawable tempDrawable = new(@event);
+                tempDrawable.CreateTweens(tweenArgs);
 
-                    drawable = tempDrawable;
+                drawable = tempDrawable;
 
-                    break;
-                }
-                case EventType.TypingCutoff: {
-                    TypingCutoffEventDrawable tempDrawable = new(noteTexture, @event);
-                    tempDrawable.CreateTweens(tweenArgs);
-
-                    drawable = tempDrawable;
-
-                    break;
-                }
-                case EventType.Lyric: {
-                    if (tweenArgs.IsEditor) {
-                        LyricEventDrawable tempDrawable = new(noteTexture, @event);
-                        tempDrawable.CreateTweens(tweenArgs);
-
-                        drawable = tempDrawable;
-                    }
-
-                    break;
-                }
+                break;
             }
+            case EventType.BeatLineBeat: {
+                BeatLineBeatEventDrawable tempDrawable = new(@event);
+                tempDrawable.CreateTweens(tweenArgs);
 
-            return drawable;
+                drawable = tempDrawable;
+
+                break;
+            }
+            case EventType.TypingCutoff: {
+                TypingCutoffEventDrawable tempDrawable = new(noteTexture, @event);
+                tempDrawable.CreateTweens(tweenArgs);
+
+                drawable = tempDrawable;
+
+                break;
+            }
+            case EventType.Lyric: {
+                if (tweenArgs.IsEditor) {
+                    LyricEventDrawable tempDrawable = new(noteTexture, @event);
+                    tempDrawable.CreateTweens(tweenArgs);
+
+                    drawable = tempDrawable;
+                }
+
+                break;
+            }
         }
-    }
 
-    public enum EventType {
-        Lyric,
-        TypingCutoff,
-        BeatLineBar,
-        BeatLineBeat
+        return drawable;
     }
+}
+
+public enum EventType {
+    Lyric,
+    TypingCutoff,
+    BeatLineBar,
+    BeatLineBeat
 }

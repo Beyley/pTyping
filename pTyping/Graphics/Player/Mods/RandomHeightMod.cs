@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using Furball.Engine;
 
-namespace pTyping.Graphics.Player.Mods {
-    public class RandomHeightMod : PlayerMod {
-        public override List<Type> IncompatibleMods() => new();
-        public override string     Name()             => "Random Height";
-        public override string     ShorthandName()    => "RH";
-        public override double     ScoreMultiplier()  => 1.0d;
+namespace pTyping.Graphics.Player.Mods;
 
-        public override void BeforeNoteCreate(Player player) {
-            player.Song.Notes.ForEach(x => x.YOffset = FurballGame.Random.Next(-400, 400));
+public class RandomHeightMod : PlayerMod {
+    public override List<Type> IncompatibleMods() => new();
+    public override string     Name()             => "Random Height";
+    public override string     ShorthandName()    => "RH";
+    public override double     ScoreMultiplier()  => 1.0d;
 
-            base.BeforeNoteCreate(player);
-        }
+    public override void BeforeNoteCreate(Player player) {
+        player.Song.Notes.ForEach(x => x.YOffset = FurballGame.Random.Next(-400, 400));
+
+        base.BeforeNoteCreate(player);
     }
 }
