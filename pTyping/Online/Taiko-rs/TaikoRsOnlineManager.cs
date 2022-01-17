@@ -333,7 +333,11 @@ public class TaikoRsOnlineManager : OnlineManager {
             PacketId.ServerSpectatorJoined         => this.HandleServerSpectatorJoinedPacket(reader),
             PacketId.ServerSpectatorFrames         => this.HandleServerSpectatorFrames(reader),
             PacketId.ServerSpectatorLeft           => this.HandleServerSpectatorLeftPacket(reader),
+            PacketId.ServerNotification            => this.HandleServerNotificationPacket(reader),
+            PacketId.ServerDropConnection          => this.HandleServerDropConnectionPacket(reader),
+            PacketId.ServerError                   => this.HandleServerErrorPacket(reader),
             PacketId.ServerSpectatorPlayingRequest => true,//TODO: fix this
+            PacketId.ServerPermissions             => throw new NotImplementedException(),
             #region we ignore these
 
             PacketId.Ping => true,
@@ -344,10 +348,40 @@ public class TaikoRsOnlineManager : OnlineManager {
             _                => throw new Exception("Recieved client packet?")
         };
 
-        // if (reader.BaseStream.Position != reader.BaseStream.Length)
-        // throw new Exception("you didnt handle the packet all the way smh");
+        if (RuntimeInfo.IsDebug() && reader.BaseStream.Position != reader.BaseStream.Length)
+            throw new Exception($"Packet {pid} was not fully read!");
 
         if (!success) throw new Exception($"Error reading packet with PID: {pid}");
+    }
+
+    private bool HandleServerErrorPacket(TaikoRsReader reader) {
+        ServerErrorPacket p = new();
+        p.ReadDataFromStream(reader);
+
+        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Server Error {p.ErrorCode}");
+
+        return true;
+    }
+
+    private bool HandleServerDropConnectionPacket(TaikoRsReader reader) {
+        ServerDropConnectionPacket p = new();
+        p.ReadDataFromStream(reader);
+
+        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Dropped from server \nReason: {p.Message}");
+
+        this.Disconnect();
+
+        return true;
+    }
+
+
+    private bool HandleServerNotificationPacket(TaikoRsReader reader) {
+        ServerNotificationPacket p = new();
+        p.ReadDataFromStream(reader);
+
+        pTypingGame.NotificationManager.CreateNotification(p.Importance, p.Message);
+
+        return true;
     }
 
     private bool HandleServerSpectatorFrames(TaikoRsReader reader) {
@@ -523,7 +557,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         this.PacketQueue.Clear();
 
-        if (this._client.IsAlive)
+        if (this._client?.IsAlive ?? false)
             this._client.Close(CloseStatusCode.Normal, "Client Disconnecting");
 
         this.InvokeOnDisconnect(this);
@@ -544,7 +578,7 @@ public class TaikoRsOnlineManager : OnlineManager {
     }
 
     protected override void ClientLogout() {
-        if (this._client.ReadyState != WebSocketState.Open) return;
+        if (this._client?.ReadyState != WebSocketState.Open) return;
 
         FurballGame.Instance.AfterScreenChange += this.OnScreenChangeAfter;
 
@@ -572,6 +606,11 @@ public class TaikoRsOnlineManager : OnlineManager {
             $"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}",
             LoggerLevelChatMessage.Instance
             );
+
+            lock (this.KnownChannels) {
+                if (!this.KnownChannels.Contains(packet.Channel))
+                    this.KnownChannels.Add(packet.Channel);
+            }
         }
 
         return true;
@@ -650,9 +689,10 @@ public class TaikoRsOnlineManager : OnlineManager {
             }
         }
 
-        this.Player.Username.Value = this.Username();
-        this.Player.UserId.Value   = packet.UserId;
-        this.State                 = ConnectionState.LoggedIn;
+        this.Player.Username.Value          = this.Username();
+        this.Player.Action.Value.Mode.Value = PlayMode.pTyping;
+        this.Player.UserId.Value            = packet.UserId;
+        this.State                          = ConnectionState.LoggedIn;
 
         this.InvokeOnLoginComplete(this);
 
@@ -662,6 +702,14 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         this.PacketQueue.Enqueue(new ClientStatusUpdatePacket(new UserAction(UserActionType.Idle, "")));
         this.PacketQueue.Enqueue(new ClientNotifyScoreUpdatePacket());
+
+        lock (this.KnownChannels) {
+            if (!this.KnownChannels.Contains("#general"))
+                this.KnownChannels.Add("#general");
+
+            if (!this.KnownChannels.Contains("#pTyping"))
+                this.KnownChannels.Add("#pTyping");
+        }
 
         return true;
     }
@@ -732,4 +780,9 @@ public class TaikoRsWriter : BinaryWriter {
         this.Write(length);
         this.Write(bytes);
     }
+}
+
+public enum ServerErrorCode {
+    Unknown      = 0,
+    CantSpectate = 1
 }

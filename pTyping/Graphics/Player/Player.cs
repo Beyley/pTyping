@@ -391,6 +391,8 @@ public class Player : CompositeDrawable {
             case HitResult.Poor: {
                 this.Score.PoorHits++;
                 hitColor = COLOR_POOR;
+
+                this.Score.Combo = 0;
                 break;
             }
         }

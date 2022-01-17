@@ -40,6 +40,8 @@ public abstract class OnlineManager {
 
     public PlayerScreen GameScene;
 
+    public ObservableCollection<string> KnownChannels = new();
+
     public ConnectionState State {
         get;
         protected set;

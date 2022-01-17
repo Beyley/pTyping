@@ -16,7 +16,7 @@ public enum ServerPermissions : ushort {
 public class OnlinePlayer {
     private UserCardDrawable            _userCard;
     public  Bindable<double>            Accuracy    = new(1d);
-    public  Bindable<UserAction>        Action      = new(new(UserActionType.Idle, "Idling."));
+    public  Bindable<UserAction>        Action      = new(new(UserActionType.Idle, "Idling.", PlayMode.Unknown));
     public  Bindable<int>               PlayCount   = new(0);
     public  Bindable<int>               Rank        = new(0);
     public  Bindable<ServerPermissions> Permissions = new(ServerPermissions.None);

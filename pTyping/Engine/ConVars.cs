@@ -65,6 +65,9 @@ public class Login : ConFunc {
     public Login() : base("sv_login") {}
 
     public override ConsoleResult Run(string[] consoleInput) {
+        if (consoleInput.Length == 0)
+            return new(ExecutionResult.Error, "You need to provide a username");
+        
         ConVars.Username.Value = consoleInput[0];
 
         pTypingGame.OnlineManager.Login();

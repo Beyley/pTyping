@@ -83,6 +83,26 @@ public class pTypingGame : FurballGame {
         TextureHeight        = 2048
     }
     );
+    public static FontSystem FurballFontRegular = new(
+    new FontSystemSettings {
+        FontResolutionFactor = 2f,
+        KernelWidth          = 1,
+        KernelHeight         = 1,
+        TextureWidth         = 2048,
+        TextureHeight        = 2048
+    }
+    );
+    public static FontSystem FurballFontRegularStroked = new(
+    new FontSystemSettings {
+        FontResolutionFactor = 2f,
+        KernelWidth          = 1,
+        KernelHeight         = 1,
+        Effect               = FontSystemEffect.Stroked,
+        EffectAmount         = 2,
+        TextureWidth         = 2048,
+        TextureHeight        = 2048
+    }
+    );
 
     public static UserCardDrawable MenuPlayerUserCard;
 
@@ -273,6 +293,9 @@ public class pTypingGame : FurballGame {
             JapaneseFont.AddFont(JapaneseFontData);
             JapaneseFontStroked.AddFont(JapaneseFontData);
         }
+
+        FurballFontRegular.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf",        ContentSource.User, true));
+        FurballFontRegularStroked.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf", ContentSource.User, true));
 
         LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
         FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
@@ -497,7 +520,10 @@ public class pTypingGame : FurballGame {
                 }
 
                 drawable.OnClick += delegate {
-                    OnlineManager.SpectatePlayer(player);
+                    lock (OnlineManager.KnownChannels) {
+                        if (!OnlineManager.KnownChannels.Contains(player.Username))
+                            OnlineManager.KnownChannels.Add(player.Username);
+                    }
                 };
 
                 this._userPanelDrawables.Add(drawable);

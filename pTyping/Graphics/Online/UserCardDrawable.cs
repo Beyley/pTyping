@@ -32,22 +32,31 @@ public class UserCardDrawable : CompositeDrawable {
         }
         );
         this._drawables.Add(
-        this._usernameDrawable = new(new(15f), FurballGame.DEFAULT_FONT_STROKED, "", 55) {
+        this._usernameDrawable = new(new(15f), pTypingGame.FurballFontRegular, "", 55) {
             Scale       = new(1.7f),
             Clickable   = false,
             CoverClicks = false
         }
         );
-        this._drawables.Add(
-        this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
-            Scale       = new(0.175f),
-            Clickable   = false,
-            CoverClicks = false
-        }
-        );
+        if (player.Action.Value.Mode.Value != PlayMode.Unknown)
+            this._drawables.Add(
+            this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
+                Scale       = new(0.175f),
+                Clickable   = false,
+                CoverClicks = false
+            }
+            );
+        else
+            this._drawables.Add(
+            this._modeIconDrawable = new(FurballGame.WhitePixel, new(0f)) {
+                Scale       = new(0f),
+                Clickable   = false,
+                CoverClicks = false
+            }
+            );
 
         this._drawables.Add(
-        this._rankDrawable = new(new(0, 0), FurballGame.DEFAULT_FONT_STROKED, "", 175) {
+        this._rankDrawable = new(new(0, 0), pTypingGame.FurballFontRegular, "", 175) {
             Scale         = new(2f),
             ColorOverride = new(255, 255, 255, 100),
             Clickable     = false,
@@ -58,7 +67,7 @@ public class UserCardDrawable : CompositeDrawable {
         this._rankDrawable.MoveTo(new(this._backgroundDrawable.Size.X - 370, 0));
 
         this._drawables.Add(
-        this._mainTextDrawable = new(new(this._usernameDrawable.Position.X, 100), FurballGame.DEFAULT_FONT_STROKED, "", 45) {
+        this._mainTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.FurballFontRegular, "", 45) {
             Scale       = new(1.7f),
             Visible     = true,
             Clickable   = false,
@@ -66,7 +75,7 @@ public class UserCardDrawable : CompositeDrawable {
         }
         );
         this._drawables.Add(
-        this._statusTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFontStroked, "", 45) {
+        this._statusTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFont, "", 45) {
             Scale       = new(1.7f),
             Visible     = true,
             Clickable   = false,
@@ -116,6 +125,7 @@ public class UserCardDrawable : CompositeDrawable {
             PlayMode.Catch    => "catch-mode-icon.png",
             PlayMode.Mania    => "mania-mode-icon.png",
             PlayMode.pTyping  => "ptyping-mode.icon.png",
+            PlayMode.Unknown  => null,
             _                 => throw new ArgumentOutOfRangeException(nameof (mode), mode, null)
         };
     }
@@ -129,7 +139,10 @@ Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Va
         this._rankDrawable.Text       = this.Player.Value.Rank == 0 ? "" : $"#{this.Player.Value.Rank.Value}";
 
         try {
-            this._modeIconDrawable.SetTexture(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode), ContentSource.User));
+            string f = GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode);
+            if (f == null) throw new Exception();
+
+            this._modeIconDrawable.SetTexture(ContentManager.LoadTextureFromFile(f, ContentSource.User));
             this._modeIconDrawable.Scale = new(0.175f);
         }
         catch {

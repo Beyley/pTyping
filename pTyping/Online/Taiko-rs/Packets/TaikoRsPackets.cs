@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using pTyping.Engine;
 
 namespace pTyping.Online.Taiko_rs.Packets;
 // public abstract class TaikoRsPacket {
@@ -402,6 +403,57 @@ public class ClientSendMessagePacket : Packet {
     public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
 }
 
+public class ServerNotificationPacket : Packet {
+    public override PacketId Pid => PacketId.ServerNotification;
+
+    private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+        ("message", DataType.String),
+        ("severity", DataType.Byte)
+    };
+
+    public string Message {
+        get => (string)this.Data["message"];
+        set => this.Data["message"] = value;
+    }
+
+    public NotificationManager.NotificationImportance Importance {
+        get => (NotificationManager.NotificationImportance)this.Data["severity"];
+        set => this.Data["severity"] = value;
+    }
+
+    public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
+}
+
+public class ServerDropConnectionPacket : Packet {
+    public override PacketId Pid => PacketId.ServerDropConnection;
+
+    private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+        ("message", DataType.String)
+    };
+
+    public string Message {
+        get => (string)this.Data["message"];
+        set => this.Data["message"] = value;
+    }
+
+    public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
+}
+
+public class ServerErrorPacket : Packet {
+    public override PacketId Pid => PacketId.ServerDropConnection;
+
+    private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+        ("error_code", DataType.Byte)
+    };
+
+    public ServerErrorCode ErrorCode {
+        get => (ServerErrorCode)this.Data["error_code"];
+        set => this.Data["error_code"] = value;
+    }
+
+    public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
+}
+
 public class ServerSendMessagePacket : Packet {
     public override PacketId Pid => PacketId.ServerSendMessage;
 
@@ -519,12 +571,15 @@ public enum PacketId : ushort {
 
     #region Login
 
-    ClientUserLogin     = 100,
-    ServerLoginResponse = 101,
-    ServerPermissions   = 102,
-    ServerUserJoined    = 103,
-    ClientLogOut        = 104,
-    ServerUserLeft      = 105,
+    ClientUserLogin      = 100,
+    ServerLoginResponse  = 101,
+    ServerPermissions    = 102,
+    ServerUserJoined     = 103,
+    ClientLogOut         = 104,
+    ServerUserLeft       = 105,
+    ServerNotification   = 106,
+    ServerDropConnection = 107,
+    ServerError          = 108,
 
     #endregion
 
