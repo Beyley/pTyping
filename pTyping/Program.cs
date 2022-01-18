@@ -70,6 +70,8 @@ internal class Program {
                 File.WriteAllText(fileName, ex.ToString());
 
                 game.Dispose();
+
+                Environment.Exit(1);
             }
 #endif
     }
