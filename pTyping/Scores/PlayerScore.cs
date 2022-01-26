@@ -214,7 +214,8 @@ public struct ReplayFrame {
 
         // We write this weirdly as the `MousePos` type requires 64bits of data
         // (this will be parsed as 2 floats on the server and other clients)
-        writer.Write(this.Character);        // 16 bits
+        writer.Write(this.Character);        // 8 bits
+        writer.Write((byte)0);               // 8 bits
         writer.Write(short.MaxValue);        // 16 bits
         writer.Write(float.NegativeInfinity);// 32 bits
     }
@@ -224,6 +225,6 @@ public struct ReplayFrame {
         reader.ReadByte();
         this.Character = reader.ReadChar();
 
-        reader.ReadBytes(6);//extra garbage we ignore
+        reader.ReadBytes(7);//extra garbage we ignore
     }
 }

@@ -237,6 +237,14 @@ public class Player : CompositeDrawable {
             foreach (string romaji in filteredRomaji) {
                 double timeDifference = Math.Abs(currentTime - note.Time);
                 if (romaji[note.TypedRomaji.Length] == args.Character) {
+                    if (checkingNext && !this._notes[this._noteToType].Note.IsHit) {
+                        this._notes[this._noteToType].Miss();
+                        this.NoteUpdate(false, this._notes[this._noteToType].Note);
+
+                        this._noteToType++;
+                        checkingNext = false;
+                    }
+                    
                     //If true, then we finished the note, if false, then we continue
                     if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this)) {
                         this.HitSoundNormal.PlayNew();

@@ -366,7 +366,7 @@ public class PlayerScreen : pScreen {
                 if (pTypingGame.OnlineManager.Spectators.Count != 0) {
                     pTypingGame.OnlineManager.SpectatorBuffer(currentTime);
                     if (this.Player.ReplayFrames.Count != 0) {
-                        this.Player.ReplayFrames.ForEach(x => pTypingGame.OnlineManager.SpectatorReplayFrame(currentTime, x));
+                        this.Player.ReplayFrames.ForEach(x => pTypingGame.OnlineManager.SpectatorReplayFrame(x.Time, x));
                         this.Player.ReplayFrames.Clear();
                     }
                 } else if (this.IsSpectating) {
