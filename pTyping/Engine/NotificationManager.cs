@@ -3,6 +3,7 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Input;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
@@ -29,7 +30,7 @@ public class NotificationManager : DrawableManager {
         return drawable;
     }
 
-    private void OnDrawableClick(object sender, Point e) {
+    private void OnDrawableClick(object? sender, (Point pos, MouseButton button) valueTuple) {
         if (sender is not NotificationDrawable drawable)
             return;
 

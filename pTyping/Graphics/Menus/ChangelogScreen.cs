@@ -7,6 +7,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 
 namespace pTyping.Graphics.Menus;
@@ -114,7 +115,7 @@ public class ChangeLogDrawable : CompositeDrawable {
             base.Dispose(disposing);
         }
 
-        private void OnClicked(object sender, Point e) {
+        private void OnClicked(object? sender, (Point pos, MouseButton button) valueTuple) {
             LinkHelper.OpenLink($"https://github.com/Beyley/pTyping/commit/{this._entry.Commit}");
         }
     }

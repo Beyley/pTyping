@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -8,12 +9,15 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input;
+using Kettu;
 using ManagedBass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
+using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
 using pTyping.Songs;
 
@@ -42,8 +46,8 @@ public class PlayerScreen : pScreen {
     private          bool        _playingReplay = false;
     private readonly PlayerScore _playingScoreReplay;
 
-    public bool               IsSpectating   = false;
-    public Queue<ReplayFrame> SpectatorQueue = new();
+    public bool                 IsSpectating   = false;
+    public List<SpectatorFrame> SpectatorQueue = new();
 
     /// <summary>
     ///     Used to play a replay
@@ -245,25 +249,25 @@ public class PlayerScreen : pScreen {
         );
     }
 
-    private void ResumeButtonClick(object sender, Point e) {
+    private void ResumeButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.PauseResumeMusic();
 
         pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
     }
 
-    private void RestartButtonClick(object sender, Point e) {
+    private void RestartButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = 0;
         ScreenManager.ChangeScreen(new PlayerScreen());
     }
 
-    private void QuitButtonClick(object sender, Point e) {
+    private void QuitButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         ScreenManager.ChangeScreen(new SongSelectionScreen(false));
     }
 
-    private void SkipButtonClick(object sender, Point e) {
+    private void SkipButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
     }
@@ -299,8 +303,95 @@ public class PlayerScreen : pScreen {
         }
     }
 
+    private double timeSinceLastBuffer    = 0;
+    private double timeSinceLastScoreSync = 0;
+    
     public override void Update(GameTime gameTime) {
         int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+
+        lock (this.SpectatorQueue) {
+            Span<SpectatorFrame> tFrames = CollectionsMarshal.AsSpan(this.SpectatorQueue);
+            for (int i = 0; i < tFrames.Length; i++) {
+                SpectatorFrame f = tFrames[i];
+
+                if (f == null) {
+                    this.SpectatorQueue.RemoveAll(x => x == null);
+                    continue;
+                }
+
+                if (f.Time < currentTime) {
+                    this.SpectatorQueue.Remove(f);
+                    Logger.Log($"Consuming frame {f.Type} with time {f.Time}  --  currenttime:{currentTime}");
+
+                    switch (f.Type) {
+                        case SpectatorFrameDataType.Pause: {
+                            pTypingGame.OnlineManager.SpectatorState = SpectatorState.Paused;
+                            pTypingGame.MusicTrack.Pause();
+                            pTypingGame.MusicTrack.CurrentPosition = f.Time;
+                            break;
+                        }
+                        // case SpectatorFrameDataType.Resume: {
+                        //     pTypingGame.OnlineManager.SpectatorState = SpectatorState.Playing;
+                        //     pTypingGame.MusicTrack.Resume();
+                        //     break;
+                        // }
+                        case SpectatorFrameDataType.ScoreSync: {
+                            SpectatorFrameScoreSync ssF = (SpectatorFrameScoreSync)f;
+
+                            this.Player.Score = ssF.Score;
+                            break;
+                        }
+                        case SpectatorFrameDataType.Buffer: {
+                            if (currentTime - f.Time > 100) {
+                                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "We got too far ahead!");
+                                pTypingGame.MusicTrack.CurrentPosition = currentTime - 2000;
+                            }
+
+                            break;
+                        }
+                        case SpectatorFrameDataType.ReplayFrame: {
+                            SpectatorFrameReplayFrame sRf = (SpectatorFrameReplayFrame)f;
+
+                            this.Player.TypeCharacter(this, new TextInputEventArgs(sRf.Frame.Character));
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            this.timeSinceLastBuffer += gameTime.ElapsedGameTime.TotalMilliseconds;
+            //Send a buffer every second
+            if (this.timeSinceLastBuffer > 1000) {
+                if (pTypingGame.OnlineManager.Spectators.Count != 0) {
+                    pTypingGame.OnlineManager.SpectatorBuffer(currentTime);
+                    if (this.Player.ReplayFrames.Count != 0) {
+                        this.Player.ReplayFrames.ForEach(x => pTypingGame.OnlineManager.SpectatorReplayFrame(currentTime, x));
+                        this.Player.ReplayFrames.Clear();
+                    }
+                } else if (this.IsSpectating) {
+                    // if(this.SpectatorQueue.Count != 0)
+                    //     if (this.SpectatorQueue[^1].Time < currentTime + 5000) {
+                    //         //TODO: make this better
+                    //         if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing && pTypingGame.OnlineManager.SpectatorState == SpectatorState.Playing) {
+                    //             pTypingGame.MusicTrack.Pause();
+                    //             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "buffering");
+                    //         }
+                    //     } else if(pTypingGame.MusicTrack.PlaybackState == PlaybackState.Paused && pTypingGame.OnlineManager.SpectatorState == SpectatorState.Playing) {
+                    //         FurballGame.GameTimeScheduler.ScheduleMethod(_ => pTypingGame.MusicTrack.Resume(), FurballGame.Time + 1000);
+                    //     }
+                }
+                this.timeSinceLastBuffer = 0;
+            }
+
+            if (pTypingGame.OnlineManager.Spectators.Count != 0) {
+                this.timeSinceLastScoreSync += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (this.timeSinceLastScoreSync > 5000) {
+                    pTypingGame.OnlineManager.SpectatorScoreSync(currentTime, this.Player.Score);
+                    this.timeSinceLastScoreSync = 0;
+                }
+            }
+        }
 
         #region update UI
 

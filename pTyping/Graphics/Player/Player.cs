@@ -203,21 +203,22 @@ public class Player : CompositeDrawable {
         return noteDrawable;
     }
 
-    public void TypeCharacter(object sender, TextInputEventArgs args) {
+    public void TypeCharacter(object sender, TextInputEventArgs e) => this.TypeCharacter(e);
+    public void TypeCharacter(TextInputEventArgs args, bool checkingNext = false) {
         if (char.IsControl(args.Character))
             return;
 
-        if (this.RecordReplay)
-            this.ReplayFrames.Add(
-            new() {
+        if (this.RecordReplay || this.IsSpectating) {
+            ReplayFrame f = new() {
                 Character = args.Character,
                 Time      = pTypingGame.MusicTrackTimeSource.GetCurrentTime()
-            }
-            );
+            };
+            this.ReplayFrames.Add(f);
+        }
 
         if (this.Song.AllNotesHit()) return;
 
-        NoteDrawable noteDrawable = this._notes[this._noteToType];
+        NoteDrawable noteDrawable = this._notes[checkingNext ? this._noteToType + 1 : this._noteToType];
 
         Note note = noteDrawable.Note;
 
@@ -241,7 +242,7 @@ public class Player : CompositeDrawable {
                         this.HitSoundNormal.PlayNew();
                         this.NoteUpdate(true, note);
 
-                        this._noteToType++;
+                        this._noteToType += checkingNext ? 2 : 1;
                     }
                     this.ShowTypingIndicator(args.Character);
 
@@ -251,6 +252,12 @@ public class Player : CompositeDrawable {
                     break;
                 }
 
+                //We do this so you can type the next note even if you fucked up the last one, which makes gameplay a lot easier
+                if (this._noteToType != this.Song.Notes.Count - 1 && !checkingNext && currentTime > note.Time) {
+                    this.TypeCharacter(args, true);
+                    return;
+                }
+                
                 this.ShowTypingIndicator(args.Character, true);
 
                 foreach (PlayerMod mod in pTypingGame.SelectedMods)

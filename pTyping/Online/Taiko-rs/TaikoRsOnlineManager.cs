@@ -102,13 +102,10 @@ public class TaikoRsOnlineManager : OnlineManager {
     private long _lastFrameSendTime;
     private void SpectatorFrameQueueRun() {
         while (this._spectatorFrameSendThreadRun) {
-            if ((double)UnixTime.Now() - this._lastFrameSendTime > 1) {
+            if ((double)UnixTime.Now() - this._lastFrameSendTime > 1 || this.SpectatorFrameQueue.Count > 10) {
                 this.SendSpectatorFrames();
                 this._lastFrameSendTime = UnixTime.Now();
             }
-
-            if (this.SpectatorFrameQueue.Count > 20)
-                this.SendSpectatorFrames();
 
             Thread.Sleep(50);
         }
@@ -145,7 +142,13 @@ public class TaikoRsOnlineManager : OnlineManager {
                 };
 
                 Logger.Log("Sending spectate frame play", LoggerLevelOnlineInfo.Instance);
-                this.SpectatorFrameQueue.Enqueue(frame);
+                this.PacketQueue.Enqueue(
+                new ClientSpectatorFramesPacket {
+                    Frames = new SpectatorFrame[] {
+                        frame
+                    }
+                }
+                );
                 break;
             }
             case SongSelectionScreen or MenuScreen:
@@ -164,7 +167,7 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("SEnding spectator pause");
+        Logger.Log("Sending spectator pause");
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFramePause {
             Time = (float)time
@@ -177,16 +180,55 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("SEnding spectator resume");
+        Logger.Log("Sending spectator resume");
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFrameUnpause {
             Time = (float)time
         }
         );
     }
+    public override void SpectatorBuffer(double time) {
+        lock (this.Spectators) {
+            if (this.Spectators.Count == 0) return;
+        }
+
+        Logger.Log("Sending spectator buffer");
+        this.SpectatorFrameQueue.Enqueue(
+        new SpectatorFrameBuffer {
+            Time = (float)time
+        }
+        );
+    }
+    public override void SpectatorScoreSync(double time, PlayerScore score) {
+        lock (this.Spectators) {
+            if (this.Spectators.Count == 0) return;
+        }
+
+        Logger.Log("Sending score frame");
+        this.SpectatorFrameQueue.Enqueue(
+        new SpectatorFrameScoreSync {
+            Time  = (float)time,
+            Score = score
+        }
+        );
+    }
+    public override void SpectatorReplayFrame(double time, ReplayFrame frame) {
+        lock (this.Spectators) {
+            if (this.Spectators.Count == 0) return;
+        }
+
+        Logger.Log("Sending replay frame");
+        this.SpectatorFrameQueue.Enqueue(
+        new SpectatorFrameReplayFrame {
+            Time  = (float)time,
+            Frame = frame
+        }
+        );
+    }
 
     public override void SpectatePlayer(OnlinePlayer player) {
-        if (this.Host != null) return;
+        if (this.Host != null)
+            return;
 
         this.PacketQueue.Enqueue(
         new ClientSpectatePacket {
@@ -196,7 +238,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         Logger.Log($"Trying to spectate {player.Username}", LoggerLevelOnlineInfo.Instance);
 
-        this.Host = player;
+        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Attepmting to spectate {player.Username}");
     }
 
     private void OnScreenChangeBefore(object? sender, Screen e) {
@@ -336,7 +378,8 @@ public class TaikoRsOnlineManager : OnlineManager {
             PacketId.ServerNotification            => this.HandleServerNotificationPacket(reader),
             PacketId.ServerDropConnection          => this.HandleServerDropConnectionPacket(reader),
             PacketId.ServerError                   => this.HandleServerErrorPacket(reader),
-            PacketId.ServerSpectatorPlayingRequest => true,//TODO: fix this
+            PacketId.ServerSpectatorPlayingRequest => this.HandleServerSpectatorPlayingRequest(reader),
+            PacketId.ServerSpectateResult          => this.HandleServerSpectateResult(reader),
             PacketId.ServerPermissions             => throw new NotImplementedException(),
             #region we ignore these
 
@@ -354,6 +397,57 @@ public class TaikoRsOnlineManager : OnlineManager {
         if (!success) throw new Exception($"Error reading packet with PID: {pid}");
     }
 
+    private bool HandleServerSpectateResult(TaikoRsReader reader) {
+        ServerSpectateResultPacket p = new();
+
+        p.ReadDataFromStream(reader);
+
+        switch (p.Result) {
+            case SpectateResult.Ok:
+                lock (this.OnlinePlayers) {
+                    if (this.OnlinePlayers.TryGetValue(p.HostId, out OnlinePlayer player)) {
+                        this.Host = player;
+                        pTypingGame.NotificationManager.CreateNotification(
+                        NotificationManager.NotificationImportance.Info,
+                        $"You have started spectating {player.Username}!"
+                        );
+                    } else {
+                        goto case SpectateResult.ErrorUnknown;
+                    }
+                }
+                break;
+            case SpectateResult.ErrorSpectatingBot:
+                pTypingGame.NotificationManager.CreateNotification(
+                NotificationManager.NotificationImportance.Error,
+                "You cannot spectate a bot! (yo wait thats bars)"
+                );
+                break;
+            case SpectateResult.ErrorHostOffline:
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "The host is offline!");
+                break;
+            case SpectateResult.ErrorSpectatingYourself:
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "You are unable to spectate yourself!");
+                break;
+            case SpectateResult.ErrorUnknown:
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Unable to spectate player!");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return true;
+    }
+
+    private bool HandleServerSpectatorPlayingRequest(TaikoRsReader reader) {
+        ServerSpectatorPlayingRequestPacket p = new();
+
+        p.ReadDataFromStream(reader);
+
+        //TODO: Actually implement this
+
+        return true;
+    }
+
     private bool HandleServerErrorPacket(TaikoRsReader reader) {
         ServerErrorPacket p = new();
         p.ReadDataFromStream(reader);
@@ -367,7 +461,31 @@ public class TaikoRsOnlineManager : OnlineManager {
         ServerDropConnectionPacket p = new();
         p.ReadDataFromStream(reader);
 
-        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Dropped from server \nReason: {p.Message}");
+        string final = "Dropped from server!\nReason: ";
+
+        switch (p.Reason) {
+            case ServerDropReason.Other: {
+                final += $"Unknown, Details: {p.Message}";
+                break;
+            }
+            case ServerDropReason.BadPacket: {
+                final += "Packet Reading Error";
+
+                if (RuntimeInfo.IsDebug())
+                    final += $"\n{p.Message}";
+                break;
+            }
+            case ServerDropReason.OtherLogin: {
+                final += "Someone else logged in with your account!";
+                break;
+            }
+            case ServerDropReason.ServerClosing: {
+                final += "Server Closing!";
+                break;
+            }
+        }
+
+        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, final);
 
         this.Disconnect();
 
@@ -397,7 +515,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
             this.LastSpectatorTime = frame.Time;
 
-            Logger.Log($"Got spectator frame {frame.Type}");
+            Logger.Log($"Got spectator frame {frame.Type} at {frame.Time}");
 
             switch (frame.Type) {
                 case SpectatorFrameDataType.Play: {
@@ -425,42 +543,61 @@ public class TaikoRsOnlineManager : OnlineManager {
 
                         ScreenManager.ChangeScreen(new PlayerScreen(this.Host));
 
-                        pTypingGame.MusicTrack.Play();
+                        //Wait 5s for now
+                        FurballGame.GameTimeScheduler.ScheduleMethod(
+                        _ => {
+                            pTypingGame.MusicTrack.Play();
+                        },
+                        FurballGame.Time + 5000
+                        );
 
                         this.SpectatorState = SpectatorState.Playing;
                     },
                     FurballGame.Time
                     );
 
-
                     break;
                 }
                 case SpectatorFrameDataType.Pause: {
                     if (this.Host == this.Player) break;
 
-                    pTypingGame.MusicTrack.Pause();
-                    this.SpectatorState = SpectatorState.Paused;
+                    lock (this.GameScene.SpectatorQueue) {
+                        this.GameScene.SpectatorQueue.Add(frame);
+                    }
 
                     break;
                 }
-                case SpectatorFrameDataType.Unpause: {
+                case SpectatorFrameDataType.Resume: {
                     if (this.Host == this.Player) break;
 
-                    pTypingGame.MusicTrack.Resume();
-                    this.SpectatorState = SpectatorState.Playing;
+                    // lock (this.GameScene.SpectatorQueue) {
+                    //     this.GameScene.SpectatorQueue.Add(frame);
+                    // }
+
+                    FurballGame.GameTimeScheduler.ScheduleMethod(
+                    _ => {
+                        pTypingGame.OnlineManager.SpectatorState = SpectatorState.Playing;
+                        pTypingGame.MusicTrack.Resume();
+                    },
+                    FurballGame.Time + 5000
+                    );
+                    
 
                     break;
                 }
-                case SpectatorFrameDataType.Stop:            { throw new NotImplementedException(); }
-                case SpectatorFrameDataType.Buffer:          { break; }// ignore
+                case SpectatorFrameDataType.Buffer: {
+                    lock (this.GameScene.SpectatorQueue) {
+                        this.GameScene.SpectatorQueue.Add(frame);
+                    }
+
+                    break;
+                }
                 case SpectatorFrameDataType.SpectatingOther: { throw new NotImplementedException(); }
                 case SpectatorFrameDataType.ReplayFrame: {
                     if (this.Host == this.Player) break;
 
-                    SpectatorFrameReplayFrame rfFrame = (SpectatorFrameReplayFrame)frame;
-
                     lock (this.GameScene.SpectatorQueue) {
-                        this.GameScene.SpectatorQueue.Enqueue(rfFrame.Frame);
+                        this.GameScene.SpectatorQueue.Add(frame);
                     }
 
                     break;
@@ -468,10 +605,8 @@ public class TaikoRsOnlineManager : OnlineManager {
                 case SpectatorFrameDataType.ScoreSync: {
                     if (this.Host == this.Player) break;
 
-                    SpectatorFrameScoreSync ssFrame = (SpectatorFrameScoreSync)frame;
-
-                    lock (this.GameScene.Player.Score) {
-                        this.GameScene.Player.Score = ssFrame.Score;
+                    lock (this.GameScene.SpectatorQueue) {
+                        this.GameScene.SpectatorQueue.Add(frame);
                     }
 
                     break;
@@ -531,11 +666,13 @@ public class TaikoRsOnlineManager : OnlineManager {
         //     
         // }
 
-        if (!this.OnlinePlayers.TryGetValue(p.UserId, out OnlinePlayer player))
-            return false;
+        lock (this.OnlinePlayers) {
+            if (!this.OnlinePlayers.TryGetValue(p.UserId, out OnlinePlayer player))
+                return false;
 
-        lock (this.Spectators) {
-            this.Spectators.Add(p.UserId, player);
+            lock (this.Spectators) {
+                this.Spectators.Add(p.UserId, player);
+            }
         }
 
         Logger.Log($"User {p.Username} started speccing us (or joined us in speccing someone else)!", LoggerLevelOnlineInfo.Instance);
@@ -595,21 +732,23 @@ public class TaikoRsOnlineManager : OnlineManager {
         ServerSendMessagePacket packet = new();
         packet.ReadDataFromStream(reader);
 
-        if (this.OnlinePlayers.TryGetValue(packet.SenderId, out OnlinePlayer player)) {
-            ChatMessage message = new(player, packet.Channel, packet.Message);
+        lock (this.OnlinePlayers) {
+            if (this.OnlinePlayers.TryGetValue(packet.SenderId, out OnlinePlayer player)) {
+                ChatMessage message = new(player, packet.Channel, packet.Message);
 
-            if (message.Message.Length > 128) message.Message = message.Message[..Math.Min(128, message.Message.Length)];
+                if (message.Message.Length > 128) message.Message = message.Message[..Math.Min(128, message.Message.Length)];
 
-            this._chatQueue.Enqueue(message);
+                this._chatQueue.Enqueue(message);
 
-            Logger.Log(
-            $"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}",
-            LoggerLevelChatMessage.Instance
-            );
+                Logger.Log(
+                $"<{message.Time.Hour:00}:{message.Time.Minute:00}> [{message.Channel}] {message.Sender.Username}: {message.Message}",
+                LoggerLevelChatMessage.Instance
+                );
 
-            lock (this.KnownChannels) {
-                if (!this.KnownChannels.Contains(packet.Channel))
-                    this.KnownChannels.Add(packet.Channel);
+                lock (this.KnownChannels) {
+                    if (!this.KnownChannels.Contains(packet.Channel))
+                        this.KnownChannels.Add(packet.Channel);
+                }
             }
         }
 
@@ -620,17 +759,19 @@ public class TaikoRsOnlineManager : OnlineManager {
         ServerScoreUpdatePacket packet = new();
         packet.ReadDataFromStream(reader);
 
-        if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-            player.TotalScore.Value  = packet.TotalScore;
-            player.RankedScore.Value = packet.RankedScore;
-            player.Accuracy.Value    = packet.Accuracy;
-            player.PlayCount.Value   = packet.Playcount;
-            player.Rank.Value        = packet.Rank;
+        lock (this.OnlinePlayers) {
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                player.TotalScore.Value  = packet.TotalScore;
+                player.RankedScore.Value = packet.RankedScore;
+                player.Accuracy.Value    = packet.Accuracy;
+                player.PlayCount.Value   = packet.Playcount;
+                player.Rank.Value        = packet.Rank;
 
-            Logger.Log(
-            $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
-            LoggerLevelOnlineInfo.Instance
-            );
+                Logger.Log(
+                $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
+                LoggerLevelOnlineInfo.Instance
+                );
+            }
         }
 
         return true;
@@ -640,12 +781,14 @@ public class TaikoRsOnlineManager : OnlineManager {
         ServerUserStatusUpdatePacket packet = new();
         packet.ReadDataFromStream(reader);
 
-        if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-            player.Action.Value = packet.Action;
-            Logger.Log(
-            $"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}! Mode: {packet.Action.Mode.Value}",
-            LoggerLevelOnlineInfo.Instance
-            );
+        lock (this.OnlinePlayers) {
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                player.Action.Value = packet.Action;
+                Logger.Log(
+                $"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}! Mode: {packet.Action.Mode.Value}",
+                LoggerLevelOnlineInfo.Instance
+                );
+            }
         }
 
         return true;
@@ -655,8 +798,12 @@ public class TaikoRsOnlineManager : OnlineManager {
         ServerUserLeftPacket packet = new();
         packet.ReadDataFromStream(reader);
 
-        if (this.OnlinePlayers.Remove(packet.UserId, out OnlinePlayer playerLeft))
-            Logger.Log($"{playerLeft.Username} has gone offline!", LoggerLevelOnlineInfo.Instance);
+        lock (this.OnlinePlayers) {
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+                Logger.Log($"{player.Username} has gone offline!", LoggerLevelOnlineInfo.Instance);
+                this.OnlinePlayers.Remove(packet.UserId);
+            }
+        }
 
         return true;
     }
@@ -696,7 +843,9 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         this.InvokeOnLoginComplete(this);
 
-        this.OnlinePlayers.Add(this.Player.UserId, this.Player);
+        lock (this.OnlinePlayers) {
+            this.OnlinePlayers.Add(this.Player.UserId, this.Player);
+        }
 
         pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Login complete! Welcome {this.Player.Username}!");
 
@@ -716,7 +865,9 @@ public class TaikoRsOnlineManager : OnlineManager {
 
     public override void Update(GameTime time) {
         while (this._chatQueue.TryDequeue(out ChatMessage message))
-            this.ChatLog.Add(message);
+            lock (this.ChatLog) {
+                this.ChatLog.Add(message);
+            }
 
         base.Update(time);
     }
@@ -734,9 +885,11 @@ public class TaikoRsOnlineManager : OnlineManager {
             }
         };
 
-        if (this.OnlinePlayers.ContainsKey(packet.UserId)) return true;
+        lock (this.OnlinePlayers) {
+            if (this.OnlinePlayers.ContainsKey(packet.UserId)) return true;
 
-        this.OnlinePlayers.Add(packet.UserId, player);
+            this.OnlinePlayers.Add(packet.UserId, player);
+        }
         Logger.Log($"{player.Username} is online!", LoggerLevelOnlineInfo.Instance);
 
         return true;

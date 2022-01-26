@@ -4,6 +4,7 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs;
@@ -45,7 +46,7 @@ public class NewSongScreen : pScreen {
         foreach (string songPath in songs) {
             FileInfo songInfo = new(songPath);
 
-            EventHandler<Point> songOnClick = delegate {
+            EventHandler<(Point pos, MouseButton button)> songOnClick = delegate {
                 this.CreateSong(songInfo);
             };
 

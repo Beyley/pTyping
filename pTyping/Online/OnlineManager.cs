@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Furball.Engine;
+using Hellosam.Net.Collections;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using pTyping.Engine;
@@ -22,8 +22,8 @@ public enum SpectatorState {
 }
 
 public abstract class OnlineManager {
-    public ObservableCollection<ChatMessage>                  ChatLog       = new();
-    public ObservableConcurrentDictionary<uint, OnlinePlayer> OnlinePlayers = new();
+    public ObservableCollection<ChatMessage>        ChatLog       = new();
+    public ObservableDictionary<uint, OnlinePlayer> OnlinePlayers = new();
     /// <summary>
     ///     If you are host, this is your spectators, otherwise it is the other spectators
     /// </summary>
@@ -69,9 +69,12 @@ public abstract class OnlineManager {
     protected abstract void Disconnect();
     public abstract    void SendMessage(string channel, string message);
 
-    public abstract void SpectatorPause(double  time);
-    public abstract void SpectatorResume(double time);
-
+    public abstract void SpectatorPause(double       time);
+    public abstract void SpectatorResume(double      time);
+    public abstract void SpectatorBuffer(double      time);
+    public abstract void SpectatorScoreSync(double   time, PlayerScore score);
+    public abstract void SpectatorReplayFrame(double time, ReplayFrame frame);
+    
     public abstract void SpectatePlayer(OnlinePlayer player);
 
     protected abstract Task ClientSubmitScore(PlayerScore score);
@@ -95,8 +98,9 @@ public abstract class OnlineManager {
     public event EventHandler OnDisconnect;
 
     public void Login() {
-        foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
-            this.OnlinePlayers.Remove(keyValuePair.Key);
+        lock (this.OnlinePlayers) {
+            this.OnlinePlayers.Clear();
+        }
 
         pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Logging in...");
         new Thread(
@@ -121,8 +125,9 @@ public abstract class OnlineManager {
     }
 
     public void Logout() {
-        foreach (KeyValuePair<uint, OnlinePlayer> keyValuePair in this.OnlinePlayers)
-            this.OnlinePlayers.Remove(keyValuePair.Key);
+        lock (this.OnlinePlayers) {
+            this.OnlinePlayers.Clear();
+        }
 
         this.ClientLogout();
 

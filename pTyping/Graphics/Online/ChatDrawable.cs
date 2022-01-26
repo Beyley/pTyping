@@ -157,9 +157,9 @@ public class ChatDrawable : CompositeDrawable {
         this._channelContents.TargetScroll += e.scrollAmount;
     }
 
-    private void OnThisClick(object sender, Point e) {
+    private void OnThisClick(object? sender, (Point pos, MouseButton button) e) {
         if (this.Visible)
-            this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.LeftButton, e - this.Position.ToPoint() + this.LastCalculatedOrigin.ToPoint()), ""));
+            this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.LeftButton, e.pos - this.Position.ToPoint() + this.LastCalculatedOrigin.ToPoint()), ""));
     }
 
     private void SelectedChannelOnChange(object sender, string e) => this.RecalculateAndUpdate_wait_thats_bars();
@@ -178,34 +178,36 @@ public class ChatDrawable : CompositeDrawable {
     }
 
     private void RecalculateAndUpdate_wait_thats_bars() {
-        IEnumerable<ChatMessage> chatMessages = pTypingGame.OnlineManager.ChatLog.Skip(Math.Max(0, pTypingGame.OnlineManager.ChatLog.Count - 100))
-                                                           .Where(message => message.Channel == this.SelectedChannel).Reverse();
+        lock (pTypingGame.OnlineManager.ChatLog) {
+            IEnumerable<ChatMessage> chatMessages = pTypingGame.OnlineManager.ChatLog.Skip(Math.Max(0, pTypingGame.OnlineManager.ChatLog.Count - 100))
+                                                               .Where(message => message.Channel == this.SelectedChannel).Reverse();
 
-        // this._channelContents.ForEach(x => this._drawables.Remove(x));
-        // this._channelContents.Clear();
-        this._channelContents.Clear();
+            // this._channelContents.ForEach(x => this._drawables.Remove(x));
+            // this._channelContents.Clear();
+            this._channelContents.Clear();
 
-        float y = this.Size.Y - this.MessageInputDrawable.Size.Y - 10;
-        foreach (ChatMessage message in chatMessages) {
-            ChatMessageDrawable messageDrawable = new(this, new(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
-                OriginType = OriginType.BottomLeft
-            };
-
-            messageDrawable.Tags.Add(messageDrawable.Position.Y.ToString());
-
-            if (message.Message.Contains("trans")) {
-                messageDrawable.Colors = new[] {
-                    Color.Cyan, Color.Pink, Color.White, Color.Pink
+            float y = this.Size.Y - this.MessageInputDrawable.Size.Y - 10;
+            foreach (ChatMessage message in chatMessages) {
+                ChatMessageDrawable messageDrawable = new(this, new(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
+                    OriginType = OriginType.BottomLeft
                 };
-                messageDrawable.ColorType = TextColorType.Repeating;
+
+                messageDrawable.Tags.Add(messageDrawable.Position.Y.ToString());
+
+                if (message.Message.Contains("trans")) {
+                    messageDrawable.Colors = new[] {
+                        Color.Cyan, Color.Pink, Color.White, Color.Pink
+                    };
+                    messageDrawable.ColorType = TextColorType.Repeating;
+                }
+
+                this._channelContents.PublicDrawables.Add(messageDrawable);
+
+                y -= messageDrawable.Size.Y - 5;
             }
 
-            this._channelContents.PublicDrawables.Add(messageDrawable);
-
-            y -= messageDrawable.Size.Y - 5;
+            this._channelContents.TargetScroll = 0;
         }
-
-        this._channelContents.TargetScroll = 0;
     }
 
     public override void Dispose(bool disposing) {

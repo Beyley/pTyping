@@ -27,6 +27,7 @@
         <PackageReference Include="DiscordRichPresence" Version="1.0.175"/>
         <PackageReference Include="EeveeTools" Version="1.0.0"/>
         <PackageReference Include="GtkSharp.Win32" Version="3.1.2"/>
+        <PackageReference Include="hellosam.net.collections" Version="1.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
         <PackageReference Include="JetBrains.dotMemory.Console.linux-x64" Version="2021.3.2"/>
         <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.103"/>

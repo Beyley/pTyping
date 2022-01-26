@@ -112,6 +112,8 @@ public class PlayerScore {
         reader.ReadInt16();// ignore katu
         reader.ReadInt16();// ignore miss
         score.Accuracy = reader.ReadDouble();
+        //TODO: handle speed
+        reader.ReadSingle();
 
         return score;
     }
@@ -219,8 +221,9 @@ public struct ReplayFrame {
 
     public void TaikoRsDeserialize(double time, BinaryReader reader) {
         this.Time      = time;
+        reader.ReadByte();
         this.Character = reader.ReadChar();
 
-        reader.ReadBytes(48);//extra garbage we ignore
+        reader.ReadBytes(6);//extra garbage we ignore
     }
 }

@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input;
 using JetBrains.Annotations;
 using ManagedBass;
 using Microsoft.Xna.Framework;
@@ -75,7 +76,7 @@ public class SongSelectionScreen : pScreen {
         #region Create new song button
 
         if (this._editor) {
-            EventHandler<Point> newSongOnClick = delegate {
+            EventHandler<(Point pos, MouseButton button)> newSongOnClick = delegate {
                 pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new NewSongScreen());
             };
@@ -228,7 +229,7 @@ public class SongSelectionScreen : pScreen {
         pTypingGame.UserStatusPickingSong();
     }
 
-    private void ChangeLeaderboardType(object sender, Point e) {
+    private void ChangeLeaderboardType(object? sender, (Point pos, MouseButton button) valueTuple) {
         LeaderboardType.Value = LeaderboardType.Value switch {
             SongSelect.LeaderboardType.Local  => SongSelect.LeaderboardType.Global,
             SongSelect.LeaderboardType.Global => SongSelect.LeaderboardType.Friend,

@@ -30,8 +30,8 @@ public enum PlayMode : byte {
     Taiko    = 1,
     Catch    = 2,
     Mania    = 3,
-    Adofai   = 5,
+    Adofai   = 4,
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    pTyping = 4,
+    pTyping = 5,
     Unknown = 255
 }

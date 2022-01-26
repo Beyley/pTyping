@@ -7,14 +7,14 @@ namespace pTyping.Online.Taiko_rs;
 public enum SpectatorFrameDataType : byte {
     Play            = 0,
     Pause           = 1,
-    Unpause         = 2,
-    Stop            = 3,
-    Buffer          = 4,
-    SpectatingOther = 5,
-    ReplayFrame     = 6,
-    ScoreSync       = 7,
-    ChangingMap     = 8,
-    PlayingResponse = 9
+    Resume          = 2,
+    Buffer          = 3,
+    SpectatingOther = 4,
+    ReplayFrame     = 5,
+    ScoreSync       = 6,
+    ChangingMap     = 7,
+    PlayingResponse = 8,
+    Unknown         = 255
 }
 
 [JsonObject(MemberSerialization.OptIn)]
@@ -38,11 +38,7 @@ public class SpectatorFramePause : SpectatorFrame {
 }
 
 public class SpectatorFrameUnpause : SpectatorFrame {
-    public override SpectatorFrameDataType Type => SpectatorFrameDataType.Unpause;
-}
-
-public class SpectatorFrameStop : SpectatorFrame {
-    public override SpectatorFrameDataType Type => SpectatorFrameDataType.Stop;
+    public override SpectatorFrameDataType Type => SpectatorFrameDataType.Resume;
 }
 
 public class SpectatorFrameBuffer : SpectatorFrame {
@@ -157,11 +153,8 @@ public abstract class SpectatorFrame {
             case SpectatorFrameDataType.Pause:
                 frame = new SpectatorFramePause();
                 break;
-            case SpectatorFrameDataType.Unpause:
+            case SpectatorFrameDataType.Resume:
                 frame = new SpectatorFrameUnpause();
-                break;
-            case SpectatorFrameDataType.Stop:
-                frame = new SpectatorFrameStop();
                 break;
             case SpectatorFrameDataType.Buffer:
                 frame = new SpectatorFrameBuffer();
@@ -194,7 +187,7 @@ public abstract class SpectatorFrame {
                 break;
             }
             case SpectatorFrameDataType.ChangingMap:
-                frame = new SpectatorFramePause();
+                frame = new SpectatorFrameChangingMap();
                 break;
             case SpectatorFrameDataType.PlayingResponse: {
                 SpectatorFramePlayingResponse tframe = new();

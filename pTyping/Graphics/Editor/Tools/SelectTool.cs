@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using pTyping.Graphics.Drawables.Events;
@@ -260,7 +261,7 @@ public class SelectTool : EditorTool {
         this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
     }
 
-    private void OnObjectClick(object sender, Point e) {
+    private void OnObjectClick(object? sender, (Point pos, MouseButton button) valueTuple) {
         if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift)) return;
 
         bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl) || FurballGame.InputManager.HeldKeys.Contains(Keys.RightControl);

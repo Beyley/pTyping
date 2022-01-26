@@ -255,12 +255,17 @@ public class ServerUserJoinedPacket : Packet {
 
     private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
         ("user_id", DataType.UInt),
-        ("username", DataType.String)
+        ("username", DataType.String),
+        ("game", DataType.String)
     };
 
     public string Username {
         get => (string)this.Data["username"];
         set => this.Data["username"] = value;
+    }
+    public string Game {
+        get => (string)this.Data["game"];
+        set => this.Data["game"] = value;
     }
     public uint UserId {
         get => (uint)this.Data["user_id"];
@@ -424,13 +429,26 @@ public class ServerNotificationPacket : Packet {
     public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
 }
 
+public enum ServerDropReason : byte {
+    OtherLogin    = 0,
+    BadPacket     = 1,
+    ServerClosing = 2,
+    Other         = 255
+}
+
 public class ServerDropConnectionPacket : Packet {
     public override PacketId Pid => PacketId.ServerDropConnection;
 
     private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+        ("reason", DataType.Byte),
         ("message", DataType.String)
     };
 
+    public ServerDropReason Reason {
+        get => (ServerDropReason)this.Data["reason"];
+        set => this.Data["reason"] = value;
+    }
+    
     public string Message {
         get => (string)this.Data["message"];
         set => this.Data["message"] = value;
@@ -449,6 +467,21 @@ public class ServerErrorPacket : Packet {
     public ServerErrorCode ErrorCode {
         get => (ServerErrorCode)this.Data["error_code"];
         set => this.Data["error_code"] = value;
+    }
+
+    public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
+}
+
+public class ServerSpectatorPlayingRequestPacket : Packet {
+    public override PacketId Pid => PacketId.ServerSpectatorPlayingRequest;
+
+    private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+        ("user_id", DataType.UInt)
+    };
+
+    public uint UserId {
+        get => (uint)this.Data["user_id"];
+        set => this.Data["user_id"] = value;
     }
 
     public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
@@ -533,6 +566,27 @@ public class ServerSpectatorLeftPacket : Packet {
     public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
 }
 
+public class ServerSpectateResultPacket : Packet {
+    public override PacketId Pid => PacketId.ServerSpectateResult;
+
+    private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+        ("result", DataType.Byte),
+        ("host_id", DataType.UInt)
+    };
+
+    public SpectateResult Result {
+        get => (SpectateResult)this.Data["result"];
+        set => this.Data["result"] = value;
+    }
+
+    public uint HostId {
+        get => (uint)this.Data["host_id"];
+        set => this.Data["host_id"] = value;
+    }
+
+    public override List<(string name, DataType type)> DataDefinition => DATA_DEFINITION;
+}
+
 public class ClientSpectatorFramesPacket : Packet {
     public override PacketId Pid => PacketId.ClientSpectatorFrames;
 
@@ -607,7 +661,16 @@ public enum PacketId : ushort {
     ServerSpectatorLeft           = 403,
     ClientSpectatorFrames         = 404,
     ServerSpectatorFrames         = 405,
-    ServerSpectatorPlayingRequest = 406
+    ServerSpectatorPlayingRequest = 406,
+    ServerSpectateResult          = 407
 
     #endregion
+}
+
+public enum SpectateResult : byte {
+    Ok                      = 0,
+    ErrorSpectatingBot      = 1,
+    ErrorHostOffline        = 2,
+    ErrorSpectatingYourself = 3,
+    ErrorUnknown            = 255
 }

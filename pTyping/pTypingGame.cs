@@ -14,6 +14,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
 using ManagedBass;
@@ -503,13 +504,17 @@ public class pTypingGame : FurballGame {
     private void UpdateUserPanel(object sender, object e) {
         GameTimeScheduler.ScheduleMethod(
         _ => {
-            _OnlineUsersText.Text = $"Online Users: {OnlineManager.OnlinePlayers.Count(x => !x.Value.Bot)} ({OnlineManager.OnlinePlayers.Count()})";
+            _OnlineUsersText.Text = $"Online Users: {OnlineManager.OnlinePlayers.Count(x => !x.Bot)} ({OnlineManager.OnlinePlayers.Count})";
 
-            this._userPanelDrawables.ForEach(x => this._userPanelManager.Remove(x));
+            this._userPanelDrawables.ForEach(
+            x => {
+                this._userPanelManager.Remove(x);
+            }
+            );
             this._userPanelDrawables.Clear();
 
             Vector2 pos = new(10, 10 + _OnlineUsersText.Size.Y + 10);
-            foreach ((uint _, OnlinePlayer player) in OnlineManager.OnlinePlayers) {
+            foreach (OnlinePlayer player in OnlineManager.OnlinePlayers) {
                 UserCardDrawable drawable = player.GetUserCard();
                 drawable.MoveTo(pos);
                 pos.X += drawable.Size.X + 10;
@@ -519,11 +524,20 @@ public class pTypingGame : FurballGame {
                     pos.Y += drawable.Size.Y + 10;
                 }
 
-                drawable.OnClick += delegate {
-                    lock (OnlineManager.KnownChannels) {
-                        if (!OnlineManager.KnownChannels.Contains(player.Username))
-                            OnlineManager.KnownChannels.Add(player.Username);
+                drawable.OnClick += delegate(object _, (Point pos, MouseButton button) a) {
+                    switch (a.button) {
+                        case MouseButton.LeftButton: {
+                            lock (OnlineManager.KnownChannels) {
+                                if (!OnlineManager.KnownChannels.Contains(player.Username))
+                                    OnlineManager.KnownChannels.Add(player.Username);
+                            }
+                            break;
+                        }
+                        case MouseButton.RightButton:
+                            OnlineManager.SpectatePlayer(player);
+                            break;
                     }
+
                 };
 
                 this._userPanelDrawables.Add(drawable);
