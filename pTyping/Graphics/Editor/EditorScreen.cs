@@ -311,7 +311,8 @@ public class EditorScreen : pScreen {
         ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
         this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
     }
-    private void ProgressBarOnInteract(object? sender, Point e) {
+
+    private void ProgressBarOnInteract(object sender, Point e) {
         this.ProgressBarOnInteract(sender, (e, MouseButton.LeftButton));
     }
 
@@ -344,7 +345,7 @@ public class EditorScreen : pScreen {
         this.HitSoundNormal.Volume = f;
     }
 
-    private void ProgressBarOnInteract(object? sender, (Point pos, MouseButton button) e) {
+    private void ProgressBarOnInteract(object sender, (Point pos, MouseButton button) e) {
         Vector2 adjustedPoint = e.pos.ToVector2() - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
 
         double value = (double)adjustedPoint.X / this._progressBar.Size.X;

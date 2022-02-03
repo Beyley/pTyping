@@ -157,7 +157,7 @@ public class ChatDrawable : CompositeDrawable {
         this._channelContents.TargetScroll += e.scrollAmount;
     }
 
-    private void OnThisClick(object? sender, (Point pos, MouseButton button) e) {
+    private void OnThisClick(object sender, (Point pos, MouseButton button) e) {
         if (this.Visible)
             this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.LeftButton, e.pos - this.Position.ToPoint() + this.LastCalculatedOrigin.ToPoint()), ""));
     }

@@ -114,7 +114,7 @@ public class TaikoRsOnlineManager : OnlineManager {
     private void SendSpectatorFrames() {
         if (this.SpectatorFrameQueue.IsEmpty) return;
 
-        Logger.Log($"Sending spectator frames c:{this.SpectatorFrameQueue.Count}");
+        Logger.Log($"Sending spectator frames c:{this.SpectatorFrameQueue.Count}", LoggerLevelOnlineInfo.Instance);
 
         this.PacketQueue.Enqueue(
         new ClientSpectatorFramesPacket {
@@ -124,7 +124,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         this.SpectatorFrameQueue.Clear();
     }
 
-    private void OnScreenChangeAfter(object? sender, Screen e) {
+    private void OnScreenChangeAfter(object sender, Screen e) {
         lock (this.Spectators) {
             if (this.Spectators.Count == 0) return;
         }
@@ -167,7 +167,7 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("Sending spectator pause");
+        Logger.Log("Sending spectator pause", LoggerLevelOnlineInfo.Instance);
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFramePause {
             Time = (float)time
@@ -180,7 +180,7 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("Sending spectator resume");
+        Logger.Log("Sending spectator resume", LoggerLevelOnlineInfo.Instance);
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFrameUnpause {
             Time = (float)time
@@ -192,7 +192,7 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("Sending spectator buffer");
+        Logger.Log("Sending spectator buffer", LoggerLevelOnlineInfo.Instance);
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFrameBuffer {
             Time = (float)time
@@ -204,7 +204,7 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("Sending score frame");
+        Logger.Log("Sending score frame", LoggerLevelOnlineInfo.Instance);
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFrameScoreSync {
             Time  = (float)time,
@@ -217,7 +217,7 @@ public class TaikoRsOnlineManager : OnlineManager {
             if (this.Spectators.Count == 0) return;
         }
 
-        Logger.Log("Sending replay frame");
+        Logger.Log("Sending replay frame", LoggerLevelOnlineInfo.Instance);
         this.SpectatorFrameQueue.Enqueue(
         new SpectatorFrameReplayFrame {
             Time  = (float)time,
@@ -241,7 +241,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Attepmting to spectate {player.Username}");
     }
 
-    private void OnScreenChangeBefore(object? sender, Screen e) {
+    private void OnScreenChangeBefore(object sender, Screen e) {
         if (e is PlayerScreen) {
             // lock(this.Spectators)
             //     if (this.Spectators.Count == 0) return;
@@ -515,7 +515,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
             this.LastSpectatorTime = frame.Time;
 
-            Logger.Log($"Got spectator frame {frame.Type} at {frame.Time}");
+            Logger.Log($"Got spectator frame {frame.Type} at {frame.Time}", LoggerLevelOnlineInfo.Instance);
 
             switch (frame.Type) {
                 case SpectatorFrameDataType.Play: {
@@ -523,7 +523,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
                     SpectatorFramePlay pFrame = (SpectatorFramePlay)frame;
 
-                    Logger.Log($"host playing map: {pFrame.BeatmapHash} starting to switch");
+                    Logger.Log($"host playing map: {pFrame.BeatmapHash} starting to switch", LoggerLevelOnlineInfo.Instance);
 
                     FurballGame.GameTimeScheduler.ScheduleMethod(
                     _ => {

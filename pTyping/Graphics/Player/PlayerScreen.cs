@@ -249,25 +249,25 @@ public class PlayerScreen : pScreen {
         );
     }
 
-    private void ResumeButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
+    private void ResumeButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.PauseResumeMusic();
 
         pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
     }
 
-    private void RestartButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
+    private void RestartButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = 0;
         ScreenManager.ChangeScreen(new PlayerScreen());
     }
 
-    private void QuitButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
+    private void QuitButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         ScreenManager.ChangeScreen(new SongSelectionScreen(false));
     }
 
-    private void SkipButtonClick(object? sender, (Point pos, MouseButton button) valueTuple) {
+    private void SkipButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
     }
@@ -321,7 +321,7 @@ public class PlayerScreen : pScreen {
 
                 if (f.Time < currentTime) {
                     this.SpectatorQueue.Remove(f);
-                    Logger.Log($"Consuming frame {f.Type} with time {f.Time}  --  currenttime:{currentTime}");
+                    Logger.Log($"Consuming frame {f.Type} with time {f.Time}  --  currenttime:{currentTime}", LoggerLevelPlayerInfo.Instance);
 
                     switch (f.Type) {
                         case SpectatorFrameDataType.Pause: {

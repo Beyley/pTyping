@@ -229,7 +229,7 @@ public class SongSelectionScreen : pScreen {
         pTypingGame.UserStatusPickingSong();
     }
 
-    private void ChangeLeaderboardType(object? sender, (Point pos, MouseButton button) valueTuple) {
+    private void ChangeLeaderboardType(object sender, (Point pos, MouseButton button) valueTuple) {
         LeaderboardType.Value = LeaderboardType.Value switch {
             SongSelect.LeaderboardType.Local  => SongSelect.LeaderboardType.Global,
             SongSelect.LeaderboardType.Global => SongSelect.LeaderboardType.Friend,

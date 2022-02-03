@@ -115,7 +115,7 @@ public class ChangeLogDrawable : CompositeDrawable {
             base.Dispose(disposing);
         }
 
-        private void OnClicked(object? sender, (Point pos, MouseButton button) valueTuple) {
+        private void OnClicked(object sender, (Point pos, MouseButton button) valueTuple) {
             LinkHelper.OpenLink($"https://github.com/Beyley/pTyping/commit/{this._entry.Commit}");
         }
     }

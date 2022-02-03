@@ -7,6 +7,13 @@
         <LangVersion>10</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+        <DebugType>full</DebugType>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>NU1701;NU1702</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Update="html/*.*" CopyToOutputDirectory="Always"/>
         <PackageReference Include="EeveeTools" Version="1.0.0"/>

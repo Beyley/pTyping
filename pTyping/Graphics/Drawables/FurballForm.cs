@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Input;
 using Kettu;
 using Microsoft.Xna.Framework;
+using pTyping.Engine;
 
 namespace pTyping.Graphics.Drawables;
 
@@ -72,12 +73,12 @@ public class FurballForm : CompositeDrawable {
 
         #endregion
 
-        Logger.Log($"Created form with title {title}");
+        Logger.Log($"Created form with title {title}", LoggerLevelFurballFormInfo.Instance);
     }
 
     private void OnCloseButtonClick(object _, (Point pos, MouseButton button) e) {
         if (this.OnTryClose == null) {
-            Logger.Log("Unhandled FurballForm close!");
+            Logger.Log("Unhandled FurballForm close!", LoggerLevelFurballFormInfo.Instance);
             return;
         }
 

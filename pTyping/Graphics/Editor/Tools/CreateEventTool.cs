@@ -64,7 +64,7 @@ public class CreateEventTool : EditorTool {
         base.Initialize();
     }
 
-    private void OnSelectedEventChange(object? sender, string e) {
+    private void OnSelectedEventChange(object sender, string e) {
         switch (e) {
             case LYRIC: {
                 this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInputLabel);

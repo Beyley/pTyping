@@ -261,7 +261,7 @@ public class SelectTool : EditorTool {
         this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
     }
 
-    private void OnObjectClick(object? sender, (Point pos, MouseButton button) valueTuple) {
+    private void OnObjectClick(object sender, (Point pos, MouseButton button) valueTuple) {
         if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift)) return;
 
         bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl) || FurballGame.InputManager.HeldKeys.Contains(Keys.RightControl);
