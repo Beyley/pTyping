@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using DiscordRPC;
 using FontStashSharp;
@@ -14,13 +16,10 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
+using Furball.Volpe.Evaluation;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics;
 using pTyping.Graphics.Menus;
@@ -31,6 +30,7 @@ using pTyping.Online;
 using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
 using pTyping.Songs;
+using Silk.NET.Input;
 using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
 
@@ -45,8 +45,8 @@ public enum Localizations {
 public class pTypingGame : FurballGame {
     public static readonly Vector2 BackButtonScale = new(0.12f);
 
-    public static Texture2D BackButtonTexture;
-    public static Texture2D DefaultBackground;
+    public static Texture BackButtonTexture;
+    public static Texture DefaultBackground;
 
     public static AudioStream           MusicTrack           = null;
     public static AudioStreamTimeSource MusicTrackTimeSource = null;
@@ -107,9 +107,9 @@ public class pTypingGame : FurballGame {
 
     public static UserCardDrawable MenuPlayerUserCard;
 
-    public static Texture2D LocalLeaderboardButtonTexture;
-    public static Texture2D FriendLeaderboardButtonTexture;
-    public static Texture2D GlobalLeaderboardButtonTexture;
+    public static Texture LocalLeaderboardButtonTexture;
+    public static Texture FriendLeaderboardButtonTexture;
+    public static Texture GlobalLeaderboardButtonTexture;
 
     private          double                _musicTrackSchedulerDelta = 0;
     private readonly List<ManagedDrawable> _userPanelDrawables       = new();
@@ -154,7 +154,7 @@ public class pTypingGame : FurballGame {
     }
 
     public static void UserStatusEditing() {
-        if (ConVars.Username.Value == CurrentSong.Value.Creator) {
+        if (ConVars.Username.Value.Value == CurrentSong.Value.Creator) {
             string text = $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
 
             if (OnlineManager.State == ConnectionState.LoggedIn)
@@ -185,7 +185,7 @@ public class pTypingGame : FurballGame {
     public static void PlayMusic() {
         MusicTrack.Play();
         // if (MusicTrack.IsValidHandle)
-        MusicTrack.Volume = ConVars.Volume.Value;
+        MusicTrack.Volume = ConVars.Volume.Value.Value;
     }
 
     public static void PauseResumeMusic() {
@@ -217,49 +217,42 @@ public class pTypingGame : FurballGame {
         BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
     }
 
-    public static void SetBackgroundTexture(Texture2D tex) {
+    public static void SetBackgroundTexture(Texture tex) {
         CurrentSongBackground.SetTexture(tex);
 
         CurrentSongBackground.Scale = new(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
     }
 
     public static void LoadBackgroundFromSong(Song song) {
-        Texture2D backgroundTex;
+        Texture backgroundTex;
         if (song.BackgroundPath == null) {
             DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
 
             backgroundTex = DefaultBackground;
         } else {
             string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
-            if (File.Exists(qualifiedBackgroundPath))
-                backgroundTex = Texture2D.FromStream(
-                Instance.GraphicsDevice,
-                new MemoryStream(ContentManager.LoadRawAsset(qualifiedBackgroundPath, ContentSource.External))
-                );
-            else
-                backgroundTex = DefaultBackground;
+            backgroundTex = File.Exists(qualifiedBackgroundPath) ? ContentManager.LoadTextureFromFile(qualifiedBackgroundPath, ContentSource.External)
+                                : DefaultBackground;
         }
 
         SetBackgroundTexture(backgroundTex);
     }
 
     protected override void LoadContent() {
-        base.LoadContent();
-
         byte[] menuClickSoundData = ContentManager.LoadRawAsset("menuhit.wav", ContentSource.User);
         MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
-        MenuClickSound.Volume = ConVars.Volume.Value;
+        MenuClickSound.Volume = ConVars.Volume.Value.Value;
         // if (MusicTrack.IsValidHandle)
         // MusicTrack.Volume = ConVars.Volume.Value;
 
-        ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
-            MenuClickSound.Volume = volume;
+        ConVars.Volume.OnChange += delegate(object _, Value.Number volume) {
+            MenuClickSound.Volume = volume.Value;
             // if (MusicTrack.IsValidHandle)
-            MusicTrack.Volume = ConVars.Volume.Value;
+            MusicTrack.Volume = ConVars.Volume.Value.Value;
 
             if (VolumeSelector is not null)
-                VolumeSelector.Text = $"Volume: {ConVars.Volume.Value * 100f:00.##}";
+                VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100d:00.##}";
         };
 
         DefaultBackground = ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
@@ -298,12 +291,12 @@ public class pTypingGame : FurballGame {
         FurballFontRegular.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf",        ContentSource.User, true));
         FurballFontRegularStroked.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf", ContentSource.User, true));
 
-        LocalLeaderboardButtonTexture  = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("local-leaderboard-button.png")));
-        FriendLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("friend-leaderboard-button.png")));
-        GlobalLeaderboardButtonTexture = Texture2D.FromStream(this.GraphicsDevice, new MemoryStream(ContentManager.LoadRawAsset("global-leaderboard-button.png")));
+        LocalLeaderboardButtonTexture  = ContentManager.LoadTextureFromFile("local-leaderboard-button.png");
+        FriendLeaderboardButtonTexture = ContentManager.LoadTextureFromFile("friend-leaderboard-button.png");
+        GlobalLeaderboardButtonTexture = ContentManager.LoadTextureFromFile("global-leaderboard-button.png");
     }
 
-    public static void ChangeGlobalVolume(int mouseScroll) {
+    public static void ChangeGlobalVolume(float mouseScroll) {
         VolumeSelector.Tweens.Clear();
 
         VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, VolumeSelector.ColorOverride.A / 255f, 1f, Time, Time + 200));
@@ -311,17 +304,18 @@ public class pTypingGame : FurballGame {
         VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
 
         if (mouseScroll > 0)
-            ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value + 0.05f, 0f, 1f);
+            ConVars.Volume.Value = new(Math.Clamp(ConVars.Volume.Value.Value + 0.05d, 0d, 1d));
         else
-            ConVars.Volume.Value = Math.Clamp(ConVars.Volume.Value - 0.05f, 0f, 1f);
+            ConVars.Volume.Value = new(Math.Clamp(ConVars.Volume.Value.Value - 0.05d, 0d, 1d));
     }
 
-    protected override void Update(GameTime gameTime) {
+    protected override void Update(double gameTime) {
         base.Update(gameTime);
 
-        this._musicTrackSchedulerDelta += gameTime.ElapsedGameTime.TotalMilliseconds;
+        this._musicTrackSchedulerDelta += gameTime * 1000;
         if (this._musicTrackSchedulerDelta > 10) {
-            MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
+            if (MusicTrack != null)
+                MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
             this._musicTrackSchedulerDelta = 0;
         }
 
@@ -333,24 +327,13 @@ public class pTypingGame : FurballGame {
         NotificationManager.Update(gameTime);
     }
 
-    protected override void Draw(GameTime gameTime) {
+    protected override void Draw(double gameTime) {
         base.Draw(gameTime);
 
         if (this._userPanelManager.Visible)
             this._userPanelManager.Draw(gameTime, DrawableBatch, new());
 
         NotificationManager.Draw(gameTime, DrawableBatch, new());
-    }
-
-    protected override void EndRun() {
-        MusicTrackScheduler.Dispose(0);
-
-        // if (OnlineManager.State == ConnectionState.LoggedIn)
-        OnlineManager.Logout();
-
-        RpcClient.Dispose();
-
-        base.EndRun();
     }
 
     public static void SubmitScore(Song song, PlayerScore score) {
@@ -360,6 +343,17 @@ public class pTypingGame : FurballGame {
             OnlineManager.SubmitScore(score).Wait();
     }
 
+    protected override void OnClosing() {
+        MusicTrackScheduler.Dispose(0);
+
+        // if (OnlineManager.State == ConnectionState.LoggedIn)
+        OnlineManager.Logout();
+
+        RpcClient.Dispose();
+
+        base.OnClosing();
+    }
+
     protected override void Initialize() {
         RpcClient = new("908631391934222366");
 
@@ -367,7 +361,7 @@ public class pTypingGame : FurballGame {
 
         RpcClient.Invoke();
 
-        this.AfterScreenChange += (_, screen) => this.Window.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
+        this.AfterScreenChange += (_, screen) => this.WindowManager.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
 
         Thread thread = new(
         () => {
@@ -389,15 +383,15 @@ public class pTypingGame : FurballGame {
                 RpcClient.SetPresence(RichPresence);
                 RpcClient.Invoke();
 
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
         }
         );
-        thread.Start();
+        // thread.Start();
 
-        DevConsole.AddConVarStore(typeof(ConVars));
+        // DevConsole.AddConVarStore(typeof(ConVars));
 
-        CurrentSongBackground = new TexturedDrawable(new Texture2D(this.GraphicsDevice, 1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+        CurrentSongBackground = new TexturedDrawable(new Texture(1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
             Depth       = 1f,
             OriginType  = OriginType.Center,
             Hoverable   = false,
@@ -410,8 +404,28 @@ public class pTypingGame : FurballGame {
 
         NotificationManager = new();
 
+        ScreenManager.SetBlankTransition();
+
+        // this.LoadContent();
         base.Initialize();
 
+        DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
+        DevConsole.VolpeEnvironment.SetVariable(ConVars.BackgroundDim);
+        DevConsole.VolpeEnvironment.SetVariable(ConVars.Username);
+        DevConsole.VolpeEnvironment.SetVariable(ConVars.Password);
+
+        // ConVars.Volume        = 0.05;
+        // ConVars.BackgroundDim = 0.5;
+        //
+        // ConVars.Username = "beyley";
+        // ConVars.Password = "test";
+
+        DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Login);
+        DevConsole.VolpeEnvironment.AddBuiltin(ConVars.SendMessage);
+        DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Logout);
+        DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadUTypingReplay);
+        DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadAutoReplay);
+        
         // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
         OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
         OnlineManager.Initialize();
@@ -422,7 +436,7 @@ public class pTypingGame : FurballGame {
 
         // OnlineManager.Login();
 
-        VolumeSelector = new(new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value}", 50) {
+        VolumeSelector = new(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
             OriginType  = OriginType.BottomRight,
             Clickable   = false,
             CoverClicks = false
@@ -431,15 +445,14 @@ public class pTypingGame : FurballGame {
         //Set the opacity to 0
         VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 0f, 0f, 0, 0));
 
-        InputManager.OnMouseScroll += delegate(object _, (int, string) eventArgs) {
-            if (InputManager.HeldKeys.Contains(Keys.LeftAlt))
-                ChangeGlobalVolume(eventArgs.Item1);
+        InputManager.OnMouseScroll += delegate(object _, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) eventArgs) {
+            if (InputManager.HeldKeys.Contains(Key.AltLeft))
+                ChangeGlobalVolume(eventArgs.scroll.scrollAmount);
         };
 
         DrawableManager.Add(VolumeSelector);
 
         HiraganaConversion.LoadConversion();
-        ScreenManager.SetBlankTransition();
         SongManager.UpdateSongs();
 
         MusicTrackScheduler = new();
@@ -481,13 +494,13 @@ public class pTypingGame : FurballGame {
         base.InitializeLocalizations();
     }
 
-    private void OnKeyDown(object sender, Keys e) {
+    private void OnKeyDown(object sender, Key e) {
         switch (e) {
-            case Keys.Escape:
+            case Key.Escape:
                 if (!this._userPanelManager.Visible) break;
-                goto case Keys.F8;
-            case Keys.F8:
-            case Keys.F9:
+                goto case Key.F8;
+            case Key.F8:
+            case Key.F9:
                 if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
                 this._userPanelManager.Visible = !this._userPanelManager.Visible;
@@ -524,16 +537,16 @@ public class pTypingGame : FurballGame {
                     pos.Y += drawable.Size.Y + 10;
                 }
 
-                drawable.OnClick += delegate(object _, (Point pos, MouseButton button) a) {
+                drawable.OnClick += delegate(object _, (MouseButton button, Point pos) a) {
                     switch (a.button) {
-                        case MouseButton.LeftButton: {
+                        case MouseButton.Left: {
                             lock (OnlineManager.KnownChannels) {
                                 if (!OnlineManager.KnownChannels.Contains(player.Username))
                                     OnlineManager.KnownChannels.Add(player.Username);
                             }
                             break;
                         }
-                        case MouseButton.RightButton:
+                        case MouseButton.Right:
                             OnlineManager.SpectatePlayer(player);
                             break;
                     }

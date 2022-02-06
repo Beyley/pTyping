@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -11,18 +13,16 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
 using JetBrains.Annotations;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Scores;
 using pTyping.Songs;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -76,7 +76,7 @@ public class SongSelectionScreen : pScreen {
         #region Create new song button
 
         if (this._editor) {
-            EventHandler<(Point pos, MouseButton button)> newSongOnClick = delegate {
+            EventHandler<(MouseButton, Point)> newSongOnClick = delegate {
                 pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new NewSongScreen());
             };
@@ -229,7 +229,7 @@ public class SongSelectionScreen : pScreen {
         pTypingGame.UserStatusPickingSong();
     }
 
-    private void ChangeLeaderboardType(object sender, (Point pos, MouseButton button) valueTuple) {
+    private void ChangeLeaderboardType(object sender, (MouseButton button, Point pos) tuple) {
         LeaderboardType.Value = LeaderboardType.Value switch {
             SongSelect.LeaderboardType.Local  => SongSelect.LeaderboardType.Global,
             SongSelect.LeaderboardType.Global => SongSelect.LeaderboardType.Friend,
@@ -248,35 +248,35 @@ public class SongSelectionScreen : pScreen {
         this.UpdateScores();
     }
 
-    private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
-        this._songSelectDrawable.TargetScroll += e.scrollAmount;
+    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
+        this._songSelectDrawable.TargetScroll += e.scroll.scrollAmount;
     }
 
-    public override void Update(GameTime gameTime) {
+    public override void Update(double gameTime) {
         if (this._movingDirection != 0f)
-            this._songSelectDrawable.TargetScroll += this._movingDirection * (gameTime.ElapsedGameTime.Ticks / 10000f);
+            this._songSelectDrawable.TargetScroll += (float)(this._movingDirection * gameTime);
 
         base.Update(gameTime);
     }
 
-    private void OnKeyDown(object sender, Keys e) {
+    private void OnKeyDown(object sender, Key e) {
         this._movingDirection = e switch {
-            Keys.Up   => 1f,
-            Keys.Down => -1f,
-            _         => this._movingDirection
+            Key.Up   => 1f,
+            Key.Down => -1f,
+            _        => this._movingDirection
         };
 
-        if (e == Keys.F5) {
+        if (e == Key.F5) {
             SongManager.UpdateSongs();
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
             ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor));
         }
     }
 
-    private void OnKeyUp(object sender, Keys e) {
+    private void OnKeyUp(object sender, Key e) {
         this._movingDirection = e switch {
-            Keys.Up or Keys.Down => 0f,
-            _                    => this._movingDirection
+            Key.Up or Key.Down => 0f,
+            _                  => this._movingDirection
         };
     }
 
@@ -345,7 +345,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
         this.Manager.Add(this._leaderboardDrawable);
     }
 
-    protected override void Dispose(bool disposing) {
+    public override void Dispose() {
         pTypingGame.CurrentSong.OnChange -= this.OnSongChange;
 
         FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
@@ -355,11 +355,11 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
 
         LeaderboardType.OnChange -= this.OnLeaderboardTypeChange;
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 
     [Pure]
-    public static Texture2D TextureFromLeaderboardType(LeaderboardType type) {
+    public static Texture TextureFromLeaderboardType(LeaderboardType type) {
         return type switch {
             SongSelect.LeaderboardType.Friend => pTypingGame.FriendLeaderboardButtonTexture,
             SongSelect.LeaderboardType.Global => pTypingGame.GlobalLeaderboardButtonTexture,

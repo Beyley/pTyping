@@ -13,7 +13,6 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Platform;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Menus.SongSelect;
@@ -50,8 +49,8 @@ public class TaikoRsOnlineManager : OnlineManager {
         this._httpClient = new();
     }
 
-    public override string Username() => ConVars.Username.Value;
-    public override string Password() => CryptoHelper.GetSha512(Encoding.UTF8.GetBytes(ConVars.Password.Value));
+    public override string Username() => ConVars.Username.Value.Value;
+    public override string Password() => CryptoHelper.GetSha512(Encoding.UTF8.GetBytes(ConVars.Password.Value.Value));
 
     private Thread _sendThread;
     private Thread _replayFrameThread;
@@ -863,7 +862,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    public override void Update(GameTime time) {
+    public override void Update(double time) {
         while (this._chatQueue.TryDequeue(out ChatMessage message))
             lock (this.ChatLog) {
                 this.ChatLog.Add(message);

@@ -1,9 +1,8 @@
-using System;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Microsoft.Xna.Framework;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
@@ -15,7 +14,8 @@ public class BeatLineBeatEventDrawable : LinePrimitiveDrawable {
 
     public override Vector2 Size => new(5, 100);
 
-    public BeatLineBeatEventDrawable(Event @event) : base(Vector2.Zero, 100, (float)Math.PI / 2f) {
+    // public BeatLineBeatEventDrawable(Event @event) : base(Vector2.Zero, 100, (float)Math.PI / 2f) {
+    public BeatLineBeatEventDrawable(Event @event) : base(Vector2.Zero, Vector2.Zero, Color.White) {
         this.Event      = @event;
         this.TimeSource = pTypingGame.MusicTrackTimeSource;
         this.OriginType = OriginType.Center;

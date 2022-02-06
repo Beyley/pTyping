@@ -1,11 +1,14 @@
 using System;
+using System.Drawing;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-using Furball.Engine.Engine.Input;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
+
 
 namespace pTyping.Engine;
 
@@ -30,7 +33,7 @@ public class NotificationManager : DrawableManager {
         return drawable;
     }
 
-    private void OnDrawableClick(object sender, (Point pos, MouseButton button) valueTuple) {
+    private void OnDrawableClick(object sender, (MouseButton button, Point pos) tuple) {
         if (sender is not NotificationDrawable drawable)
             return;
 
@@ -39,7 +42,7 @@ public class NotificationManager : DrawableManager {
         this.RemoveDrawable(drawable);
     }
 
-    public override void Update(GameTime time) {
+    public override void Update(double time) {
         for (int i = 0; i < this.Drawables.Count; i++) {
             BaseDrawable baseDrawable = this.Drawables[i];
             if (baseDrawable is not NotificationDrawable drawable || drawable.ScheduledForRemoval)
@@ -117,7 +120,7 @@ public class NotificationManager : DrawableManager {
             this._outlineDrawable = new(Vector2.Zero, this._textDrawable.Size + new Vector2(10f), 2, false) {
                 ColorOverride = importance switch {
                     NotificationImportance.Info    => new(225, 225, 225, 200),
-                    NotificationImportance.Warning => Color.Yellow,
+                    NotificationImportance.Warning => Color.Red,
                     NotificationImportance.Error   => Color.Red,
                     _                              => throw new ArgumentOutOfRangeException(nameof (importance), importance, "huh? the fuck did you just do?")
                 },

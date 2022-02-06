@@ -1,11 +1,12 @@
-using System;
+using System.Drawing;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
 using pTyping.Songs;
 using pTyping.UiGenerator;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Editor.Tools;
 
@@ -22,7 +23,7 @@ public class CreateNoteTool : EditorTool {
     private LinePrimitiveDrawable _createLine;
 
     public override void Initialize() {
-        this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), 80f, (float)Math.PI / 2f) {
+        this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), Vector2.Zero, Color.White) {
             Visible    = false,
             TimeSource = pTypingGame.MusicTrackTimeSource
         };
@@ -45,7 +46,7 @@ public class CreateNoteTool : EditorTool {
         base.Initialize();
     }
 
-    public override void OnMouseMove(Point position) {
+    public override void OnMouseMove(Vector2 position) {
         //Only show the create line if we are inside of the playfield, as thats the only time we are able to place notes
         this._createLine.Visible = EditorScreen.InPlayfield(position);
 
@@ -66,9 +67,9 @@ public class CreateNoteTool : EditorTool {
         base.OnMouseMove(position);
     }
 
-    public override void OnMouseClick((MouseButton mouseButton, Point position) args) {
+    public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
         if (!EditorScreen.InPlayfield(args.position)) return;
-        if (args.mouseButton != MouseButton.LeftButton) return;
+        if (args.mouseButton != MouseButton.Left) return;
 
         Note noteToAdd = new() {
             Time  = this.EditorInstance.EditorState.MouseTime,

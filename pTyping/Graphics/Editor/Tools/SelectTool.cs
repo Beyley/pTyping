@@ -1,12 +1,12 @@
 using System.Collections.Specialized;
+using System.Drawing;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
 using pTyping.UiGenerator;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Editor.Tools;
 
@@ -171,7 +171,7 @@ public class SelectTool : EditorTool {
     }
 
     private void OnObjectDragBegin(object sender, Point e) {
-        if (!FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift)) return;
+        if (!FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) return;
 
         this._dragging     = true;
         this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
@@ -183,7 +183,7 @@ public class SelectTool : EditorTool {
 
     private double _lastDragTime;
     private void OnObjectDrag(object sender, Point e) {
-        if (!FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift)) {
+        if (!FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) {
             this._dragging = false;
             return;
         }
@@ -261,10 +261,10 @@ public class SelectTool : EditorTool {
         this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
     }
 
-    private void OnObjectClick(object sender, (Point pos, MouseButton button) valueTuple) {
-        if (FurballGame.InputManager.HeldKeys.Contains(Keys.LeftShift)) return;
+    private void OnObjectClick(object sender, (MouseButton button, Point pos) tuple) {
+        if (FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) return;
 
-        bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Keys.LeftControl) || FurballGame.InputManager.HeldKeys.Contains(Keys.RightControl);
+        bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft) || FurballGame.InputManager.HeldKeys.Contains(Key.ControlRight);
 
         if (sender is not ManagedDrawable drawable) return;
 

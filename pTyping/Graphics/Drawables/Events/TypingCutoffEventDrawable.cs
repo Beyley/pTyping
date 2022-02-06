@@ -1,8 +1,7 @@
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
@@ -12,7 +11,7 @@ namespace pTyping.Graphics.Drawables.Events;
 public class TypingCutoffEventDrawable : TexturedDrawable {
     public readonly Event Event;
 
-    public TypingCutoffEventDrawable(Texture2D texture, Event @event) : base(texture, Vector2.Zero) {
+    public TypingCutoffEventDrawable(Texture texture, Event @event) : base(texture, Vector2.Zero) {
         this.Event         = @event;
         this.TimeSource    = pTypingGame.MusicTrackTimeSource;
         this.ColorOverride = Color.LightBlue;

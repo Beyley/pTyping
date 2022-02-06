@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
+
 
 namespace pTyping.Graphics.Menus;
 
@@ -29,10 +32,10 @@ public class ChangeLogDrawable : CompositeDrawable {
         }
     }
 
-    public override void Update(GameTime time) {
+    public override void Update(double time) {
         // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
         foreach (ChangeLogEntryDrawable drawable in this._drawables)
-            drawable.Visible = drawable.RealRectangle.Intersects(FurballGame.DisplayRect);
+            drawable.Visible = drawable.RealRectangle.IntersectsWith(FurballGame.DisplayRect);
 
         base.Update(time);
     }
@@ -108,14 +111,14 @@ public class ChangeLogDrawable : CompositeDrawable {
             this._summary.FadeColor(new(100, 100, 255), 100);
         }
 
-        public override void Dispose(bool disposing) {
+        public override void Dispose() {
             this._summary.OnClick    -= this.OnClicked;
             this._bottomLine.OnClick -= this.OnClicked;
 
-            base.Dispose(disposing);
+            base.Dispose();
         }
 
-        private void OnClicked(object sender, (Point pos, MouseButton button) valueTuple) {
+        private void OnClicked(object sender, (MouseButton button, Point pos) tuple) {
             LinkHelper.OpenLink($"https://github.com/Beyley/pTyping/commit/{this._entry.Commit}");
         }
     }
@@ -177,19 +180,19 @@ public class ChangelogScreen : pScreen {
         this.Manager.Add(this._changeLogDrawable);
     }
 
-    private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
-        this.TargetScroll += e.scrollAmount;
+    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
+        this.TargetScroll += e.scroll.scrollAmount;
     }
 
-    public override void Update(GameTime gameTime) {
+    public override void Update(double gameTime) {
         if (this.TargetScroll > 0)
-            this.TargetScroll *= (float)(0.99 * gameTime.ElapsedGameTime.TotalMilliseconds);
+            this.TargetScroll *= (float)(0.99 * gameTime * 1000);
         if (this.TargetScroll < -this._changeLogDrawable.Size.Y + FurballGame.DEFAULT_WINDOW_HEIGHT - 10) {
             float target = -this._changeLogDrawable.Size.Y + FurballGame.DEFAULT_WINDOW_HEIGHT - 10;
 
             float difference = Math.Abs(this.TargetScroll - target);
 
-            difference *= 1f - (float)(0.99 * gameTime.ElapsedGameTime.TotalMilliseconds);
+            difference *= 1f - (float)(0.99 * gameTime * 1000);
 
             this.TargetScroll += difference;
         }
@@ -197,7 +200,7 @@ public class ChangelogScreen : pScreen {
         Vector2 adjustedPos = this._changeLogDrawable.Position - new Vector2(10);
 
         float y = this._changeLogDrawable.Position.Y;
-        y += (this.TargetScroll - adjustedPos.Y) / 200 * (gameTime.ElapsedGameTime.Ticks / 10000f);
+        y += (float)((this.TargetScroll - adjustedPos.Y) / 200 * gameTime);
 
         this._changeLogDrawable.Position = new(10, y);
 

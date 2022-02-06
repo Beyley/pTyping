@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -8,7 +9,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Localization.Languages;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 
 namespace pTyping.Graphics.Menus.Options;
@@ -59,7 +59,7 @@ public class OptionsScreen : pScreen {
         UiTextBoxDrawable backgroundDimInput = new(
         new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
         FurballGame.DEFAULT_FONT,
-        ConVars.BackgroundDim.Value.ToString(CultureInfo.InvariantCulture),
+        ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture),
         30,
         200
         );
@@ -95,7 +95,7 @@ public class OptionsScreen : pScreen {
         UiTextBoxDrawable usernameInput = new(
         new Vector2(360 + usernameInputLabel.Size.X, 200),
         FurballGame.DEFAULT_FONT,
-        ConVars.Username.Value.ToString(CultureInfo.InvariantCulture),
+        ConVars.Username.Value.Value.ToString(CultureInfo.InvariantCulture),
         30,
         200
         );
@@ -162,7 +162,7 @@ public class OptionsScreen : pScreen {
     }
 
     private void BackgroundDimInputOnCommit(object sender, string e) {
-        ConVars.BackgroundDim.Value = float.Parse(e);
+        ConVars.BackgroundDim.Value = new(float.Parse(e));
     }
 
     // private void TargetFpsInputOnCommit(object sender, string e) {
@@ -170,7 +170,7 @@ public class OptionsScreen : pScreen {
     // }
 
     private void UsernameInputOnCommit(object sender, string e) {
-        ConVars.Username.Value = e;
+        ConVars.Username.Value = new(e);
     }
     public override string Name    => "Options";
     public override string State   => "Tweaking the settings!";

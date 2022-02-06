@@ -106,10 +106,10 @@ public class UiContainer : CompositeDrawable {
         }
     }
 
-    public override void Dispose(bool disposing) {
+    public override void Dispose() {
         this._elements.CollectionChanged -= this.Recalculate;
         this.ElementOriginType.OnChange  -= this.OnOriginTypeChange;
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -10,9 +12,9 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
 using pTyping.Online;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Online;
 
@@ -31,7 +33,7 @@ public class ChatContentsDrawable : CompositeDrawable {
         this.Drawables.ToList().ForEach(x => this._drawables.Remove(x));
     }
 
-    public override void Update(GameTime time) {
+    public override void Update(double time) {
         if (this._drawables.Count != 0) {
             this.TargetScroll = Math.Max(this.TargetScroll, 0);
 
@@ -42,14 +44,14 @@ public class ChatContentsDrawable : CompositeDrawable {
 
                 float difference = targetY - drawable.Position.Y;
 
-                drawable.Position.Y += (float)(difference * time.ElapsedGameTime.TotalMilliseconds * 0.01);
+                drawable.Position.Y += (float)(difference * time * 1000 * 0.01);
             }
         }
 
         base.Update(time);
     }
 
-    public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+    public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
         batch.End();
 
         Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
@@ -151,15 +153,15 @@ public class ChatDrawable : CompositeDrawable {
         pTypingGame.OnlineManager.KnownChannels.CollectionChanged += this.UpdateChannelButtons;
     }
 
-    private void OnMouseScroll(object sender, (int scrollAmount, string cursorName) e) {
+    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
         if (!this.IsHovered) return;
 
-        this._channelContents.TargetScroll += e.scrollAmount;
+        this._channelContents.TargetScroll += e.scroll.scrollAmount;
     }
 
-    private void OnThisClick(object sender, (Point pos, MouseButton button) e) {
+    private void OnThisClick(object sender, (MouseButton button, Point pos) e) {
         if (this.Visible)
-            this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.LeftButton, e.pos - this.Position.ToPoint() + this.LastCalculatedOrigin.ToPoint()), ""));
+            this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.Left, e.pos.ToVector2() - this.Position + this.LastCalculatedOrigin), ""));
     }
 
     private void SelectedChannelOnChange(object sender, string e) => this.RecalculateAndUpdate_wait_thats_bars();
@@ -171,7 +173,7 @@ public class ChatDrawable : CompositeDrawable {
 
         public ChatMessageDrawable(ChatDrawable d, Vector2 position, FontSystem font, string text, int size) : base(position, font, text, size) => this._chat = d;
 
-        public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+        public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
             if (this._chat.RealContains(this.RealPosition.ToPoint()))
                 base.Draw(time, batch, args);
         }
@@ -210,7 +212,7 @@ public class ChatDrawable : CompositeDrawable {
         }
     }
 
-    public override void Dispose(bool disposing) {
+    public override void Dispose() {
         pTypingGame.OnlineManager.ChatLog.CollectionChanged -= this.ChatLogOnCollectionChanged;
         this.SelectedChannel.OnChange                       -= this.SelectedChannelOnChange;
 
@@ -218,6 +220,6 @@ public class ChatDrawable : CompositeDrawable {
 
         pTypingGame.OnlineManager.KnownChannels.CollectionChanged -= this.UpdateChannelButtons;
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 }

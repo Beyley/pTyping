@@ -1,5 +1,5 @@
 using Eto.Drawing;
-using Color=Microsoft.Xna.Framework.Color;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Engine;
 

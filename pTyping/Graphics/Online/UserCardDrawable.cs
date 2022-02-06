@@ -1,4 +1,6 @@
 using System;
+using System.Drawing;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -6,8 +8,8 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
-using Microsoft.Xna.Framework;
 using pTyping.Online;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Online;
 
@@ -90,14 +92,14 @@ public class UserCardDrawable : CompositeDrawable {
 
     public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
-    public override void Update(GameTime time) {
+    public override void Update(double time) {
         this._mainTextDrawable.Visible   = !this.IsHovered;
         this._statusTextDrawable.Visible = this.IsHovered;
 
         base.Update(time);
     }
 
-    public override void Draw(GameTime time, DrawableBatch batch, DrawableManagerArgs args) {
+    public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
         batch.End();
 
         Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;

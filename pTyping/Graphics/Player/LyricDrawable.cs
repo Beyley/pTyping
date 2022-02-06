@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Microsoft.Xna.Framework;
 using pTyping.Songs;
 using pTyping.Songs.Events;
 

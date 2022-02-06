@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Kettu;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs;
 using sowelipisona;
+
 // using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player.Mods;
@@ -45,7 +45,7 @@ public abstract class PlayerMod {
 
     public virtual void OnNoteHit(Note note) {}
 
-    public virtual void Update(GameTime time) {}
+    public virtual void Update(double time) {}
 
     public virtual void BeforeNoteCreate(Player player) {}
 }

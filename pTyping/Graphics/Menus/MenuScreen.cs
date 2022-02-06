@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -7,8 +8,6 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
@@ -70,7 +69,7 @@ public class MenuScreen : pScreen {
 
         #region Main buttons
 
-        Texture2D menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
+        Texture menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
 
         float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
@@ -117,7 +116,7 @@ public class MenuScreen : pScreen {
 
         exitButton.OnClick += delegate {
             pTypingGame.MenuClickSound.PlayNew();
-            FurballGame.Instance.Exit();
+            FurballGame.Instance.WindowManager.Close();
         };
 
         optionsButton.OnClick += delegate {
@@ -138,7 +137,7 @@ public class MenuScreen : pScreen {
             OriginType = OriginType.TopRight
         };
 
-        Texture2D editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
+        Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
         TexturedDrawable musicPlayButton = new(
         editorButtonsTexture2D,
@@ -211,11 +210,11 @@ public class MenuScreen : pScreen {
             this.LoadSong(false);
     }
 
-    protected override void Dispose(bool disposing) {
+    public override void Dispose() {
         pTypingGame.OnlineManager.OnLoginComplete -= this.UpdateUserCard;
         pTypingGame.OnlineManager.OnLogout        -= this.UpdateUserCard;
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 
     public void UpdateUserCard(object sender, EventArgs e) {

@@ -1,15 +1,17 @@
 using System;
+using System.Drawing;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Furball.Engine.Engine.Input;
-using Microsoft.Xna.Framework;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Player;
 
@@ -72,7 +74,7 @@ public class ScoreResultsScreen : pScreen {
 
         #region Buttons
 
-        EventHandler<(Point pos, MouseButton button)> exitOnClick = delegate {
+        EventHandler<(MouseButton, Point)> exitOnClick = delegate {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
         };
@@ -93,7 +95,7 @@ public class ScoreResultsScreen : pScreen {
 
         this.Manager.Add(exitButton);
 
-        EventHandler<(Point pos, MouseButton button)> watchReplayOnClick = delegate {
+        EventHandler<(MouseButton, Point)> watchReplayOnClick = delegate {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new PlayerScreen(this.Score));
         };

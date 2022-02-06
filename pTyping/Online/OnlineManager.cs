@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Furball.Engine;
 using Hellosam.Net.Collections;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
 using pTyping.Scores;
@@ -136,7 +135,7 @@ public abstract class OnlineManager {
 
     public virtual void Initialize() {}
 
-    public virtual void Update(GameTime time) {}
+    public virtual void Update(double time) {}
 }
 
 public enum ConnectionState {

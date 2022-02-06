@@ -1,6 +1,5 @@
 using Furball.Engine.Engine.Graphics.Drawables;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
@@ -15,23 +14,23 @@ public abstract class Event {
     public double Time { get; set; }
 
     [Pure, CanBeNull]
-    public static ManagedDrawable CreateEventDrawable(Event @event, Texture2D noteTexture, GameplayDrawableTweenArgs tweenArgs) {
+    public static ManagedDrawable CreateEventDrawable(Event @event, Texture noteTexture, GameplayDrawableTweenArgs tweenArgs) {
         ManagedDrawable drawable = null;
 
         switch (@event.Type) {
             case EventType.BeatLineBar: {
-                BeatLineBarEventDrawable tempDrawable = new(@event);
-                tempDrawable.CreateTweens(tweenArgs);
+                // BeatLineBarEventDrawable tempDrawable = new(@event);
+                // tempDrawable.CreateTweens(tweenArgs);
 
-                drawable = tempDrawable;
+                // drawable = tempDrawable;
 
                 break;
             }
             case EventType.BeatLineBeat: {
-                BeatLineBeatEventDrawable tempDrawable = new(@event);
-                tempDrawable.CreateTweens(tweenArgs);
+                // BeatLineBeatEventDrawable tempDrawable = new(@event);
+                // tempDrawable.CreateTweens(tweenArgs);
 
-                drawable = tempDrawable;
+                // drawable = tempDrawable;
 
                 break;
             }

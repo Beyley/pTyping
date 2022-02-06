@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -9,16 +10,18 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
+using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using pTyping.Engine;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using pTyping.Songs.Events;
+using Silk.NET.Input;
 using sowelipisona;
 using Path=Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween.Path;
+
+
 // using Furball.Engine.Engine.Audio;
 
 namespace pTyping.Graphics.Player;
@@ -50,7 +53,7 @@ public class Player : CompositeDrawable {
     public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, NOTE_HEIGHT);
     public static readonly Vector2 NOTE_END_POS   = new(-100, NOTE_HEIGHT);
 
-    public double BaseApproachTime = ConVars.BaseApproachTime.Value;
+    public double BaseApproachTime = ConVars.BASE_APPROACH_TIME;
     public double CurrentApproachTime(double time) => this.BaseApproachTime / this.Song.CurrentTimingPoint(time).ApproachMultiplier;
 
     private readonly TexturedDrawable _recepticle;
@@ -71,7 +74,7 @@ public class Player : CompositeDrawable {
 
     public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
 
-    private readonly Texture2D _noteTexture;
+    private readonly Texture _noteTexture;
 
     public Song Song;
 
@@ -97,16 +100,12 @@ public class Player : CompositeDrawable {
 
         this.BaseApproachTime /= song.Settings.GlobalApproachMultiplier;
 
-        this.Score            = new(this.Song.MapHash, ConVars.Username.Value);
+        this.Score            = new(this.Song.MapHash, ConVars.Username.Value.Value);
         this.Score.Mods       = pTypingGame.SelectedMods;
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 
-        this._playfieldTopLine = new(new Vector2(0, 0), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-            ColorOverride = Color.Gray
-        };
-        this._playfieldBottomLine = new(new Vector2(0, 100), FurballGame.DEFAULT_WINDOW_WIDTH, 0) {
-            ColorOverride = Color.Gray
-        };
+        this._playfieldTopLine    = new(new Vector2(0, 0), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH,   0), Color.Gray);
+        this._playfieldBottomLine = new(new Vector2(0, 100), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, 100), Color.Gray);
         this._drawables.Add(this._playfieldTopLine);
         this._drawables.Add(this._playfieldBottomLine);
 
@@ -138,8 +137,8 @@ public class Player : CompositeDrawable {
 
         this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-        ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
-        this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
+        ConVars.Volume.OnChange    += this.OnVolumeChange;
+        this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
 
         //This wont be needed soon
         this._drawables = this._drawables.OrderByDescending(o => o.Depth).ToList();
@@ -150,8 +149,8 @@ public class Player : CompositeDrawable {
             mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
     }
 
-    private void OnVolumeChange(object sender, float f) {
-        this.HitSoundNormal.Volume = f;
+    private void OnVolumeChange(object sender, Value.Number f) {
+        this.HitSoundNormal.Volume = f.Value;
     }
 
     private void CreateEvents() {
@@ -203,14 +202,14 @@ public class Player : CompositeDrawable {
         return noteDrawable;
     }
 
-    public void TypeCharacter(object sender, TextInputEventArgs e) => this.TypeCharacter(e);
-    public void TypeCharacter(TextInputEventArgs args, bool checkingNext = false) {
-        if (char.IsControl(args.Character))
+    public void TypeCharacter(object sender, char e) => this.TypeCharacter(e);
+    public void TypeCharacter(char @char, bool checkingNext = false) {
+        if (char.IsControl(@char))
             return;
 
         if (this.RecordReplay || this.IsSpectating) {
             ReplayFrame f = new() {
-                Character = args.Character,
+                Character = @char,
                 Time      = pTypingGame.MusicTrackTimeSource.GetCurrentTime()
             };
             this.ReplayFrames.Add(f);
@@ -227,7 +226,7 @@ public class Player : CompositeDrawable {
         if (note.IsHit)
             return;
 
-        int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+        double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
         if (currentTime > note.Time - this.TIMING_POOR) {
             (string hiragana, List<string> romajiToType) = note.TypableRomaji;
@@ -236,7 +235,7 @@ public class Player : CompositeDrawable {
 
             foreach (string romaji in filteredRomaji) {
                 double timeDifference = Math.Abs(currentTime - note.Time);
-                if (romaji[note.TypedRomaji.Length] == args.Character) {
+                if (romaji[note.TypedRomaji.Length] == @char) {
                     if (checkingNext && !this._notes[this._noteToType].Note.IsHit) {
                         this._notes[this._noteToType].Miss();
                         this.NoteUpdate(false, this._notes[this._noteToType].Note);
@@ -252,24 +251,24 @@ public class Player : CompositeDrawable {
 
                         this._noteToType += checkingNext ? 2 : 1;
                     }
-                    this.ShowTypingIndicator(args.Character);
+                    this.ShowTypingIndicator(@char);
 
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
-                        mod.OnCharacterTyped(note, args.Character.ToString(), true);
+                        mod.OnCharacterTyped(note, @char.ToString(), true);
 
                     break;
                 }
 
                 //We do this so you can type the next note even if you fucked up the last one, which makes gameplay a lot easier
                 if (this._noteToType != this.Song.Notes.Count - 1 && !checkingNext && currentTime > note.Time) {
-                    this.TypeCharacter(args, true);
+                    this.TypeCharacter(@char, true);
                     return;
                 }
-                
-                this.ShowTypingIndicator(args.Character, true);
+
+                this.ShowTypingIndicator(@char, true);
 
                 foreach (PlayerMod mod in pTypingGame.SelectedMods)
-                    mod.OnCharacterTyped(note, args.Character.ToString(), false);
+                    mod.OnCharacterTyped(note, @char.ToString(), false);
             }
         }
 
@@ -415,8 +414,8 @@ public class Player : CompositeDrawable {
         this.OnComboUpdate?.Invoke(this, hitColor);
     }
 
-    public override void Update(GameTime time) {
-        int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+    public override void Update(double time) {
+        double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
         #region spawn notes and bars as needed
 
@@ -492,10 +491,10 @@ public class Player : CompositeDrawable {
 
     }
 
-    public override void Dispose(bool disposing) {
-        ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
+    public override void Dispose() {
+        ConVars.Volume.OnChange -= this.OnVolumeChange;
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 
     public void CallMapEnd() {
@@ -512,5 +511,8 @@ public class Player : CompositeDrawable {
             pTypingGame.PlayMusic();
         else
             pTypingGame.MusicTrack.Stop();
+    }
+    public void TypeCharacter(object sender, (IKeyboard keyboard, char character) e) {
+        this.TypeCharacter(sender, e.character);
     }
 }

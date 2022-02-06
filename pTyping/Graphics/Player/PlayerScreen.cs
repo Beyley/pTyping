@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -9,17 +11,16 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Engine.Engine.Input;
 using Kettu;
 using ManagedBass;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using pTyping.Engine;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
 using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
 using pTyping.Songs;
+using Silk.NET.Input;
+using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Player;
 
@@ -212,7 +213,11 @@ public class PlayerScreen : pScreen {
         new ColorTween(
         TweenType.Color,
         pTypingGame.CurrentSongBackground.ColorOverride,
-        new(1f * (1f - ConVars.BackgroundDim.Value), 1f * (1f - ConVars.BackgroundDim.Value), 1f * (1f - ConVars.BackgroundDim.Value)),
+        new(
+        (float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
+        (float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
+        (float)(1f * (1f - ConVars.BackgroundDim.Value.Value))
+        ),
         pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
         pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
         )
@@ -227,7 +232,7 @@ public class PlayerScreen : pScreen {
 
         FurballGame.InputManager.OnKeyDown += this.OnKeyPress;
         if (!this._playingReplay)
-            FurballGame.Instance.Window.TextInput += this.Player.TypeCharacter;
+            FurballGame.InputManager.OnCharInput += this.Player.TypeCharacter;
 
         pTypingGame.UserStatusPlaying();
 
@@ -249,33 +254,33 @@ public class PlayerScreen : pScreen {
         );
     }
 
-    private void ResumeButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
+    private void ResumeButtonClick(object sender, (MouseButton button, Point pos) tuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.PauseResumeMusic();
 
         pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
     }
 
-    private void RestartButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
+    private void RestartButtonClick(object sender, (MouseButton button, Point pos) tuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = 0;
         ScreenManager.ChangeScreen(new PlayerScreen());
     }
 
-    private void QuitButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
+    private void QuitButtonClick(object sender, (MouseButton button, Point pos) tuple) {
         pTypingGame.MenuClickSound.PlayNew();
         ScreenManager.ChangeScreen(new SongSelectionScreen(false));
     }
 
-    private void SkipButtonClick(object sender, (Point pos, MouseButton button) valueTuple) {
+    private void SkipButtonClick(object sender, (MouseButton, Point) tuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
     }
 
 
-    protected override void Dispose(bool disposing) {
-        FurballGame.InputManager.OnKeyDown    -= this.OnKeyPress;
-        FurballGame.Instance.Window.TextInput -= this.Player.TypeCharacter;
+    public override void Dispose() {
+        FurballGame.InputManager.OnKeyDown   -= this.OnKeyPress;
+        FurballGame.InputManager.OnCharInput -= this.Player.TypeCharacter;
 
         this.Player.OnAllNotesComplete -= this.EndScore;
         this.Player.OnComboUpdate      -= this.OnComboUpdate;
@@ -283,11 +288,11 @@ public class PlayerScreen : pScreen {
         if (pTypingGame.OnlineManager.GameScene == this)
             pTypingGame.OnlineManager.GameScene = null;
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 
-    private void OnKeyPress(object sender, Keys key) {
-        if (key == Keys.Escape) {
+    private void OnKeyPress(object sender, Key key) {
+        if (key == Key.Escape) {
             if (this._endScheduled) return;
 
             pTypingGame.PauseResumeMusic();
@@ -305,9 +310,9 @@ public class PlayerScreen : pScreen {
 
     private double timeSinceLastBuffer    = 0;
     private double timeSinceLastScoreSync = 0;
-    
-    public override void Update(GameTime gameTime) {
-        int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+
+    public override void Update(double gameTime) {
+        double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
         lock (this.SpectatorQueue) {
             Span<SpectatorFrame> tFrames = CollectionsMarshal.AsSpan(this.SpectatorQueue);
@@ -323,8 +328,8 @@ public class PlayerScreen : pScreen {
                     this.SpectatorQueue.Remove(f);
                     Logger.Log($"Consuming frame {f.Type} with time {f.Time}  --  currenttime:{currentTime}", LoggerLevelPlayerInfo.Instance);
 
-                    switch (f.Type) {
-                        case SpectatorFrameDataType.Pause: {
+                    switch (f) {
+                        case SpectatorFramePause: {
                             pTypingGame.OnlineManager.SpectatorState = SpectatorState.Paused;
                             pTypingGame.MusicTrack.Pause();
                             pTypingGame.MusicTrack.CurrentPosition = f.Time;
@@ -335,13 +340,11 @@ public class PlayerScreen : pScreen {
                         //     pTypingGame.MusicTrack.Resume();
                         //     break;
                         // }
-                        case SpectatorFrameDataType.ScoreSync: {
-                            SpectatorFrameScoreSync ssF = (SpectatorFrameScoreSync)f;
-
+                        case SpectatorFrameScoreSync ssF: {
                             this.Player.Score = ssF.Score;
                             break;
                         }
-                        case SpectatorFrameDataType.Buffer: {
+                        case SpectatorFrameBuffer: {
                             if (currentTime - f.Time > 100) {
                                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "We got too far ahead!");
                                 pTypingGame.MusicTrack.CurrentPosition = currentTime - 2000;
@@ -349,10 +352,8 @@ public class PlayerScreen : pScreen {
 
                             break;
                         }
-                        case SpectatorFrameDataType.ReplayFrame: {
-                            SpectatorFrameReplayFrame sRf = (SpectatorFrameReplayFrame)f;
-
-                            this.Player.TypeCharacter(this, new TextInputEventArgs(sRf.Frame.Character));
+                        case SpectatorFrameReplayFrame sRf: {
+                            this.Player.TypeCharacter(this, sRf.Frame.Character);
 
                             break;
                         }
@@ -360,7 +361,7 @@ public class PlayerScreen : pScreen {
                 }
             }
 
-            this.timeSinceLastBuffer += gameTime.ElapsedGameTime.TotalMilliseconds;
+            this.timeSinceLastBuffer += gameTime * 1000;
             //Send a buffer every second
             if (this.timeSinceLastBuffer > 1000) {
                 if (pTypingGame.OnlineManager.Spectators.Count != 0) {
@@ -385,7 +386,7 @@ public class PlayerScreen : pScreen {
             }
 
             if (pTypingGame.OnlineManager.Spectators.Count != 0) {
-                this.timeSinceLastScoreSync += gameTime.ElapsedGameTime.TotalMilliseconds;
+                this.timeSinceLastScoreSync += gameTime * 1000;
                 if (this.timeSinceLastScoreSync > 5000) {
                     pTypingGame.OnlineManager.SpectatorScoreSync(currentTime, this.Player.Score);
                     this.timeSinceLastScoreSync = 0;
@@ -432,7 +433,7 @@ public class PlayerScreen : pScreen {
                 ref ReplayFrame currentFrame = ref this._playingScoreReplay.ReplayFrames[i];
 
                 if (currentTime > currentFrame.Time && !currentFrame.Used) {
-                    this.Player.TypeCharacter(this, new TextInputEventArgs(currentFrame.Character));
+                    this.Player.TypeCharacter(this, currentFrame.Character);
 
                     currentFrame.Used = true;
                     break;

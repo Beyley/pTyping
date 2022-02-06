@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Kettu;
-using Microsoft.Xna.Framework;
 using pTyping.Engine;
 using pTyping.Songs.Events;
 
