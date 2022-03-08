@@ -6,7 +6,6 @@ using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
@@ -59,9 +58,9 @@ public class Player : CompositeDrawable {
 
     private readonly TexturedDrawable _recepticle;
 
-    private readonly LinePrimitiveDrawable      _playfieldTopLine;
-    private readonly LinePrimitiveDrawable      _playfieldBottomLine;
-    private readonly RectanglePrimitiveDrawable _playfieldBackground;
+    // private readonly LinePrimitiveDrawable _playfieldTopLine;
+    // private readonly LinePrimitiveDrawable _playfieldBottomLine;
+    private readonly TexturedDrawable _playfieldBackground;
 
     private readonly TextDrawable[] _typingIndicators = new TextDrawable[8];
     private          int            _currentTypingIndicatorIndex;
@@ -105,16 +104,20 @@ public class Player : CompositeDrawable {
         this.Score.Mods       = pTypingGame.SelectedMods;
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 
-        this._playfieldTopLine    = new(new Vector2(0, 0), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH,   0), Color.Gray);
-        this._playfieldBottomLine = new(new Vector2(0, 100), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, 100), Color.Gray);
-        this._drawables.Add(this._playfieldTopLine);
-        this._drawables.Add(this._playfieldBottomLine);
+        // this._playfieldTopLine    = new(new Vector2(0, 0), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH,   0), Color.Gray);
+        // this._playfieldBottomLine = new(new Vector2(0, 100), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, 100), Color.Gray);
+        // this._drawables.Add(this._playfieldTopLine);
+        // this._drawables.Add(this._playfieldBottomLine);
 
-        this._playfieldBackground = new(new(0, 0), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
-            ColorOverride = new(100, 100, 100, 100),
-            Depth         = 0.9f
+        // this._playfieldBackground = new(new(0, 0), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
+        //     ColorOverride = new(100, 100, 100, 100),
+        //     Depth         = -0.95f
+        // };
+
+        this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User), new(0)) {
+            Depth = -0.95f
         };
-
+        
         this._drawables.Add(this._playfieldBackground);
 
         FileInfo[] noteFiles = this.Song.FileInfo.Directory?.GetFiles("note.png");
@@ -145,6 +148,8 @@ public class Player : CompositeDrawable {
         this._drawables = this._drawables.OrderByDescending(o => o.Depth).ToList();
 
         this.Play();
+
+        this._sortDrawables = true;
 
         foreach (PlayerMod mod in pTypingGame.SelectedMods)
             mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);

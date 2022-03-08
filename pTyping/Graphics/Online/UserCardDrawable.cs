@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -8,8 +7,8 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Furball.Vixie.Graphics;
 using pTyping.Online;
-using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Online;
 
@@ -102,20 +101,20 @@ public class UserCardDrawable : CompositeDrawable {
     public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
         batch.End();
         //
-        Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
+        // Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
         //
-        FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
-        (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
-        (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
-        (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
-        (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
-        );
+        // FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
+        // (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
+        // (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
+        // (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
+        // (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
+        // );
 
         batch.Begin();
         base.Draw(time, batch, args);
         batch.End();
 
-        FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
+        // FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
 
         batch.Begin();
     }

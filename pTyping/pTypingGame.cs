@@ -410,23 +410,19 @@ public class pTypingGame : FurballGame {
         // this.LoadContent();
         base.Initialize();
 
+        ScreenManager.SetBlankTransition();
+
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
         DevConsole.VolpeEnvironment.SetVariable(ConVars.BackgroundDim);
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Username);
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Password);
-
-        // ConVars.Volume        = 0.05;
-        // ConVars.BackgroundDim = 0.5;
-        //
-        // ConVars.Username = "beyley";
-        // ConVars.Password = "test";
 
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Login);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.SendMessage);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Logout);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadUTypingReplay);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadAutoReplay);
-        
+
         // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
         OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
         OnlineManager.Initialize();

@@ -1,7 +1,9 @@
 using System.Numerics;
 using FontStashSharp;
 using Furball.Engine;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
@@ -214,6 +216,10 @@ public class NoteDrawable : CompositeDrawable {
         );
         this.Note.Typed     = this.Note.Text;
         this.Note.HitResult = HitResult.Poor;
+    }
+
+    public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
+        base.Draw(time, batch, args);
     }
 
     // public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
