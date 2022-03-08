@@ -10,6 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
+using Silk.NET.Input;
 using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Player {
@@ -77,7 +78,7 @@ namespace pTyping.Graphics.Player {
 
             #region Buttons
 
-            EventHandler<Point> exitOnClick = delegate {
+            EventHandler<(MouseButton, Point)> exitOnClick = delegate {
                 pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             };

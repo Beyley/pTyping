@@ -268,8 +268,11 @@ namespace pTyping.Graphics.Editor {
 
             this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
+            ConVars.Volume.OnChange += this.OnVolumeChange;
             this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
+        }
+        private void ProgressBarOnInteract(object? sender, (MouseButton button, Point pos) e) {
+            ProgressBarOnInteract(sender, e.pos);
         }
 
         private void OnVolumeChange(object sender, float f) {
@@ -424,7 +427,7 @@ namespace pTyping.Graphics.Editor {
 
             this._progressBar.OnDrag -= this.ProgressBarOnInteract;
 
-            ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
+            ConVars.Volume.OnChange -= this.OnVolumeChange;
 
             // SongManager.UpdateSongs();
 

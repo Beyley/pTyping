@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
+        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
     </ItemGroup>
 
     <!--    <ItemGroup>-->
@@ -16,37 +16,37 @@
     <!--    </ItemGroup>-->
 
     <ItemGroup>
-        <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
+        <None Update="Content/*.png" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.wav" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.ttf" CopyToOutputDirectory="Always" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DiscordRichPresence" Version="1.0.175"/>
-        <PackageReference Include="EeveeTools" Version="1.0.0"/>
-        <PackageReference Include="GtkSharp.Win32" Version="3.1.2"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
-        <PackageReference Include="Kettu" Version="1.2.1"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageReference Include="ParallelExtensionsCore" Version="1.3.0"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
-        <PackageReference Include="TextCopy" Version="4.3.1"/>
-        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11"/>
+        <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+        <PackageReference Include="EeveeTools" Version="1.0.0" />
+        <PackageReference Include="GtkSharp.Win32" Version="3.1.2" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+        <PackageReference Include="Kettu" Version="1.2.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="ParallelExtensionsCore" Version="1.3.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+        <PackageReference Include="TextCopy" Version="4.3.1" />
+        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="gitversion.txt"/>
+        <None Remove="gitversion.txt" />
         <EmbeddedResource Include="gitversion.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitlog.json"/>
+        <None Remove="gitlog.json" />
         <EmbeddedResource Include="gitlog.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  &quot;commit&quot;: &quot;%H&quot;,%n  &quot;author&quot;: &quot;%aN;&quot;,%n  &quot;date&quot;: &quot;%ci&quot;,%n  &quot;message&quot;: &quot;%s&quot;%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;"/>
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  &quot;commit&quot;: &quot;%H&quot;,%n  &quot;author&quot;: &quot;%aN;&quot;,%n  &quot;date&quot;: &quot;%ci&quot;,%n  &quot;message&quot;: &quot;%s&quot;%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;" />
     </Target>
 
 </Project>

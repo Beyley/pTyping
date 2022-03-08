@@ -263,7 +263,7 @@ namespace pTyping.Graphics.Editor.Tools {
             this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
         }
 
-        private void OnObjectClick(object sender, Point e) {
+        private void OnObjectClick(object? sender, (MouseButton button, Point pos) valueTuple) {
             if (FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) return;
 
             bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft) || FurballGame.InputManager.HeldKeys.Contains(Key.ControlRight);

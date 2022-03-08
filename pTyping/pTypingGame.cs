@@ -213,7 +213,7 @@ namespace pTyping {
             // if (MusicTrack.IsValidHandle)
             // MusicTrack.Volume = ConVars.Volume.Value;
 
-            ConVars.Volume.BindableValue.OnChange += delegate(object _, float volume) {
+            ConVars.Volume.OnChange += delegate(object _, float volume) {
                 MenuClickSound.Volume = volume;
                 // if (MusicTrack.IsValidHandle)
                 MusicTrack.Volume = ConVars.Volume.Value;
@@ -350,7 +350,7 @@ namespace pTyping {
             );
             thread.Start();
 
-            DevConsole.AddConVarStore(typeof(ConVars));
+            // DevConsole.AddConVarStore(typeof(ConVars));
 
             CurrentSongBackground = new TexturedDrawable(new Texture(1, 1), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
                     Depth       = 1f,

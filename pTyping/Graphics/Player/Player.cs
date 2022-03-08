@@ -129,7 +129,7 @@ namespace pTyping.Graphics.Player {
 
             this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
-            ConVars.Volume.BindableValue.OnChange += this.OnVolumeChange;
+            ConVars.Volume.OnChange += this.OnVolumeChange;
             this.HitSoundNormal.Volume            =  ConVars.Volume.Value;
 
             //This wont be needed soon
@@ -217,7 +217,7 @@ namespace pTyping.Graphics.Player {
             if (note.IsHit)
                 return;
 
-            int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+            double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             if (currentTime > note.Time - TIMING_POOR) {
                 (string hiragana, List<string> romajiToType) = note.TypableRomaji;
@@ -352,7 +352,7 @@ namespace pTyping.Graphics.Player {
         }
 
         public override void Update(double time) {
-            int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+            double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             #region spawn notes and bars as needed
 
@@ -429,7 +429,7 @@ namespace pTyping.Graphics.Player {
         }
 
         public override void Dispose() {
-            ConVars.Volume.BindableValue.OnChange -= this.OnVolumeChange;
+            ConVars.Volume.OnChange -= this.OnVolumeChange;
 
             base.Dispose();
         }

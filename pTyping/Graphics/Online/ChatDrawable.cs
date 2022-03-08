@@ -128,9 +128,9 @@ namespace pTyping.Graphics.Online {
             this._channelContents.TargetScroll += valueTuple.scroll.scrollAmount;
         }
 
-        private void OnThisClick(object sender, Point e) {
+        private void OnThisClick(object? sender, (MouseButton button, Point pos) e) {
             if (this.Visible)
-                this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.Left, e.ToVector2() - this.Position + this.LastCalculatedOrigin), ""));
+                this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.Left, e.pos.ToVector2() - this.Position + this.LastCalculatedOrigin), ""));
         }
 
         private void SelectedChannelOnChange(object sender, string e) => this.RecalculateAndUpdate_wait_thats_bars();

@@ -220,23 +220,23 @@ namespace pTyping.Graphics.Player {
             );
         }
 
-        private void ResumeButtonClick(object sender, Point e) {
+        private void ResumeButtonClick(object? sender, (MouseButton button, Point pos) valueTuple) {
             pTypingGame.MenuClickSound.PlayNew();
             pTypingGame.PauseResumeMusic();
         }
 
-        private void RestartButtonClick(object sender, Point e) {
+        private void RestartButtonClick(object? sender, (MouseButton button, Point pos) valueTuple) {
             pTypingGame.MenuClickSound.PlayNew();
             pTypingGame.MusicTrack.CurrentPosition = 0;
             ScreenManager.ChangeScreen(new PlayerScreen());
         }
 
-        private void QuitButtonClick(object sender, Point e) {
+        private void QuitButtonClick(object? sender, (MouseButton button, Point pos) valueTuple) {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
         }
 
-        private void SkipButtonClick(object sender, Point e) {
+        private void SkipButtonClick(object? sender, (MouseButton, Point) valueTuple) {
             pTypingGame.MenuClickSound.PlayNew();
             pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
         }
@@ -261,7 +261,7 @@ namespace pTyping.Graphics.Player {
         }
 
         public override void Update(double gameTime) {
-            int currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+            double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
             #region update UI
 

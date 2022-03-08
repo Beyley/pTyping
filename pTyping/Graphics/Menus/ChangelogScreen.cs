@@ -9,6 +9,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Silk.NET.Input;
 using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Menus {
@@ -115,7 +116,7 @@ namespace pTyping.Graphics.Menus {
                 base.Dispose();
             }
 
-            private void OnClicked(object sender, Point e) {
+            private void OnClicked(object? sender, (MouseButton button, Point pos) valueTuple) {
                 LinkHelper.OpenLink($"https://github.com/Beyley/pTyping/commit/{this._entry.Commit}");
             }
         }

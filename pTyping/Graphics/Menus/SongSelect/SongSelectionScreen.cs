@@ -70,7 +70,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             #region Create new song button
 
             if (this._editor) {
-                EventHandler<Point> newSongOnClick = delegate {
+                EventHandler<(MouseButton, Point)> newSongOnClick = delegate {
                     pTypingGame.MenuClickSound.PlayNew();
                     ScreenManager.ChangeScreen(new NewSongScreen());
                 };
@@ -223,7 +223,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             pTypingGame.UserStatusPickingSong();
         }
 
-        private void ChangeLeaderboardType(object sender, Point e) {
+        private void ChangeLeaderboardType(object? sender, (MouseButton button, Point pos) valueTuple) {
             LeaderboardType.Value = LeaderboardType.Value switch {
                 SongSelect.LeaderboardType.Local  => SongSelect.LeaderboardType.Global,
                 SongSelect.LeaderboardType.Global => SongSelect.LeaderboardType.Friend,

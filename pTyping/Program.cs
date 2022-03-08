@@ -58,6 +58,7 @@ namespace pTyping {
             WindowOptions options = WindowOptions.Default;
             options.VSync        = false;
             options.WindowBorder = WindowBorder.Fixed;
+            options.API          = new GraphicsAPI(ContextAPI.OpenGLES, ContextProfile.Core, ContextFlags.Default, new APIVersion(3, 0));
             game.Run(options);
 #if RELEASE
             }

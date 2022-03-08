@@ -9,6 +9,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Graphics;
+using GLib;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
@@ -114,8 +115,7 @@ namespace pTyping.Graphics.Menus {
 
             exitButton.OnClick += delegate {
                 pTypingGame.MenuClickSound.PlayNew();
-                throw new NotImplementedException();
-                // FurballGame.Instance.Exit();
+                FurballGame.GameTimeScheduler.ScheduleMethod(_ => { FurballGame.Instance.WindowManager.Close(); }, FurballGame.Time + 100);
             };
 
             optionsButton.OnClick += delegate {

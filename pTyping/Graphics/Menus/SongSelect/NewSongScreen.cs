@@ -7,6 +7,7 @@ using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Songs;
+using Silk.NET.Input;
 using Color=Furball.Vixie.Graphics.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect {
@@ -45,7 +46,7 @@ namespace pTyping.Graphics.Menus.SongSelect {
             foreach (string songPath in songs) {
                 FileInfo songInfo = new(songPath);
 
-                EventHandler<Point> songOnClick = delegate {
+                EventHandler<(MouseButton, Point)> songOnClick = delegate {
                     this.CreateSong(songInfo);
                 };
 
