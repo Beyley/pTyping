@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
+using Furball.Vixie.Graphics;
 using pTyping.Engine;
 using pTyping.Graphics.Editor;
 using pTyping.Songs;

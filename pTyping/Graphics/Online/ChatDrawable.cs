@@ -53,21 +53,21 @@ public class ChatContentsDrawable : CompositeDrawable {
 
     public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
         batch.End();
-
-        Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
-
-        FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
-        (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
-        (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
-        (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
-        (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
-        );
-
+        //
+        // Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
+        //
+        // FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
+        // (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
+        // (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
+        // (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
+        // (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
+        // );
+        //
         batch.Begin();
         base.Draw(time, batch, args);
         batch.End();
 
-        FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
+        // FurballGame.Instance.GraphicsDevice.ScissorRectangle = originalRect;
 
         batch.Begin();
     }
@@ -198,7 +198,7 @@ public class ChatDrawable : CompositeDrawable {
 
                 if (message.Message.Contains("trans")) {
                     messageDrawable.Colors = new[] {
-                        Color.Cyan, Color.Pink, Color.White, Color.Pink
+                        System.Drawing.Color.Cyan, System.Drawing.Color.Pink, System.Drawing.Color.White, System.Drawing.Color.Pink
                     };
                     messageDrawable.ColorType = TextColorType.Repeating;
                 }

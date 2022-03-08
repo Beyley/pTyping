@@ -3,6 +3,7 @@ using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Vixie.Graphics;
 using pTyping.Graphics.Player.Mods;
 
 namespace pTyping.Graphics.Menus.SongSelect;

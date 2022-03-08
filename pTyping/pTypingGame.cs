@@ -18,6 +18,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
+using Furball.Vixie.Graphics;
 using Furball.Volpe.Evaluation;
 using ManagedBass;
 using pTyping.Engine;
@@ -361,7 +362,7 @@ public class pTypingGame : FurballGame {
 
         RpcClient.Invoke();
 
-        this.AfterScreenChange += (_, screen) => this.WindowManager.Title = screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
+        this.AfterScreenChange += (_, screen) => this.WindowManager.SetWindowTitle(screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}");
 
         Thread thread = new(
         () => {
@@ -387,7 +388,7 @@ public class pTypingGame : FurballGame {
             }
         }
         );
-        // thread.Start();
+        thread.Start();
 
         // DevConsole.AddConVarStore(typeof(ConVars));
 

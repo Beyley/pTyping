@@ -27,8 +27,10 @@ public class ConVars {
     "cl_load_utyping_replay",
     1,
     (context, parameters) => {
+        if (parameters[0] is not Value.String filename) return Value.DefaultVoid;
+        
         Logger.Log($"Loading UTyping replay {parameters[0].Representation}", LoggerLevelPlayerInfo.Instance);
-        ScreenManager.ChangeScreen(new PlayerScreen(PlayerScore.LoadUTypingReplay(parameters[0].Representation)));
+        ScreenManager.ChangeScreen(new PlayerScreen(PlayerScore.LoadUTypingReplay(filename.Value)));
 
         return Value.DefaultVoid;
     }
@@ -56,8 +58,10 @@ public class ConVars {
     "sv_login",
     2,
     (context, parameters) => {
-        Username.Value = new(parameters[0].Representation);
-        Password.Value = new(parameters[1].Representation);
+        if (parameters[0] is not Value.String username || parameters[1] is not Value.String password) return Value.DefaultVoid;
+
+        Username.Value = new(username.Value);
+        Password.Value = new(password.Value);
 
         pTypingGame.OnlineManager.Login();
 
@@ -68,7 +72,9 @@ public class ConVars {
     "sv_send_message",
     2,
     (context, parameters) => {
-        pTypingGame.OnlineManager.SendMessage(parameters[0].Representation, parameters[1].Representation);
+        if (parameters[0] is not Value.String channel || parameters[1] is not Value.String message) return Value.DefaultVoid;
+
+        pTypingGame.OnlineManager.SendMessage(channel.Value, message.Value);
 
         return Value.DefaultVoid;
     }

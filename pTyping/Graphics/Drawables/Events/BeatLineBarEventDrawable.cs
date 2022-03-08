@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Vixie.Graphics;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Songs;

@@ -14,6 +14,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Vixie.Graphics;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using ManagedBass;

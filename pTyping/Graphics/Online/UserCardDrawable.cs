@@ -42,8 +42,8 @@ public class UserCardDrawable : CompositeDrawable {
         );
         if (player.Action.Value.Mode.Value != PlayMode.Unknown)
             this._drawables.Add(
-            this._modeIconDrawable = new(ContentManager.LoadTextureFromFile(GetFilenameForModeIcon(player.Action.Value.Mode), ContentSource.User), new(0f)) {
-                Scale       = new(0.175f),
+            this._modeIconDrawable = new(FurballGame.WhitePixel, new(0f)) {
+                Scale       = new(0f),
                 Clickable   = false,
                 CoverClicks = false
             }
@@ -101,9 +101,9 @@ public class UserCardDrawable : CompositeDrawable {
 
     public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
         batch.End();
-
+        //
         Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
-
+        //
         FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
         (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
         (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Furball.Vixie.Graphics;
 using Kettu;
 using pTyping.Engine;
 using pTyping.Songs.Events;

@@ -9,6 +9,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Localization.Languages;
+using Furball.Vixie.Graphics;
 using pTyping.Engine;
 
 namespace pTyping.Graphics.Menus.Options;
