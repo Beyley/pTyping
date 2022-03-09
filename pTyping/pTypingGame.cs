@@ -479,9 +479,7 @@ public class pTypingGame : FurballGame {
 
         InputManager.OnKeyDown += this.OnKeyDown;
     }
-
-
-
+    
     public override void InitializeLocalizations() {
         //default language is already english, and im an english speaker, so no need to set it here
 

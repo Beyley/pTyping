@@ -93,31 +93,38 @@ public class EditorScreen : pScreen {
 
         #region Playfield decorations
 
-        LinePrimitiveDrawable playfieldTopLine = new(
-        new Vector2(1,                                recepticlePos.Y - 50),
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y - 50),
-        Color.Gray
-        ) {
-            Clickable     = false,
-            CoverClicks   = false
-        };
-        LinePrimitiveDrawable playfieldBottomLine = new(
-        new Vector2(1,                                recepticlePos.Y + 50),
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y + 50),
-        Color.Gray
-        ) {
-            Clickable     = false,
-            CoverClicks   = false
-        };
-        this.Manager.Add(playfieldTopLine);
-        this.Manager.Add(playfieldBottomLine);
+        // LinePrimitiveDrawable playfieldTopLine = new(
+        // new Vector2(1,                                recepticlePos.Y - 50),
+        // new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y - 50),
+        // Color.Gray
+        // ) {
+        //     Clickable     = false,
+        //     CoverClicks   = false
+        // };
+        // LinePrimitiveDrawable playfieldBottomLine = new(
+        // new Vector2(1,                                recepticlePos.Y + 50),
+        // new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y + 50),
+        // Color.Gray
+        // ) {
+        //     Clickable     = false,
+        //     CoverClicks   = false
+        // };
+        // this.Manager.Add(playfieldTopLine);
+        // this.Manager.Add(playfieldBottomLine);
 
-        RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
-            ColorOverride = new(100, 100, 100, 100),
-            Depth         = 0.9f,
-            Clickable     = false,
-            CoverClicks   = false
+        TexturedDrawable playfieldBackgroundCover = new(
+        ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User),
+        new(0, recepticlePos.Y - 50)
+        ) {
+            Depth = -0.95f
         };
+
+        // RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
+        //     ColorOverride = new(100, 100, 100, 100),
+        //     Depth         = 0.9f,
+        //     Clickable     = false,
+        //     CoverClicks   = false
+        // };
         this.Manager.Add(playfieldBackgroundCover);
 
         #region background image

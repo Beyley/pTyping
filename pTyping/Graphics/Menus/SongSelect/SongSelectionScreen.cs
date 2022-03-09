@@ -250,7 +250,7 @@ public class SongSelectionScreen : pScreen {
     }
 
     private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
-        this._songSelectDrawable.TargetScroll += e.scroll.scrollAmount;
+        this._songSelectDrawable.TargetScroll += e.scroll.scrollAmount * 10;
     }
 
     public override void Update(double gameTime) {

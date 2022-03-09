@@ -39,7 +39,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
             float distanceToTravel = this.TargetScroll - drawable.Position.Y + float.Parse(drawable.Tags[0]);
 
-            drawable.Position += new Vector2(0f, (float)(distanceToTravel / 200 * time));
+            drawable.Position += new Vector2(0f, (float)(distanceToTravel * time * 4));
         }
     }
 
