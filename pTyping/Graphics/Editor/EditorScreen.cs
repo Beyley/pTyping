@@ -116,7 +116,9 @@ public class EditorScreen : pScreen {
         ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User),
         new(0, recepticlePos.Y - 50)
         ) {
-            Depth = -0.95f
+            Depth       = -0.95f,
+            Clickable   = false,
+            CoverClicks = false
         };
 
         // RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
