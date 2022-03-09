@@ -447,7 +447,7 @@ public class pTypingGame : FurballGame {
                 ChangeGlobalVolume(eventArgs.scroll.scrollAmount);
         };
 
-        DrawableManager.Add(VolumeSelector);
+        DebugOverlayDrawableManager.Add(VolumeSelector);
 
         HiraganaConversion.LoadConversion();
         SongManager.UpdateSongs();
