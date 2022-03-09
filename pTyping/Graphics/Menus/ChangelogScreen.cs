@@ -12,7 +12,6 @@ using Furball.Engine.Engine.Helpers;
 using Silk.NET.Input;
 using Color=Furball.Vixie.Graphics.Color;
 
-
 namespace pTyping.Graphics.Menus;
 
 public class ChangeLogDrawable : CompositeDrawable {
@@ -27,14 +26,14 @@ public class ChangeLogDrawable : CompositeDrawable {
                 Position = new(0, y)
             };
 
-            this._drawables.Add(drawable);
+            this.Drawables.Add(drawable);
             y += drawable.Size.Y + 5;
         }
     }
 
     public override void Update(double time) {
         // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
-        foreach (ChangeLogEntryDrawable drawable in this._drawables)
+        foreach (ChangeLogEntryDrawable drawable in this.Drawables)
             drawable.Visible = drawable.RealRectangle.IntersectsWith(FurballGame.DisplayRect);
 
         base.Update(time);
@@ -95,8 +94,8 @@ public class ChangeLogDrawable : CompositeDrawable {
             this._summary.OnHoverLost += this.OnHoveredLost;
             // this._bottomLine.OnHoverLost += this.OnHoveredLost;
 
-            this._drawables.Add(this._bottomLine);
-            this._drawables.Add(this._summary);
+            this.Drawables.Add(this._bottomLine);
+            this.Drawables.Add(this._summary);
 
             this._entry = entry;
         }

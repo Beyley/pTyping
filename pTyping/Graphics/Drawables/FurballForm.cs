@@ -52,12 +52,12 @@ public class FurballForm : CompositeDrawable {
         //Make sure the contents are above the background
         this.Contents.Depth = 2f;
 
-        this._drawables.Add(this._titleBar);
-        this._drawables.Add(this._title);
-        this._drawables.Add(this._closeButton);
+        this.Drawables.Add(this._titleBar);
+        this.Drawables.Add(this._title);
+        this.Drawables.Add(this._closeButton);
 
-        this._drawables.Add(this._background);
-        this._drawables.Add(this.Contents);
+        this.Drawables.Add(this._background);
+        this.Drawables.Add(this.Contents);
 
         Vector2 size = base.Size;
 

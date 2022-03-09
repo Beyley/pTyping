@@ -24,12 +24,12 @@ public class LyricDrawable : CompositeDrawable {
         this.Position = pos;
 
         this._currentLyricText = new(new(0), pTypingGame.JapaneseFont, "", 35);
-        this._drawables.Add(this._currentLyricText);
+        this.Drawables.Add(this._currentLyricText);
 
         this._nextLyricText = new(new(0), pTypingGame.JapaneseFont, "", 27) {
             ColorOverride = Color.LightGray
         };
-        this._drawables.Add(this._nextLyricText);
+        this.Drawables.Add(this._nextLyricText);
     }
 
     public void UpdateLyric(double time) {

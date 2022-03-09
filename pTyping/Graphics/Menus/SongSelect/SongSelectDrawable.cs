@@ -26,7 +26,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
             drawable.Tags.Add(y.ToString(CultureInfo.CurrentCulture));
 
-            this._drawables.Add(drawable);
+            this.Drawables.Add(drawable);
             this._buttonDrawables.Add(drawable);
 
             y += drawable.Size.Y + 7.5f;
@@ -64,8 +64,8 @@ public class SongSelectDrawable : CompositeDrawable {
 
             this._titleDrawable = new(new(5), pTypingGame.JapaneseFontStroked, $"{song.Artist} - {song.Name} [{song.Difficulty}]", 30);
 
-            this._drawables.Add(this._titleDrawable);
-            this._drawables.Add(this._backgroundDrawable);
+            this.Drawables.Add(this._titleDrawable);
+            this.Drawables.Add(this._backgroundDrawable);
 
             this.OnClick += delegate {
                 pTypingGame.CurrentSong.Value = song;

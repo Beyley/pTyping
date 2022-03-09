@@ -19,7 +19,7 @@ using Color=Furball.Vixie.Graphics.Color;
 namespace pTyping.Graphics.Online;
 
 public class ChatContentsDrawable : CompositeDrawable {
-    public List<ManagedDrawable> PublicDrawables => this._drawables;
+    public List<ManagedDrawable> PublicDrawables => this.Drawables;
     
     public float TargetScroll = 0;
 
@@ -30,11 +30,11 @@ public class ChatContentsDrawable : CompositeDrawable {
     public ChatContentsDrawable(Vector2 size) => this.Size = size;
 
     public void Clear() {
-        this.Drawables.ToList().ForEach(x => this._drawables.Remove(x));
+        this.Drawables.ForEach(x => this.Drawables.Remove(x));
     }
 
     public override void Update(double time) {
-        if (this._drawables.Count != 0) {
+        if (this.Drawables.Count != 0) {
             this.TargetScroll = Math.Max(this.TargetScroll, 0);
 
             foreach (ManagedDrawable drawable in this.Drawables) {
@@ -90,7 +90,7 @@ public class ChatDrawable : CompositeDrawable {
 
     private void UpdateChannelButtons(object _, NotifyCollectionChangedEventArgs __) {
         lock (pTypingGame.OnlineManager.KnownChannels) {
-            this._channelButtons.ForEach(x => this._drawables.Remove(x));
+            this._channelButtons.ForEach(x => this.Drawables.Remove(x));
             this._channelButtons.Clear();
 
             float x = 0f;
@@ -104,7 +104,7 @@ public class ChatDrawable : CompositeDrawable {
                     this.SelectedChannel.Value = channel;
                 };
 
-                this._drawables.Add(button);
+                this.Drawables.Add(button);
             }
         }
     }
@@ -113,20 +113,20 @@ public class ChatDrawable : CompositeDrawable {
         this.Position = pos;
         this.Size     = size;
 
-        this._drawables.Add(
+        this.Drawables.Add(
         this._background = new(Vector2.Zero, size, 2, true) {
             ColorOverride = new(100, 100, 100, 100)
         }
         );
 
-        this._drawables.Add(
+        this.Drawables.Add(
         this.MessageInputDrawable = new(new(0, size.Y), pTypingGame.JapaneseFontStroked, "", 35, size.X) {
             OriginType       = OriginType.BottomLeft,
             DeselectOnCommit = false
         }
         );
 
-        this._drawables.Add(
+        this.Drawables.Add(
         this._channelContents = new(new(size.X, size.Y - this.MessageInputDrawable.Size.Y - this._padding)) {
             OriginType = OriginType.BottomLeft,
             Position   = new(0, size.Y - this.MessageInputDrawable.Size.Y - this._padding)

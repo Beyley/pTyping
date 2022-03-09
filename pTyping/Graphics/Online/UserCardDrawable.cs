@@ -26,13 +26,13 @@ public class UserCardDrawable : CompositeDrawable {
         this.Player   = new(player);
         this.Position = position;
 
-        this._drawables.Add(
+        this.Drawables.Add(
         this._backgroundDrawable = new(ContentManager.LoadTextureFromFile("user-card.png", ContentSource.User), new(0f)) {
             Clickable   = false,
             CoverClicks = false
         }
         );
-        this._drawables.Add(
+        this.Drawables.Add(
         this._usernameDrawable = new(new(15f), pTypingGame.FurballFontRegular, "", 55) {
             Scale       = new(1.7f),
             Clickable   = false,
@@ -40,7 +40,7 @@ public class UserCardDrawable : CompositeDrawable {
         }
         );
         if (player.Action.Value.Mode.Value != PlayMode.Unknown)
-            this._drawables.Add(
+            this.Drawables.Add(
             this._modeIconDrawable = new(FurballGame.WhitePixel, new(0f)) {
                 Scale       = new(0f),
                 Clickable   = false,
@@ -48,7 +48,7 @@ public class UserCardDrawable : CompositeDrawable {
             }
             );
         else
-            this._drawables.Add(
+            this.Drawables.Add(
             this._modeIconDrawable = new(FurballGame.WhitePixel, new(0f)) {
                 Scale       = new(0f),
                 Clickable   = false,
@@ -56,7 +56,7 @@ public class UserCardDrawable : CompositeDrawable {
             }
             );
 
-        this._drawables.Add(
+        this.Drawables.Add(
         this._rankDrawable = new(new(0, 0), pTypingGame.FurballFontRegular, "", 175) {
             Scale         = new(2f),
             ColorOverride = new(255, 255, 255, 100),
@@ -67,7 +67,7 @@ public class UserCardDrawable : CompositeDrawable {
 
         this._rankDrawable.MoveTo(new(this._backgroundDrawable.Size.X - 370, 0));
 
-        this._drawables.Add(
+        this.Drawables.Add(
         this._mainTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.FurballFontRegular, "", 45) {
             Scale       = new(1.7f),
             Visible     = true,
@@ -75,7 +75,7 @@ public class UserCardDrawable : CompositeDrawable {
             CoverClicks = false
         }
         );
-        this._drawables.Add(
+        this.Drawables.Add(
         this._statusTextDrawable = new(new(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFont, "", 45) {
             Scale       = new(1.7f),
             Visible     = true,

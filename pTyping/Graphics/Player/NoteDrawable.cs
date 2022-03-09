@@ -57,9 +57,9 @@ public class NoteDrawable : CompositeDrawable {
             OriginType = OriginType.TopCenter
         };
 
-        this._drawables.Add(this.NoteTexture);
-        this._drawables.Add(this.RawTextDrawable);
-        this._drawables.Add(this.ToTypeTextDrawable);
+        this.Drawables.Add(this.NoteTexture);
+        this.Drawables.Add(this.RawTextDrawable);
+        this.Drawables.Add(this.ToTypeTextDrawable);
 
         this.OriginType = OriginType.Center;
     }

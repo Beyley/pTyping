@@ -40,7 +40,7 @@ public class UiContainer : CompositeDrawable {
         UiElement removedElement = e?.Action == NotifyCollectionChangedAction.Remove ? e.OldItems?[0] as UiElement : null;
 
         if (removedElement != null)
-            this._drawables.Remove(removedElement.Drawable);
+            this.Drawables.Remove(removedElement.Drawable);
 
         for (int i = 0; i < this._elements.Count; i++) {
             UiElement element = this._elements[i];
@@ -72,7 +72,7 @@ public class UiContainer : CompositeDrawable {
 
             //Only add the new element
             if (elementIsAdded)
-                this._drawables.Add(element.Drawable);
+                this.Drawables.Add(element.Drawable);
         }
     }
 

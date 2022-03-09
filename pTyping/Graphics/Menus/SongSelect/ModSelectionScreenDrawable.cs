@@ -40,7 +40,7 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
             };
 
             this._mods.Add((mod, modButton));
-            this._drawables.Add(modButton);
+            this.Drawables.Add(modButton);
 
             x += modButton.Size.X + 30;
             if ((i + 1) % 4 == 0 && i != PlayerMod.RegisteredMods.Count - 1) {
@@ -58,7 +58,7 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
         $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x",
         30
         );
-        this._drawables.Add(this._scoreMultiplier);
+        this.Drawables.Add(this._scoreMultiplier);
     }
 
     private void OnButtonClick(UiButtonDrawable modButton, PlayerMod mod) {

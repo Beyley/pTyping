@@ -117,8 +117,8 @@ public class Player : CompositeDrawable {
         this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User), new(0)) {
             Depth = -0.95f
         };
-        
-        this._drawables.Add(this._playfieldBackground);
+
+        this.Drawables.Add(this._playfieldBackground);
 
         FileInfo[] noteFiles = this.Song.FileInfo.Directory?.GetFiles("note.png");
 
@@ -131,7 +131,7 @@ public class Player : CompositeDrawable {
             OriginType = OriginType.Center
         };
 
-        this._drawables.Add(this._recepticle);
+        this.Drawables.Add(this._recepticle);
 
         //Called before creating the notes
         this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
@@ -145,7 +145,7 @@ public class Player : CompositeDrawable {
         this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
 
         //This wont be needed soon
-        this._drawables = this._drawables.OrderByDescending(o => o.Depth).ToList();
+        this.Drawables = this.Drawables.OrderByDescending(o => o.Depth).ToList();
 
         this.Play();
 
@@ -284,7 +284,7 @@ public class Player : CompositeDrawable {
 
     private void ShowTypingIndicator(char character, bool miss = false) {
         if (this._currentTypingIndicator != null)
-            this._drawables.Remove(this._currentTypingIndicator);
+            this.Drawables.Remove(this._currentTypingIndicator);
 
         if (this._currentTypingIndicator == null) {
             this._currentTypingIndicator = new(RECEPTICLE_POS, pTypingGame.JapaneseFont, character.ToString(), 60) {
@@ -296,7 +296,7 @@ public class Player : CompositeDrawable {
             this._currentTypingIndicator.Text     = character.ToString();
         }
 
-        this._drawables.Add(this._currentTypingIndicator);
+        this.Drawables.Add(this._currentTypingIndicator);
 
         if (miss) {
             //random bool
@@ -432,7 +432,7 @@ public class Player : CompositeDrawable {
 
             if (currentTime < note.Note.Time - this.CurrentApproachTime(note.Note.Time)) continue;
 
-            this._drawables.Add(note);
+            this.Drawables.Add(note);
             note.Added = true;
         }
 
@@ -443,7 +443,7 @@ public class Player : CompositeDrawable {
 
             if (currentTime < drawable.Tweens[0].StartTime) continue;
 
-            this._drawables.Add(drawable);
+            this.Drawables.Add(drawable);
             this._events[i] = new(drawable, true);
         }
 

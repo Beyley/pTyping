@@ -32,7 +32,7 @@ public class LeaderboardDrawable : CompositeDrawable {
             };
 
             this._leaderboardElementDrawables.Add(drawable);
-            this._drawables.Add(drawable);
+            this.Drawables.Add(drawable);
 
             drawable.OnClick += delegate {
                 ScreenManager.ChangeScreen(new ScoreResultsScreen(score));
@@ -52,13 +52,13 @@ public class LeaderboardDrawable : CompositeDrawable {
         public LeaderboardElementDrawable(PlayerScore score) {
             this.Score = score;
 
-            this._drawables.Add(
+            this.Drawables.Add(
             this._backgroundDrawable = new TexturedDrawable(ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User), Vector2.Zero) {
                 Scale = new(0.2f)
             }
             );
-            this._drawables.Add(this._usernameInfoDrawable = new TextDrawable(new(3f),                                         pTypingGame.JapaneseFont, "a", 30));
-            this._drawables.Add(this._infoTextDrawable     = new TextDrawable(new(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
+            this.Drawables.Add(this._usernameInfoDrawable = new TextDrawable(new(3f),                                         pTypingGame.JapaneseFont, "a", 30));
+            this.Drawables.Add(this._infoTextDrawable     = new TextDrawable(new(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
 
             this.UpdateText();
         }

@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using Silk.NET.Input;
 using Color=Furball.Vixie.Graphics.Color;
 
-
 namespace pTyping.Engine;
 
 public class NotificationManager : DrawableManager {
@@ -139,9 +138,9 @@ public class NotificationManager : DrawableManager {
                 _                              => throw new ArgumentOutOfRangeException(nameof (importance), importance, "what the hell?")
             };
 
-            this._drawables.Add(this._backgroundDrawable);
-            this._drawables.Add(this._outlineDrawable);
-            this._drawables.Add(this._textDrawable);
+            this.Drawables.Add(this._backgroundDrawable);
+            this.Drawables.Add(this._outlineDrawable);
+            this.Drawables.Add(this._textDrawable);
         }
     }
 }
