@@ -297,15 +297,15 @@ public class ClientStatusUpdatePacket : Packet {
     private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
         ("action", DataType.Byte),
         ("action_text", DataType.String),
-        ("mode", DataType.Byte)
+        ("mode", DataType.String)
     };
 
     public UserAction Action {
-        get => new((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), (PlayMode)this.Data["mode"]);
+        get => new((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), PlayModeMethods.FromString((string)this.Data["mode"]));
         set {
             this.Data["action"]      = value.Action.Value;
             this.Data["action_text"] = value.ActionText.Value;
-            this.Data["mode"]        = value.Mode.Value;
+            this.Data["mode"]        = value.Mode.Value.GetString();
         }
     }
 
@@ -319,7 +319,7 @@ public class ServerUserStatusUpdatePacket : Packet {
         ("user_id", DataType.UInt),
         ("action", DataType.Byte),
         ("action_text", DataType.String),
-        ("mode", DataType.Byte)
+        ("mode", DataType.String)
     };
 
     public uint UserId {
@@ -328,11 +328,11 @@ public class ServerUserStatusUpdatePacket : Packet {
     }
 
     public UserAction Action {
-        get => new((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), (PlayMode)this.Data["mode"]);
+        get => new((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), PlayModeMethods.FromString((string)this.Data["mode"]));
         set {
             this.Data["action"]      = value.Action.Value;
             this.Data["action_text"] = value.ActionText.Value;
-            this.Data["mode"]        = value.Mode.Value;
+            this.Data["mode"]        = value.Mode.Value.GetString();
         }
     }
 

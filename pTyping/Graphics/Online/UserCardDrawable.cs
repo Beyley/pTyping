@@ -126,7 +126,7 @@ public class UserCardDrawable : CompositeDrawable {
             PlayMode.Catch    => "catch-mode-icon.png",
             PlayMode.Mania    => "mania-mode-icon.png",
             PlayMode.pTyping  => "ptyping-mode.icon.png",
-            PlayMode.Unknown  => null,
+            PlayMode.Unknown  => "none",
             _                 => throw new ArgumentOutOfRangeException(nameof (mode), mode, null)
         };
     }
@@ -139,17 +139,17 @@ Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Va
         this._statusTextDrawable.Text = $"{this.Player.Value.Action.Value.ActionText}";
         this._rankDrawable.Text       = this.Player.Value.Rank == 0 ? "" : $"#{this.Player.Value.Rank.Value}";
 
-        try {
-            string f = GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode);
-            if (f == null) throw new Exception();
-
+        string f = GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode);
+        if (f == "none") {
+            this._modeIconDrawable.SetTexture(FurballGame.WhitePixel);
+            this._modeIconDrawable.Scale = new(0f);
+        } else {
             this._modeIconDrawable.SetTexture(ContentManager.LoadTextureFromFile(f, ContentSource.User));
             this._modeIconDrawable.Scale = new(0.175f);
         }
-        catch {
-            this._modeIconDrawable.SetTexture(FurballGame.WhitePixel);
-            this._modeIconDrawable.Scale = new(0f);
-        }
+
+        Console.WriteLine(f);
+        
         Color color = this.Player.Value.Action.Value.Action.Value switch {
             UserActionType.Idle    => Color.White,
             UserActionType.Ingame  => Color.Green,

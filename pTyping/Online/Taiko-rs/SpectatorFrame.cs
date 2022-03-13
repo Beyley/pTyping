@@ -94,7 +94,7 @@ public abstract class SpectatorFrame {
                 SpectatorFramePlay frame = (SpectatorFramePlay)this;
 
                 writer.Write(frame.BeatmapHash);
-                writer.Write((byte)frame.Mode);
+                writer.Write(frame.Mode.GetString());
                 writer.Write(JsonConvert.SerializeObject(frame.Modinfo));
                 break;
             }
@@ -124,7 +124,7 @@ public abstract class SpectatorFrame {
 
                 writer.Write(frame.UserId);
                 writer.Write(frame.BeatmapHash);
-                writer.Write((byte)frame.Mode);
+                writer.Write(frame.Mode.GetString());
                 writer.Write(JsonConvert.SerializeObject(frame.Mods));
                 writer.Write(frame.CurrentTime);
 

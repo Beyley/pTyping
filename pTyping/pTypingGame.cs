@@ -532,6 +532,7 @@ public class pTypingGame : FurballGame {
                     pos.Y += drawable.Size.Y + 10;
                 }
 
+                drawable.ClearEvents();
                 drawable.OnClick += delegate(object _, (MouseButton button, Point pos) a) {
                     switch (a.button) {
                         case MouseButton.Left: {
@@ -542,6 +543,8 @@ public class pTypingGame : FurballGame {
                             break;
                         }
                         case MouseButton.Right:
+                            if (OnlineManager.Host != null) return;
+                            
                             OnlineManager.SpectatePlayer(player);
                             break;
                     }

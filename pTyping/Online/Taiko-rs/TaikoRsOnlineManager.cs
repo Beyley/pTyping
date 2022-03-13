@@ -229,6 +229,8 @@ public class TaikoRsOnlineManager : OnlineManager {
         if (this.Host != null)
             return;
 
+        // this.Host = player;
+
         this.PacketQueue.Enqueue(
         new ClientSpectatePacket {
             HostId = player.UserId
@@ -420,18 +422,24 @@ public class TaikoRsOnlineManager : OnlineManager {
                 NotificationManager.NotificationImportance.Error,
                 "You cannot spectate a bot! (yo wait thats bars)"
                 );
+                this.Host = null;
                 break;
             case SpectateResult.ErrorHostOffline:
                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "The host is offline!");
+                this.Host = null;
                 break;
             case SpectateResult.ErrorSpectatingYourself:
                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "You are unable to spectate yourself!");
+                this.Host = null;
                 break;
             case SpectateResult.ErrorUnknown:
                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Unable to spectate player!");
+                this.Host = null;
                 break;
-            default:
+            default: {
+                this.Host = null;
                 throw new ArgumentOutOfRangeException();
+            }
         }
 
         return true;
@@ -552,7 +560,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
                         this.SpectatorState = SpectatorState.Playing;
                     },
-                    FurballGame.Time
+                    0
                     );
 
                     break;
@@ -585,9 +593,10 @@ public class TaikoRsOnlineManager : OnlineManager {
                     break;
                 }
                 case SpectatorFrameDataType.Buffer: {
-                    lock (this.GameScene.SpectatorQueue) {
-                        this.GameScene.SpectatorQueue.Add(frame);
-                    }
+                    if (this.GameScene != null)
+                        lock (this.GameScene.SpectatorQueue) {
+                            this.GameScene.SpectatorQueue.Add(frame);
+                        }
 
                     break;
                 }
@@ -595,18 +604,20 @@ public class TaikoRsOnlineManager : OnlineManager {
                 case SpectatorFrameDataType.ReplayFrame: {
                     if (this.Host == this.Player) break;
 
-                    lock (this.GameScene.SpectatorQueue) {
-                        this.GameScene.SpectatorQueue.Add(frame);
-                    }
+                    if (this.GameScene != null)
+                        lock (this.GameScene.SpectatorQueue) {
+                            this.GameScene.SpectatorQueue.Add(frame);
+                        }
 
                     break;
                 }
                 case SpectatorFrameDataType.ScoreSync: {
                     if (this.Host == this.Player) break;
 
-                    lock (this.GameScene.SpectatorQueue) {
-                        this.GameScene.SpectatorQueue.Add(frame);
-                    }
+                    if (this.GameScene != null)
+                        lock (this.GameScene.SpectatorQueue) {
+                            this.GameScene.SpectatorQueue.Add(frame);
+                        }
 
                     break;
                 }
@@ -670,7 +681,7 @@ public class TaikoRsOnlineManager : OnlineManager {
                 return false;
 
             lock (this.Spectators) {
-                this.Spectators.Add(p.UserId, player);
+                this.Spectators.TryAdd(p.UserId, player);
             }
         }
 
@@ -760,15 +771,20 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         lock (this.OnlinePlayers) {
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-                player.TotalScore.Value  = packet.TotalScore;
-                player.RankedScore.Value = packet.RankedScore;
-                player.Accuracy.Value    = packet.Accuracy;
-                player.PlayCount.Value   = packet.Playcount;
-                player.Rank.Value        = packet.Rank;
+                FurballGame.GameTimeScheduler.ScheduleMethod(
+                _ => {
+                    player.TotalScore.Value  = packet.TotalScore;
+                    player.RankedScore.Value = packet.RankedScore;
+                    player.Accuracy.Value    = packet.Accuracy;
+                    player.PlayCount.Value   = packet.Playcount;
+                    player.Rank.Value        = packet.Rank;
 
-                Logger.Log(
-                $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
-                LoggerLevelOnlineInfo.Instance
+                    Logger.Log(
+                    $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
+                    LoggerLevelOnlineInfo.Instance
+                    );
+                },
+                0
                 );
             }
         }
@@ -782,10 +798,15 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         lock (this.OnlinePlayers) {
             if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
-                player.Action.Value = packet.Action;
-                Logger.Log(
-                $"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}! Mode: {packet.Action.Mode.Value}",
-                LoggerLevelOnlineInfo.Instance
+                FurballGame.GameTimeScheduler.ScheduleMethod(
+                _ => {
+                    player.Action.Value = packet.Action;
+                    Logger.Log(
+                    $"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}! Mode: {packet.Action.Mode.Value}",
+                    LoggerLevelOnlineInfo.Instance
+                    );
+                },
+                0
                 );
             }
         }
@@ -917,7 +938,7 @@ public class TaikoRsReader : BinaryReader {
 
     public SpectatorFrameDataType ReadSpectatorFrameType() => (SpectatorFrameDataType)this.ReadByte();
 
-    public PlayMode ReadPlayMode() => (PlayMode)this.ReadByte();
+    public PlayMode ReadPlayMode() => PlayModeMethods.FromString(this.ReadString());
 }
 
 public class TaikoRsWriter : BinaryWriter {

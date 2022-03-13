@@ -101,7 +101,7 @@ public class PlayerScore {
 
         score.Username = reader.ReadString();
         score.MapHash  = reader.ReadString();
-        reader.ReadByte();// mode
+        reader.ReadPlayMode();// mode
         score.Score         = reader.ReadInt64();
         score.Combo         = reader.ReadInt16();
         score.MaxCombo      = reader.ReadInt16();
@@ -122,7 +122,7 @@ public class PlayerScore {
         writer.Write(TAIKO_RS_SCORE_VERSION);
         writer.Write(this.Username);
         writer.Write(this.MapHash);
-        writer.Write((byte)PlayMode.pTyping);
+        writer.Write(PlayMode.pTyping.GetString());
         writer.Write(this.Score);
         writer.Write((short)this.Combo);
         writer.Write((short)this.MaxCombo);
@@ -154,7 +154,7 @@ public class PlayerScore {
         writer.Write(TAIKO_RS_SCORE_VERSION);
         writer.Write(this.Username);
         writer.Write(this.MapHash);
-        writer.Write((byte)PlayMode.pTyping);
+        writer.Write(PlayMode.pTyping.GetString());
         writer.Write(this.Score);
         writer.Write((short)this.Combo);
         writer.Write((short)this.MaxCombo);

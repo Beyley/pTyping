@@ -30,7 +30,7 @@ public class ChatContentsDrawable : CompositeDrawable {
     public ChatContentsDrawable(Vector2 size) => this.Size = size;
 
     public void Clear() {
-        this.Drawables.ForEach(x => this.Drawables.Remove(x));
+        this.Drawables.Clear();
     }
 
     public override void Update(double time) {
