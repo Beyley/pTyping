@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Furball.Engine.Engine.Helpers;
+using Furball.Vixie.Graphics.Backends;
 using Newtonsoft.Json;
 using Silk.NET.Windowing;
 
@@ -62,11 +63,10 @@ internal class Program {
 #endif
                 WindowOptions options = WindowOptions.Default with {
                     VSync = false,
-                    WindowBorder = WindowBorder.Fixed,
-                    API = new GraphicsAPI(ContextAPI.OpenGLES, ContextProfile.Core, ContextFlags.Default, new APIVersion(3, 0))
+                    WindowBorder = WindowBorder.Fixed
                 };
 
-                game.Run(options);
+                game.Run(options, Backend.OpenGL);
 #if RELEASE
             }
             catch (Exception ex) {
