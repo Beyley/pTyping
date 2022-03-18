@@ -36,7 +36,7 @@
         <PackageReference Include="hellosam.net.collections" Version="1.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
 <!--        <PackageReference Include="JetBrains.dotMemory.Console.linux-x64" Version="2021.3.3"/>-->
-        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.105"/>
+        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.113"/>
         <PackageReference Include="Kettu" Version="1.2.2"/>
         <!--        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641"/>-->
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
