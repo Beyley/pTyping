@@ -65,7 +65,7 @@ internal class Program {
                     WindowBorder = WindowBorder.Fixed
                 };
 
-                game.Run(options, Backend.OpenGLES);
+                game.Run(options, Backend.OpenGL41);
 #if RELEASE
             }
             catch (Exception ex) {

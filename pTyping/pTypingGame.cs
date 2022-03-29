@@ -507,6 +507,10 @@ public class pTypingGame : FurballGame {
                     drawable.Visible = this._userPanelManager.Visible;
 
                 break;
+            case Key.F11: {
+                this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
+                break;
+            }
         }
     }
 
