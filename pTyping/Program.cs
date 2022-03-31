@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Furball.Vixie.Graphics.Backends;
 using Newtonsoft.Json;
 using Silk.NET.Windowing;
 
@@ -65,7 +64,7 @@ internal class Program {
                     WindowBorder = WindowBorder.Fixed
                 };
 
-                game.Run(options, Backend.OpenGL41);
+                game.Run(options);
 #if RELEASE
             }
             catch (Exception ex) {
