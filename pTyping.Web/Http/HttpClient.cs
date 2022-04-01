@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using EeveeTools.Servers.TCP;
@@ -5,8 +6,14 @@ using EeveeTools.Servers.TCP;
 namespace pTyping.Web.Http;
 
 public class HttpClient : TcpClientHandler {
+    private readonly List<byte> _data = new();
+    
     protected override void HandleData(byte[] data) {
-        HttpRequest  request  = HttpRequest.ParseHttpRequest(data);
+        this._data.AddRange(data);
+        if (!Encoding.UTF8.GetString(data).EndsWith("\r\n\r\n"))
+            return;
+
+        HttpRequest  request  = HttpRequest.ParseHttpRequest(this._data.ToArray());
         HttpResponse response = new();
 
         //Makes sure they dont traverse the dirtree upward
