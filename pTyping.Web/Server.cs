@@ -45,6 +45,7 @@ public static class Server {
 
         Console.WriteLine("Press enter to stop the server!");
         Console.ReadLine();
+        Console.WriteLine("Stopping server!");
 
         Environment.Exit(0);
     }
