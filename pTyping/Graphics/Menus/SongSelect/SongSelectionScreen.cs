@@ -13,7 +13,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Vixie.Graphics;
+using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
 using ManagedBass;
 using pTyping.Engine;
@@ -23,7 +23,7 @@ using pTyping.Graphics.Player;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
-using Color=Furball.Vixie.Graphics.Color;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 

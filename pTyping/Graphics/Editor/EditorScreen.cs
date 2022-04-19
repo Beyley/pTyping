@@ -14,7 +14,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using Furball.Vixie.Graphics;
+using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using ManagedBass;
@@ -29,7 +29,7 @@ using pTyping.Songs;
 using Silk.NET.Input;
 using sowelipisona;
 using TextCopy;
-using Color=Furball.Vixie.Graphics.Color;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Editor;
 

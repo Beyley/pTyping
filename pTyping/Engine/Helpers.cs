@@ -1,5 +1,5 @@
 using Eto.Drawing;
-using Color=Furball.Vixie.Graphics.Color;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Engine;
 

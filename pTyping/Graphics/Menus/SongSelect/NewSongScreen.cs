@@ -9,7 +9,7 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Engine;
 using pTyping.Songs;
 using Silk.NET.Input;
-using Color=Furball.Vixie.Graphics.Color;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 

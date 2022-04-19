@@ -1,5 +1,5 @@
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Vixie.Graphics;
+using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.Graphics.Drawables.Events;

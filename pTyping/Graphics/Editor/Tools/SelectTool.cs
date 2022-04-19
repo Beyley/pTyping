@@ -6,7 +6,7 @@ using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
-using Color=Furball.Vixie.Graphics.Color;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Editor.Tools;
 

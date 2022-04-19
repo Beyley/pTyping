@@ -18,8 +18,8 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
-using Furball.Vixie.Graphics;
-using Furball.Vixie.Graphics.Backends;
+using Furball.Vixie;
+using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using ManagedBass;
 using pTyping.Engine;
@@ -393,7 +393,7 @@ public class pTypingGame : FurballGame {
 
         // DevConsole.AddConVarStore(typeof(ConVars));
 
-        CurrentSongBackground = new TexturedDrawable(GraphicsBackend.Current.CreateWhitePixelTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+        CurrentSongBackground = new TexturedDrawable(Resources.CreateTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
             Depth       = 1f,
             OriginType  = OriginType.Center,
             Hoverable   = false,

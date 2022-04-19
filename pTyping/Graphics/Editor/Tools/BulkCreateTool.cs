@@ -46,7 +46,7 @@ public class BulkCreateTool : EditorTool {
         this.Spacing                     = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "4", ITEMTEXTSIZE, TEXTBOXWIDTH);
         this.ColorLabel                  = UiElement.CreateText(pTypingGame.JapaneseFont, "Color", LABELTEXTSIZE);
         this.ColorLabel.SpaceAfter       = LABELAFTERDISTANCE;
-        this.Color                       = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Furball.Vixie.Graphics.Color.Red);
+        this.Color                       = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Furball.Vixie.Backends.Shared.Color.Red);
 
         this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAddLabel);
         this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAdd);

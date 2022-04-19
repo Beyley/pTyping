@@ -9,7 +9,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
-using Furball.Vixie.Graphics;
+using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using pTyping.Engine;
