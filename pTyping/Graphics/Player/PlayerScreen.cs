@@ -242,6 +242,13 @@ public class PlayerScreen : pScreen {
 
         pTypingGame.UserStatusPlaying();
 
+        double offset = OffsetManager.GetOffset(this.Song);
+
+        if (offset != 0) {
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Using local offset of {offset}");
+            pTypingGame.MusicTrackTimeSource.Offset = offset;
+        }
+
         if (!this._playingReplay)
             pTypingGame.OnlineManager.GameScene = this;
     }
@@ -297,19 +304,51 @@ public class PlayerScreen : pScreen {
         base.Dispose();
     }
 
+    private double lastPress;
     private void OnKeyPress(object sender, Key key) {
-        if (key == Key.Escape) {
-            if (this._endScheduled) return;
+        if (key != Key.Minus && key != Key.Equal)
+            this.lastPress = FurballGame.Time;
 
-            pTypingGame.PauseResumeMusic();
+        switch (key) {
+            case Key.Escape when this._endScheduled: {
+                return;
+            }
+            case Key.Escape: {
+                pTypingGame.PauseResumeMusic();
 
-            switch (pTypingGame.MusicTrack.PlaybackState) {
-                case PlaybackState.Paused:
-                    pTypingGame.OnlineManager.SpectatorPause(pTypingGame.MusicTrack.CurrentPosition);
+                switch (pTypingGame.MusicTrack.PlaybackState) {
+                    case PlaybackState.Paused:
+                        pTypingGame.OnlineManager.SpectatorPause(pTypingGame.MusicTrack.CurrentPosition);
+                        break;
+                    case PlaybackState.Playing:
+                        pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
+                        break;
+                }
+                break;
+            }
+            case Key.Equal: {
+                if (FurballGame.Time - this.lastPress < 5000 && pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
                     break;
-                case PlaybackState.Playing:
-                    pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
+
+                double currentOffset = OffsetManager.GetOffset(this.Song);
+
+                OffsetManager.SetOffset(this.Song, currentOffset + 5);
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Offset set to {currentOffset + 5}");
+                pTypingGame.MusicTrackTimeSource.Offset = currentOffset + 5;
+
+                break;
+            }
+            case Key.Minus: {
+                if (FurballGame.Time - this.lastPress < 5000 && pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
                     break;
+
+                double currentOffset = OffsetManager.GetOffset(this.Song);
+
+                OffsetManager.SetOffset(this.Song, currentOffset - 5);
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Offset set to {currentOffset - 5}");
+                pTypingGame.MusicTrackTimeSource.Offset = currentOffset - 5;
+
+                break;
             }
         }
     }

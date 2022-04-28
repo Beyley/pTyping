@@ -35,7 +35,6 @@ using Silk.NET.Input;
 using SixLabors.ImageSharp;
 using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
-using Image=SixLabors.ImageSharp.Image;
 using Point=System.Drawing.Point;
 
 namespace pTyping;
@@ -52,9 +51,10 @@ public class pTypingGame : FurballGame {
     public static Texture BackButtonTexture;
     public static Texture DefaultBackground;
 
-    public static AudioStream           MusicTrack           = null;
-    public static AudioStreamTimeSource MusicTrackTimeSource = null;
-    public static SoundEffectPlayer     MenuClickSound       = null;
+    public static AudioStream           MusicTrack                   = null;
+    public static OffsetTimeSource      MusicTrackTimeSource         = null;
+    public static AudioStreamTimeSource MusicTrackTimeSourceNoOffset = null;
+    public static SoundEffectPlayer     MenuClickSound               = null;
     public static Scheduler             MusicTrackScheduler;
 
     public static Bindable<Song> CurrentSong = new(null);
@@ -211,8 +211,9 @@ public class pTypingGame : FurballGame {
         }
         // MusicTrack.Free();
         // }
-        MusicTrack           = AudioEngine.CreateStream(data);
-        MusicTrackTimeSource = new(MusicTrack);
+        MusicTrack                   = AudioEngine.CreateStream(data);
+        MusicTrackTimeSourceNoOffset = new(MusicTrack);
+        MusicTrackTimeSource         = new OffsetTimeSource(MusicTrackTimeSourceNoOffset, 0);
 
         // MusicTrack.TempoFrequencyLock = true;
     }
@@ -355,6 +356,8 @@ public class pTypingGame : FurballGame {
 
         RpcClient.Dispose();
 
+        OffsetManager.Save();
+
         base.OnClosing();
     }
 
@@ -394,6 +397,8 @@ public class pTypingGame : FurballGame {
         thread.Start();
 
         // DevConsole.AddConVarStore(typeof(ConVars));
+
+        OffsetManager.Initialize();
 
         CurrentSongBackground = new TexturedDrawable(Resources.CreateTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
             Depth       = 1f,
