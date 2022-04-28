@@ -11,10 +11,11 @@
         <DebugType>full</DebugType>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NoWarn>NU1701;NU1702</NoWarn>
+        <DefineConstants>TRACE;DEBUGWITHGL</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
+        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
     </ItemGroup>
 
     <!--    <ItemGroup>-->
@@ -24,40 +25,40 @@
     <!--    </ItemGroup>-->
 
     <ItemGroup>
-        <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
-        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always"/>
+        <None Update="Content/*.png" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.wav" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.ttf" CopyToOutputDirectory="Always" />
+        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DiscordRichPresence" Version="1.0.175"/>
-        <PackageReference Include="EeveeTools" Version="1.0.0"/>
-        <PackageReference Include="hellosam.net.collections" Version="1.0.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
+        <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+        <PackageReference Include="EeveeTools" Version="1.0.0" />
+        <PackageReference Include="hellosam.net.collections" Version="1.0.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
         <!--        <PackageReference Include="JetBrains.dotMemory.Console.linux-x64" Version="2021.3.3"/>-->
-        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.105"/>
-        <PackageReference Include="Kettu" Version="1.2.4"/>
+        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.105" />
+        <PackageReference Include="Kettu" Version="1.2.4" />
         <!--        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641"/>-->
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageReference Include="ParallelExtensionsCore" Version="1.3.0"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
-        <PackageReference Include="TextCopy" Version="6.1.0"/>
-        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="ParallelExtensionsCore" Version="1.3.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+        <PackageReference Include="TextCopy" Version="6.1.0" />
+        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="gitversion.txt"/>
+        <None Remove="gitversion.txt" />
         <EmbeddedResource Include="gitversion.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitlog.json"/>
+        <None Remove="gitlog.json" />
         <EmbeddedResource Include="gitlog.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;"/>
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;" />
     </Target>
 </Project>

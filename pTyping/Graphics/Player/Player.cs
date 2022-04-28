@@ -91,6 +91,7 @@ public class Player : CompositeDrawable {
     // private          bool              _playingReplay;
     // private readonly PlayerScore       _playingScoreReplay = new();
     public readonly List<ReplayFrame> ReplayFrames = new();
+    public event EventHandler<double> OnCorrectCharTyped;
 
     public event EventHandler<Color> OnComboUpdate;
     public event EventHandler        OnAllNotesComplete;
@@ -210,6 +211,7 @@ public class Player : CompositeDrawable {
 
     public void TypeCharacter(object sender, char e) => this.TypeCharacter(e);
     public void TypeCharacter(char @char, bool checkingNext = false) {
+        //Ignore control chars (fuck control chars all my homies hate control chars)
         if (char.IsControl(@char))
             return;
 
@@ -251,9 +253,10 @@ public class Player : CompositeDrawable {
                     }
                     
                     //If true, then we finished the note, if false, then we continue
-                    if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, this)) {
+                    if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, currentTime - note.Time, this)) {
                         this.HitSoundNormal.PlayNew();
                         this.NoteUpdate(true, note);
+                        this.OnCorrectCharTyped?.Invoke(this, noteDrawable.TimeDifference);
 
                         this._noteToType += checkingNext ? 2 : 1;
                     }

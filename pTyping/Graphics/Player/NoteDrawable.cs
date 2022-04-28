@@ -36,7 +36,8 @@ public class NoteDrawable : CompositeDrawable {
 
     public Texture Texture;
 
-    public bool EditorHitSoundQueued = false;
+    public  bool   EditorHitSoundQueued = false;
+    public double TimeDifference;
 
     public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size) {
         this.Position = position;
@@ -121,7 +122,7 @@ public class NoteDrawable : CompositeDrawable {
     /// <param name="timeDifference">The time difference from now to the note</param>
     /// <param name="score">The current score</param>
     /// <returns>Whether the note has been fully completed</returns>
-    public bool TypeCharacter(string hiragana, string romaji, double timeDifference, Player player) {
+    public bool TypeCharacter(string hiragana, string romaji, double timeDifference, double rawTimeDifference, Player player) {
         if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
             if (timeDifference < player.TIMING_EXCELLENT)
                 this.Note.HitResult = HitResult.Excellent;
@@ -132,6 +133,8 @@ public class NoteDrawable : CompositeDrawable {
             else if (timeDifference < player.TIMING_POOR)
                 this.Note.HitResult = HitResult.Poor;
 
+            this.TimeDifference = rawTimeDifference;
+            
             Color     finalColor      = Helpers.RotateColor(this.Note.Color, 150);
             const int toFinalFadeTime = 100;
             this.NoteTexture.ColorOverride = finalColor;

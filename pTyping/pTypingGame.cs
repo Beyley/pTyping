@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -33,8 +32,11 @@ using pTyping.Online.Taiko_rs;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
+using SixLabors.ImageSharp;
 using sowelipisona;
 using ConVars=pTyping.Engine.ConVars;
+using Image=SixLabors.ImageSharp.Image;
+using Point=System.Drawing.Point;
 
 namespace pTyping;
 
@@ -479,8 +481,17 @@ public class pTypingGame : FurballGame {
         this._userPanelManager.Add(this._chatDrawable);
 
         InputManager.OnKeyDown += this.OnKeyDown;
+        GraphicsBackend.Current.ScreenshotTaken += OnScreenshotTaken;
     }
     
+    private void OnScreenshotTaken(object sender, Image e) {
+        string filename = "screenshot.png"; //TODO: Dont just overwrite the image again and again, and maybe add a `screenshots` folder?
+        
+        e.SaveAsPng(filename);
+        
+        NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Screenshot taken as {filename}!");
+    }
+
     public override void InitializeLocalizations() {
         //default language is already english, and im an english speaker, so no need to set it here
 
@@ -509,6 +520,10 @@ public class pTypingGame : FurballGame {
                 break;
             case Key.F11: {
                 this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
+                break;
+            }
+            case Key.F2: {
+                GraphicsBackend.Current.TakeScreenshot();
                 break;
             }
         }

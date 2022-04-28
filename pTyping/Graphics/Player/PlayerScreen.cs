@@ -38,6 +38,8 @@ public class PlayerScreen : pScreen {
 
     private LyricDrawable _lyricDrawable;
 
+    private AccuracyBarDrawable _accuracyBar;
+
     public Song Song;
 
     public Player Player;
@@ -201,6 +203,10 @@ public class PlayerScreen : pScreen {
 
         #endregion
 
+        this.Manager.Add(this._accuracyBar = new AccuracyBarDrawable(new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT), this.Player) {
+            OriginType = OriginType.BottomCenter
+        });
+        
         #endregion
 
         #region Playfield decorations

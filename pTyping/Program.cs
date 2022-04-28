@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Furball.Vixie;
+using Furball.Vixie.Backends.Shared.Backends;
 using Newtonsoft.Json;
 using Silk.NET.Windowing;
 
@@ -63,6 +65,8 @@ internal class Program {
                     VSync = false,
                     WindowBorder = WindowBorder.Fixed
                 };
+
+                // GraphicsBackend.PrefferedBackends = Backend.Veldrid;
 
                 game.Run(options);
 #if RELEASE
