@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Kettu;
 using pTyping.Engine;
@@ -37,7 +38,9 @@ public static class SongManager {
                 Logger.Log($"Song {file.Name} has failed to load!", LoggerLevelSongManagerUpdateInfo.Instance);
         }
 
-        foreach (FileInfo file in dirInfo.GetFiles("info.txt", SearchOption.AllDirectories)) {
+        IEnumerable<FileInfo> utypingSongs =
+            dirInfo.GetFiles("*.txt", SearchOption.AllDirectories).Where(x => !x.Name.EndsWith("_src.txt") && x.Name.StartsWith("info"));
+        foreach (FileInfo file in utypingSongs) {
             Song tempSong = UTYPING_SONG_HANDLER.LoadSong(file);
 
             if (tempSong is not null)
