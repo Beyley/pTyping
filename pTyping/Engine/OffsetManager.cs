@@ -18,6 +18,8 @@ public static class OffsetManager {
             string fileContents = File.ReadAllText(FILENAME);
             Offsets = JsonConvert.DeserializeObject<Dictionary<string, double>>(fileContents);
         }
+        
+        Offsets ??= new Dictionary<string, double>();
     }
 
     public static void Save() {
