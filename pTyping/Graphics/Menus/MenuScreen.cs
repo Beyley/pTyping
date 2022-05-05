@@ -1,12 +1,9 @@
 using System;
-using System.IO;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
@@ -174,7 +171,10 @@ public class MenuScreen : pScreen {
         };
 
         musicNextButton.OnClick += delegate {
-            this.LoadSong();
+            this.UpdateStats();
+
+            pTypingGame.SelectNewSong();
+            pTypingGame.PlayMusic();
         };
 
         this.Manager.Add(this._musicTitle);
@@ -195,16 +195,22 @@ public class MenuScreen : pScreen {
 
         pTypingGame.OnlineManager.OnLoginComplete += this.UpdateUserCard;
         pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
-
+        pTypingGame.CurrentSong.OnChange          += this.OnCurrentSongOnOnChange;
+        
         // if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
         //     this.LoadSong();
         // else
-        this.LoadSong();
+        pTypingGame.UserStatusListening();
+        this.UpdateStats();
+    }
+    private void OnCurrentSongOnOnChange(object sender, Song e) {
+        this.UpdateStats();
     }
 
     public override void Dispose() {
         pTypingGame.OnlineManager.OnLoginComplete -= this.UpdateUserCard;
         pTypingGame.OnlineManager.OnLogout        -= this.UpdateUserCard;
+        pTypingGame.CurrentSong.OnChange          -= this.OnCurrentSongOnOnChange;
 
         base.Dispose();
     }
@@ -226,11 +232,11 @@ public class MenuScreen : pScreen {
         );
     }
 
-    public void LoadSong() {
-        pTypingGame.SelectNewSong();
-        
-        pTypingGame.UserStatusListening();
-        this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+    public void UpdateStats() {
+        if (pTypingGame.CurrentSong.Value == null)
+            this._musicTitle.Text = "None";
+        else
+            this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
     }
     
     public override string Name    => "Main Menu";

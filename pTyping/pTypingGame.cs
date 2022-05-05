@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using DiscordRPC;
 using FontStashSharp;
@@ -319,30 +318,25 @@ public class pTypingGame : FurballGame {
 
     public static void SelectNewSong() {
         CurrentSong.Value = SongManager.Songs[Random.Next(SongManager.Songs.Count)];
-        // if (SongManager.Songs.Count == 0) return true;
-        //
-        //     int songToChoose = Random.Next(SongManager.Songs.Count);
-        //
-        //     if (CurrentSong == null)
-        //         CurrentSong = new(SongManager.Songs[songToChoose]);
-        //     else
-        //         CurrentSong.Value = SongManager.Songs[songToChoose];
-        //
-        // string qualifiedAudioPath = Path.Combine(CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, CurrentSong.Value.AudioPath);
-        //
-        // LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-        // PlayMusic();
-        //
-        // LoadBackgroundFromSong(CurrentSong.Value);
-        // return false;
     }
     
     protected override void Update(double gameTime) {
         base.Update(gameTime);
 
-        if (CurrentLoopState == MusicLoopState.NewSong && MusicTrack != null && MusicTrack.CurrentPosition > (MusicTrack.Length - 0.1d)) {
-            SelectNewSong();
+        if (MusicTrack != null) {
+            if (CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
+                PlayMusic();
+
+            if (CurrentLoopState         == MusicLoopState.LoopFromPreviewPoint &&
+                MusicTrack.PlaybackState == PlaybackState.Stopped)//TODO: Set playback position to non-existant preview point i have yet to add.
+                PlayMusic();
+
+            if (CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
+                SelectNewSong();
+                PlayMusic();
+            }
         }
+
         
         this._musicTrackSchedulerDelta += gameTime * 1000;
         if (this._musicTrackSchedulerDelta > 10) {
@@ -509,6 +503,9 @@ public class pTypingGame : FurballGame {
         InputManager.OnKeyDown                  += this.OnKeyDown;
         GraphicsBackend.Current.ScreenshotTaken += this.OnScreenshotTaken;
         CurrentSong.OnChange                    += this.OnSongChange;
+
+        SelectNewSong();
+        PlayMusic();
     }
     private void OnSongChange(object sender, Song song) {
         string qualifiedAudioPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.AudioPath);
@@ -548,7 +545,7 @@ public class pTypingGame : FurballGame {
                 MusicTrack.Loop = true;
                 break;
             case MusicLoopState.LoopFromPreviewPoint:
-                MusicTrack.Loop = true;
+                MusicTrack.Loop = false;
                 break;
             case MusicLoopState.NewSong:
                 MusicTrack.Loop = false;
