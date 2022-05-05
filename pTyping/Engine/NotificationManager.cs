@@ -18,8 +18,13 @@ public class NotificationManager : DrawableManager {
         Error   = 2
     }
 
+    public enum NotificationType : byte {
+        BottomRight = 0,
+        MiddlePopup = 1
+    }
+
     public NotificationDrawable CreateNotification(NotificationImportance importance, string text) {
-        NotificationDrawable drawable = new(importance, text) {
+        NotificationDrawable drawable = new(importance, NotificationType.BottomRight, text) {
             OriginType = OriginType.BottomRight,
             Position   = new(FurballGame.DEFAULT_WINDOW_WIDTH + 500, FurballGame.DEFAULT_WINDOW_HEIGHT + 500)
         };
@@ -28,6 +33,18 @@ public class NotificationManager : DrawableManager {
 
         this.Add(drawable);
         this.UpdateNotifications();
+
+        return drawable;
+    }
+
+    public NotificationDrawable CreatePopup(string text) {
+        NotificationDrawable drawable = new(NotificationImportance.Info, NotificationType.MiddlePopup, text) {
+            OriginType = OriginType.Center, Position = new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+        };
+        drawable.FadeInFromZero(100);
+        
+        this.UpdatePopups();
+        this.Add(drawable);
 
         return drawable;
     }
@@ -70,6 +87,24 @@ public class NotificationManager : DrawableManager {
         );
     }
 
+    private void UpdatePopups() {
+        foreach (BaseDrawable baseDrawable in this.Drawables) {
+            if (baseDrawable is not NotificationDrawable drawable) continue;
+            
+            if(drawable.Type == NotificationType.MiddlePopup && !drawable.ScheduledForRemoval) {
+                drawable.FadeOutFromOne(100);
+                drawable.ScheduledForRemoval = true;
+
+                FurballGame.GameTimeScheduler.ScheduleMethod(
+                delegate {
+                    this.Remove(drawable);
+                },
+                drawable.TimeSource.GetCurrentTime() + 100
+                );
+            }
+        }
+    }
+    
     public void UpdateNotifications() {
         const float x = FurballGame.DEFAULT_WINDOW_WIDTH - 10;
         float       y = FurballGame.DEFAULT_WINDOW_HEIGHT - 10;
@@ -92,7 +127,8 @@ public class NotificationManager : DrawableManager {
         private readonly RectanglePrimitiveDrawable _backgroundDrawable;
         private readonly RectanglePrimitiveDrawable _outlineDrawable;
         // private RectanglePrimitiveDrawable _outlineDrawable2;
-        private NotificationImportance _importance;
+        public NotificationImportance _importance;
+        public readonly NotificationType Type;
 
         public double StartTime;
         public double Duration;
@@ -100,8 +136,9 @@ public class NotificationManager : DrawableManager {
         [CanBeNull]
         public Func<bool> OnNotificationClick;
 
-        public NotificationDrawable(NotificationImportance importance, string text) {
+        public NotificationDrawable(NotificationImportance importance, NotificationType type, string text) {
             this._importance = importance;
+            this.Type        = type;
 
             this._textDrawable = new(new(5f), pTypingGame.JapaneseFontStroked, text, 20) {
                 Clickable   = false,
@@ -130,13 +167,22 @@ public class NotificationManager : DrawableManager {
             };
 
             this.StartTime = this.TimeSource.GetCurrentTime();
-
+            
             this.Duration = importance switch {
                 NotificationImportance.Info    => 10000,
                 NotificationImportance.Warning => 20000,
                 NotificationImportance.Error   => 30000,
                 _                              => throw new ArgumentOutOfRangeException(nameof (importance), importance, "what the hell?")
             };
+
+            if (type == NotificationType.MiddlePopup) {
+                this.Duration = 2000;
+
+                this.Clickable   = false;
+                this.CoverClicks = false;
+                this.Hoverable   = false;
+                this.CoverHovers = false;
+            }
 
             this.Drawables.Add(this._backgroundDrawable);
             this.Drawables.Add(this._outlineDrawable);

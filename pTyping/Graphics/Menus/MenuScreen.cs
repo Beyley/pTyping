@@ -6,6 +6,7 @@ using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
+using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
@@ -103,8 +104,10 @@ public class MenuScreen : pScreen {
         };
 
         playButton.OnClick += delegate {
-            pTypingGame.MenuClickSound.PlayNew();
-            ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+            // pTypingGame.MenuClickSound.PlayNew();
+            // ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+
+            pTypingGame.NotificationManager.CreatePopup("damn. it be this way sometimes tho");
         };
 
         editButton.OnClick += delegate {
