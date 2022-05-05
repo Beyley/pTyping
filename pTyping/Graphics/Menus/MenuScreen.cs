@@ -174,7 +174,7 @@ public class MenuScreen : pScreen {
         };
 
         musicNextButton.OnClick += delegate {
-            this.LoadSong(true);
+            this.LoadSong();
         };
 
         this.Manager.Add(this._musicTitle);
@@ -188,15 +188,6 @@ public class MenuScreen : pScreen {
         #region Background image
 
         this.Manager.Add(pTypingGame.CurrentSongBackground);
-        pTypingGame.CurrentSongBackground.Tweens.Add(
-        new ColorTween(
-        TweenType.Color,
-        pTypingGame.CurrentSongBackground.ColorOverride,
-        new Color(175, 175, 175),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
-        )
-        );
 
         #endregion
 
@@ -205,10 +196,10 @@ public class MenuScreen : pScreen {
         pTypingGame.OnlineManager.OnLoginComplete += this.UpdateUserCard;
         pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
 
-        if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
-            this.LoadSong(true);
-        else
-            this.LoadSong(false);
+        // if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
+        //     this.LoadSong();
+        // else
+        this.LoadSong();
     }
 
     public override void Dispose() {
@@ -235,40 +226,17 @@ public class MenuScreen : pScreen {
         );
     }
 
-    public void LoadSong(bool chooseNewOne) {
-        if (SongManager.Songs.Count == 0) return;
-
-        if (chooseNewOne) {
-            int songToChoose = FurballGame.Random.Next(SongManager.Songs.Count);
-
-            if (pTypingGame.CurrentSong == null)
-                pTypingGame.CurrentSong = new(SongManager.Songs[songToChoose]);
-            else
-                pTypingGame.CurrentSong.Value = SongManager.Songs[songToChoose];
-        }
-
-        string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
-
-        // if (chooseNewOne) {
-        //     if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
-        //         pTypingGame.StopMusic();
-        //
-        //     pTypingGame
-        //     pTypingGame.MusicTrack.Free();
-        // }
-
-        if (chooseNewOne) {
-            pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
-            pTypingGame.PlayMusic();
-        }
-
-        pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
-
-        this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
-
+    public void LoadSong() {
+        pTypingGame.SelectNewSong();
+        
         pTypingGame.UserStatusListening();
+        this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
     }
+    
     public override string Name    => "Main Menu";
     public override string State   => "Vibing on the menu!";
     public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+    public override bool ForceSpeedReset => true;
+    public override float BackgroundFadeAmount => 0.7f;
+    public override MusicLoopState LoopState => MusicLoopState.NewSong;
 }

@@ -13,16 +13,5 @@ public class HalfTimeMod : PlayerMod {
     public override string Name()            => "Half Time";
     public override string ShorthandName()   => "HT";
     public override double ScoreMultiplier() => 0.75d;
-
-    public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
-        musicTrack.SetSpeed(0.5f);
-
-        base.OnMapStart(musicTrack, notes, player);
-    }
-
-    public override void OnMapEnd(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
-        musicTrack.SetSpeed(1f);
-
-        base.OnMapEnd(musicTrack, notes, player);
-    }
+    public override double SpeedMultiplier() => 0.5d;
 }

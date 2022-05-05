@@ -46,6 +46,9 @@ public class SongSelectionScreen : pScreen {
     public override string State => "Selecting a song!";
     public override string Details
         => $"Deciding on playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
+    public override bool ForceSpeedReset => false;
+    public override float BackgroundFadeAmount => 0.7f;
+    public override MusicLoopState LoopState => MusicLoopState.LoopFromPreviewPoint;
 
     public override void Initialize() {
         base.Initialize();
@@ -166,15 +169,6 @@ public class SongSelectionScreen : pScreen {
         #region background image
 
         this.Manager.Add(pTypingGame.CurrentSongBackground);
-        pTypingGame.CurrentSongBackground.Tweens.Add(
-        new ColorTween(
-        TweenType.Color,
-        pTypingGame.CurrentSongBackground.ColorOverride,
-        new Color(175, 175, 175),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
-        )
-        );
 
         #endregion
 
@@ -223,9 +217,6 @@ public class SongSelectionScreen : pScreen {
         FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
-
-        // if (pTypingGame.MusicTrack.IsValidHandle)
-        pTypingGame.MusicTrack.SetSpeed(1f);
 
         pTypingGame.UserStatusPickingSong();
     }
@@ -295,16 +286,12 @@ public class SongSelectionScreen : pScreen {
 Created by {pTypingGame.CurrentSong.Value.Creator}
 BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
 
-        string qualifiedAudioPath = Path.Combine(pTypingGame.CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, pTypingGame.CurrentSong.Value.AudioPath);
-
         if (!fromPrevScreen) {
-            pTypingGame.LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+            // pTypingGame.CurrentSong.Value 
             pTypingGame.PlayMusic();
         } else if (pTypingGame.MusicTrack.PlaybackState is PlaybackState.Paused or PlaybackState.Stopped) {
             pTypingGame.PlayMusic();
         }
-
-        pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
 
         this.UpdateScores();
     }

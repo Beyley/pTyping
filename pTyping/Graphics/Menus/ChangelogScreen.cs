@@ -127,7 +127,10 @@ public class ChangelogScreen : pScreen {
     public override string Name    => "Changelog";
     public override string State   => "Browsing the changelog";
     public override string Details => "";
-
+    public override bool ForceSpeedReset => true;
+    public override float BackgroundFadeAmount => 0.7f;
+    public override MusicLoopState LoopState => MusicLoopState.NewSong;
+    
     public float TargetScroll = 0;
 
     private ChangeLogDrawable _changeLogDrawable;
@@ -162,15 +165,6 @@ public class ChangelogScreen : pScreen {
         #region Background image
 
         this.Manager.Add(pTypingGame.CurrentSongBackground);
-        pTypingGame.CurrentSongBackground.Tweens.Add(
-        new ColorTween(
-        TweenType.Color,
-        pTypingGame.CurrentSongBackground.ColorOverride,
-        new Color(175, 175, 175),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 100
-        )
-        );
 
         #endregion
 

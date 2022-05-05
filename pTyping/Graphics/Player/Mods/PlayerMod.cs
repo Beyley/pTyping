@@ -32,6 +32,7 @@ public abstract class PlayerMod {
     public abstract string Name();
     public abstract string ShorthandName();
     public abstract double ScoreMultiplier();
+    public virtual double SpeedMultiplier() => 1f;
 
     public virtual void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
         Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) initialized!", LoggerLevelModInfo.Instance);

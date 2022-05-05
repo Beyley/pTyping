@@ -42,16 +42,6 @@ public class OptionsScreen : pScreen {
 
         this.Manager.Add(pTypingGame.CurrentSongBackground);
 
-        pTypingGame.CurrentSongBackground.Tweens.Add(
-        new ColorTween(
-        TweenType.Color,
-        pTypingGame.CurrentSongBackground.ColorOverride,
-        new(100, 100, 100),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
-        )
-        );
-
         #endregion
 
         #region Background Dim
@@ -176,4 +166,7 @@ public class OptionsScreen : pScreen {
     public override string Name    => "Options";
     public override string State   => "Tweaking the settings!";
     public override string Details => "";
+    public override bool ForceSpeedReset => true;
+    public override float BackgroundFadeAmount => 0.4f;
+    public override MusicLoopState LoopState => MusicLoopState.NewSong;
 }

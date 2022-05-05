@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using DiscordRPC;
 using FontStashSharp;
@@ -34,6 +35,7 @@ using pTyping.Songs;
 using Silk.NET.Input;
 using SixLabors.ImageSharp;
 using sowelipisona;
+using Color=Furball.Vixie.Backends.Shared.Color;
 using ConVars=pTyping.Engine.ConVars;
 using Point=System.Drawing.Point;
 
@@ -128,6 +130,7 @@ public class pTypingGame : FurballGame {
 
     public static  NotificationManager NotificationManager;
     private static TextDrawable        _OnlineUsersText;
+    private static MusicLoopState      CurrentLoopState;
 
     public pTypingGame() : base(new MenuScreen()) {
         // this.Window.AllowUserResizing = true;
@@ -215,6 +218,8 @@ public class pTypingGame : FurballGame {
         MusicTrackTimeSourceNoOffset = new(MusicTrack);
         MusicTrackTimeSource         = new OffsetTimeSource(MusicTrackTimeSourceNoOffset, 0);
 
+        SetSongLoopState(CurrentLoopState);
+        
         // MusicTrack.TempoFrequencyLock = true;
     }
 
@@ -225,7 +230,7 @@ public class pTypingGame : FurballGame {
     public static void SetBackgroundTexture(Texture tex) {
         CurrentSongBackground.SetTexture(tex);
 
-        CurrentSongBackground.Scale = new(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
+        CurrentSongBackground.Scale = new(1f / ((float) CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
     }
 
     public static void LoadBackgroundFromSong(Song song) {
@@ -236,7 +241,8 @@ public class pTypingGame : FurballGame {
             backgroundTex = DefaultBackground;
         } else {
             string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
-            backgroundTex = File.Exists(qualifiedBackgroundPath) ? ContentManager.LoadTextureFromFile(qualifiedBackgroundPath, ContentSource.External)
+            backgroundTex = File.Exists(qualifiedBackgroundPath)
+                                ? ContentManager.LoadTextureFromFile(qualifiedBackgroundPath, ContentSource.External)
                                 : DefaultBackground;
         }
 
@@ -268,10 +274,7 @@ public class pTypingGame : FurballGame {
             JapaneseFont = ContentManager.LoadSystemFont(
             "Aller",
             new FontSystemSettings {
-                FontResolutionFactor = 2f,
-                KernelWidth          = 1,
-                KernelHeight         = 1,
-                Effect               = FontSystemEffect.None
+                FontResolutionFactor = 2f, KernelWidth = 1, KernelHeight = 1, Effect = FontSystemEffect.None
             }
             );
             JapaneseFont.AddFont(JapaneseFontData);
@@ -314,13 +317,37 @@ public class pTypingGame : FurballGame {
             ConVars.Volume.Value = new(Math.Clamp(ConVars.Volume.Value.Value - 0.05d, 0d, 1d));
     }
 
+    public static void SelectNewSong() {
+        CurrentSong.Value = SongManager.Songs[Random.Next(SongManager.Songs.Count)];
+        // if (SongManager.Songs.Count == 0) return true;
+        //
+        //     int songToChoose = Random.Next(SongManager.Songs.Count);
+        //
+        //     if (CurrentSong == null)
+        //         CurrentSong = new(SongManager.Songs[songToChoose]);
+        //     else
+        //         CurrentSong.Value = SongManager.Songs[songToChoose];
+        //
+        // string qualifiedAudioPath = Path.Combine(CurrentSong.Value.FileInfo.DirectoryName ?? string.Empty, CurrentSong.Value.AudioPath);
+        //
+        // LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+        // PlayMusic();
+        //
+        // LoadBackgroundFromSong(CurrentSong.Value);
+        // return false;
+    }
+    
     protected override void Update(double gameTime) {
         base.Update(gameTime);
 
+        if (CurrentLoopState == MusicLoopState.NewSong && MusicTrack != null && MusicTrack.CurrentPosition > (MusicTrack.Length - 0.1d)) {
+            SelectNewSong();
+        }
+        
         this._musicTrackSchedulerDelta += gameTime * 1000;
         if (this._musicTrackSchedulerDelta > 10) {
             if (MusicTrack != null)
-                MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
+                MusicTrackScheduler.Update((int) MusicTrack.CurrentPosition);
             this._musicTrackSchedulerDelta = 0;
         }
 
@@ -368,7 +395,7 @@ public class pTypingGame : FurballGame {
 
         RpcClient.Invoke();
 
-        this.AfterScreenChange += (_, screen) => this.WindowManager.SetWindowTitle(screen is not pScreen actualScreen ? "pTyping" : $"pTyping - {actualScreen.Name}");
+        this.AfterScreenChange += this.OnScreenChange;
 
         Thread thread = new(
         () => {
@@ -435,16 +462,12 @@ public class pTypingGame : FurballGame {
         OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
         OnlineManager.Initialize();
 
-        OnlineManager.OnLogout += delegate {
-            this._userPanelManager.Visible = false;
-        };
+        OnlineManager.OnLogout += delegate { this._userPanelManager.Visible = false; };
 
         // OnlineManager.Login();
 
         VolumeSelector = new(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
-            OriginType  = OriginType.BottomRight,
-            Clickable   = false,
-            CoverClicks = false
+            OriginType = OriginType.BottomRight, Clickable = false, CoverClicks = false
         };
 
         //Set the opacity to 0
@@ -467,9 +490,7 @@ public class pTypingGame : FurballGame {
         this._userPanelManager = new();
         this._userPanelManager.Add(
         new TexturedDrawable(WhitePixel, new(0)) {
-            Scale         = new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
-            Depth         = 1.5f,
-            ColorOverride = new(0, 0, 0, 100)
+            Scale = new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), Depth = 1.5f, ColorOverride = new(0, 0, 0, 100)
         }
         );
         this._userPanelManager.Add(
@@ -485,15 +506,66 @@ public class pTypingGame : FurballGame {
         };
         this._userPanelManager.Add(this._chatDrawable);
 
-        InputManager.OnKeyDown += this.OnKeyDown;
-        GraphicsBackend.Current.ScreenshotTaken += OnScreenshotTaken;
+        InputManager.OnKeyDown                  += this.OnKeyDown;
+        GraphicsBackend.Current.ScreenshotTaken += this.OnScreenshotTaken;
+        CurrentSong.OnChange                    += this.OnSongChange;
     }
-    
+    private void OnSongChange(object sender, Song song) {
+        string qualifiedAudioPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.AudioPath);
+
+        LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+        
+        LoadBackgroundFromSong(song);
+    }
+    private void OnScreenChange(object _, Screen screen) {
+        pScreen actualScreen = screen as pScreen;
+
+        this.WindowManager.SetWindowTitle(screen is not pScreen ? "pTyping" : $"pTyping - {actualScreen.Name}");
+
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (actualScreen != null) {
+            if (actualScreen.BackgroundFadeAmount != -1f)
+                CurrentSongBackground.Tweens.Add(
+                new ColorTween(
+                TweenType.Color,
+                CurrentSongBackground.ColorOverride,
+                new Color(actualScreen.BackgroundFadeAmount, actualScreen.BackgroundFadeAmount, actualScreen.BackgroundFadeAmount),
+                CurrentSongBackground.TimeSource.GetCurrentTime(),
+                CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
+                )
+                );
+
+            if (actualScreen.ForceSpeedReset)
+                MusicTrack.SetSpeed(1f);
+            
+            SetSongLoopState(actualScreen.LoopState);
+        }
+    }
+    private static void SetSongLoopState(MusicLoopState loopState) {
+        CurrentLoopState = loopState;
+        switch (loopState) {
+            case MusicLoopState.Loop:
+                MusicTrack.Loop = true;
+                break;
+            case MusicLoopState.LoopFromPreviewPoint:
+                MusicTrack.Loop = true;
+                break;
+            case MusicLoopState.NewSong:
+                MusicTrack.Loop = false;
+                break;
+            case MusicLoopState.None:
+                MusicTrack.Loop = false;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
     private void OnScreenshotTaken(object sender, Image e) {
-        string filename = "screenshot.png"; //TODO: Dont just overwrite the image again and again, and maybe add a `screenshots` folder?
-        
+        string filename = "screenshot.png";//TODO: Dont just overwrite the image again and again, and maybe add a `screenshots` folder?
+
         e.SaveAsPng(filename);
-        
+
         NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Screenshot taken as {filename}!");
     }
 
@@ -524,7 +596,7 @@ public class pTypingGame : FurballGame {
 
                 break;
             case Key.F11: {
-                this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
+                this.ChangeScreenSize((int) this.WindowManager.WindowSize.X, (int) this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
                 break;
             }
             case Key.F2: {
@@ -539,11 +611,7 @@ public class pTypingGame : FurballGame {
         _ => {
             _OnlineUsersText.Text = $"Online Users: {OnlineManager.OnlinePlayers.Count(x => !x.Bot)} ({OnlineManager.OnlinePlayers.Count})";
 
-            this._userPanelDrawables.ForEach(
-            x => {
-                this._userPanelManager.Remove(x);
-            }
-            );
+            this._userPanelDrawables.ForEach(x => { this._userPanelManager.Remove(x); });
             this._userPanelDrawables.Clear();
 
             Vector2 pos = new(10, 10 + _OnlineUsersText.Size.Y + 10);
@@ -569,7 +637,7 @@ public class pTypingGame : FurballGame {
                         }
                         case MouseButton.Right:
                             if (OnlineManager.Host != null) return;
-                            
+
                             OnlineManager.SpectatePlayer(player);
                             break;
                     }

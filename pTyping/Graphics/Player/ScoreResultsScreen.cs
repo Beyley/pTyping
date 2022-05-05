@@ -122,21 +122,7 @@ public class ScoreResultsScreen : pScreen {
 
         this.Manager.Add(pTypingGame.CurrentSongBackground);
 
-        pTypingGame.CurrentSongBackground.Tweens.Add(
-        new ColorTween(
-        TweenType.Color,
-        pTypingGame.CurrentSongBackground.ColorOverride,
-        new(0.5f, 0.5f, 0.5f),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
-        )
-        );
-        pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong.Value);
-
         #endregion
-
-        // if (pTypingGame.MusicTrack.IsValidHandle)
-        pTypingGame.MusicTrack.SetSpeed(1f);
 
         pTypingGame.UserStatusListening();
     }
@@ -147,4 +133,7 @@ public class ScoreResultsScreen : pScreen {
     public override string Details => $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
 Played by {this.Score.Username}
 Score: {this.Score.Score:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
+    public override bool ForceSpeedReset => false;
+    public override float BackgroundFadeAmount => 0.5f;
+    public override MusicLoopState LoopState => MusicLoopState.None;
 }

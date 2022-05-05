@@ -132,18 +132,7 @@ public class EditorScreen : pScreen {
         #region background image
 
         this.Manager.Add(pTypingGame.CurrentSongBackground);
-
-        pTypingGame.CurrentSongBackground.Tweens.Add(
-        new ColorTween(
-        TweenType.Color,
-        pTypingGame.CurrentSongBackground.ColorOverride,
-        new(0.3f, 0.3f, 0.3f),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
-        pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
-        )
-        );
-        pTypingGame.LoadBackgroundFromSong(this.EditorState.Song);
-
+        
         #endregion
 
         #endregion
@@ -780,4 +769,8 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
     public override string Details => ConVars.Username.Value.Value == pTypingGame.CurrentSong.Value.Creator
                                           ? $"Editing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}"
                                           : $"Modding {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}";
+
+    public override bool ForceSpeedReset => true;
+    public override float BackgroundFadeAmount => 0.3f;
+    public override MusicLoopState LoopState => MusicLoopState.None;
 }

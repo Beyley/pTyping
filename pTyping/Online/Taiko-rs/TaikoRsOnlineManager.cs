@@ -538,7 +538,7 @@ public class TaikoRsOnlineManager : OnlineManager {
                             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 
                         pTypingGame.CurrentSong.Value = SongManager.Songs.FirstOrDefault(x => x.MapHash == pFrame.BeatmapHash);
-                        pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong);
+                        // pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong);
 
                         if (pTypingGame.CurrentSong.Value == default) {
                             pTypingGame.NotificationManager.CreateNotification(

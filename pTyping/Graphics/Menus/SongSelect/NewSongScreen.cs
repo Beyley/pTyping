@@ -153,4 +153,7 @@ public class NewSongScreen : pScreen {
     public override string Name    => "New Song";
     public override string State   => "Getting ready to map!";
     public override string Details => "";
+    public override bool ForceSpeedReset => true;
+    public override float BackgroundFadeAmount => 0.4f;
+    public override MusicLoopState LoopState => MusicLoopState.None;
 }

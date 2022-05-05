@@ -83,6 +83,12 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
             modButton.FadeColor(this._selectedColor, 100);
         }
 
+        double speed = 1f;
+        foreach (PlayerMod moditer in pTypingGame.SelectedMods) {
+            speed *= moditer.SpeedMultiplier();
+        }
+        pTypingGame.MusicTrack.SetSpeed(speed);
+        
         this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
     }
 }

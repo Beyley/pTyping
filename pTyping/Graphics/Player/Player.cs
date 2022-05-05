@@ -152,8 +152,12 @@ public class Player : CompositeDrawable {
 
         this._sortDrawables = true;
 
-        foreach (PlayerMod mod in pTypingGame.SelectedMods)
+        double speedMod = 1f;
+        foreach (PlayerMod mod in pTypingGame.SelectedMods) {
             mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
+            speedMod *= mod.SpeedMultiplier();
+        }
+        pTypingGame.MusicTrack.SetSpeed(speedMod);
     }
 
     private void OnVolumeChange(object sender, Value.Number f) {
