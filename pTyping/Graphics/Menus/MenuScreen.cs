@@ -1,23 +1,28 @@
 using System;
+using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Songs;
+using Silk.NET.Input;
 using static Furball.Engine.Engine.Localization.LocalizationManager;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Menus;
 
 public class MenuScreen : pScreen {
     private TextDrawable _musicTitle;
 
-    private ManagedDrawable _userCard = null;
+    private ManagedDrawable       _userCard = null;
+    private UiProgressBarDrawable _songProgressBar;
 
     public override void Initialize() {
         base.Initialize();
@@ -135,11 +140,23 @@ public class MenuScreen : pScreen {
             OriginType = OriginType.TopRight
         };
 
+        this._songProgressBar = new UiProgressBarDrawable(
+        new(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
+        pTypingGame.JapaneseFontStroked,
+        new(250, 25),
+        Color.White,
+        Color.LightGray,
+        Color.White
+        ) {
+            OriginType = OriginType.TopRight
+        };
+        this._songProgressBar.OnClick += OnProgressBarClick;
+
         Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
 
         TexturedDrawable musicPlayButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._musicTitle.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_PLAY
         ) {
             Scale      = new(0.5f, 0.5f),
@@ -147,7 +164,7 @@ public class MenuScreen : pScreen {
         };
         TexturedDrawable musicPauseButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._musicTitle.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_PAUSE
         ) {
             Scale      = new(0.5f, 0.5f),
@@ -155,7 +172,7 @@ public class MenuScreen : pScreen {
         };
         TexturedDrawable musicNextButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_RIGHT
         ) {
             Scale      = new(0.5f, 0.5f),
@@ -178,7 +195,8 @@ public class MenuScreen : pScreen {
         };
 
         this.Manager.Add(this._musicTitle);
-
+        this.Manager.Add(this._songProgressBar);
+        
         this.Manager.Add(musicPlayButton);
         this.Manager.Add(musicPauseButton);
         this.Manager.Add(musicNextButton);
@@ -202,6 +220,14 @@ public class MenuScreen : pScreen {
         // else
         pTypingGame.UserStatusListening();
         this.UpdateStats();
+    }
+    
+    private void OnProgressBarClick(object sender, (MouseButton button, Point pos) e) {
+        float x = e.pos.X - this._songProgressBar.RealPosition.X;
+
+        float targetProgress = x / this._songProgressBar.Size.X;
+
+        pTypingGame.MusicTrack.CurrentPosition = targetProgress * pTypingGame.MusicTrack.Length;
     }
     private void OnCurrentSongOnOnChange(object sender, Song e) {
         this.UpdateStats();
@@ -238,7 +264,13 @@ public class MenuScreen : pScreen {
         else
             this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
     }
-    
+
+    public override void Update(double gameTime) {
+        base.Update(gameTime);
+
+        this._songProgressBar.Progress = (float) (pTypingGame.MusicTrack.CurrentPosition / pTypingGame.MusicTrack.Length);
+    }
+
     public override string Name    => "Main Menu";
     public override string State   => "Vibing on the menu!";
     public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
