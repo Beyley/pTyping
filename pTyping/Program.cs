@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Furball.Vixie;
-using Furball.Vixie.Backends.Shared.Backends;
 using Newtonsoft.Json;
+using pTyping.Graphics.Drawables;
 using Silk.NET.Windowing;
 
 namespace pTyping;
@@ -35,6 +34,8 @@ internal class Program {
 
     [STAThread]
     private static void Main(string[] args) {
+        VideoDrawable test = new(File.ReadAllBytes("test.mp4"));
+        
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         SetReleaseStream();
