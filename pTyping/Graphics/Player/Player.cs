@@ -105,16 +105,6 @@ public class Player : CompositeDrawable {
         this.Score.Mods       = pTypingGame.SelectedMods;
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 
-        // this._playfieldTopLine    = new(new Vector2(0, 0), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH,   0), Color.Gray);
-        // this._playfieldBottomLine = new(new Vector2(0, 100), new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, 100), Color.Gray);
-        // this._drawables.Add(this._playfieldTopLine);
-        // this._drawables.Add(this._playfieldBottomLine);
-
-        // this._playfieldBackground = new(new(0, 0), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
-        //     ColorOverride = new(100, 100, 100, 100),
-        //     Depth         = -0.95f
-        // };
-
         this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User), new(0)) {
             Depth = -0.95f
         };

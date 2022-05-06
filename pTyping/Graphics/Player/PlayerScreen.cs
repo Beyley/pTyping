@@ -333,7 +333,7 @@ public class PlayerScreen : pScreen {
                 double currentOffset = OffsetManager.GetOffset(this.Song);
 
                 OffsetManager.SetOffset(this.Song, currentOffset + 5);
-                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Offset set to {currentOffset + 5}");
+                pTypingGame.NotificationManager.CreatePopup($"Offset set to {currentOffset + 5}");
                 pTypingGame.MusicTrackTimeSource.Offset = currentOffset + 5;
 
                 break;
@@ -345,7 +345,7 @@ public class PlayerScreen : pScreen {
                 double currentOffset = OffsetManager.GetOffset(this.Song);
 
                 OffsetManager.SetOffset(this.Song, currentOffset - 5);
-                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Offset set to {currentOffset - 5}");
+                pTypingGame.NotificationManager.CreatePopup($"Offset set to {currentOffset - 5}");
                 pTypingGame.MusicTrackTimeSource.Offset = currentOffset - 5;
 
                 break;

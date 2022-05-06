@@ -110,7 +110,7 @@ public class NotificationManager : DrawableManager {
         float       y = FurballGame.DEFAULT_WINDOW_HEIGHT - 10;
 
         foreach (BaseDrawable baseDrawable in this.Drawables) {
-            if (baseDrawable is not NotificationDrawable drawable) continue;
+            if (baseDrawable is not NotificationDrawable drawable || drawable.Type != NotificationType.BottomRight) continue;
 
             drawable.MoveTo(new(x, y), 100);
 
