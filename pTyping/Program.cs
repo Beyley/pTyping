@@ -7,6 +7,7 @@ using System.Text;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared.Backends;
 using Newtonsoft.Json;
+using pTyping.Engine;
 using Silk.NET.Windowing;
 
 namespace pTyping;
@@ -35,6 +36,14 @@ internal class Program {
 
     [STAThread]
     private static void Main(string[] args) {
+        pTypingConfig a = new();
+        
+        a.Load();
+        // a.Save();
+        
+        Console.WriteLine($"{a.Values["test"]}");
+        Console.WriteLine($"{a.Values["testnum"]}");
+
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         SetReleaseStream();
