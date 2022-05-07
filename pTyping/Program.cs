@@ -4,10 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Furball.Vixie;
-using Furball.Vixie.Backends.Shared.Backends;
 using Newtonsoft.Json;
-using pTyping.Engine;
 using Silk.NET.Windowing;
 
 namespace pTyping;

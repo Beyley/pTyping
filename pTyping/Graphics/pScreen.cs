@@ -22,6 +22,8 @@ public abstract class pScreen : Screen {
     /// Should music automatically loop after a song ends
     /// </summary>
     public abstract MusicLoopState LoopState { get; }
+
+    public abstract ScreenType ScreenType { get; }
 }
 
 public enum MusicLoopState {
@@ -29,4 +31,9 @@ public enum MusicLoopState {
     LoopFromPreviewPoint,
     NewSong,
     None
+}
+
+public enum ScreenType {
+    Menu,
+    Gameplay
 }

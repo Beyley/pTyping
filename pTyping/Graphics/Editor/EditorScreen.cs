@@ -10,8 +10,6 @@ using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
@@ -770,7 +768,8 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
                                           ? $"Editing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}"
                                           : $"Modding {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}";
 
-    public override bool ForceSpeedReset => true;
-    public override float BackgroundFadeAmount => 0.3f;
-    public override MusicLoopState LoopState => MusicLoopState.None;
+    public override bool           ForceSpeedReset      => true;
+    public override float          BackgroundFadeAmount => 0.3f;
+    public override MusicLoopState LoopState            => MusicLoopState.None;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
 }

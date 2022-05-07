@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Furball.Engine;
 using Furball.Engine.Engine;
-using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
@@ -46,9 +44,10 @@ public class SongSelectionScreen : pScreen {
     public override string State => "Selecting a song!";
     public override string Details
         => $"Deciding on playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
-    public override bool ForceSpeedReset => false;
-    public override float BackgroundFadeAmount => 0.7f;
-    public override MusicLoopState LoopState => MusicLoopState.LoopFromPreviewPoint;
+    public override bool           ForceSpeedReset      => false;
+    public override float          BackgroundFadeAmount => 0.7f;
+    public override MusicLoopState LoopState            => MusicLoopState.LoopFromPreviewPoint;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
 
     public override void Initialize() {
         base.Initialize();

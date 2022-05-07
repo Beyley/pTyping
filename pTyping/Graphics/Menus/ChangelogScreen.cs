@@ -6,8 +6,6 @@ using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Silk.NET.Input;
 using Color=Furball.Vixie.Backends.Shared.Color;
@@ -124,13 +122,14 @@ public class ChangeLogDrawable : CompositeDrawable {
 }
 
 public class ChangelogScreen : pScreen {
-    public override string Name    => "Changelog";
-    public override string State   => "Browsing the changelog";
-    public override string Details => "";
-    public override bool ForceSpeedReset => true;
-    public override float BackgroundFadeAmount => 0.7f;
-    public override MusicLoopState LoopState => MusicLoopState.NewSong;
-    
+    public override string         Name                 => "Changelog";
+    public override string         State                => "Browsing the changelog";
+    public override string         Details              => "";
+    public override bool           ForceSpeedReset      => true;
+    public override float          BackgroundFadeAmount => 0.7f;
+    public override MusicLoopState LoopState            => MusicLoopState.NewSong;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
+
     public float TargetScroll = 0;
 
     private ChangeLogDrawable _changeLogDrawable;

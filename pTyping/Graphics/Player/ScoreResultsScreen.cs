@@ -4,8 +4,6 @@ using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player.Mods;
@@ -133,7 +131,8 @@ public class ScoreResultsScreen : pScreen {
     public override string Details => $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
 Played by {this.Score.Username}
 Score: {this.Score.Score:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
-    public override bool ForceSpeedReset => false;
-    public override float BackgroundFadeAmount => 0.5f;
-    public override MusicLoopState LoopState => MusicLoopState.None;
+    public override bool           ForceSpeedReset      => false;
+    public override float          BackgroundFadeAmount => 0.5f;
+    public override MusicLoopState LoopState            => MusicLoopState.None;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
 }

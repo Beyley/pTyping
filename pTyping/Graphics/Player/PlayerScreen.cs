@@ -515,7 +515,8 @@ public class PlayerScreen : pScreen {
     public override string State => "Typing away!";
     public override string Details
         => $@"Playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
-    public override bool ForceSpeedReset => false;
-    public override float BackgroundFadeAmount => -1f;
-    public override MusicLoopState LoopState => MusicLoopState.None;
+    public override bool           ForceSpeedReset      => false;
+    public override float          BackgroundFadeAmount => -1f;
+    public override MusicLoopState LoopState            => MusicLoopState.None;
+    public override ScreenType     ScreenType           => ScreenType.Gameplay;
 }

@@ -150,10 +150,11 @@ public class NewSongScreen : pScreen {
         //Change the screen to the song select screen
         ScreenManager.ChangeScreen(new SongSelectionScreen(true));
     }
-    public override string Name    => "New Song";
-    public override string State   => "Getting ready to map!";
-    public override string Details => "";
-    public override bool ForceSpeedReset => true;
-    public override float BackgroundFadeAmount => 0.4f;
-    public override MusicLoopState LoopState => MusicLoopState.None;
+    public override string         Name                 => "New Song";
+    public override string         State                => "Getting ready to map!";
+    public override string         Details              => "";
+    public override bool           ForceSpeedReset      => true;
+    public override float          BackgroundFadeAmount => 0.4f;
+    public override MusicLoopState LoopState            => MusicLoopState.None;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
 }

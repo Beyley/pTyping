@@ -4,8 +4,6 @@ using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Localization.Languages;
@@ -163,10 +161,11 @@ public class OptionsScreen : pScreen {
     private void UsernameInputOnCommit(object sender, string e) {
         ConVars.Username.Value = new(e);
     }
-    public override string Name    => "Options";
-    public override string State   => "Tweaking the settings!";
-    public override string Details => "";
-    public override bool ForceSpeedReset => true;
-    public override float BackgroundFadeAmount => 0.4f;
-    public override MusicLoopState LoopState => MusicLoopState.NewSong;
+    public override string         Name                 => "Options";
+    public override string         State                => "Tweaking the settings!";
+    public override string         Details              => "";
+    public override bool           ForceSpeedReset      => true;
+    public override float          BackgroundFadeAmount => 0.4f;
+    public override MusicLoopState LoopState            => MusicLoopState.NewSong;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
 }

@@ -5,7 +5,6 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
@@ -271,10 +270,11 @@ public class MenuScreen : pScreen {
         this._songProgressBar.Progress = (float) (pTypingGame.MusicTrack.CurrentPosition / pTypingGame.MusicTrack.Length);
     }
 
-    public override string Name    => "Main Menu";
-    public override string State   => "Vibing on the menu!";
-    public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
-    public override bool ForceSpeedReset => true;
-    public override float BackgroundFadeAmount => 0.7f;
-    public override MusicLoopState LoopState => MusicLoopState.NewSong;
+    public override string         Name                 => "Main Menu";
+    public override string         State                => "Vibing on the menu!";
+    public override string         Details              => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+    public override bool           ForceSpeedReset      => true;
+    public override float          BackgroundFadeAmount => 0.7f;
+    public override MusicLoopState LoopState            => MusicLoopState.NewSong;
+    public override ScreenType     ScreenType           => ScreenType.Menu;
 }

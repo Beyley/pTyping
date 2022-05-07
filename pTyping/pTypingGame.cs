@@ -133,6 +133,11 @@ public class pTypingGame : FurballGame {
 
     public pTypingGame() : base(new MenuScreen()) {
         // this.Window.AllowUserResizing = true;
+
+        pTypingConfig.Instance.Load();
+
+        //We set this flag so that we can fully control the FPS without the engine mucking it up
+        BypassFurballFPSLimit = pTypingConfig.Instance.FpsBasedOnMonitorHz;
     }
 
     public static ManagedDrawable GetUserCard() {
@@ -379,6 +384,8 @@ public class pTypingGame : FurballGame {
 
         OffsetManager.Save();
 
+        pTypingConfig.Instance.Save();
+
         base.OnClosing();
     }
 
@@ -536,6 +543,26 @@ public class pTypingGame : FurballGame {
                 MusicTrack.SetSpeed(1f);
             
             SetSongLoopState(actualScreen.LoopState);
+
+            if (pTypingConfig.Instance.FpsBasedOnMonitorHz) {
+                int? videoModeRefreshRate = this.WindowManager.Monitor.VideoMode.RefreshRate ?? 60;
+
+                switch (actualScreen.ScreenType) {
+                    case ScreenType.Gameplay:
+                        if (pTypingConfig.Instance.UnlimitedFpsGameplay)
+                            this.SetTargetFps(-1);
+                        else
+                            this.SetTargetFps((int)(videoModeRefreshRate.Value * pTypingConfig.Instance.GameplayFpsMult));
+                        break;
+                    case ScreenType.Menu:
+                        if (pTypingConfig.Instance.UnlimitedFpsMenu)
+                            this.SetTargetFps(-1);
+                        else
+                            this.SetTargetFps((int)(videoModeRefreshRate.Value * pTypingConfig.Instance.MenuFpsMult));
+                        break;
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
         }
     }
     private static void SetSongLoopState(MusicLoopState loopState) {
