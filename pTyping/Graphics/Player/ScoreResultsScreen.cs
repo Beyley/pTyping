@@ -7,7 +7,6 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
-using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using Silk.NET.Input;
 using Color=Furball.Vixie.Backends.Shared.Color;
@@ -39,7 +38,7 @@ public class ScoreResultsScreen : pScreen {
 
         #region Score info
 
-        ScoreResultsDrawable playerResults = new ScoreResultsDrawable(this.Score) {
+        ScoreResultsDrawable playerResults = new(this.Score) {
             Position = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
         };
         
