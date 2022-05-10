@@ -5,6 +5,7 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
@@ -38,36 +39,12 @@ public class ScoreResultsScreen : pScreen {
 
         #region Score info
 
-        float y = 175;
-
-        TextDrawable score = new(new(100, y), FurballGame.DEFAULT_FONT, $"Score: {this.Score.Score:00000000}", 35);
-        y += 20 + score.Size.Y;
-        TextDrawable accuracy = new(new(100, y), FurballGame.DEFAULT_FONT, $"Accuracy: {this.Score.Accuracy * 100:0.00}%", 35);
-        y += 20 + accuracy.Size.Y;
-        TextDrawable combo = new(new(100, y), FurballGame.DEFAULT_FONT, $"Combo: {this.Score.MaxCombo}x", 35);
-        y += 20 + combo.Size.Y;
-        TextDrawable excellent = new(new(100, y), FurballGame.DEFAULT_FONT, $"Excellent: {this.Score.ExcellentHits}x", 35);
-        y += 20 + excellent.Size.Y;
-        TextDrawable good = new(new(100, y), FurballGame.DEFAULT_FONT, $"Good: {this.Score.GoodHits}x", 35);
-        y += 20 + good.Size.Y;
-        TextDrawable fair = new(new(100, y), FurballGame.DEFAULT_FONT, $"Fair: {this.Score.FairHits}x", 35);
-        y += 20 + fair.Size.Y;
-        TextDrawable poor = new(new(100, y), FurballGame.DEFAULT_FONT, $"Poor/Miss: {this.Score.PoorHits}x", 35);
-        y += 20 + poor.Size.Y;
-        // TextDrawable miss = new(new(100, y), FurballGame.DEFAULT_FONT, $"Miss: {this.Score.MissHits}x", 35);
-        // y += 20 + miss.Size.Y;
-        TextDrawable mods = new(new(100, y), FurballGame.DEFAULT_FONT, $"Mods: {PlayerMod.GetModString(this.Score.Mods)}", 35);
-
-        this.Manager.Add(score);
-        this.Manager.Add(accuracy);
-        this.Manager.Add(combo);
-        this.Manager.Add(excellent);
-        this.Manager.Add(good);
-        this.Manager.Add(fair);
-        this.Manager.Add(poor);
-        // this.Manager.Add(miss);
-        this.Manager.Add(mods);
-
+        ScoreResultsDrawable playerResults = new ScoreResultsDrawable(this.Score) {
+            Position = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+        };
+        
+        this.Manager.Add(playerResults);
+        
         #endregion
 
         #region Buttons
