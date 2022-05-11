@@ -34,17 +34,17 @@ public class ScoreResultsDrawable : CompositeDrawable {
         this.Drawables.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Fair: {playerScore.FairHits}", 30)));
         this.Drawables.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Poor: {playerScore.PoorHits}", 30)));
 
-        FurballGame.InputManager.OnMouseMove += this.OnMouseMove;
+        FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+    }
+    
+    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
+        this._targetRotation += e.scroll.scrollAmount / 16f;
     }
 
     public override void Dispose() {
-        FurballGame.InputManager.OnMouseMove -= this.OnMouseMove;
+        FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
 
         base.Dispose();
-    }
-
-    private void OnMouseMove(object sender, (Vector2 position, string cursorName) e) {
-        this._targetRotation = (e.position.Y - FurballGame.DEFAULT_WINDOW_HEIGHT / 2f) / (FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
     }
 
     private const float SEPARATION_AMOUNT = 0.15f;
