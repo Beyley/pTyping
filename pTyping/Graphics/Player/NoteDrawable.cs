@@ -123,7 +123,9 @@ public class NoteDrawable : CompositeDrawable {
     /// <param name="score">The current score</param>
     /// <returns>Whether the note has been fully completed</returns>
     public bool TypeCharacter(string hiragana, string romaji, double timeDifference, double rawTimeDifference, Player player) {
-        if (this.Note.TypedRomaji == string.Empty && this.Note.Typed == string.Empty) {
+        //If this is the first time a character is being typed on this note, 
+        if (this.Note.TypedRomaji.Length == 0 && this.Note.Typed.Length == 0) {
+            //Find the correct hit result for the users time
             if (timeDifference < player.TIMING_EXCELLENT)
                 this.Note.HitResult = HitResult.Excellent;
             else if (timeDifference < player.TIMING_GOOD)
@@ -132,29 +134,33 @@ public class NoteDrawable : CompositeDrawable {
                 this.Note.HitResult = HitResult.Fair;
             else if (timeDifference < player.TIMING_POOR)
                 this.Note.HitResult = HitResult.Poor;
-
+            
             this.TimeDifference = rawTimeDifference;
             
+            //Rotate the hue by 150 degrees
             Color     finalColor      = Helpers.RotateColor(this.Note.Color, 150);
+            //The time it will take the note to fade to its partially hit state
             const int toFinalFadeTime = 100;
+            //Set the notes colour to the final colour TODO: figure out why this is needed
             this.NoteTexture.ColorOverride = finalColor;
             this.NoteTexture.Tweens.Add(
             new ColorTween(TweenType.Color, this.NoteTexture.ColorOverride, finalColor, FurballGame.Time, FurballGame.Time + toFinalFadeTime)
             );
-            // this.NoteTexture.Tweens.Add(new ColorTween(TweenType.Color, finalColor,                     new((int)finalColor.R, finalColor.G, finalColor.B, 100), FurballGame.Time + toFinalFadeTime, FurballGame.Time + toFinalFadeTime + 200));
         }
 
-        //Types the next character
+        //Add the next typed character to the string of currently typed romaji
         this.Note.TypedRomaji += romaji[this.Note.TypedRomaji.Length];
 
-        //Checks if we have finished typing the current romaji
+        //Have we finished checking th romaji sequence? if so,
         if (string.Equals(this.Note.TypedRomaji, romaji)) {
+            //Add the hiragana to the typed section
             this.Note.Typed += hiragana;
+            //Give the play the appropriate 
             player.Score.AddScore(Player.SCORE_PER_CHARACTER);
             //Clear the typed romaji
             this.Note.TypedRomaji = string.Empty;
 
-            //Checks if we have typed the full note
+            //Are we finished with the whole note?
             if (string.Equals(this.Note.Typed, this.Note.Text)) {
                 this.Hit();
                 return true;

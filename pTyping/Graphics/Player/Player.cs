@@ -274,7 +274,6 @@ public class Player : CompositeDrawable {
                         this._noteToType += checkingNext ? 2 : 1;
                     }
                     this.ShowTypingIndicator(@char);
-
                     
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnCharacterTyped(note, @char.ToString(), true);
