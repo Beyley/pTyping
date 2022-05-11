@@ -185,7 +185,9 @@ public class Player : CompositeDrawable {
                 ColorOverride = note.Color
             },
             RawTextDrawable = {
-                Text = $"{note.Text}"
+                Text      = $"{note.Text}",
+                Colors    = new System.Drawing.Color[note.Text.Length],
+                ColorType = TextColorType.Repeating
             },
             ToTypeTextDrawable = {
                 Text = $"{string.Join("\n", note.TypableRomaji.Romaji)}"
@@ -195,6 +197,10 @@ public class Player : CompositeDrawable {
             OriginType = OriginType.Center,
             Note       = note
         };
+        
+        for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++) {
+            noteDrawable.RawTextDrawable.Colors[i] = System.Drawing.Color.White;
+        }
 
         noteDrawable.UpdateTextPositions();
 
@@ -296,7 +302,7 @@ public class Player : CompositeDrawable {
         }
 
         //Update the text on all notes to show the new Romaji paths
-        this.UpdateNoteText();
+        this.UpdateNoteText(noteDrawable);
     }
 
     private void ShowTypingIndicator(char character, bool miss = false) {
@@ -342,13 +348,20 @@ public class Player : CompositeDrawable {
         this._currentTypingIndicatorIndex %= this._typingIndicators.Length;
     }
 
-    private void UpdateNoteText() {
-        foreach (NoteDrawable noteDrawable in this._notes) {
-            noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
-            noteDrawable.ToTypeTextDrawable.Text = $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
-
-            noteDrawable.UpdateTextPositions();
+    private void UpdateNoteText(NoteDrawable noteDrawable) {
+        // foreach (NoteDrawable noteDrawable in this._notes) {
+            // noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
+        noteDrawable.ToTypeTextDrawable.Text = $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
+        
+        for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++) {
+            if(i < noteDrawable.Note.Typed.Length)
+                noteDrawable.RawTextDrawable.Colors[i] = System.Drawing.Color.Gray;
+            else
+                noteDrawable.RawTextDrawable.Colors[i] = System.Drawing.Color.White;
         }
+        
+        noteDrawable.UpdateTextPositions();
+        // }
     }
 
     private void NoteUpdate(bool wasHit, Note note) {
