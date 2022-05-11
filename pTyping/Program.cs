@@ -64,12 +64,11 @@ internal class Program {
                     WindowBorder = WindowBorder.Fixed
                 };
 
-                // GraphicsBackend.PrefferedBackends = Backend.Veldrid;
-
                 game.Run(options);
 #if RELEASE
             }
             catch (Exception ex) {
+                //TODO: clean this shit up dear god what is this
                 string fileName = $"crashlog-{UnixTime.Now()}";
                 
                 FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");

@@ -20,18 +20,18 @@ public abstract class Event {
 
         switch (@event.Type) {
             case EventType.BeatLineBar: {
-                // BeatLineBarEventDrawable tempDrawable = new(@event);
-                // tempDrawable.CreateTweens(tweenArgs);
+                BeatLineBarEventDrawable tempDrawable = new(@event);
+                tempDrawable.CreateTweens(tweenArgs);
 
-                // drawable = tempDrawable;
+                drawable = tempDrawable;
 
                 break;
             }
             case EventType.BeatLineBeat: {
-                // BeatLineBeatEventDrawable tempDrawable = new(@event);
-                // tempDrawable.CreateTweens(tweenArgs);
+                BeatLineBeatEventDrawable tempDrawable = new(@event);
+                tempDrawable.CreateTweens(tweenArgs);
 
-                // drawable = tempDrawable;
+                drawable = tempDrawable;
 
                 break;
             }

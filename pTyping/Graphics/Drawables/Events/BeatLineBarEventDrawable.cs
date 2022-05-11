@@ -1,4 +1,5 @@
 using System.Numerics;
+using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
@@ -12,17 +13,18 @@ using pTyping.Songs;
 
 namespace pTyping.Graphics.Drawables.Events;
 
-public class BeatLineBarEventDrawable : LinePrimitiveDrawable {
+public class BeatLineBarEventDrawable : TexturedDrawable {
     public readonly Event Event;
 
     public override Vector2 Size => new(5, 100);
 
     // public BeatLineBarEventDrawable(Event @event) : base(Vector2.Zero, 100, (float)Math.PI / 2f) {
-    public BeatLineBarEventDrawable(Event @event) : base(Vector2.Zero, Vector2.Zero, Color.White) {
-        this.Event      = @event;
-        this.Thickness  = 3f;
-        this.TimeSource = pTypingGame.MusicTrackTimeSource;
-        this.OriginType = OriginType.Center;
+    public BeatLineBarEventDrawable(Event @event) : base(FurballGame.WhitePixel, Vector2.Zero) {
+        this.Event         = @event;
+        this.Scale         = new Vector2(4, 100);
+        this.TimeSource    = pTypingGame.MusicTrackTimeSource;
+        this.OriginType    = OriginType.Center;
+        this.ColorOverride = new(1f, 1f, 1f, 0.7f);
     }
 
     public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {

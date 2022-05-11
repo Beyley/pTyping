@@ -127,8 +127,8 @@ public class Player : CompositeDrawable {
         //Called before creating the notes
         this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
 
-        this.CreateNotes();
         this.CreateEvents();
+        this.CreateNotes();
 
         this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
@@ -162,7 +162,7 @@ public class Player : CompositeDrawable {
 
             if (drawable != null) {
                 drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
-                drawable.Depth      = 0.5f;
+                drawable.Depth      = 0f;
 
                 this._events.Add(new(drawable, false));
             }
@@ -193,7 +193,7 @@ public class Player : CompositeDrawable {
                 Text = $"{string.Join("\n", note.TypableRomaji.Romaji)}"
             },
             Scale      = new(0.55f),
-            Depth      = 0f,
+            Depth      = 0.5f,
             OriginType = OriginType.Center,
             Note       = note
         };
