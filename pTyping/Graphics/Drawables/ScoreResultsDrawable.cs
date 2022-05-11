@@ -30,9 +30,9 @@ public class ScoreResultsDrawable : CompositeDrawable {
         this.Drawables.Add(SetRotOrigin(this._combo     = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Combo: {playerScore.MaxCombo}",                    30)));
         this.Drawables.Add(SetRotOrigin(this._mods      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Mods: {PlayerMod.GetModString(playerScore.Mods)}", 30)));
         this.Drawables.Add(SetRotOrigin(this._excellent = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Excellent: {playerScore.ExcellentHits}",           30)));
-        this.Drawables.Add(SetRotOrigin(this._good      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Good: {playerScore.ExcellentHits}",                30)));
-        this.Drawables.Add(SetRotOrigin(this._fair      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Fair: {playerScore.ExcellentHits}",                30)));
-        this.Drawables.Add(SetRotOrigin(this._poor      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Poor: {playerScore.ExcellentHits}",                30)));
+        this.Drawables.Add(SetRotOrigin(this._good      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Good: {playerScore.GoodHits}",                30)));
+        this.Drawables.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Fair: {playerScore.FairHits}", 30)));
+        this.Drawables.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Poor: {playerScore.PoorHits}", 30)));
 
         FurballGame.InputManager.OnMouseMove += this.OnMouseMove;
     }
@@ -63,10 +63,10 @@ public class ScoreResultsDrawable : CompositeDrawable {
         this._combo.Rotation    = this._rotation + SEPARATION_AMOUNT * 3f;
         this._mods.Rotation     = this._rotation + SEPARATION_AMOUNT * 4f;
 
-        this._excellent.Rotation = this._rotation - SEPARATION_AMOUNT;
-        this._good.Rotation      = this._rotation - SEPARATION_AMOUNT * 2f;
-        this._fair.Rotation      = this._rotation - SEPARATION_AMOUNT * 3f;
-        this._poor.Rotation      = this._rotation - SEPARATION_AMOUNT * 4f;
+        this._excellent.Rotation = this._rotation - SEPARATION_AMOUNT * 4f;
+        this._good.Rotation      = this._rotation - SEPARATION_AMOUNT * 3f;
+        this._fair.Rotation      = this._rotation - SEPARATION_AMOUNT * 2f;
+        this._poor.Rotation      = this._rotation - SEPARATION_AMOUNT;
 
         base.Update(time);
     }
