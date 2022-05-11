@@ -209,6 +209,7 @@ public class Player : CompositeDrawable {
         if (char.IsControl(@char))
             return;
 
+        //If we are recording a replay or we are spectating someone, record the keypress
         if (this.RecordReplay || this.IsSpectating) {
             ReplayFrame f = new() {
                 Character = @char,
@@ -217,10 +218,13 @@ public class Player : CompositeDrawable {
             this.ReplayFrames.Add(f);
         }
 
+        //If we already hit all the notes in the song, wtf are we dont here? stop hitting your keyboard you monkey
         if (this.Song.AllNotesHit()) return;
 
+        //The drawable for the note we are going to check
         NoteDrawable noteDrawable = this._notes[checkingNext ? this._noteToType + 1 : this._noteToType];
 
+        //The extracted `Note` object 
         Note note = noteDrawable.Note;
 
         // Makes sure we dont hit an already hit note, which would cause a crash currently
@@ -228,42 +232,59 @@ public class Player : CompositeDrawable {
         if (note.IsHit)
             return;
 
+        //Get the current time of the music
         double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
+        //If we are within or past the notes timing point,
         if (currentTime > note.Time - this.TIMING_POOR) {
+            //Get the list of the currently typable romaji
             (string hiragana, List<string> romajiToType) = note.TypableRomaji;
 
+            //Filter the typable romaji by the ones which start with the already typed romaji
             List<string> filteredRomaji = romajiToType.Where(romaji => romaji.StartsWith(note.TypedRomaji)).ToList();
 
+            //Get the time difference between the current time and the notes exact time
+            double timeDifference = Math.Abs(currentTime - note.Time);
+            
+            //For all the possible romaji options,
             foreach (string romaji in filteredRomaji) {
-                double timeDifference = Math.Abs(currentTime - note.Time);
+                //Check if the next romaji to type is the character we typed
                 if (romaji[note.TypedRomaji.Length] == @char) {
+                    //If we are checking the next note, and the current note is not hit,
                     if (checkingNext && !this._notes[this._noteToType].Note.IsHit) {
+                        //Miss the current note
                         this._notes[this._noteToType].Miss();
                         this.NoteUpdate(false, this._notes[this._noteToType].Note);
 
+                        //Go to the next note
                         this._noteToType++;
+                        //Say that we are now checking the next note as the primary note
                         checkingNext = false;
                     }
                     
-                    //If true, then we finished the note, if false, then we continue
+                    //If true, then we finished the note
                     if (noteDrawable.TypeCharacter(hiragana, romaji, timeDifference, currentTime - note.Time, this)) {
+                        //Play the hitsound
                         this.HitSoundNormal.PlayNew();
+                        //Update the note saying its been typed
                         this.NoteUpdate(true, note);
                         this.OnCorrectCharTyped?.Invoke(this, noteDrawable.TimeDifference);
 
+                        //Update the current note to the note after the one we are checking right now
                         this._noteToType += checkingNext ? 2 : 1;
                     }
                     this.ShowTypingIndicator(@char);
 
+                    
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
                         mod.OnCharacterTyped(note, @char.ToString(), true);
 
                     break;
                 }
 
-                //We do this so you can type the next note even if you fucked up the last one, which makes gameplay a lot easier
+                //If we are not on the last note of the song, we are not checking the next note, and we are after the current note,
                 if (this._noteToType != this.Song.Notes.Count - 1 && !checkingNext && currentTime > note.Time) {
+                    //Then check the next note instead
                     this.TypeCharacter(@char, true);
                     return;
                 }
