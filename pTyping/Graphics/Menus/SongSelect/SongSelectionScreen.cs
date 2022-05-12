@@ -265,7 +265,7 @@ public class SongSelectionScreen : pScreen {
         if (e == Key.F5) {
             SongManager.UpdateSongs();
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
-            ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor));
+            ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor)); //TODO: implement dynamic song select
         }
     }
 
@@ -291,7 +291,6 @@ Created by {pTypingGame.CurrentSong.Value.Creator}
 BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
 
         if (!fromPrevScreen) {
-            // pTypingGame.CurrentSong.Value 
             pTypingGame.PlayMusic();
         } else if (pTypingGame.MusicTrack.PlaybackState is PlaybackState.Paused or PlaybackState.Stopped) {
             pTypingGame.PlayMusic();
