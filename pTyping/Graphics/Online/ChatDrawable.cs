@@ -95,7 +95,7 @@ public class ChatDrawable : CompositeDrawable {
 
             float x = 0f;
             foreach (string channel in pTypingGame.OnlineManager.KnownChannels) {
-                UiButtonDrawable button = new(new(x, 0), channel, FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.Black, new(100, 32)) {
+                UiButtonDrawable button = new(new Vector2(x, 0), channel, FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.Black, new Vector2(100, 32)) {
                     OriginType = OriginType.BottomLeft
                 };
                 x += button.Size.X;
@@ -114,22 +114,22 @@ public class ChatDrawable : CompositeDrawable {
         this.Size     = size;
 
         this.Drawables.Add(
-        this._background = new(Vector2.Zero, size, 2, true) {
-            ColorOverride = new(100, 100, 100, 100)
+        this._background = new RectanglePrimitiveDrawable(Vector2.Zero, size, 2, true) {
+            ColorOverride = new Color(100, 100, 100, 100)
         }
         );
 
         this.Drawables.Add(
-        this.MessageInputDrawable = new(new(0, size.Y), pTypingGame.JapaneseFontStroked, "", 35, size.X) {
+        this.MessageInputDrawable = new UiTextBoxDrawable(new Vector2(0, size.Y), pTypingGame.JapaneseFontStroked, "", 35, size.X) {
             OriginType       = OriginType.BottomLeft,
             DeselectOnCommit = false
         }
         );
 
         this.Drawables.Add(
-        this._channelContents = new(new(size.X, size.Y - this.MessageInputDrawable.Size.Y - this._padding)) {
+        this._channelContents = new ChatContentsDrawable(new Vector2(size.X, size.Y - this.MessageInputDrawable.Size.Y - this._padding)) {
             OriginType = OriginType.BottomLeft,
-            Position   = new(0, size.Y - this.MessageInputDrawable.Size.Y - this._padding)
+            Position   = new Vector2(0, size.Y - this.MessageInputDrawable.Size.Y - this._padding)
         }
         );
 
@@ -190,7 +190,7 @@ public class ChatDrawable : CompositeDrawable {
 
             float y = this.Size.Y - this.MessageInputDrawable.Size.Y - 10;
             foreach (ChatMessage message in chatMessages) {
-                ChatMessageDrawable messageDrawable = new(this, new(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
+                ChatMessageDrawable messageDrawable = new(this, new Vector2(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
                     OriginType = OriginType.BottomLeft
                 };
 

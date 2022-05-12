@@ -27,7 +27,7 @@ public class MenuScreen : pScreen {
         base.Initialize();
 
         TextDrawable gitVersionText = new(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
         pTypingGame.JapaneseFont,
         string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion),
         30
@@ -38,14 +38,14 @@ public class MenuScreen : pScreen {
         this.Manager.Add(gitVersionText);
 
         UiButtonDrawable changelogButton = new(
-        new(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        new Vector2(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
         GetLocalizedString(Localizations.Changelog),
         pTypingGame.JapaneseFont,
         30,
         Color.Blue,
         Color.White,
         Color.White,
-        new(0)
+        new Vector2(0)
         ) {
             OriginType = OriginType.BottomLeft
         };
@@ -75,35 +75,35 @@ public class MenuScreen : pScreen {
 
         float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
-        TexturedDrawable playButton = new(menuButtonsTexture, new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
+        TexturedDrawable playButton = new(menuButtonsTexture, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
             OriginType = OriginType.Center,
-            Scale      = new(0.75f),
+            Scale      = new Vector2(0.75f),
             ToolTip    = "gordon this is a tool tip"
         };
         TexturedDrawable editButton = new(
         menuButtonsTexture,
-        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += playButton.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += playButton.Size.Y + 10),
         TexturePositions.MENU_EDIT_BUTTON
         ) {
             OriginType = OriginType.Center,
-            Scale      = new(0.75f),
+            Scale      = new Vector2(0.75f),
             ToolTip    = "you can use it to get across big pits!"
         };
         TexturedDrawable optionsButton = new(
         menuButtonsTexture,
-        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += editButton.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += editButton.Size.Y + 10),
         TexturePositions.MENU_OPTIONS_BUTTON
         ) {
             OriginType = OriginType.Center,
-            Scale      = new(0.75f)
+            Scale      = new Vector2(0.75f)
         };
         TexturedDrawable exitButton = new(
         menuButtonsTexture,
-        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += optionsButton.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += optionsButton.Size.Y + 10),
         TexturePositions.MENU_EXIT_BUTTON
         ) {
             OriginType = OriginType.Center,
-            Scale      = new(0.75f)
+            Scale      = new Vector2(0.75f)
         };
 
         playButton.OnClick += delegate {
@@ -135,14 +135,14 @@ public class MenuScreen : pScreen {
 
         #region Menu music
 
-        this._musicTitle = new(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, "None", 40) {
+        this._musicTitle = new TextDrawable(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, "None", 40) {
             OriginType = OriginType.TopRight
         };
 
         this._songProgressBar = new UiProgressBarDrawable(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
         pTypingGame.JapaneseFontStroked,
-        new(250, 25),
+        new Vector2(250, 25),
         Color.White,
         Color.LightGray,
         Color.White
@@ -158,7 +158,7 @@ public class MenuScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_PLAY
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.TopRight
         };
         TexturedDrawable musicPauseButton = new(
@@ -166,7 +166,7 @@ public class MenuScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_PAUSE
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.TopRight
         };
         TexturedDrawable musicNextButton = new(
@@ -174,7 +174,7 @@ public class MenuScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_RIGHT
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.TopRight
         };
 
@@ -248,7 +248,7 @@ public class MenuScreen : pScreen {
 
             this.Manager.Add(this._userCard = pTypingGame.GetUserCard());
 
-            this._userCard.MoveTo(new(10f));
+            this._userCard.MoveTo(new Vector2(10f));
 
             if (sender != this)
                 this._userCard.FadeInFromZero(100);

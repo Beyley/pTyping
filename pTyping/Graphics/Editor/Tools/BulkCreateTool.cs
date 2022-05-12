@@ -3,6 +3,7 @@ using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
@@ -94,11 +95,11 @@ public class BulkCreateTool : EditorTool {
                 RawTextDrawable = {
                     Text = $"{note.Text}"
                 },
-                Scale      = new(0.55f, 0.55f),
+                Scale      = new Vector2(0.55f, 0.55f),
                 OriginType = OriginType.Center,
                 Note       = note,
                 NoteTexture = {
-                    ColorOverride = new(255, 255, 255, 100)
+                    ColorOverride = new Color(255, 255, 255, 100)
                 }
             };
 

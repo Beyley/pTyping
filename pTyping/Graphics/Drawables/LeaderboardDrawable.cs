@@ -28,7 +28,7 @@ public class LeaderboardDrawable : CompositeDrawable {
         for (int i = 0; i < this._scores.GetRange(0, Math.Min(8, scores.Count)).Count; i++) {
             PlayerScore score = this._scores.GetRange(0, Math.Min(8, scores.Count))[i];
             LeaderboardElementDrawable drawable = new(score) {
-                Position = new(0, y)
+                Position = new Vector2(0, y)
             };
 
             this._leaderboardElementDrawables.Add(drawable);
@@ -54,11 +54,11 @@ public class LeaderboardDrawable : CompositeDrawable {
 
             this.Drawables.Add(
             this._backgroundDrawable = new TexturedDrawable(ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User), Vector2.Zero) {
-                Scale = new(0.2f)
+                Scale = new Vector2(0.2f)
             }
             );
-            this.Drawables.Add(this._usernameInfoDrawable = new TextDrawable(new(3f),                                         pTypingGame.JapaneseFont, "a", 30));
-            this.Drawables.Add(this._infoTextDrawable     = new TextDrawable(new(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
+            this.Drawables.Add(this._usernameInfoDrawable = new TextDrawable(new Vector2(3f),                                         pTypingGame.JapaneseFont, "a", 30));
+            this.Drawables.Add(this._infoTextDrawable     = new TextDrawable(new Vector2(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
 
             this.UpdateText();
         }

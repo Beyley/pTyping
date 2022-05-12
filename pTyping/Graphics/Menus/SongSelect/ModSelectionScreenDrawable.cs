@@ -25,14 +25,14 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
             PlayerMod mod = PlayerMod.RegisteredMods[i];
 
             UiButtonDrawable modButton = new(
-            new(x, y),
+            new Vector2(x, y),
             mod.Name(),
             FurballGame.DEFAULT_FONT_STROKED,
             30,
             pTypingGame.SelectedMods.Contains(mod) ? this._selectedColor : this._unselectedColor,
             Color.White,
             Color.White,
-            new(0)
+            new Vector2(0)
             );
 
             modButton.OnClick += delegate {
@@ -52,8 +52,8 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
                 y += modButton.Size.Y + 25;
         }
 
-        this._scoreMultiplier = new(
-        new(0, y + 10),
+        this._scoreMultiplier = new TextDrawable(
+        new Vector2(0, y + 10),
         FurballGame.DEFAULT_FONT_STROKED,
         $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x",
         30

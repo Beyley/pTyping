@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Furball.Engine.Engine.Helpers;
 using JetBrains.Annotations;
 using pTyping.Graphics.Online;
@@ -16,7 +17,7 @@ public enum ServerPermissions : ushort {
 public class OnlinePlayer {
     private UserCardDrawable            _userCard;
     public  Bindable<double>            Accuracy    = new(1d);
-    public  Bindable<UserAction>        Action      = new(new(UserActionType.Idle, "Idling.", PlayMode.Unknown));
+    public  Bindable<UserAction>        Action      = new(new UserAction(UserActionType.Idle, "Idling.", PlayMode.Unknown));
     public  Bindable<int>               PlayCount   = new(0);
     public  Bindable<int>               Rank        = new(0);
     public  Bindable<ServerPermissions> Permissions = new(ServerPermissions.None);
@@ -31,8 +32,8 @@ public class OnlinePlayer {
     [Pure]
     public UserCardDrawable GetUserCard() {
         if (this._userCard is null) {
-            this._userCard = new(new(0), this) {
-                Scale = new(0.3f)
+            this._userCard = new UserCardDrawable(new Vector2(0), this) {
+                Scale = new Vector2(0.3f)
             };
 
             this._userCard.Player.OnChange                               += (_, _) => this._userCard.UpdateDrawable();

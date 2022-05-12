@@ -23,10 +23,10 @@ public class LyricDrawable : CompositeDrawable {
 
         this.Position = pos;
 
-        this._currentLyricText = new(new(0), pTypingGame.JapaneseFont, "", 35);
+        this._currentLyricText = new TextDrawable(new Vector2(0), pTypingGame.JapaneseFont, "", 35);
         this.Drawables.Add(this._currentLyricText);
 
-        this._nextLyricText = new(new(0), pTypingGame.JapaneseFont, "", 27) {
+        this._nextLyricText = new TextDrawable(new Vector2(0), pTypingGame.JapaneseFont, "", 27) {
             ColorOverride = Color.LightGray
         };
         this.Drawables.Add(this._nextLyricText);
@@ -58,7 +58,7 @@ public class LyricDrawable : CompositeDrawable {
         this._currentLyricText.Text = $"{thisLyric.Lyric}";
         this._nextLyricText.Text    = $"{nextLyric.Lyric}";
 
-        this._nextLyricText.MoveTo(new(0, this._currentLyricText.Font.LineHeight * this._currentLyricText.RealScale.Y + 10));
+        this._nextLyricText.MoveTo(new Vector2(0, this._currentLyricText.Font.LineHeight * this._currentLyricText.RealScale.Y + 10));
 
         // this._lastUpdate = time;
     }

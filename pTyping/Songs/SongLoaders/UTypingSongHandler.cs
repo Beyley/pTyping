@@ -69,7 +69,7 @@ public class UTypingSongHandler : ISongHandler {
                     string text = splitLine[1];
 
                     song.Notes.Add(
-                    new() {
+                    new Note {
                         Time  = time,
                         Text  = text.Trim(),
                         Color = Color.Red

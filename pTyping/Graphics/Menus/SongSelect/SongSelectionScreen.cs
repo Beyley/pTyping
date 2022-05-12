@@ -108,7 +108,7 @@ public class SongSelectionScreen : pScreen {
 
         IEnumerable<Song> songList = this._editor ? SongManager.Songs.Where(x => x.Type == SongType.pTyping) : SongManager.Songs;
 
-        this._songSelectDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10), songList) {
+        this._songSelectDrawable = new SongSelectDrawable(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10), songList) {
             OriginType = OriginType.TopRight,
             Depth      = 0.8f
         };
@@ -127,7 +127,7 @@ public class SongSelectionScreen : pScreen {
         Color.Red,
         Color.White,
         Color.White,
-        new(0)
+        new Vector2(0)
         ) {
             OriginType = OriginType.BottomRight,
             Depth      = 0f
@@ -143,8 +143,8 @@ public class SongSelectionScreen : pScreen {
 
         #region Leaderboard select
 
-        this._leaderboardButton = new(TextureFromLeaderboardType(LeaderboardType), new(10, 10)) {
-            Scale = new(0.05f),
+        this._leaderboardButton = new TexturedDrawable(TextureFromLeaderboardType(LeaderboardType), new Vector2(10, 10)) {
+            Scale = new Vector2(0.05f),
             Depth = 0.75f
         };
 
@@ -174,7 +174,7 @@ public class SongSelectionScreen : pScreen {
         #region mods
 
         if (!this._editor) {
-            this._modScreen = new(new(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
+            this._modScreen = new ModSelectionScreenDrawable(new Vector2(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
                 Visible    = false,
                 OriginType = OriginType.BottomLeft,
                 Depth      = 0.5f
@@ -182,14 +182,14 @@ public class SongSelectionScreen : pScreen {
             this.Manager.Add(this._modScreen);
 
             UiButtonDrawable toggleMods = new(
-            new(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
+            new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
             "Mods",
             FurballGame.DEFAULT_FONT_STROKED,
             30,
             Color.Blue,
             Color.White,
             Color.White,
-            new(0)
+            new Vector2(0)
             ) {
                 OriginType = OriginType.BottomLeft
             };
@@ -231,8 +231,8 @@ public class SongSelectionScreen : pScreen {
         this._leaderboardButton.SetTexture(TextureFromLeaderboardType(LeaderboardType));
 
         // this._leaderboardButton.Tweens.Clear();
-        this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, this._leaderboardButton.Scale, new(0.055f), FurballGame.Time, FurballGame.Time + 50));
-        this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, new(0.055f),                   new(0.05f), FurballGame.Time + 50, FurballGame.Time + 100));
+        this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, this._leaderboardButton.Scale, new Vector2(0.055f), FurballGame.Time, FurballGame.Time + 50));
+        this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, new Vector2(0.055f),           new Vector2(0.05f),          FurballGame.Time + 50, FurballGame.Time + 100));
     }
 
     private void OnLeaderboardTypeChange(object sender, LeaderboardType e) {
@@ -325,7 +325,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
         float y = this._songInfo.Size.Y + 25;
 
         this._leaderboardDrawable = new LeaderboardDrawable(scores) {
-            Position = new(25, y),
+            Position = new Vector2(25, y),
             Depth    = 0.9f
         };
 

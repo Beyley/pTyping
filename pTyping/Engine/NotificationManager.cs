@@ -26,7 +26,7 @@ public class NotificationManager : DrawableManager {
     public NotificationDrawable CreateNotification(NotificationImportance importance, string text) {
         NotificationDrawable drawable = new(importance, NotificationType.BottomRight, text) {
             OriginType = OriginType.BottomRight,
-            Position   = new(FurballGame.DEFAULT_WINDOW_WIDTH + 500, FurballGame.DEFAULT_WINDOW_HEIGHT + 500)
+            Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH + 500, FurballGame.DEFAULT_WINDOW_HEIGHT + 500)
         };
         drawable.OnClick += this.OnDrawableClick;
         drawable.FadeInFromZero(100);
@@ -39,7 +39,7 @@ public class NotificationManager : DrawableManager {
 
     public NotificationDrawable CreatePopup(string text) {
         NotificationDrawable drawable = new(NotificationImportance.Info, NotificationType.MiddlePopup, text) {
-            OriginType = OriginType.Center, Position = new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+            OriginType = OriginType.Center, Position = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
         };
         drawable.FadeInFromZero(100);
         
@@ -112,7 +112,7 @@ public class NotificationManager : DrawableManager {
         foreach (BaseDrawable baseDrawable in this.Drawables) {
             if (baseDrawable is not NotificationDrawable drawable || drawable.Type != NotificationType.BottomRight) continue;
 
-            drawable.MoveTo(new(x, y), 100);
+            drawable.MoveTo(new Vector2(x, y), 100);
 
             y -= drawable.Size.Y + 10;
         }
@@ -140,22 +140,22 @@ public class NotificationManager : DrawableManager {
             this._importance = importance;
             this.Type        = type;
 
-            this._textDrawable = new(new(5f), pTypingGame.JapaneseFontStroked, text, 20) {
+            this._textDrawable = new TextDrawable(new Vector2(5f), pTypingGame.JapaneseFontStroked, text, 20) {
                 Clickable   = false,
                 CoverClicks = false,
                 Hoverable   = false,
                 CoverHovers = false
             };
-            this._backgroundDrawable = new(Vector2.Zero, this._textDrawable.Size + new Vector2(10f), 0, true) {
-                ColorOverride = new(50, 50, 50, 100),
+            this._backgroundDrawable = new RectanglePrimitiveDrawable(Vector2.Zero, this._textDrawable.Size + new Vector2(10f), 0, true) {
+                ColorOverride = new Color(50, 50, 50, 100),
                 Clickable     = false,
                 CoverClicks   = false,
                 Hoverable     = false,
                 CoverHovers   = false
             };
-            this._outlineDrawable = new(Vector2.Zero, this._textDrawable.Size + new Vector2(10f), 2, false) {
+            this._outlineDrawable = new RectanglePrimitiveDrawable(Vector2.Zero, this._textDrawable.Size + new Vector2(10f), 2, false) {
                 ColorOverride = importance switch {
-                    NotificationImportance.Info    => new(225, 225, 225, 200),
+                    NotificationImportance.Info    => new Color(225, 225, 225, 200),
                     NotificationImportance.Warning => Color.Red,
                     NotificationImportance.Error   => Color.Red,
                     _                              => throw new ArgumentOutOfRangeException(nameof (importance), importance, "huh? the fuck did you just do?")

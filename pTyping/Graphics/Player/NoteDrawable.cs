@@ -43,18 +43,18 @@ public class NoteDrawable : CompositeDrawable {
         this.Position = position;
         this.Texture  = texture;
 
-        this.NoteTexture = new TexturedDrawable(this.Texture, new(0)) {
+        this.NoteTexture = new TexturedDrawable(this.Texture, new Vector2(0)) {
             OriginType  = OriginType.TopLeft,
             Clickable   = false,
             CoverClicks = false
         };
 
-        this.RawTextDrawable = new TextDrawable(new(this.NoteTexture.Size.X / 2f, this.NoteTexture.Size.Y + 20), font, "", size) {
-            Scale      = new(1.5f),
+        this.RawTextDrawable = new TextDrawable(new Vector2(this.NoteTexture.Size.X / 2f, this.NoteTexture.Size.Y + 20), font, "", size) {
+            Scale      = new Vector2(1.5f),
             OriginType = OriginType.TopCenter
         };
-        this.ToTypeTextDrawable = new TextDrawable(new(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 40), font, "", size) {
-            Scale      = new(1.5f),
+        this.ToTypeTextDrawable = new TextDrawable(new Vector2(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 40), font, "", size) {
+            Scale      = new Vector2(1.5f),
             OriginType = OriginType.TopCenter
         };
 
@@ -82,7 +82,7 @@ public class NoteDrawable : CompositeDrawable {
         this.Tweens.Add(
         new VectorTween(
         TweenType.Movement,
-        new(noteStartPos.X, noteStartPos.Y + this.Note.YOffset),
+        new Vector2(noteStartPos.X, noteStartPos.Y + this.Note.YOffset),
         recepticlePos,
         (int)(this.Note.Time - tweenArgs.ApproachTime),
         (int)this.Note.Time
@@ -92,7 +92,7 @@ public class NoteDrawable : CompositeDrawable {
         );
 
         this.Tweens.Add(
-        new VectorTween(TweenType.Movement, recepticlePos, new(noteEndPos.X, recepticlePos.Y), (int)this.Note.Time, (int)(this.Note.Time + afterTravelTime)) {
+        new VectorTween(TweenType.Movement, recepticlePos, new Vector2(noteEndPos.X, recepticlePos.Y), (int)this.Note.Time, (int)(this.Note.Time + afterTravelTime)) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );
@@ -109,9 +109,9 @@ public class NoteDrawable : CompositeDrawable {
     ///     Updates the positions of the text
     /// </summary>
     public void UpdateTextPositions() {
-        this.RawTextDrawable.Position = new(this.NoteTexture.Size.X / 2f, this.NoteTexture.Size.Y + 20);
+        this.RawTextDrawable.Position = new Vector2(this.NoteTexture.Size.X / 2f, this.NoteTexture.Size.Y + 20);
 
-        this.ToTypeTextDrawable.Position = new(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 80);
+        this.ToTypeTextDrawable.Position = new Vector2(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 80);
     }
 
     /// <summary>
@@ -185,8 +185,8 @@ public class NoteDrawable : CompositeDrawable {
         this.NoteTexture.Tweens.Add(
         new ColorTween(
         TweenType.Color,
-        new((int)finalColor.R, finalColor.G, finalColor.B, 127),
-        new((int)this.NoteTexture.ColorOverride.R, this.NoteTexture.ColorOverride.G, this.NoteTexture.ColorOverride.B, 0),
+        new Color((int)finalColor.R,                     finalColor.G,                     finalColor.B,                     127),
+        new Color((int)this.NoteTexture.ColorOverride.R, this.NoteTexture.ColorOverride.G, this.NoteTexture.ColorOverride.B, 0),
         FurballGame.Time,
         FurballGame.Time + timeToDie
         )

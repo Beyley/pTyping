@@ -147,8 +147,8 @@ public class pTypingGame : FurballGame {
         if (MenuPlayerUserCard is not null)
             return MenuPlayerUserCard;
 
-        MenuPlayerUserCard = new(Vector2.Zero, OnlineManager.Player) {
-            Scale = new(0.3f)
+        MenuPlayerUserCard = new UserCardDrawable(Vector2.Zero, OnlineManager.Player) {
+            Scale = new Vector2(0.3f)
         };
 
         MenuPlayerUserCard.Player.OnChange                               += (_, _) => MenuPlayerUserCard.UpdateDrawable();
@@ -169,28 +169,28 @@ public class pTypingGame : FurballGame {
             string text = $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
 
             if (OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
+                OnlineManager.ChangeUserAction(new UserAction(UserActionType.Editing, text));
         } else {
             string text = $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
 
             if (OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.ChangeUserAction(new(UserActionType.Editing, text));
+                OnlineManager.ChangeUserAction(new UserAction(UserActionType.Editing, text));
         }
     }
 
     public static void UserStatusPickingSong() {
         if (OnlineManager.State != ConnectionState.LoggedIn) return;
-        OnlineManager.ChangeUserAction(new(UserActionType.Idle, "Choosing a song!"));
+        OnlineManager.ChangeUserAction(new UserAction(UserActionType.Idle, "Choosing a song!"));
     }
 
     public static void UserStatusListening() {
         if (OnlineManager.State != ConnectionState.LoggedIn) return;
-        OnlineManager.ChangeUserAction(new(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
+        OnlineManager.ChangeUserAction(new UserAction(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
     }
 
     public static void UserStatusPlaying() {
         if (OnlineManager.State != ConnectionState.LoggedIn) return;
-        OnlineManager.ChangeUserAction(new(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]"));
+        OnlineManager.ChangeUserAction(new UserAction(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]"));
     }
 
     public static void PlayMusic() {
@@ -219,7 +219,7 @@ public class pTypingGame : FurballGame {
         // MusicTrack.Free();
         // }
         MusicTrack                   = AudioEngine.CreateStream(data);
-        MusicTrackTimeSourceNoOffset = new(MusicTrack);
+        MusicTrackTimeSourceNoOffset = new AudioStreamTimeSource(MusicTrack);
         MusicTrackTimeSource         = new OffsetTimeSource(MusicTrackTimeSourceNoOffset, 0);
 
         SetSongLoopState(CurrentLoopState);
@@ -234,7 +234,7 @@ public class pTypingGame : FurballGame {
     public static void SetBackgroundTexture(Texture tex) {
         CurrentSongBackground.SetTexture(tex);
 
-        CurrentSongBackground.Scale = new(1f / ((float) CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
+        CurrentSongBackground.Scale = new Vector2(1f / ((float) CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
     }
 
     public static void LoadBackgroundFromSong(Song song) {
@@ -316,9 +316,9 @@ public class pTypingGame : FurballGame {
         VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
 
         if (mouseScroll > 0)
-            ConVars.Volume.Value = new(Math.Clamp(ConVars.Volume.Value.Value + 0.05d, 0d, 1d));
+            ConVars.Volume.Value = new Value.Number(Math.Clamp(ConVars.Volume.Value.Value + 0.05d, 0d, 1d));
         else
-            ConVars.Volume.Value = new(Math.Clamp(ConVars.Volume.Value.Value - 0.05d, 0d, 1d));
+            ConVars.Volume.Value = new Value.Number(Math.Clamp(ConVars.Volume.Value.Value - 0.05d, 0d, 1d));
     }
 
     public static void SelectNewSong() {
@@ -362,9 +362,9 @@ public class pTypingGame : FurballGame {
         base.Draw(gameTime);
 
         if (this._userPanelManager.Visible)
-            this._userPanelManager.Draw(gameTime, DrawableBatch, new());
+            this._userPanelManager.Draw(gameTime, DrawableBatch, new DrawableManagerArgs());
 
-        NotificationManager.Draw(gameTime, DrawableBatch, new());
+        NotificationManager.Draw(gameTime, DrawableBatch, new DrawableManagerArgs());
     }
 
     public static void SubmitScore(Song song, PlayerScore score) {
@@ -390,7 +390,7 @@ public class pTypingGame : FurballGame {
     }
 
     protected override void Initialize() {
-        RpcClient = new("908631391934222366");
+        RpcClient = new DiscordRpcClient("908631391934222366");
 
         RpcClient.Initialize();
 
@@ -439,7 +439,7 @@ public class pTypingGame : FurballGame {
 
         ScoreManager.Load();
 
-        NotificationManager = new();
+        NotificationManager = new NotificationManager();
 
         ScreenManager.SetBlankTransition();
 
@@ -467,7 +467,7 @@ public class pTypingGame : FurballGame {
 
         // OnlineManager.Login();
 
-        VolumeSelector = new(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
+        VolumeSelector = new TextDrawable(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
             OriginType = OriginType.BottomRight, Clickable = false, CoverClicks = false
         };
 
@@ -484,25 +484,25 @@ public class pTypingGame : FurballGame {
         HiraganaConversion.LoadConversion();
         SongManager.UpdateSongs();
 
-        MusicTrackScheduler = new();
+        MusicTrackScheduler = new Scheduler();
 
         OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
 
-        this._userPanelManager = new();
+        this._userPanelManager = new DrawableManager();
         this._userPanelManager.Add(
-        new TexturedDrawable(WhitePixel, new(0)) {
-            Scale = new(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), Depth = 1.5f, ColorOverride = new(0, 0, 0, 100)
+        new TexturedDrawable(WhitePixel, new Vector2(0)) {
+            Scale = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), Depth = 1.5f, ColorOverride = new Color(0, 0, 0, 100)
         }
         );
         this._userPanelManager.Add(
-        _OnlineUsersText = new TextDrawable(new(10), JapaneseFontStroked, "Online Users: 0", 50) {
+        _OnlineUsersText = new TextDrawable(new Vector2(10), JapaneseFontStroked, "Online Users: 0", 50) {
             Depth = 0f
         }
         );
         this._userPanelManager.Visible = false;
         this.UpdateUserPanel(null, null);
 
-        this._chatDrawable = new(new(10, DEFAULT_WINDOW_HEIGHT - 10), new(DEFAULT_WINDOW_WIDTH - 20, DEFAULT_WINDOW_HEIGHT * 0.4f)) {
+        this._chatDrawable = new ChatDrawable(new Vector2(10, DEFAULT_WINDOW_HEIGHT - 10), new Vector2(DEFAULT_WINDOW_WIDTH - 20, DEFAULT_WINDOW_HEIGHT * 0.4f)) {
             OriginType = OriginType.BottomLeft
         };
         this._userPanelManager.Add(this._chatDrawable);

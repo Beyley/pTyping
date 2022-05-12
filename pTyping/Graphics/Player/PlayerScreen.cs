@@ -95,8 +95,8 @@ public class PlayerScreen : pScreen {
 
         #endregion
 
-        this.Player = new(this.Song) {
-            Position     = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
+        this.Player = new Player(this.Song) {
+            Position     = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
             OriginType   = OriginType.LeftCenter,
             RecordReplay = !this._playingReplay,
             IsSpectating = this.IsSpectating
@@ -129,14 +129,14 @@ public class PlayerScreen : pScreen {
         this.Manager.Add(this._comboDrawable);
 
         this._skipButton = new UiButtonDrawable(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
         "Skip Intro",
         FurballGame.DEFAULT_FONT,
         50,
         Color.Blue,
         Color.White,
         Color.White,
-        new(0),
+        new Vector2(0),
         this.SkipButtonClick
         );
         this._skipButton.OriginType = OriginType.BottomRight;
@@ -144,15 +144,15 @@ public class PlayerScreen : pScreen {
 
         this.Manager.Add(this._skipButton);
 
-        this._lyricDrawable = new(new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.1f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.8f), this.Song);
+        this._lyricDrawable = new LyricDrawable(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.1f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.8f), this.Song);
         this.Manager.Add(this._lyricDrawable);
 
         #region Pause UI
 
         Vector2 pauseUiButtonSize = new(170, 50);
 
-        this._resumeButton = new(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
+        this._resumeButton = new UiButtonDrawable(
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
         "Resume",
         FurballGame.DEFAULT_FONT,
         50,
@@ -165,8 +165,8 @@ public class PlayerScreen : pScreen {
             Depth      = -1f
         };
 
-        this._restartButton = new(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.3f),
+        this._restartButton = new UiButtonDrawable(
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.3f),
         "Restart",
         FurballGame.DEFAULT_FONT,
         50,
@@ -179,8 +179,8 @@ public class PlayerScreen : pScreen {
             Depth      = -1f
         };
 
-        this._quitButton = new(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f),
+        this._quitButton = new UiButtonDrawable(
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f),
         "Quit",
         FurballGame.DEFAULT_FONT,
         50,
@@ -203,7 +203,7 @@ public class PlayerScreen : pScreen {
 
         #endregion
 
-        this.Manager.Add(this._accuracyBar = new AccuracyBarDrawable(new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT), this.Player) {
+        this.Manager.Add(this._accuracyBar = new AccuracyBarDrawable(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT), this.Player) {
             OriginType = OriginType.BottomCenter
         });
         
@@ -219,7 +219,7 @@ public class PlayerScreen : pScreen {
         new ColorTween(
         TweenType.Color,
         pTypingGame.CurrentSongBackground.ColorOverride,
-        new(
+        new Color(
         (float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
         (float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
         (float)(1f * (1f - ConVars.BackgroundDim.Value.Value))

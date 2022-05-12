@@ -56,7 +56,7 @@ public abstract class OnlineManager {
         if (this.State == ConnectionState.LoggedIn)
             return await this.ClientGetScores(hash);
 
-        return new();
+        return new List<PlayerScore>();
     }
 
     public abstract string Username();

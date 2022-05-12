@@ -51,7 +51,7 @@ public class Note {
     [Pure]
     public (string Hiragana, List<string> Romaji) GetTypableRomaji(string typed = "") {
         if (this.IsHit)
-            return (string.Empty, new() {
+            return (string.Empty, new List<string> {
                            string.Empty
                        });
 

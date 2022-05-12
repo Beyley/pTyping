@@ -59,7 +59,7 @@ public class EditorScreen : pScreen {
         base.Initialize();
 
         //Create a copy of the song so that we dont edit it globally
-        this.EditorState = new(pTypingGame.CurrentSong.Value.Copy());
+        this.EditorState = new EditorState(pTypingGame.CurrentSong.Value.Copy());
 
         pTypingGame.MusicTrack.Stop();
 
@@ -72,7 +72,7 @@ public class EditorScreen : pScreen {
 
         Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
-            Scale       = new(0.55f),
+            Scale       = new Vector2(0.55f),
             OriginType  = OriginType.Center,
             Clickable   = false,
             CoverClicks = false,
@@ -112,7 +112,7 @@ public class EditorScreen : pScreen {
 
         TexturedDrawable playfieldBackgroundCover = new(
         ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User),
-        new(0, recepticlePos.Y - 50)
+        new Vector2(0, recepticlePos.Y - 50)
         ) {
             Depth       = -0.95f,
             Clickable   = false,
@@ -188,7 +188,7 @@ public class EditorScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 150, FurballGame.DEFAULT_WINDOW_HEIGHT),
         TexturePositions.EDITOR_PLAY
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.BottomRight
         };
         TexturedDrawable pauseButton = new(
@@ -196,7 +196,7 @@ public class EditorScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 100, FurballGame.DEFAULT_WINDOW_HEIGHT),
         TexturePositions.EDITOR_PAUSE
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.BottomRight
         };
         TexturedDrawable rightButton = new(
@@ -204,7 +204,7 @@ public class EditorScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
         TexturePositions.EDITOR_RIGHT
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.BottomRight
         };
         TexturedDrawable leftButton = new(
@@ -212,7 +212,7 @@ public class EditorScreen : pScreen {
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, FurballGame.DEFAULT_WINDOW_HEIGHT),
         TexturePositions.EDITOR_LEFT
         ) {
-            Scale      = new(0.5f, 0.5f),
+            Scale      = new Vector2(0.5f, 0.5f),
             OriginType = OriginType.BottomRight
         };
 
@@ -256,7 +256,7 @@ public class EditorScreen : pScreen {
 
         float y = 10;
         foreach (EditorTool tool in this.EditorTools) {
-            UiTickboxDrawable tickboxDrawable = new(new(10, y), tool.Name, 35, false, true) {
+            UiTickboxDrawable tickboxDrawable = new(new Vector2(10, y), tool.Name, 35, false, true) {
                 ToolTip = tool.Tooltip
             };
 
@@ -279,14 +279,14 @@ public class EditorScreen : pScreen {
         #region Speed dropdown
 
         this._speedDropdown = new UiDropdownDrawable(
-        new(10, 200),
+        new Vector2(10, 200),
         new List<string> {
             x025,
             x050,
             x075,
             x100
         },
-        new(100, 20),
+        new Vector2(100, 20),
         pTypingGame.JapaneseFont,
         20
         );
@@ -398,7 +398,7 @@ public class EditorScreen : pScreen {
     }
 
     public void CreateEvent(Event @event, bool isNew = false) {
-        ManagedDrawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new(this.CurrentApproachTime(@event.Time), true, true));
+        ManagedDrawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time), true, true));
 
         if (eventDrawable == null) return;
 
@@ -421,12 +421,12 @@ public class EditorScreen : pScreen {
             RawTextDrawable = {
                 Text = $"{note.Text}"
             },
-            Scale      = new(0.55f, 0.55f),
+            Scale      = new Vector2(0.55f, 0.55f),
             OriginType = OriginType.Center,
             Note       = note
         };
 
-        noteDrawable.CreateTweens(new(this.CurrentApproachTime(note.Time), true, true));
+        noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), true, true));
 
         this.Manager.Add(noteDrawable);
         this.EditorState.Notes.Add(noteDrawable);
@@ -685,10 +685,10 @@ public class EditorScreen : pScreen {
         foreach (TimingPoint timingPoint in this.EditorState.Song.TimingPoints) {
             float x = (float)(timingPoint.Time / pTypingGame.MusicTrack.Length * length + startX);
 
-            TexturedDrawable drawable = new(FurballGame.WhitePixel, new(x, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
-                Scale         = new(3, this._progressBar.BarSize.Y + 10),
+            TexturedDrawable drawable = new(FurballGame.WhitePixel, new Vector2(x, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+                Scale         = new Vector2(3, this._progressBar.BarSize.Y + 10),
                 OriginType    = OriginType.BottomCenter,
-                ColorOverride = new(50, 200, 50, 100),
+                ColorOverride = new Color(50, 200, 50, 100),
                 ToolTip = $@"BPM:{60000d / timingPoint.Tempo:#.##}
 ApproachMult:{timingPoint.ApproachMultiplier}"
             };

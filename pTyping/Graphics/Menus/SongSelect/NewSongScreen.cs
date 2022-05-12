@@ -77,13 +77,13 @@ public class NewSongScreen : pScreen {
 
         y = 20f;
 
-        this._songNameTextBox       =  new(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Name of Song", 50, 400f);
+        this._songNameTextBox       =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Name of Song", 50, 400f);
         y                           += 20 + this._songNameTextBox.Size.Y;
-        this._songArtistTextBox     =  new(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Artist", 50, 400f);
+        this._songArtistTextBox     =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Artist", 50, 400f);
         y                           += 20 + this._songArtistTextBox.Size.Y;
-        this._songCreatorTextBox    =  new(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Map Creator Name", 50, 400f);
+        this._songCreatorTextBox    =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Map Creator Name", 50, 400f);
         y                           += 20 + this._songCreatorTextBox.Size.Y;
-        this._songDifficultyTextBox =  new(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Difficulty Name", 50, 400f);
+        this._songDifficultyTextBox =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Difficulty Name", 50, 400f);
 
         this.Manager.Add(this._songNameTextBox);
         this.Manager.Add(this._songArtistTextBox);
@@ -108,7 +108,7 @@ public class NewSongScreen : pScreen {
 
         //Add a default timing point so we dont crash
         song.TimingPoints.Add(
-        new() {
+        new TimingPoint {
             Tempo = 100,
             Time  = 0
         }

@@ -10,9 +10,9 @@ public class UserAction {
     public Bindable<PlayMode>       Mode       = new(PlayMode.pTyping);
 
     public UserAction(UserActionType action, string actionText, PlayMode mode = PlayMode.pTyping) {
-        this.Action     = new(action);
-        this.ActionText = new(actionText);
-        this.Mode       = new(mode);
+        this.Action     = new Bindable<UserActionType>(action);
+        this.ActionText = new Bindable<string>(actionText);
+        this.Mode       = new Bindable<PlayMode>(mode);
     }
 
     public UserAction() {}

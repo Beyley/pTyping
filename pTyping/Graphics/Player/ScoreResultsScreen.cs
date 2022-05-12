@@ -24,12 +24,12 @@ public class ScoreResultsScreen : pScreen {
         #region Title
 
         TextDrawable songTitleText = new(
-        new(10, 10),
+        new Vector2(10, 10),
         pTypingGame.JapaneseFont,
         $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]",
         40
         );
-        TextDrawable songCreatorText = new(new(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
+        TextDrawable songCreatorText = new(new Vector2(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
 
         this.Manager.Add(songTitleText);
         this.Manager.Add(songCreatorText);
@@ -54,7 +54,7 @@ public class ScoreResultsScreen : pScreen {
         };
 
         UiButtonDrawable exitButton = new(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f),
         "Exit",
         FurballGame.DEFAULT_FONT,
         40,
@@ -75,7 +75,7 @@ public class ScoreResultsScreen : pScreen {
         };
 
         UiButtonDrawable watchReplayButton = new(
-        new(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 80f),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 80f),
         "Watch Replay",
         FurballGame.DEFAULT_FONT,
         40,

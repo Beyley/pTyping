@@ -101,11 +101,11 @@ public class Player : CompositeDrawable {
 
         this.BaseApproachTime /= song.Settings.GlobalApproachMultiplier;
 
-        this.Score            = new(this.Song.MapHash, ConVars.Username.Value.Value);
+        this.Score            = new PlayerScore(this.Song.MapHash, ConVars.Username.Value.Value);
         this.Score.Mods       = pTypingGame.SelectedMods;
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 
-        this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User), new(0)) {
+        this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User), new Vector2(0)) {
             Depth = -0.95f
         };
 
@@ -118,7 +118,7 @@ public class Player : CompositeDrawable {
 
 
         this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
-            Scale      = new(0.55f),
+            Scale      = new Vector2(0.55f),
             OriginType = OriginType.Center
         };
 
@@ -158,13 +158,13 @@ public class Player : CompositeDrawable {
         for (int i = 0; i < this.Song.Events.Count; i++) {
             Event @event = this.Song.Events[i];
 
-            ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new(this.CurrentApproachTime(@event.Time)));
+            ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time)));
 
             if (drawable != null) {
                 drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
                 drawable.Depth      = 0f;
 
-                this._events.Add(new(drawable, false));
+                this._events.Add(new Tuple<ManagedDrawable, bool>(drawable, false));
             }
         }
     }
@@ -179,7 +179,7 @@ public class Player : CompositeDrawable {
 
     [Pure]
     private NoteDrawable CreateNote(Note note) {
-        NoteDrawable noteDrawable = new(new(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
+        NoteDrawable noteDrawable = new(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
             TimeSource = pTypingGame.MusicTrackTimeSource,
             NoteTexture = {
                 ColorOverride = note.Color
@@ -192,7 +192,7 @@ public class Player : CompositeDrawable {
             ToTypeTextDrawable = {
                 Text = $"{string.Join("\n", note.TypableRomaji.Romaji)}"
             },
-            Scale      = new(0.55f),
+            Scale      = new Vector2(0.55f),
             Depth      = 0.5f,
             OriginType = OriginType.Center,
             Note       = note
@@ -204,7 +204,7 @@ public class Player : CompositeDrawable {
 
         noteDrawable.UpdateTextPositions();
 
-        noteDrawable.CreateTweens(new(this.CurrentApproachTime(note.Time)));
+        noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time)));
 
         return noteDrawable;
     }
@@ -310,7 +310,7 @@ public class Player : CompositeDrawable {
             this.Drawables.Remove(this._currentTypingIndicator);
 
         if (this._currentTypingIndicator == null) {
-            this._currentTypingIndicator = new(RECEPTICLE_POS, pTypingGame.JapaneseFont, character.ToString(), 60) {
+            this._currentTypingIndicator = new TextDrawable(RECEPTICLE_POS, pTypingGame.JapaneseFont, character.ToString(), 60) {
                 OriginType = OriginType.Center
             };
         } else {
@@ -325,7 +325,7 @@ public class Player : CompositeDrawable {
             //random bool
             bool right = FurballGame.Random.Next(-1, 2) == 1;
 
-            this._currentTypingIndicator.Tweens.Add(new ColorTween(TweenType.Color, new(200, 0, 0, 255), new(200, 0, 0, 0), FurballGame.Time, FurballGame.Time + 400));
+            this._currentTypingIndicator.Tweens.Add(new ColorTween(TweenType.Color, new Color(200, 0, 0, 255), new Color(200, 0, 0, 0), FurballGame.Time, FurballGame.Time + 400));
             this._currentTypingIndicator.Tweens.Add(
             new PathTween(
             new Path(
@@ -340,8 +340,8 @@ public class Player : CompositeDrawable {
             )
             );
         } else {
-            this._currentTypingIndicator.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new(255, 255, 255, 0), FurballGame.Time, FurballGame.Time + 400));
-            this._currentTypingIndicator.Tweens.Add(new VectorTween(TweenType.Scale, new(1f), new(1.5f), FurballGame.Time, FurballGame.Time                + 400));
+            this._currentTypingIndicator.Tweens.Add(new ColorTween(TweenType.Color, Color.White, new Color(255, 255, 255, 0), FurballGame.Time, FurballGame.Time + 400));
+            this._currentTypingIndicator.Tweens.Add(new VectorTween(TweenType.Scale, new Vector2(1f), new Vector2(1.5f), FurballGame.Time, FurballGame.Time                + 400));
         }
 
         this._currentTypingIndicatorIndex++;
@@ -474,7 +474,7 @@ public class Player : CompositeDrawable {
             if (currentTime < drawable.Tweens[0].StartTime) continue;
 
             this.Drawables.Add(drawable);
-            this._events[i] = new(drawable, true);
+            this._events[i] = new Tuple<ManagedDrawable, bool>(drawable, true);
         }
 
         #endregion

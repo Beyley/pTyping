@@ -8,6 +8,7 @@ using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Localization.Languages;
 using Furball.Vixie.Backends.Shared;
+using Furball.Volpe.Evaluation;
 using pTyping.Engine;
 
 namespace pTyping.Graphics.Menus.Options;
@@ -98,7 +99,7 @@ public class OptionsScreen : pScreen {
 
         #region 1600x900 res button
 
-        UiButtonDrawable res1600X900Button = new(new(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        UiButtonDrawable res1600X900Button = new(new Vector2(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 
         res1600X900Button.OnClick += delegate {
             FurballGame.Instance.ChangeScreenSize(1600, 900);
@@ -110,7 +111,7 @@ public class OptionsScreen : pScreen {
 
         #region 1920x1080 res button
 
-        UiButtonDrawable res1920X1080Button = new(new(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        UiButtonDrawable res1920X1080Button = new(new Vector2(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
 
         res1920X1080Button.OnClick += delegate {
             FurballGame.Instance.ChangeScreenSize(1920, 1080);
@@ -133,7 +134,7 @@ public class OptionsScreen : pScreen {
             this._languageDictionary.Add(languageName, language);
         }
 
-        UiDropdownDrawable languageDropdown = new(new(800, 100), languages, new(175, 40), pTypingGame.JapaneseFontStroked, 20);
+        UiDropdownDrawable languageDropdown = new(new Vector2(800, 100), languages, new Vector2(175, 40), pTypingGame.JapaneseFontStroked, 20);
         languageDropdown.SelectedItem.Value = LocalizationManager.CurrentLanguage.ToString();
         languageDropdown.Update();
 
@@ -151,7 +152,7 @@ public class OptionsScreen : pScreen {
     }
 
     private void BackgroundDimInputOnCommit(object sender, string e) {
-        ConVars.BackgroundDim.Value = new(float.Parse(e));
+        ConVars.BackgroundDim.Value = new Value.Number(float.Parse(e));
     }
 
     // private void TargetFpsInputOnCommit(object sender, string e) {
@@ -159,7 +160,7 @@ public class OptionsScreen : pScreen {
     // }
 
     private void UsernameInputOnCommit(object sender, string e) {
-        ConVars.Username.Value = new(e);
+        ConVars.Username.Value = new Value.String(e);
     }
     public override string         Name                 => "Options";
     public override string         State                => "Tweaking the settings!";

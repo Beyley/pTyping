@@ -21,7 +21,7 @@ public class ChangeLogDrawable : CompositeDrawable {
 
         foreach (GitLogEntry entry in Program.GitLog) {
             ChangeLogEntryDrawable drawable = new(entry) {
-                Position = new(0, y)
+                Position = new Vector2(0, y)
             };
 
             this.Drawables.Add(drawable);
@@ -69,12 +69,12 @@ public class ChangeLogDrawable : CompositeDrawable {
         }
 
         public ChangeLogEntryDrawable(GitLogEntry entry) {
-            this._summary = new(new(0, 0), pTypingGame.JapaneseFont, entry.Message, 30) {
+            this._summary = new TextDrawable(new Vector2(0, 0), pTypingGame.JapaneseFont, entry.Message, 30) {
                 Depth = 0f
             };
 
-            this._bottomLine = new(
-            new(0, 30),
+            this._bottomLine = new TextDrawable(
+            new Vector2(0, 30),
             pTypingGame.JapaneseFont,
             $"{entry.Author.TrimEnd(';')} - {ToRelativeDate(entry.Date)} - {entry.Commit.Substring(0, 8)}",
             25
@@ -105,7 +105,7 @@ public class ChangeLogDrawable : CompositeDrawable {
 
         private void OnHovered(object sender, EventArgs e) {
             this._summary.Tweens.Clear();
-            this._summary.FadeColor(new(100, 100, 255), 100);
+            this._summary.FadeColor(new Color(100, 100, 255), 100);
         }
 
         public override void Dispose() {
@@ -137,8 +137,8 @@ public class ChangelogScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        this._changeLogDrawable = new() {
-            Position = new(10),
+        this._changeLogDrawable = new ChangeLogDrawable {
+            Position = new Vector2(10),
             Depth    = 0.5
         };
 
@@ -194,7 +194,7 @@ public class ChangelogScreen : pScreen {
         float y = this._changeLogDrawable.Position.Y;
         y += (float)((this.TargetScroll - adjustedPos.Y) / 200 * gameTime);
 
-        this._changeLogDrawable.Position = new(10, y);
+        this._changeLogDrawable.Position = new Vector2(10, y);
 
         base.Update(gameTime);
     }

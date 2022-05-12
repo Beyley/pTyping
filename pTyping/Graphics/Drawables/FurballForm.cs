@@ -8,6 +8,7 @@ using Furball.Engine.Engine.Helpers;
 using Kettu;
 using pTyping.Engine;
 using Silk.NET.Input;
+using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Drawables;
 
@@ -26,28 +27,28 @@ public class FurballForm : CompositeDrawable {
     public FurballForm(string title, ManagedDrawable contents, OriginType startPosition = OriginType.Center) {
         this.Contents = contents;
 
-        this._title = new(new(2), pTypingGame.JapaneseFont, title, 20) {
+        this._title = new TextDrawable(new Vector2(2), pTypingGame.JapaneseFont, title, 20) {
             Clickable   = false,
             CoverClicks = false,
             Hoverable   = false,
             CoverHovers = false
         };
-        this._closeButton = new(new(this.Contents.Size.X + 8, 2), pTypingGame.JapaneseFont, "x", 20) {
+        this._closeButton = new TextDrawable(new Vector2(this.Contents.Size.X + 8, 2), pTypingGame.JapaneseFont, "x", 20) {
             OriginType = OriginType.TopRight,
             Depth      = 2f
         };
-        this._titleBar = new RectanglePrimitiveDrawable(new(0), new(this.Contents.Size.X + 10, 24), 0, true) {
-            ColorOverride = new(45, 45, 45, 175)
+        this._titleBar = new RectanglePrimitiveDrawable(new Vector2(0), new Vector2(this.Contents.Size.X + 10, 24), 0, true) {
+            ColorOverride = new Color(45, 45, 45, 175)
         };
 
         //We make the background a little bigger so there is margin
-        this._background = new RectanglePrimitiveDrawable(new(0, 24), this.Contents.Size + new Vector2(10), 0, true) {
-            ColorOverride = new(30, 30, 30, 175),
+        this._background = new RectanglePrimitiveDrawable(new Vector2(0, 24), this.Contents.Size + new Vector2(10), 0, true) {
+            ColorOverride = new Color(30, 30, 30, 175),
             Depth         = 0f
         };
 
         //Center it in the margin
-        this.Contents.Position = new(5, 29);
+        this.Contents.Position = new Vector2(5, 29);
 
         //Make sure the contents are above the background
         this.Contents.Depth = 2f;
@@ -62,7 +63,7 @@ public class FurballForm : CompositeDrawable {
         Vector2 size = base.Size;
 
         this.Position = startPosition switch {
-            OriginType.Center => new(FurballGame.DEFAULT_WINDOW_WIDTH / 2f - size.X / 2, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f - size.Y / 2f),
+            OriginType.Center => new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f - size.X / 2, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f - size.Y / 2f),
             _                 => this.Position
         };
 

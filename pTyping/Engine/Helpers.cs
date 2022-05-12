@@ -10,6 +10,6 @@ public static class Helpers {
         temp.H = (temp.H + r) % 360;
 
         Eto.Drawing.Color temp2 = temp.ToColor();
-        return new(temp2.Rb, temp2.Bb, temp2.Gb, temp2.Ab);
+        return new Color(temp2.Rb, temp2.Bb, temp2.Gb, temp2.Ab);
     }
 }

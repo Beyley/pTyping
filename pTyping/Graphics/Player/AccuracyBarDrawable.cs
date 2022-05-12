@@ -61,9 +61,9 @@ public class AccuracyBarDrawable : CompositeDrawable {
     private void OnChar(object sender, double e) {
         const float fadeoutTime = 2000;
         
-        RectanglePrimitiveDrawable rect = new(new Vector2((float) ((this.Width / 2f) + ((this.Width / 2) * (e / this._player.TIMING_POOR))), this.Height), new(this.Width / 50f, this.Height * 2f), 1f, true) {
-            ColorOverride = new(255, 255, 255, 100),
-            OriginType = OriginType.BottomCenter
+        RectanglePrimitiveDrawable rect = new(new Vector2((float) ((this.Width / 2f) + ((this.Width / 2) * (e / this._player.TIMING_POOR))), this.Height), new Vector2(this.Width / 50f, this.Height * 2f), 1f, true) {
+            ColorOverride = new Color(255, 255, 255, 100),
+            OriginType    = OriginType.BottomCenter
         };
         
         rect.Tweens.Add(new ColorTween(TweenType.Color, rect.ColorOverride, new Color(0, 0, 0, 0), FurballGame.Time, FurballGame.Time + fadeoutTime));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Data;
+using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Helpers;
 using JetBrains.Annotations;
@@ -23,7 +24,7 @@ public class UiContainer : CompositeDrawable {
     /// </summary>
     /// <param name="originType">The origin type for the internal elements</param>
     public UiContainer(OriginType originType) {
-        this.ElementOriginType = new(originType);
+        this.ElementOriginType = new Bindable<OriginType>(originType);
 
         this._elements.CollectionChanged += this.Recalculate;
         this.ElementOriginType.OnChange  += this.OnOriginTypeChange;
@@ -62,7 +63,7 @@ public class UiContainer : CompositeDrawable {
             //Update the origin type
             element.Drawable.OriginType = this.ElementOriginType;
 
-            element.Drawable.MoveTo(new(0, y), elementIsAdded ? 0 : this.EasingTime);
+            element.Drawable.MoveTo(new Vector2(0, y), elementIsAdded ? 0 : this.EasingTime);
 
             if (elementIsAdded)
                 element.Drawable.FadeInFromZero(this.EasingTime);

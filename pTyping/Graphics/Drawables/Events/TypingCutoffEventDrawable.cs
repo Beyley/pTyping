@@ -16,7 +16,7 @@ public class TypingCutoffEventDrawable : TexturedDrawable {
         this.Event         = @event;
         this.TimeSource    = pTypingGame.MusicTrackTimeSource;
         this.ColorOverride = Color.LightBlue;
-        this.Scale         = new(0.3f);
+        this.Scale         = new Vector2(0.3f);
         this.OriginType    = OriginType.Center;
     }
 
@@ -35,7 +35,7 @@ public class TypingCutoffEventDrawable : TexturedDrawable {
         this.Tweens.Add(
         new VectorTween(
         TweenType.Movement,
-        new(noteStartPos.X, noteStartPos.Y),
+        new Vector2(noteStartPos.X, noteStartPos.Y),
         recepticlePos,
         (int)(this.Event.Time - tweenArgs.ApproachTime),
         (int)this.Event.Time
@@ -45,7 +45,7 @@ public class TypingCutoffEventDrawable : TexturedDrawable {
         );
 
         this.Tweens.Add(
-        new VectorTween(TweenType.Movement, recepticlePos, new(noteEndPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
+        new VectorTween(TweenType.Movement, recepticlePos, new Vector2(noteEndPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );

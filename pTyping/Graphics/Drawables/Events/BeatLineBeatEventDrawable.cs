@@ -21,8 +21,8 @@ public class BeatLineBeatEventDrawable : TexturedDrawable {
         this.Event         = @event;
         this.TimeSource    = pTypingGame.MusicTrackTimeSource;
         this.OriginType    = OriginType.Center;
-        this.Scale         = new(2, 100);
-        this.ColorOverride = new(1f, 1f, 1f, 0.5f);
+        this.Scale         = new Vector2(2, 100);
+        this.ColorOverride = new Color(1f, 1f, 1f, 0.5f);
     }
 
     public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
@@ -38,13 +38,13 @@ public class BeatLineBeatEventDrawable : TexturedDrawable {
         float afterTravelTime = (recepticlePos.X - endPos.X) * travelRatio;
 
         this.Tweens.Add(
-        new VectorTween(TweenType.Movement, new(startPos.X, startPos.Y), recepticlePos, (int)(this.Event.Time - tweenArgs.ApproachTime), (int)this.Event.Time) {
+        new VectorTween(TweenType.Movement, new Vector2(startPos.X, startPos.Y), recepticlePos, (int)(this.Event.Time - tweenArgs.ApproachTime), (int)this.Event.Time) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );
 
         this.Tweens.Add(
-        new VectorTween(TweenType.Movement, recepticlePos, new(endPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
+        new VectorTween(TweenType.Movement, recepticlePos, new Vector2(endPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );

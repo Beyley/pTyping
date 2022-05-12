@@ -24,7 +24,7 @@ public class UiElement {
 
     public static UiElement CreateButton(FontSystem font, string text, int size, Color buttonColor, Color textColor, Color outlineColor, Vector2 buttonSize) {
         UiElement element = new(UiElementType.Button) {
-            Drawable = new UiButtonDrawable(new(0f), text, font, size, buttonColor, textColor, outlineColor, buttonSize)
+            Drawable = new UiButtonDrawable(new Vector2(0f), text, font, size, buttonColor, textColor, outlineColor, buttonSize)
         };
 
         return element;
@@ -32,7 +32,7 @@ public class UiElement {
 
     public static UiElement CreateDropdown(List<string> items, Vector2 buttonSize, FontSystem font, int fontSize) {
         UiElement element = new(UiElementType.Dropdown) {
-            Drawable = new UiDropdownDrawable(new(0f), items, buttonSize, font, fontSize)
+            Drawable = new UiDropdownDrawable(new Vector2(0f), items, buttonSize, font, fontSize)
         };
 
         return element;
@@ -40,7 +40,7 @@ public class UiElement {
 
     public static UiElement CreateProgressBar(FontSystem font, Vector2 size, Color outlineColor, Color textColor, Color barColor) {
         UiElement element = new(UiElementType.ProgressBar) {
-            Drawable = new UiProgressBarDrawable(new(0), font, size, outlineColor, barColor, textColor)
+            Drawable = new UiProgressBarDrawable(new Vector2(0), font, size, outlineColor, barColor, textColor)
         };
 
         return element;
@@ -48,7 +48,7 @@ public class UiElement {
 
     public static UiElement CreateTextBox(FontSystem font, string text, int size, float width) {
         UiElement element = new(UiElementType.TextBox) {
-            Drawable = new UiTextBoxDrawable(new(0), font, text, size, width)
+            Drawable = new UiTextBoxDrawable(new Vector2(0), font, text, size, width)
         };
 
         return element;
@@ -56,7 +56,7 @@ public class UiElement {
 
     public static UiElement CreateTickBox(string text, int size, bool initialState = false, bool managed = false) {
         UiElement element = new(UiElementType.TickBox) {
-            Drawable = new UiTickboxDrawable(new(0), text, size, initialState, managed)
+            Drawable = new UiTickboxDrawable(new Vector2(0), text, size, initialState, managed)
         };
 
         return element;
@@ -64,7 +64,7 @@ public class UiElement {
 
     public static UiElement CreateText(FontSystem font, string text, int size) {
         UiElement element = new(UiElementType.Text) {
-            Drawable = new TextDrawable(new(0), font, text, size)
+            Drawable = new TextDrawable(new Vector2(0), font, text, size)
         };
 
         return element;
@@ -72,7 +72,7 @@ public class UiElement {
 
     public static UiElement CreateColorPicker(FontSystem font, int size, Color initialColor) {
         UiElement element = new(UiElementType.ColorPicker) {
-            Drawable = new UiColorPickerDrawable(new(0), font, size, initialColor)
+            Drawable = new UiColorPickerDrawable(new Vector2(0), font, size, initialColor)
         };
 
         return element;

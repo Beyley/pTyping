@@ -43,10 +43,10 @@ public class TaikoRsOnlineManager : OnlineManager {
     private readonly Queue<ChatMessage> _chatQueue = new();
 
     public TaikoRsOnlineManager(string wsUri, string httpUri) {
-        this._wsUri   = new(wsUri);
-        this._httpUri = new(httpUri);
+        this._wsUri   = new Uri(wsUri);
+        this._httpUri = new Uri(httpUri);
 
-        this._httpClient = new();
+        this._httpClient = new HttpClient();
     }
 
     public override string Username() => ConVars.Username.Value.Value;
@@ -133,7 +133,7 @@ public class TaikoRsOnlineManager : OnlineManager {
                 SpectatorFramePlay frame = new() {
                     Mode        = PlayMode.pTyping,
                     BeatmapHash = pTypingGame.CurrentSong.Value.MapHash,
-                    Modinfo = new() {
+                    Modinfo = new SpectatorModInfo {
                         Autoplay = false,
                         Speed    = 1f
                     },

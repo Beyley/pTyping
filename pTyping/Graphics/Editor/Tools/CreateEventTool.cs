@@ -35,7 +35,7 @@ public class CreateEventTool : EditorTool {
         this._createLine = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(0, 0)) {
             Visible    = false, 
             TimeSource = pTypingGame.MusicTrackTimeSource,
-            Scale      = new(1, 80)
+            Scale      = new Vector2(1, 80)
         };
 
         this.DrawableManager.Add(this._createLine);
@@ -136,8 +136,8 @@ public class CreateEventTool : EditorTool {
             this._createLine.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            new(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y - 40),
-            new(EditorScreen.RECEPTICLE_POS.X, EditorScreen.RECEPTICLE_POS.Y - 40),
+            new Vector2(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y - 40),
+            new Vector2(EditorScreen.RECEPTICLE_POS.X, EditorScreen.RECEPTICLE_POS.Y - 40),
             (int)(this.EditorInstance.EditorState.MouseTime - this.EditorInstance.CurrentApproachTime(this.EditorInstance.EditorState.MouseTime)),
             (int)this.EditorInstance.EditorState.MouseTime
             )

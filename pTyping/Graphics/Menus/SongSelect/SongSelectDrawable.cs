@@ -22,7 +22,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
         float y = 0;
         foreach (Song song in songList) {
-            SongButtonDrawable drawable = new(new(0, y), song, backgroundTexture);
+            SongButtonDrawable drawable = new(new Vector2(0, y), song, backgroundTexture);
 
             drawable.Tags.Add(y.ToString(CultureInfo.CurrentCulture));
 
@@ -55,14 +55,14 @@ public class SongSelectDrawable : CompositeDrawable {
             this.Song     = song;
             this.Position = pos;
 
-            this._backgroundDrawable = new(backgroundTexture, Vector2.Zero) {
-                Scale = new(0.3f)
+            this._backgroundDrawable = new TexturedDrawable(backgroundTexture, Vector2.Zero) {
+                Scale = new Vector2(0.3f)
 
                 // it doesnt look to good with the texture, so i think ill just leave it out for now
                 // ColorOverride = song.Type == SongType.pTyping ? Color.Blue : Color.Green
             };
 
-            this._titleDrawable = new(new(5), pTypingGame.JapaneseFontStroked, $"{song.Artist} - {song.Name} [{song.Difficulty}]", 30);
+            this._titleDrawable = new TextDrawable(new Vector2(5), pTypingGame.JapaneseFontStroked, $"{song.Artist} - {song.Name} [{song.Difficulty}]", 30);
 
             this.Drawables.Add(this._titleDrawable);
             this.Drawables.Add(this._backgroundDrawable);

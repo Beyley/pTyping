@@ -29,7 +29,7 @@ public static class AutoReplayCreator {
 
                 foreach (char s in currentRomaji) {
                     frames.Add(
-                    new() {
+                    new ReplayFrame {
                         Character = s,
                         Time      = time,
                         Used      = false

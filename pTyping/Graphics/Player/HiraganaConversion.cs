@@ -795,7 +795,7 @@ _	＿
             else
                 CONVERSIONS.Add(
                 hiragana,
-                new() {
+                new List<string> {
                     romaji
                 }
                 );

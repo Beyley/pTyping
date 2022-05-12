@@ -13,8 +13,8 @@ namespace pTyping.Graphics.Drawables.Events;
 public class LyricEventDrawable : TexturedDrawable {
     public readonly LyricEvent Event;
 
-    public LyricEventDrawable(Texture texture, Event @event) : base(texture, new(0)) {
-        this.Scale         = new(0.3f, 0.6f);
+    public LyricEventDrawable(Texture texture, Event @event) : base(texture, new Vector2(0)) {
+        this.Scale         = new Vector2(0.3f, 0.6f);
         this.OriginType    = OriginType.Center;
         this.ColorOverride = Color.CornflowerBlue;
         this.Event         = @event as LyricEvent;
@@ -36,7 +36,7 @@ public class LyricEventDrawable : TexturedDrawable {
         this.Tweens.Add(
         new VectorTween(
         TweenType.Movement,
-        new(noteStartPos.X, noteStartPos.Y),
+        new Vector2(noteStartPos.X, noteStartPos.Y),
         recepticlePos,
         (int)(this.Event.Time - tweenArgs.ApproachTime),
         (int)this.Event.Time
@@ -46,7 +46,7 @@ public class LyricEventDrawable : TexturedDrawable {
         );
 
         this.Tweens.Add(
-        new VectorTween(TweenType.Movement, recepticlePos, new(noteEndPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
+        new VectorTween(TweenType.Movement, recepticlePos, new Vector2(noteEndPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );
