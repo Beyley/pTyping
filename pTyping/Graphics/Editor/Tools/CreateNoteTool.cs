@@ -1,4 +1,6 @@
 using System.Numerics;
+using Furball.Engine;
+using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
@@ -19,12 +21,13 @@ public class CreateNoteTool : EditorTool {
     private UiElement _defaultNoteColor;
     private UiElement _defaultNoteColorLabel;
 
-    private LinePrimitiveDrawable _createLine;
+    private TexturedDrawable _createLine;
 
     public override void Initialize() {
-        this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), Vector2.Zero, Color.White) {
-            Visible    = false,
-            TimeSource = pTypingGame.MusicTrackTimeSource
+        this._createLine = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(0, 0)) {
+            Visible = false, 
+            TimeSource = pTypingGame.MusicTrackTimeSource,
+            Scale = new(1, 80)
         };
 
         this.DrawableManager.Add(this._createLine);

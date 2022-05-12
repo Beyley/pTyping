@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Furball.Engine;
+using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
@@ -15,7 +17,7 @@ public class CreateEventTool : EditorTool {
     public override string Name    => "Create Event";
     public override string Tooltip => "Create events on the timeline";
 
-    private LinePrimitiveDrawable _createLine;
+    private TexturedDrawable _createLine;
 
     private const string BEAT_LINE_BEAT = "Beat Line Event";
     private const string BEAT_LINE_BAR  = "Bar Line Event";
@@ -30,9 +32,10 @@ public class CreateEventTool : EditorTool {
     public UiElement LyricInputLabel;
 
     public override void Initialize() {
-        this._createLine = new LinePrimitiveDrawable(new Vector2(0, 0), Vector2.Zero, Color.White) {
-            Visible    = false,
-            TimeSource = pTypingGame.MusicTrackTimeSource
+        this._createLine = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(0, 0)) {
+            Visible    = false, 
+            TimeSource = pTypingGame.MusicTrackTimeSource,
+            Scale      = new(1, 80)
         };
 
         this.DrawableManager.Add(this._createLine);
