@@ -455,7 +455,7 @@ public class EditorScreen : pScreen {
 
     private void OnMouseMove(object sender, (Vector2 position, string cursorName) e) {
         double currentTime  = this.EditorState.CurrentTime;
-        double reticuleXPos = this._recepticle.Position.X;
+        double reticuleXPos = this._recepticle.RealPosition.X + (this._recepticle.Size.X / 2f);
         double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
 
         double speed = (noteStartPos - reticuleXPos) / this.CurrentApproachTime(currentTime);
