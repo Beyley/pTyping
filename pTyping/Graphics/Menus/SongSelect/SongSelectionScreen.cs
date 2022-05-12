@@ -144,14 +144,19 @@ public class SongSelectionScreen : pScreen {
         #region Leaderboard select
 
         this._leaderboardButton = new TexturedDrawable(TextureFromLeaderboardType(LeaderboardType), new Vector2(10, 10)) {
-            Scale = new Vector2(0.05f),
-            Depth = 0.75f
+            Scale       = new Vector2(0.05f),
+            Depth       = 0.75f,
+            Visible     = !this._editor,
+            CoverClicks = !this._editor,
+            CoverHovers = !this._editor,
+            Clickable   = !this._editor,
+            Hoverable   = !this._editor
         };
 
         this._leaderboardButton.OnClick += this.ChangeLeaderboardType;
 
         this.Manager.Add(this._leaderboardButton);
-
+        
         #endregion
 
         #region Song info
@@ -296,6 +301,8 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
     }
 
     public void UpdateScores() {
+        if (this._editor) return;
+        
         this.Manager.Remove(this._leaderboardDrawable);
 
         List<PlayerScore> origScores = new();
