@@ -713,7 +713,7 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
                                this.EditorState.CurrentTime < note.Note.Time + 1000;
 
                 if (note.EditorHitSoundQueued && note.Note.Time < this.EditorState.CurrentTime) {
-                    this.HitSoundNormal.PlayNew();
+                    if(!this._progressBar.IsClicked) this.HitSoundNormal.PlayNew();
                     note.EditorHitSoundQueued = false;
                 }
             }
