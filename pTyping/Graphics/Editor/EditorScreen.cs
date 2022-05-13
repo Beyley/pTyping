@@ -26,7 +26,6 @@ using pTyping.Graphics.Player;
 using pTyping.Songs;
 using Silk.NET.Input;
 using sowelipisona;
-using TextCopy;
 using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Editor;
@@ -588,13 +587,16 @@ public class EditorScreen : pScreen {
                     return;
                 }
 
+                //The current time
                 long unixTime = UnixTime.Now();
+                //Have 5 seconds elapsed between now and the last press of the button?
                 if (unixTime - this.LastEscapeTime > 5) {
                     this.LastEscapeTime = unixTime;
                     return;
                 }
 
                 if (this.SaveNeeded) {
+                    //TODO: reimplement this somehow, maybe use `FurballForm`?
                     // ResponseType responseType = EtoHelper.MessageDialog(
                     // "Are you sure?",
                     // "Do you want to save before quitting?",
@@ -650,13 +652,13 @@ public class EditorScreen : pScreen {
                     notes.Add(note);
                 }
 
-                ClipboardService.SetText(JsonConvert.SerializeObject(notes));
+                FurballGame.InputManager.Clipboard = JsonConvert.SerializeObject(notes);
 
                 break;
             }
             case Key.V when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
                 try {
-                    List<Note> notes = JsonConvert.DeserializeObject<List<Note>>(ClipboardService.GetText());
+                    List<Note> notes = JsonConvert.DeserializeObject<List<Note>>(FurballGame.InputManager.Clipboard);
 
                     foreach (Note note in notes) {
                         note.Time += this.EditorState.CurrentTime;
