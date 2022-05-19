@@ -15,8 +15,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="html/*.*" CopyToOutputDirectory="Always"/>
-        <PackageReference Include="EeveeTools" Version="1.0.0"/>
+        <None Update="html/*.*" CopyToOutputDirectory="Always" />
+        <PackageReference Include="EeveeTools" Version="1.0.0" />
+        <PackageReference Include="Kettu" Version="1.4.0" />
     </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using EeveeTools.Servers.TCP;
+using Kettu;
 using pTyping.Web.Gopher;
 using pTyping.Web.Http;
 
@@ -19,12 +20,14 @@ public static class Server {
     public static readonly string ExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception("shits fucked man");
 
     private static void Main() {
-
+        Logger.StartLogging();
+        Logger.AddLogger(new ConsoleLogger());
+        
         Thread httpThread = new(
         () => {
             TcpServer httpServer = new(BIND_IP, HTTP_PORT, typeof(HttpClient));
 
-            Console.WriteLine($"Starting HTTP server at {BIND_IP}:{HTTP_PORT}!");
+            Logger.Log($"Starting HTTP server at {BIND_IP}:{HTTP_PORT}!", LoggerLevelHTTPServer.Instance);
 
             httpServer.Start();
         }
@@ -34,7 +37,7 @@ public static class Server {
         () => {
             TcpServer gopherServer = new(BIND_IP, GOPHER_PORT, typeof(GopherClient));
 
-            Console.WriteLine($"Starting Gopher server at {BIND_IP}:{GOPHER_PORT}!");
+            Logger.Log($"Starting Gopher server at {BIND_IP}:{GOPHER_PORT}!", LoggerLevelGopherServer.Instance);
 
             gopherServer.Start();
         }
@@ -43,10 +46,13 @@ public static class Server {
         httpThread.Start();
         gopherThread.Start();
 
-        Console.WriteLine("Press enter to stop the server!");
+        Logger.Log("Press enter to stop the servers!", LoggerLevelServer.Instance);
         Console.ReadLine();
-        Console.WriteLine("Stopping server!");
+        Logger.Log("Stopping servers!", LoggerLevelServer.Instance);
 
+        Logger.Update();
+        Logger.StopLogging();
+        
         Environment.Exit(0);
     }
 }
