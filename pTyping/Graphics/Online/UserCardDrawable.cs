@@ -148,8 +148,6 @@ Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Va
             this._modeIconDrawable.Scale = new Vector2(0.175f);
         }
 
-        Console.WriteLine(f);
-        
         Color color = this.Player.Value.Action.Value.Action.Value switch {
             UserActionType.Idle    => Color.White,
             UserActionType.Ingame  => Color.Green,
