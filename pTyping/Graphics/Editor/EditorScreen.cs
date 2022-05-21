@@ -307,13 +307,14 @@ public class EditorScreen : pScreen {
         FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
         FurballGame.InputManager.OnMouseDrag   += this.OnMouseDrag;
 
-        pTypingGame.UserStatusEditing();
-
         this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
         ConVars.Volume.OnChange    += this.OnVolumeChange;
         this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
     }
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Editing;
+
     private void ProgressBarOnInteract(object sender, Point e) {
         this.ProgressBarOnInteract(sender, (MouseButton.Left, e));
     }
@@ -766,7 +767,7 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
 
     public override string Name  => "Editor";
     public override string State => "Editing a map!";
-    public override string Details => ConVars.Username.Value.Value == pTypingGame.CurrentSong.Value.Creator
+    public override string Details => pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Creator
                                           ? $"Editing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}"
                                           : $"Modding {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}";
 

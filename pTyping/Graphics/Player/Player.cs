@@ -101,7 +101,7 @@ public class Player : CompositeDrawable {
 
         this.BaseApproachTime /= song.Settings.GlobalApproachMultiplier;
 
-        this.Score            = new PlayerScore(this.Song.MapHash, ConVars.Username.Value.Value);
+        this.Score            = new PlayerScore(this.Song.MapHash, pTypingConfig.Instance.Username);
         this.Score.Mods       = pTypingGame.SelectedMods;
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 

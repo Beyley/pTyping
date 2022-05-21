@@ -1,4 +1,6 @@
+using System.Text;
 using Furball.Engine.Engine;
+using Furball.Engine.Engine.Helpers;
 using Furball.Volpe.Evaluation;
 using Kettu;
 using pTyping.Graphics.Player;
@@ -10,8 +12,8 @@ namespace pTyping.Engine;
 public class ConVars {
     public static TypedVariable<Value.Number> Volume        = new("sl_master_volume", new Value.Number(0.05));
     public static TypedVariable<Value.Number> BackgroundDim = new("cl_background_dim", new Value.Number(0.5));
-    public static TypedVariable<Value.String> Username      = new("net_username", new Value.String("beyley"));
-    public static TypedVariable<Value.String> Password      = new("net_password", new Value.String("test"));
+    // public static TypedVariable<Value.String> Username      = new("net_username", new Value.String("beyley"));
+    // public static TypedVariable<Value.String> Password      = new("net_password", new Value.String("test"));
 
     // public static FloatConVar  Volume        = new("sl_master_volume", 0.05f);
     // public static FloatConVar  BackgroundDim = new("cl_background_dim", 0.5f);
@@ -60,8 +62,8 @@ public class ConVars {
     (context, parameters) => {
         if (parameters[0] is not Value.String username || parameters[1] is not Value.String password) return Value.DefaultVoid;
 
-        Username.Value = new Value.String(username.Value);
-        Password.Value = new Value.String(password.Value);
+        pTypingConfig.Instance.Values["username"] = new Value.String(username.Value);
+        pTypingConfig.Instance.Values["password"] = new Value.String(CryptoHelper.GetSha512(Encoding.UTF8.GetBytes(password.Value)));
 
         pTypingGame.OnlineManager.Login();
 

@@ -85,7 +85,7 @@ public class OptionsScreen : pScreen {
         UiTextBoxDrawable usernameInput = new(
         new Vector2(360 + usernameInputLabel.Size.X, 200),
         FurballGame.DEFAULT_FONT,
-        ConVars.Username.Value.Value.ToString(CultureInfo.InvariantCulture),
+        pTypingConfig.Instance.Username,
         30,
         200
         );
@@ -143,9 +143,9 @@ public class OptionsScreen : pScreen {
         this.Manager.Add(languageDropdown);
 
         #endregion
-
-        pTypingGame.UserStatusListening();
     }
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
     private void OnLanguageChange(object _, string s) {
         LocalizationManager.CurrentLanguage = this._languageDictionary[s];
@@ -160,7 +160,7 @@ public class OptionsScreen : pScreen {
     // }
 
     private void UsernameInputOnCommit(object sender, string e) {
-        ConVars.Username.Value = new Value.String(e);
+        pTypingConfig.Instance.Values["username"] = new Value.String(e);
     }
     public override string         Name                 => "Options";
     public override string         State                => "Tweaking the settings!";

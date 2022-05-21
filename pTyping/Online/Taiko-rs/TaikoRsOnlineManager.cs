@@ -49,8 +49,8 @@ public class TaikoRsOnlineManager : OnlineManager {
         this._httpClient = new HttpClient();
     }
 
-    public override string Username() => ConVars.Username.Value.Value;
-    public override string Password() => CryptoHelper.GetSha512(Encoding.UTF8.GetBytes(ConVars.Password.Value.Value));
+    public override string Username() => pTypingConfig.Instance.Username;
+    public override string Password() => pTypingConfig.Instance.Password;
 
     private Thread _sendThread;
     private Thread _replayFrameThread;
@@ -725,6 +725,11 @@ public class TaikoRsOnlineManager : OnlineManager {
     }
 
     protected override void ClientLogout() {
+        if (this._client?.ReadyState == WebSocketState.Connecting) {
+            this._client.Close();
+            return;
+        }
+        
         if (this._client?.ReadyState != WebSocketState.Open) return;
 
         FurballGame.Instance.AfterScreenChange += this.OnScreenChangeAfter;

@@ -9,21 +9,28 @@ public abstract class pScreen : Screen {
     public abstract string Details { get; }
 
     /// <summary>
-    /// Should speed be reset to 0 when this screen is loaded
+    ///     Should speed be reset to 0 when this screen is loaded
     /// </summary>
     public abstract bool ForceSpeedReset { get; }
-    
+
     /// <summary>
-    /// How much to fade the background image to, -1 is dont fade at all and let the screen itself decide
+    ///     How much to fade the background image to, -1 is dont fade at all and let the screen itself decide
     /// </summary>
     public abstract float BackgroundFadeAmount { get; }
 
     /// <summary>
-    /// Should music automatically loop after a song ends
+    ///     Should music automatically loop after a song ends
     /// </summary>
     public abstract MusicLoopState LoopState { get; }
 
+    /// <summary>
+    ///     The type of screen
+    /// </summary>
     public abstract ScreenType ScreenType { get; }
+    /// <summary>
+    ///     The type of user action to display online
+    /// </summary>
+    public abstract ScreenUserActionType OnlineUserActionType { get; }
 }
 
 public enum MusicLoopState {
@@ -36,4 +43,11 @@ public enum MusicLoopState {
 public enum ScreenType {
     Menu,
     Gameplay
+}
+
+public enum ScreenUserActionType {
+    Listening,
+    Editing,
+    ChoosingSong,
+    Playing
 }

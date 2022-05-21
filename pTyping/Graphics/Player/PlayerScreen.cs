@@ -240,8 +240,6 @@ public class PlayerScreen : pScreen {
         if (!this._playingReplay)
             FurballGame.InputManager.OnCharInput += this.Player.TypeCharacter;
 
-        pTypingGame.UserStatusPlaying();
-
         double offset = OffsetManager.GetOffset(this.Song);
 
         if (offset != 0) {
@@ -252,6 +250,9 @@ public class PlayerScreen : pScreen {
         if (!this._playingReplay)
             pTypingGame.OnlineManager.GameScene = this;
     }
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Playing;
+
     private void OnComboUpdate(object sender, Color e) {
         this._comboDrawable.Tweens.Add(
         new ColorTween(

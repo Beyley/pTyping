@@ -130,6 +130,7 @@ public class pTypingGame : FurballGame {
     public static  NotificationManager NotificationManager;
     private static TextDrawable        _OnlineUsersText;
     private static MusicLoopState      CurrentLoopState;
+    private        pScreen             CurrentRealScreen;
 
     public pTypingGame() : base(new MenuScreen()) {
         // this.Window.AllowUserResizing = true;
@@ -162,35 +163,6 @@ public class pTypingGame : FurballGame {
         MenuPlayerUserCard.Player.Value.Action.Value.ActionText.OnChange += (_, _) => MenuPlayerUserCard.UpdateDrawable();
 
         return MenuPlayerUserCard;
-    }
-
-    public static void UserStatusEditing() {
-        if (ConVars.Username.Value.Value == CurrentSong.Value.Creator) {
-            string text = $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
-
-            if (OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.ChangeUserAction(new UserAction(UserActionType.Editing, text));
-        } else {
-            string text = $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
-
-            if (OnlineManager.State == ConnectionState.LoggedIn)
-                OnlineManager.ChangeUserAction(new UserAction(UserActionType.Editing, text));
-        }
-    }
-
-    public static void UserStatusPickingSong() {
-        if (OnlineManager.State != ConnectionState.LoggedIn) return;
-        OnlineManager.ChangeUserAction(new UserAction(UserActionType.Idle, "Choosing a song!"));
-    }
-
-    public static void UserStatusListening() {
-        if (OnlineManager.State != ConnectionState.LoggedIn) return;
-        OnlineManager.ChangeUserAction(new UserAction(UserActionType.Idle, $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}"));
-    }
-
-    public static void UserStatusPlaying() {
-        if (OnlineManager.State != ConnectionState.LoggedIn) return;
-        OnlineManager.ChangeUserAction(new UserAction(UserActionType.Ingame, $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]"));
     }
 
     public static void PlayMusic() {
@@ -396,7 +368,8 @@ public class pTypingGame : FurballGame {
 
         RpcClient.Invoke();
 
-        this.AfterScreenChange += this.OnScreenChange;
+        this.BeforeScreenChange += this.BeforeOnScreenChange;
+        this.AfterScreenChange  += this.OnScreenChange;
 
         Thread thread = new(
         () => {
@@ -450,8 +423,8 @@ public class pTypingGame : FurballGame {
 
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
         DevConsole.VolpeEnvironment.SetVariable(ConVars.BackgroundDim);
-        DevConsole.VolpeEnvironment.SetVariable(ConVars.Username);
-        DevConsole.VolpeEnvironment.SetVariable(ConVars.Password);
+        // DevConsole.VolpeEnvironment.SetVariable(ConVars.Username);
+        // DevConsole.VolpeEnvironment.SetVariable(ConVars.Password);
 
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Login);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.SendMessage);
@@ -460,12 +433,13 @@ public class pTypingGame : FurballGame {
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadAutoReplay);
 
         // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
-        OnlineManager = new TaikoRsOnlineManager("wss://taikors.ayyeve.xyz", "http://127.0.0.1:8000");
+        OnlineManager = new TaikoRsOnlineManager("ws://192.168.0.201:8098", "http://127.0.0.1:8000");
         OnlineManager.Initialize();
 
         OnlineManager.OnLogout += delegate { this._userPanelManager.Visible = false; };
 
-        // OnlineManager.Login();
+        if (pTypingConfig.Instance.Username != string.Empty)
+            OnlineManager.Login();
 
         VolumeSelector = new TextDrawable(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
             OriginType = OriginType.BottomRight, Clickable = false, CoverClicks = false
@@ -514,13 +488,50 @@ public class pTypingGame : FurballGame {
         SelectNewSong();
         PlayMusic();
     }
+    private void BeforeOnScreenChange(object sender, Screen e) {
+        if (e is pScreen s)
+            this.CurrentRealScreen = s;
+    }
     private void OnSongChange(object sender, Song song) {
         string qualifiedAudioPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.AudioPath);
 
         LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
         
         LoadBackgroundFromSong(song);
+
+        UpdateCurrentOnlineStatus(this.CurrentRealScreen);
     }
+
+    public static void UpdateCurrentOnlineStatus(pScreen screen) {
+        if (OnlineManager.State != ConnectionState.LoggedIn || screen == null) return;
+
+        UserActionType actionType = UserActionType.Unknown;
+        string         final      = "Unknown";
+
+        switch (screen.OnlineUserActionType) {
+            case ScreenUserActionType.Listening:
+                actionType = UserActionType.Idle;
+                final      = $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}";
+                break;
+            case ScreenUserActionType.Editing:
+                final = pTypingConfig.Instance.Username == CurrentSong.Value.Creator
+                            ? $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"
+                            : $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+                actionType = UserActionType.Editing;
+                break;
+            case ScreenUserActionType.ChoosingSong:
+                final      = "Choosing a song!";
+                actionType = UserActionType.Idle;
+                break;
+            case ScreenUserActionType.Playing:
+                final      = $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
+                actionType = UserActionType.Ingame;
+                break;
+        }
+
+        OnlineManager.ChangeUserAction(new UserAction(actionType, final));
+    }
+    
     private void OnScreenChange(object _, Screen screen) {
         pScreen actualScreen = screen as pScreen;
 
@@ -528,6 +539,8 @@ public class pTypingGame : FurballGame {
 
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (actualScreen != null) {
+            this.CurrentRealScreen = actualScreen;
+            
             if (actualScreen.BackgroundFadeAmount != -1f)
                 CurrentSongBackground.Tweens.Add(
                 new ColorTween(
@@ -563,6 +576,8 @@ public class pTypingGame : FurballGame {
                     default: throw new ArgumentOutOfRangeException();
                 }
             }
+
+            UpdateCurrentOnlineStatus(actualScreen);
         }
     }
     private static void SetSongLoopState(MusicLoopState loopState) {

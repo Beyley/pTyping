@@ -97,9 +97,9 @@ public class ScoreResultsScreen : pScreen {
         this.Manager.Add(pTypingGame.CurrentSongBackground);
 
         #endregion
-
-        pTypingGame.UserStatusListening();
     }
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
     public override string Name  => "Score Results";
     public override string State => "Looking at scores!";

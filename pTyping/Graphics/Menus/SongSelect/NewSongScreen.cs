@@ -91,9 +91,9 @@ public class NewSongScreen : pScreen {
         this.Manager.Add(this._songDifficultyTextBox);
 
         #endregion
-
-        pTypingGame.UserStatusListening();
     }
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
     private void CreateSong(FileInfo musicFileInfo) {
         if (musicFileInfo.DirectoryName is null) throw new Exception("Song directory is null? how???? wtf are you doing??????");

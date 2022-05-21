@@ -221,9 +221,9 @@ public class SongSelectionScreen : pScreen {
         FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
-
-        pTypingGame.UserStatusPickingSong();
     }
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.ChoosingSong;
 
     private void ChangeLeaderboardType(object sender, (MouseButton button, Point pos) tuple) {
         LeaderboardType.Value = LeaderboardType.Value switch {

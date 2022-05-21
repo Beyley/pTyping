@@ -217,10 +217,11 @@ public class MenuScreen : pScreen {
         // if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
         //     this.LoadSong();
         // else
-        pTypingGame.UserStatusListening();
         this.UpdateStats();
     }
-    
+
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+
     private void OnProgressBarClick(object sender, (MouseButton button, Point pos) e) {
         float x = e.pos.X - this._songProgressBar.RealPosition.X;
 

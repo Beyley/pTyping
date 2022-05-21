@@ -172,6 +172,8 @@ public class ChangelogScreen : pScreen {
         this.Manager.Add(this._changeLogDrawable);
     }
 
+    public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+
     private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
         this.TargetScroll += e.scroll.scrollAmount;
     }

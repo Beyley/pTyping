@@ -13,6 +13,9 @@ public class pTypingConfig : VolpeConfig {
     public bool   UnlimitedFpsMenu     => this.Values["unlimited_fps_menu"].ToBoolean().Value;
     public bool   UnlimitedFpsGameplay => this.Values["unlimited_fps_gameplay"].ToBoolean().Value;
 
+    public string Username => this.Values["username"].ToStringValue().Value;
+    public string Password => this.Values["password"].ToStringValue().Value;
+    
     public static pTypingConfig Instance = new();
     
     public pTypingConfig() {
@@ -22,5 +25,8 @@ public class pTypingConfig : VolpeConfig {
 
         this.Values["unlimited_fps_menu"]     = new Value.Boolean(false);
         this.Values["unlimited_fps_gameplay"] = new Value.Boolean(false);
+
+        this.Values["username"] = new Value.String("");
+        this.Values["password"] = new Value.String("");
     }
 }
