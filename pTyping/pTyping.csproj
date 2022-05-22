@@ -42,7 +42,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="ParallelExtensionsCore" Version="2.1.0" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
-        <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
+        <PackageReference Include="Websocket.Client" Version="4.4.43"/>
     </ItemGroup>
 
     <ItemGroup>

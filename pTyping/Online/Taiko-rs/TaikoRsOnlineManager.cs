@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
-using System.Security.Authentication;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Platform;
+using Kettu;
 using pTyping.Engine;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Menus.SongSelect;
@@ -20,9 +20,8 @@ using pTyping.Graphics.Player;
 using pTyping.Online.Taiko_rs.Packets;
 using pTyping.Scores;
 using pTyping.Songs;
-using WebSocketSharp;
-using ErrorEventArgs=WebSocketSharp.ErrorEventArgs;
-using Logger=Kettu.Logger;
+using Websocket.Client;
+using Websocket.Client.Models;
 
 namespace pTyping.Online.Taiko_rs;
 
@@ -35,10 +34,10 @@ public class TaikoRsOnlineManager : OnlineManager {
 
     private readonly string _scoreSubmitUrl = "/score_submit";
 
-    private readonly Uri       _wsUri;
-    private          WebSocket _client;
+    private readonly Uri             _wsUri;
+    private          WebsocketClient _client;
 
-    public bool IsAlive => this._client.IsAlive;
+    public bool IsAlive => this._client.IsRunning;
 
     private readonly Queue<ChatMessage> _chatQueue = new();
 
@@ -61,41 +60,49 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         this.InvokeOnConnectStart(this);
 
-        this._client = new WebSocket(this._wsUri.ToString());
+        this._client = new WebsocketClient(this._wsUri);
 
-        #region Disable logging
+        // #region Disable logging
+        //
+        // FieldInfo field = this._client.Log.GetType().GetField("_output", BindingFlags.NonPublic | BindingFlags.Instance);
+        // field?.SetValue(this._client.Log, new Action<LogData, string>((_, _) => {}));
+        //
+        // #endregion
 
-        FieldInfo field = this._client.Log.GetType().GetField("_output", BindingFlags.NonPublic | BindingFlags.Instance);
-        field?.SetValue(this._client.Log, new Action<LogData, string>((_, _) => {}));
+        this._client.MessageReceived.Subscribe(this.HandleMessage);
+        this._client.ReconnectionHappened.Subscribe(this.HandleReconnection);
+        this._client.DisconnectionHappened.Subscribe(_ => this.ClientOnClose());
 
-        #endregion
+        this._client.MessageEncoding                = Encoding.UTF8;
+        this._client.IsTextMessageConversionEnabled = false;
+        this._client.IsReconnectionEnabled          = false;
 
-        this._client.OnMessage += this.HandleMessage;
-        this._client.OnClose   += this.ClientOnClose;
-        this._client.OnError   += this.ClientOnError;
-        this._client.OnOpen    += this.ClientOnOpen;
+        this._client.Start();
+    }
 
-        this._client.SslConfiguration.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
+    private void HandleReconnection(ReconnectionInfo reconnectionInfo) {
+        if (reconnectionInfo.Type == ReconnectionType.Initial) {
+            Logger.Log("Connection established", LoggerLevelOnlineInfo.Instance);
 
-        this._client.Compression = CompressionMethod.Deflate;
+            this.InvokeOnConnect(this);
 
-        this._client.Connect();
-        Logger.Log("Connection established", LoggerLevelOnlineInfo.Instance);
+            this._sendPackets = true;
+            this._sendThread  = new Thread(this.PacketSendMain);
+            this._sendThread.Start();
 
-        this.InvokeOnConnect(this);
+            this._spectatorFrameSendThreadRun = true;
+            this._replayFrameThread           = new Thread(this.SpectatorFrameQueueRun);
+            this._replayFrameThread.Start();
 
-        this._sendPackets = true;
-        this._sendThread  = new Thread(this.SpectatorFrameQueueRun);
-        this._sendThread.Start();
+            this._lastFrameSendTime = UnixTime.Now();
 
-        this._spectatorFrameSendThreadRun = true;
-        this._replayFrameThread           = new Thread(this.PacketSendMain);
-        this._replayFrameThread.Start();
+            FurballGame.Instance.AfterScreenChange  += this.OnScreenChangeAfter;
+            FurballGame.Instance.BeforeScreenChange += this.OnScreenChangeBefore;
 
-        this._lastFrameSendTime = UnixTime.Now();
+            this.ClientOnOpen();
 
-        FurballGame.Instance.AfterScreenChange  += this.OnScreenChangeAfter;
-        FurballGame.Instance.BeforeScreenChange += this.OnScreenChangeBefore;
+            this.ClientLogin();
+        }
     }
 
     private long _lastFrameSendTime;
@@ -263,33 +270,41 @@ public class TaikoRsOnlineManager : OnlineManager {
 
     private void PacketSendMain() {
         while (this._sendPackets) {
-            if (this.PacketQueue.TryDequeue(out Packet packet) && this._client.IsAlive) {
-                MemoryStream  s = new();
-                TaikoRsWriter w = new(s);
-                packet.WriteDataToStream(w);
-                this._client.Send(s.ToArray());
-            }
+            if (this._client.NativeClient.State == WebSocketState.Open) {
+                if (this.PacketQueue.TryDequeue(out Packet packet)) {
+                    using MemoryStream  s = new();
+                    using TaikoRsWriter w = new(s);
 
-            if (UnixTime.Now() - this._lastPing > 5) {
-                this._lastPing = UnixTime.Now();
-                this._client.Ping();
+                    packet.WriteDataToStream(w);
+                    this._client.Send(s.ToArray());
+                }
+
+                if (UnixTime.Now() - this._lastPing > 5) {
+                    this._lastPing = UnixTime.Now();
+
+                    using MemoryStream  s = new();
+                    using TaikoRsWriter w = new(s);
+
+                    PingPacket pingPacket = new();
+                    pingPacket.WriteDataToStream(w);
+                }
             }
 
             Thread.Sleep(50);
         }
     }
 
-    private void ClientOnOpen(object sender, EventArgs e) {
+    private void ClientOnOpen() {
         this.State = ConnectionState.Connected;
     }
 
-    private void ClientOnError(object sender, ErrorEventArgs e) {
+    private void ClientOnError() {
         this.State = ConnectionState.Disconnected;
         this.Disconnect();
         this.ScheduleAutomaticReconnect();
     }
 
-    private void ClientOnClose(object sender, CloseEventArgs e) {
+    private void ClientOnClose() {
         this.State = ConnectionState.Disconnected;
         this.Disconnect();
     }
@@ -352,16 +367,8 @@ public class TaikoRsOnlineManager : OnlineManager {
         return scores;
     }
 
-    private static void CheckMessageIntegrity(MessageEventArgs args) {
-        if (args.IsText) throw new InvalidDataException("Recieved non-binary data!");
-
-        if (args.RawData.Length == 0) throw new InvalidDataException("Recieved empty data packet!");
-    }
-
-    private void HandleMessage(object sender, MessageEventArgs args) {
-        CheckMessageIntegrity(args);
-
-        MemoryStream  stream = new(args.RawData);
+    private void HandleMessage(ResponseMessage args) {
+        MemoryStream  stream = new(args.Binary);
         TaikoRsReader reader = new(stream);
 
         PacketId pid = reader.ReadPacketId();
@@ -704,8 +711,8 @@ public class TaikoRsOnlineManager : OnlineManager {
 
         this.PacketQueue.Clear();
 
-        if (this._client?.IsAlive ?? false)
-            this._client.Close(CloseStatusCode.Normal, "Client Disconnecting");
+        if (this._client?.IsRunning ?? false)
+            this._client.Stop(WebSocketCloseStatus.NormalClosure, "Client Disconnecting");
 
         this.InvokeOnDisconnect(this);
         this.State = ConnectionState.Disconnected;
@@ -725,12 +732,14 @@ public class TaikoRsOnlineManager : OnlineManager {
     }
 
     protected override void ClientLogout() {
-        if (this._client?.ReadyState == WebSocketState.Connecting) {
-            this._client.Close();
-            return;
+        try {
+            if (this._client != null)
+                this._client.NativeClient.Abort();
         }
-        
-        if (this._client?.ReadyState != WebSocketState.Open) return;
+        catch {/* */
+        }
+
+        // if (this._client?.ReadyState != WebSocketState.Open) return;
 
         FurballGame.Instance.AfterScreenChange += this.OnScreenChangeAfter;
 

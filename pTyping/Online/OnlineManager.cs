@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
 using System.Threading.Tasks;
 using Furball.Engine;
 using Hellosam.Net.Collections;
@@ -102,15 +101,8 @@ public abstract class OnlineManager {
         }
 
         pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Logging in...");
-        new Thread(
-        () => {
-            if (this.State == ConnectionState.Disconnected)
-                this.Connect();
-
-            if (this.State != ConnectionState.Disconnected)
-                this.ClientLogin();
-        }
-        ).Start();
+        if (this.State == ConnectionState.Disconnected)
+            this.Connect();
     }
 
     public void ScheduleAutomaticReconnect() {
