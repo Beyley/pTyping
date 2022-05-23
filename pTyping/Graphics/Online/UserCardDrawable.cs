@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -29,39 +30,39 @@ public class UserCardDrawable : CompositeDrawable {
         this.Drawables.Add(
         this._backgroundDrawable = new TexturedDrawable(ContentManager.LoadTextureFromFile("user-card.png", ContentSource.User), new Vector2(0f)) {
             Clickable   = false,
-            CoverClicks = false
+            CoverClicks = false,
+            CoverHovers = false,
+            Hoverable   = false
         }
         );
         this.Drawables.Add(
         this._usernameDrawable = new TextDrawable(new Vector2(15f), pTypingGame.FurballFontRegular, "", 55) {
             Scale       = new Vector2(1.7f),
             Clickable   = false,
-            CoverClicks = false
+            CoverClicks = false,
+            CoverHovers = false,
+            Hoverable   = false
         }
         );
-        if (player.Action.Value.Mode.Value != PlayMode.Unknown)
-            this.Drawables.Add(
-            this._modeIconDrawable = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(0f)) {
-                Scale       = new Vector2(0f),
-                Clickable   = false,
-                CoverClicks = false
-            }
-            );
-        else
-            this.Drawables.Add(
-            this._modeIconDrawable = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(0f)) {
-                Scale       = new Vector2(0f),
-                Clickable   = false,
-                CoverClicks = false
-            }
-            );
+        this.Drawables.Add(
+        this._modeIconDrawable = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(0f)) {
+            Scale       = new Vector2(0f),
+            Clickable   = false,
+            CoverClicks = false,
+            CoverHovers = false,
+            Hoverable   = false,
+            OriginType  = OriginType.TopRight
+        }
+        );
 
         this.Drawables.Add(
         this._rankDrawable = new TextDrawable(new Vector2(0, 0), pTypingGame.FurballFontRegular, "", 175) {
             Scale         = new Vector2(2f),
             ColorOverride = new Color(255, 255, 255, 100),
             Clickable     = false,
-            CoverClicks   = false
+            CoverClicks   = false,
+            CoverHovers   = false,
+            Hoverable     = false
         }
         );
 
@@ -72,7 +73,9 @@ public class UserCardDrawable : CompositeDrawable {
             Scale       = new Vector2(1.7f),
             Visible     = true,
             Clickable   = false,
-            CoverClicks = false
+            CoverClicks = false,
+            CoverHovers = false,
+            Hoverable   = false
         }
         );
         this.Drawables.Add(
@@ -80,7 +83,9 @@ public class UserCardDrawable : CompositeDrawable {
             Scale       = new Vector2(1.7f),
             Visible     = true,
             Clickable   = false,
-            CoverClicks = false
+            CoverClicks = false,
+            CoverHovers = false,
+            Hoverable   = false
         }
         );
 
@@ -131,6 +136,19 @@ public class UserCardDrawable : CompositeDrawable {
         };
     }
 
+    private static readonly Dictionary<string, Texture> _TextureCache = new();
+
+    private static Texture GetTextureForMode(string mode) {
+        if (_TextureCache.TryGetValue(mode, out Texture tex))
+            return tex;
+
+        tex = ContentManager.LoadTextureFromFile(mode, ContentSource.User);
+
+        _TextureCache[mode] = tex;
+
+        return tex;
+    }
+    
     public void UpdateDrawable() {
         this._usernameDrawable.Text = $@"{this.Player.Value.Username}";
         this._mainTextDrawable.Text = $@"Total Score: {this.Player.Value.TotalScore}
@@ -144,7 +162,7 @@ Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Va
             this._modeIconDrawable.SetTexture(FurballGame.WhitePixel);
             this._modeIconDrawable.Scale = new Vector2(0f);
         } else {
-            this._modeIconDrawable.SetTexture(ContentManager.LoadTextureFromFile(f, ContentSource.User));
+            this._modeIconDrawable.SetTexture(GetTextureForMode(f));
             this._modeIconDrawable.Scale = new Vector2(0.175f);
         }
 
