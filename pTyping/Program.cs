@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using EeveeTools.Helpers;
+using Furball.Engine.Engine.Platform;
 using Newtonsoft.Json;
 using Silk.NET.Windowing;
 
@@ -56,30 +58,23 @@ internal class Program {
 
         using pTypingGame game = new();
 
-#if RELEASE
+        WindowOptions options = WindowOptions.Default with {
+            VSync = false,
+            WindowBorder = WindowBorder.Fixed
+        };
+        if (RuntimeInfo.IsDebug())
+            game.Run(options);
+        else
             try {
-#endif
-                WindowOptions options = WindowOptions.Default with {
-                    VSync = false,
-                    WindowBorder = WindowBorder.Fixed
-                };
-
                 game.Run(options);
-#if RELEASE
             }
             catch (Exception ex) {
-                //TODO: clean this shit up dear god what is this
-                string fileName = $"crashlog-{UnixTime.Now()}";
-                
-                FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
-                stream.Close();
+                using FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
+                using StreamWriter writer = new(stream);
 
-                File.WriteAllText(fileName, ex.ToString());
+                writer.Write(ex.ToString());
 
-                game.Dispose();
-
-                Environment.Exit(1);
+                game.WindowManager.Close();
             }
-#endif
     }
 }

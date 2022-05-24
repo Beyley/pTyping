@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
@@ -141,6 +142,18 @@ public class OptionsScreen : pScreen {
         languageDropdown.SelectedItem.OnChange += this.OnLanguageChange;
 
         this.Manager.Add(languageDropdown);
+
+        #endregion
+
+        #region Crash Button
+
+        UiButtonDrawable crash = new(new(400, 400), "Crash the game", pTypingGame.JapaneseFont, 30, Color.Red, Color.White, Color.Black, Vector2.Zero);
+
+        crash.OnClick += delegate {
+            throw new Exception("Manual crash.");
+        };
+
+        this.Manager.Add(crash);
 
         #endregion
     }
