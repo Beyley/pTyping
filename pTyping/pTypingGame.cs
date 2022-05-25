@@ -432,11 +432,11 @@ public class pTypingGame : FurballGame {
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadUTypingReplay);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadAutoReplay);
 
-        // OnlineManager = new TaikoRsOnlineManager("ws://localhost:8080", "http://127.0.0.1:8000");
-        OnlineManager = new TaikoRsOnlineManager("ws://192.168.0.201:8098", "http://127.0.0.1:8000");
+        OnlineManager = new TaikoRsOnlineManager(pTypingConfig.Instance.ServerWebsocketUrl, pTypingConfig.Instance.ServerWebUrl);
         OnlineManager.Initialize();
 
-        OnlineManager.OnLogout += delegate { this._userPanelManager.Visible = false; };
+        OnlineManager.OnLogout     += delegate { this._userPanelManager.Visible = false; };
+        OnlineManager.OnDisconnect += delegate { this._userPanelManager.Visible = false; }; 
 
         if (pTypingConfig.Instance.Username != string.Empty)
             OnlineManager.Login();

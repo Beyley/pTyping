@@ -12,10 +12,6 @@ public static class OffsetManager {
         public static readonly OffsetConfig Instance = new();
     }
 
-    // public static Dictionary<string, double> Offsets = new();
-
-    // public const string FILENAME = "offsets.json";
-
     public static void Initialize() {
         OffsetConfig.Instance.Load();
     }
