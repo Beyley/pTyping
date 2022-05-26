@@ -55,7 +55,13 @@ internal class Program {
                 GitLog = JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
             }
         }
-
+        Process[] processes    = Process.GetProcesses();
+        int       pTypingCount = -1;
+        foreach (Process process in processes)
+            if (process.ProcessName.Contains("pTyping"))
+                pTypingCount++;
+        Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", pTypingCount.ToString());
+        
         using pTypingGame game = new();
 
         WindowOptions options = WindowOptions.Default with {

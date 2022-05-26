@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie.Backends.Veld
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie.OpenGLDetector", "Furball\Furball.Vixie\Furball.Vixie.OpenGLDetector\Furball.Vixie.OpenGLDetector.csproj", "{F9E293FD-7E0A-4760-B131-2A3B8E681F2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordSDK", "DiscordSDK\DiscordSDK.csproj", "{FDDCA9C3-18D0-4A6D-8231-5674442308FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{F9E293FD-7E0A-4760-B131-2A3B8E681F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9E293FD-7E0A-4760-B131-2A3B8E681F2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9E293FD-7E0A-4760-B131-2A3B8E681F2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDDCA9C3-18D0-4A6D-8231-5674442308FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDDCA9C3-18D0-4A6D-8231-5674442308FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDDCA9C3-18D0-4A6D-8231-5674442308FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDDCA9C3-18D0-4A6D-8231-5674442308FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}

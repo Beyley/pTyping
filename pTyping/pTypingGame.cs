@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
-using DiscordRPC;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -123,9 +121,6 @@ public class pTypingGame : FurballGame {
     private ChatDrawable    _chatDrawable;
 
     public static List<PlayerMod> SelectedMods = new();
-
-    public static DiscordRpcClient RpcClient;
-    public static RichPresence     RichPresence = new();
 
     public static  NotificationManager NotificationManager;
     private static TextDrawable        _OnlineUsersText;
@@ -296,9 +291,15 @@ public class pTypingGame : FurballGame {
     public static void SelectNewSong() {
         CurrentSong.Value = SongManager.Songs[Random.Next(SongManager.Songs.Count)];
     }
-    
-    protected override void Update(double gameTime) {
-        base.Update(gameTime);
+
+    protected override void Update(double deltaTime) {
+        base.Update(deltaTime);
+        try {
+            DiscordManager.Update(deltaTime);
+        }
+        catch {
+            Console.WriteLine("RPC FAILED");
+        }
 
         if (MusicTrack != null) {
             if (CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
@@ -314,20 +315,20 @@ public class pTypingGame : FurballGame {
             }
         }
 
-        
-        this._musicTrackSchedulerDelta += gameTime * 1000;
+
+        this._musicTrackSchedulerDelta += deltaTime * 1000;
         if (this._musicTrackSchedulerDelta > 10) {
             if (MusicTrack != null)
                 MusicTrackScheduler.Update((int) MusicTrack.CurrentPosition);
             this._musicTrackSchedulerDelta = 0;
         }
 
-        OnlineManager.Update(gameTime);
+        OnlineManager.Update(deltaTime);
 
         if (this._userPanelManager.Visible)
-            this._userPanelManager.Update(gameTime);
+            this._userPanelManager.Update(deltaTime);
 
-        NotificationManager.Update(gameTime);
+        NotificationManager.Update(deltaTime);
     }
 
     protected override void Draw(double gameTime) {
@@ -352,7 +353,7 @@ public class pTypingGame : FurballGame {
         // if (OnlineManager.State == ConnectionState.LoggedIn)
         OnlineManager.Logout();
 
-        RpcClient.Dispose();
+        DiscordManager.Dispose();
 
         OffsetManager.Save();
 
@@ -362,42 +363,10 @@ public class pTypingGame : FurballGame {
     }
 
     protected override void Initialize() {
-        RpcClient = new DiscordRpcClient("908631391934222366");
-
-        RpcClient.Initialize();
-
-        RpcClient.Invoke();
-
+        DiscordManager.Initialize();
+        
         this.BeforeScreenChange += this.BeforeOnScreenChange;
         this.AfterScreenChange  += this.OnScreenChange;
-
-        Thread thread = new(
-        () => {
-            Thread.Sleep(1000);
-
-            while (true) {
-                if (RpcClient.IsDisposed) return;
-
-                if (RpcClient.CurrentUser == null) {
-                    Thread.Sleep(1000);
-                    continue;
-                }
-
-                pScreen screen = Instance.RunningScreen as pScreen;
-
-                RichPresence.State   = screen?.State;
-                RichPresence.Details = screen?.Details;
-
-                RpcClient.SetPresence(RichPresence);
-                RpcClient.Invoke();
-
-                Thread.Sleep(1000);
-            }
-        }
-        );
-        thread.Start();
-
-        // DevConsole.AddConVarStore(typeof(ConVars));
 
         OffsetManager.Initialize();
 
@@ -423,8 +392,6 @@ public class pTypingGame : FurballGame {
 
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
         DevConsole.VolpeEnvironment.SetVariable(ConVars.BackgroundDim);
-        // DevConsole.VolpeEnvironment.SetVariable(ConVars.Username);
-        // DevConsole.VolpeEnvironment.SetVariable(ConVars.Password);
 
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Login);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.SendMessage);
@@ -435,8 +402,14 @@ public class pTypingGame : FurballGame {
         OnlineManager = new TaikoRsOnlineManager(pTypingConfig.Instance.ServerWebsocketUrl, pTypingConfig.Instance.ServerWebUrl);
         OnlineManager.Initialize();
 
-        OnlineManager.OnLogout     += delegate { this._userPanelManager.Visible = false; };
-        OnlineManager.OnDisconnect += delegate { this._userPanelManager.Visible = false; }; 
+        OnlineManager.OnLogout += delegate {
+            if (this._userPanelManager != null)
+                this._userPanelManager.Visible = false;
+        };
+        OnlineManager.OnDisconnect += delegate {
+            if (this._userPanelManager != null)
+                this._userPanelManager.Visible = false;
+        }; 
 
         if (pTypingConfig.Instance.Username != string.Empty)
             OnlineManager.Login();
@@ -488,6 +461,7 @@ public class pTypingGame : FurballGame {
         SelectNewSong();
         PlayMusic();
     }
+    
     private void BeforeOnScreenChange(object sender, Screen e) {
         if (e is pScreen s)
             this.CurrentRealScreen = s;

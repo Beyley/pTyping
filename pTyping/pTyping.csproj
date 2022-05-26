@@ -15,6 +15,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\DiscordSDK\DiscordSDK.csproj"/>
         <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
     </ItemGroup>
 
@@ -29,10 +30,10 @@
         <None Update="Content/*.wav" CopyToOutputDirectory="Always" />
         <None Update="Content/*.ttf" CopyToOutputDirectory="Always" />
         <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always" />
+        <None Update="runtimes/**" CopyToOutputDirectory="Always"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
         <PackageReference Include="EeveeTools" Version="1.0.0" />
         <PackageReference Include="hellosam.net.collections" Version="1.0.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
