@@ -156,6 +156,18 @@ public class OptionsScreen : pScreen {
         this.Manager.Add(crash);
 
         #endregion
+
+        #region Lobby test
+
+        UiButtonDrawable lobbyTest = new(new(400, 500), "Crate a lobby", pTypingGame.JapaneseFont, 30, Color.Red, Color.White, Color.Black, Vector2.Zero);
+
+        lobbyTest.OnClick += delegate {
+            DiscordManager.CreateLobby();
+        };
+
+        this.Manager.Add(lobbyTest);
+
+        #endregion
     }
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;

@@ -1295,9 +1295,11 @@ public class UserManager {
         callback(result, ref user);
     }
 
+    private static readonly FFIMethods.GetUserCallback getUserCallback = GetUserCallbackImpl;
+    
     public void GetUser(long userId, GetUserHandler callback) {
         GCHandle wrapped = GCHandle.Alloc(callback);
-        this.Methods.GetUser(this.MethodsPtr, userId, GCHandle.ToIntPtr(wrapped), GetUserCallbackImpl);
+        this.Methods.GetUser(this.MethodsPtr, userId, GCHandle.ToIntPtr(wrapped), getUserCallback);
     }
 
     public PremiumType GetCurrentUserPremiumType() {
@@ -1563,9 +1565,11 @@ public partial class ActivityManager {
         callback(result);
     }
 
+    private static readonly FFIMethods.UpdateActivityCallback UpdateActivityCallback = UpdateActivityCallbackImpl;
+    
     public void UpdateActivity(Activity activity, UpdateActivityHandler callback) {
         GCHandle wrapped = GCHandle.Alloc(callback);
-        this.Methods.UpdateActivity(this.MethodsPtr, ref activity, GCHandle.ToIntPtr(wrapped), UpdateActivityCallbackImpl);
+        this.Methods.UpdateActivity(this.MethodsPtr, ref activity, GCHandle.ToIntPtr(wrapped), UpdateActivityCallback);
     }
 
     [MonoPInvokeCallback]
@@ -2160,9 +2164,11 @@ public partial class LobbyManager {
         callback(result, ref lobby);
     }
 
+    private static readonly FFIMethods.CreateLobbyCallback createLobbyCallback = CreateLobbyCallbackImpl;
+
     public void CreateLobby(LobbyTransaction transaction, CreateLobbyHandler callback) {
         GCHandle wrapped = GCHandle.Alloc(callback);
-        this.Methods.CreateLobby(this.MethodsPtr, transaction.MethodsPtr, GCHandle.ToIntPtr(wrapped), CreateLobbyCallbackImpl);
+        this.Methods.CreateLobby(this.MethodsPtr, transaction.MethodsPtr, GCHandle.ToIntPtr(wrapped), createLobbyCallback);
         transaction.MethodsPtr = IntPtr.Zero;
     }
 
@@ -2214,9 +2220,11 @@ public partial class LobbyManager {
         callback(result, ref lobby);
     }
 
+    private static readonly FFIMethods.ConnectLobbyWithActivitySecretCallback ConnectLobbyWithActivitySecretCallback = ConnectLobbyWithActivitySecretCallbackImpl;
+    
     public void ConnectLobbyWithActivitySecret(string activitySecret, ConnectLobbyWithActivitySecretHandler callback) {
         GCHandle wrapped = GCHandle.Alloc(callback);
-        this.Methods.ConnectLobbyWithActivitySecret(this.MethodsPtr, activitySecret, GCHandle.ToIntPtr(wrapped), ConnectLobbyWithActivitySecretCallbackImpl);
+        this.Methods.ConnectLobbyWithActivitySecret(this.MethodsPtr, activitySecret, GCHandle.ToIntPtr(wrapped), ConnectLobbyWithActivitySecretCallback);
     }
 
     [MonoPInvokeCallback]
