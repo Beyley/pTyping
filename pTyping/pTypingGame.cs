@@ -294,12 +294,7 @@ public class pTypingGame : FurballGame {
 
     protected override void Update(double deltaTime) {
         base.Update(deltaTime);
-        try {
-            DiscordManager.Update(deltaTime);
-        }
-        catch {
-            Console.WriteLine("RPC FAILED");
-        }
+        DiscordManager.Update(deltaTime);
 
         if (MusicTrack != null) {
             if (CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
@@ -358,6 +353,8 @@ public class pTypingGame : FurballGame {
         OffsetManager.Save();
 
         pTypingConfig.Instance.Save();
+
+        DiscordManager.Client.Dispose();
 
         base.OnClosing();
     }
@@ -499,6 +496,14 @@ public class pTypingGame : FurballGame {
                 break;
             case ScreenUserActionType.Playing:
                 final      = $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
+                actionType = UserActionType.Ingame;
+                break;
+            case ScreenUserActionType.Lobbying:
+                final      = $"Partying to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
+                actionType = UserActionType.Idle;
+                break;
+            case ScreenUserActionType.Multiplaying:
+                final      = $"Multiplaying {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
                 actionType = UserActionType.Ingame;
                 break;
         }

@@ -18,6 +18,7 @@ using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
+using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
@@ -221,6 +222,15 @@ public class SongSelectionScreen : pScreen {
         FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
+
+        this._modScreen.OnModAdd += this.ModScreenOnOnModAdd;
+    }
+
+    private void ModScreenOnOnModAdd(object sender, EventArgs e) {
+        double speed = 1f;
+        foreach (PlayerMod moditer in pTypingGame.SelectedMods)
+            speed *= moditer.SpeedMultiplier();
+        pTypingGame.MusicTrack.SetSpeed(speed);
     }
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.ChoosingSong;

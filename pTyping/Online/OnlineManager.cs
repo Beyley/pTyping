@@ -95,6 +95,8 @@ public abstract class OnlineManager {
     protected void            InvokeOnDisconnect(object sender) => this.OnDisconnect?.Invoke(sender, null);
     public event EventHandler OnDisconnect;
 
+    public OnlineLobby OnlineLobby = null;
+    
     public void Login() {
         lock (this.OnlinePlayers) {
             this.OnlinePlayers.Clear();

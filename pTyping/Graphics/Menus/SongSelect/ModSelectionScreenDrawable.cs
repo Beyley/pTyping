@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Furball.Engine;
@@ -15,6 +16,7 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
     private readonly Color _selectedColor   = Color.Blue;
 
     private readonly TextDrawable _scoreMultiplier;
+    public event EventHandler     OnModAdd;
 
     public ModSelectionScreenDrawable(Vector2 pos) {
         this.Position = pos;
@@ -83,12 +85,8 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
             modButton.FadeColor(this._selectedColor, 100);
         }
 
-        double speed = 1f;
-        foreach (PlayerMod moditer in pTypingGame.SelectedMods) {
-            speed *= moditer.SpeedMultiplier();
-        }
-        pTypingGame.MusicTrack.SetSpeed(speed);
-        
+        this.OnModAdd?.Invoke(this, EventArgs.Empty);
+
         this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
     }
 }

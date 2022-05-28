@@ -49,5 +49,7 @@ public enum ScreenUserActionType {
     Listening,
     Editing,
     ChoosingSong,
-    Playing
+    Playing,
+    Lobbying,
+    Multiplaying
 }

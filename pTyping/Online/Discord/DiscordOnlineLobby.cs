@@ -21,8 +21,22 @@ public class DiscordOnlineLobby : OnlineLobby {
         DiscordManager.LobbyManager.OnMemberConnect    += this.OnMemberConnect;
         DiscordManager.LobbyManager.OnMemberDisconnect += this.OnMemberDisconnect;
         DiscordManager.LobbyManager.OnLobbyUpdate      += this.OnLobbyUpdate;
+        DiscordManager.LobbyManager.OnLobbyDelete      += this.OnLobbyDelete;
 
         this.LobbySize = this.GetDiscordLobby().Capacity;
+
+        this.UpdateSlots();
+    }
+    private void OnLobbyDelete(long lobbyid, uint reason) {
+        this.Dispose();
+        this.OnClosed();
+    }
+
+    private void Dispose() {
+        DiscordManager.LobbyManager.OnMemberConnect    -= this.OnMemberConnect;
+        DiscordManager.LobbyManager.OnMemberDisconnect -= this.OnMemberDisconnect;
+        DiscordManager.LobbyManager.OnLobbyUpdate      -= this.OnLobbyUpdate;
+        DiscordManager.LobbyManager.OnLobbyDelete      -= this.OnLobbyDelete;
     }
 
     private Lobby GetDiscordLobby() => DiscordManager.LobbyManager.GetLobby(this.lobby.Value!.Value.Id);
@@ -30,31 +44,28 @@ public class DiscordOnlineLobby : OnlineLobby {
     private void UpdateSlots() {
         IEnumerable<User>       memberUsers = DiscordManager.LobbyManager.GetMemberUsers(this.lobby.Value!.Value.Id);
         using IEnumerator<User> enumerator  = memberUsers.GetEnumerator();
-        for (int i = 0; i < this.LobbySlots.Length; i++) {
-            User current = enumerator.Current;
+        if (enumerator.MoveNext())
+            for (int i = 0; i < this.LobbySlots.Length; i++) {
+                User current = enumerator.Current;
 
-            if (enumerator.MoveNext())
                 this.LobbySlots[i] = current.Id;
-            else
-                this.LobbySlots[i] = 0;
-        }
+                enumerator.MoveNext();
+            }
     }
 
     private void OnLobbyUpdate(long lobbyid) {
         this.LobbySize = this.GetDiscordLobby().Capacity;
 
         this.lobby.Value = DiscordManager.LobbyManager.GetLobby(this.lobby.Value!.Value.Id);
+
+        this.OnGeneralUpdate();
     }
     private void OnMemberConnect(long lobbyid, long userid) {
-        this.OnUserJoined(userid);
-
         pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"{this.GetUsername(userid)} has joined your lobby!");
-
         this.UpdateSlots();
+        this.OnUserJoined(userid);
     }
     private void OnMemberDisconnect(long lobbyid, long userid) {
-        this.OnUserLeft(userid);
-
         DiscordManager.UserManager.GetUser(
         userid,
         (Result result, ref User user) => {
@@ -68,17 +79,48 @@ public class DiscordOnlineLobby : OnlineLobby {
         );
 
         this.UpdateSlots();
+        this.OnUserLeft(userid);
     }
 
     public override void DisconnectUser(long id) {
         throw new NotImplementedException();
     }
 
+    public override string Name {
+        get => DiscordManager.LobbyManager.GetLobbyMetadataValue(this.lobby.Value!.Value.Id, "name");
+        set {
+            LobbyTransaction transaction = DiscordManager.LobbyManager.GetLobbyCreateTransaction();
+
+            transaction.SetMetadata("name", value);
+
+            DiscordManager.LobbyManager.UpdateLobby(
+            this.lobby.Value!.Value.Id,
+            transaction,
+            result => {
+                if (result != Result.Ok)
+                    pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Unable to change lobby name! err:{result}");
+            }
+            );
+        }
+    }
     public override string GetUsername(long id) => DiscordManager.LobbyManager.GetMemberUser(this.lobby.Value!.Value.Id, id).Username;
 
-    public override void Dispose() {
+    public override void Leave() {
         DiscordManager.LobbyManager.OnMemberConnect -= this.OnMemberConnect;
-
         this.Pipe.Disconnect();
+
+        DiscordManager.LobbyManager.DisconnectLobby(
+        this.lobby.Value!.Value.Id,
+        delegate(Result result) {
+            if (result != Result.Ok) {
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Error leaving lobby! err:{result}");
+                return;
+            }
+
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Left lobby!");
+        }
+        );
+
+        this.Dispose();
     }
 }

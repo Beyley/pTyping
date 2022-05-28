@@ -25,6 +25,8 @@ public abstract class OnlineLobby {
 
     public event EventHandler<long> UserJoined;
     public event EventHandler<long> UserLeft;
+    public event EventHandler       Closed;
+    public event EventHandler       GeneralUpdate;
 
     public bool Full() {
         for (int i = 0; i < this.LobbySlots.Length; i++)
@@ -41,6 +43,11 @@ public abstract class OnlineLobby {
                 count++;
 
         return count;
+    }
+
+    public abstract string Name {
+        get;
+        set;
     }
 
     /// <summary>
@@ -63,6 +70,12 @@ public abstract class OnlineLobby {
     protected void OnUserLeft(long userid) {
         this.UserLeft?.Invoke(this, userid);
     }
+    protected void OnClosed() {
+        this.Closed?.Invoke(this, EventArgs.Empty);
+    }
+    protected void OnGeneralUpdate() {
+        this.GeneralUpdate?.Invoke(this, EventArgs.Empty);
+    }
 
-    public abstract void Dispose();
+    public abstract void Leave();
 }

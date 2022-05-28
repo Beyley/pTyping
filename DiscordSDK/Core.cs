@@ -2180,9 +2180,11 @@ public partial class LobbyManager {
         callback(result);
     }
 
+    private static readonly FFIMethods.UpdateLobbyCallback updateLobbyCallback = UpdateLobbyCallbackImpl;
+
     public void UpdateLobby(long lobbyId, LobbyTransaction transaction, UpdateLobbyHandler callback) {
         GCHandle wrapped = GCHandle.Alloc(callback);
-        this.Methods.UpdateLobby(this.MethodsPtr, lobbyId, transaction.MethodsPtr, GCHandle.ToIntPtr(wrapped), UpdateLobbyCallbackImpl);
+        this.Methods.UpdateLobby(this.MethodsPtr, lobbyId, transaction.MethodsPtr, GCHandle.ToIntPtr(wrapped), updateLobbyCallback);
         transaction.MethodsPtr = IntPtr.Zero;
     }
 
@@ -2235,9 +2237,11 @@ public partial class LobbyManager {
         callback(result);
     }
 
+    private static readonly FFIMethods.DisconnectLobbyCallback disconnectLobbyCallback = DisconnectLobbyCallbackImpl;
+
     public void DisconnectLobby(long lobbyId, DisconnectLobbyHandler callback) {
         GCHandle wrapped = GCHandle.Alloc(callback);
-        this.Methods.DisconnectLobby(this.MethodsPtr, lobbyId, GCHandle.ToIntPtr(wrapped), DisconnectLobbyCallbackImpl);
+        this.Methods.DisconnectLobby(this.MethodsPtr, lobbyId, GCHandle.ToIntPtr(wrapped), disconnectLobbyCallback);
     }
 
     public Lobby GetLobby(long lobbyId) {

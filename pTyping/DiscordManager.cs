@@ -1,7 +1,10 @@
 using DiscordSDK;
 using Furball.Engine;
+using Furball.Engine.Engine;
 using Furball.Engine.Engine.Helpers;
+using pTyping.Engine;
 using pTyping.Graphics;
+using pTyping.Graphics.Menus.Online;
 using pTyping.Online.Discord;
 
 namespace pTyping;
@@ -36,17 +39,33 @@ public static class DiscordManager {
         LobbyManager.ConnectLobbyWithActivitySecret(
         secret,
         (Result result, ref Lobby lobby) => {
-            Lobby.Value = lobby;
+            if (result != Result.Ok) {
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Unable to join lobby!");
 
-            DiscordOnlineLobby online = new(Lobby);
+                return;
+            }
+
+            Lobby _lobby = lobby;
+
+            FurballGame.GameTimeScheduler.ScheduleMethod(
+            _ => {
+                Lobby.Value = _lobby;
+
+                pTypingGame.OnlineManager.OnlineLobby = new DiscordOnlineLobby(Lobby);
+
+                ScreenManager.ChangeScreen(new LobbyScreen());
+            },
+            0
+            );
         }
         );
     }
 
     public static void CreateLobby() {
         LobbyTransaction transaction = LobbyManager.GetLobbyCreateTransaction();
-        transaction.SetType(LobbyType.Private);
+        transaction.SetType(LobbyType.Public);
         transaction.SetCapacity(8);
+        transaction.SetMetadata("name", $"{User.Username}'s game");
 
         LobbyManager.CreateLobby(
         transaction,
@@ -58,7 +77,9 @@ public static class DiscordManager {
 
             UpdatePresence();
 
-            DiscordOnlineLobby online = new(Lobby);
+            pTypingGame.OnlineManager.OnlineLobby = new DiscordOnlineLobby(Lobby);
+
+            ScreenManager.ChangeScreen(new LobbyScreen());
         }
         );
     }
