@@ -2,6 +2,13 @@ using System;
 
 namespace pTyping.Online;
 
+public class LobbyPlayer {
+    public long   Id;
+    public string Username;
+
+    public bool Ready;
+}
+
 public abstract class OnlineLobby {
     private uint _lobbySize;
     public uint LobbySize {
@@ -9,7 +16,7 @@ public abstract class OnlineLobby {
         protected set {
             if (value < this._lobbySize)
                 for (int i = (int)value; i < this._lobbySize; i++)
-                    if (this.LobbySlots[i] != 0)
+                    if (this.LobbySlots[i] != null)
                         this.DisconnectUser(this.LobbySlots[i]);
 
             this._lobbySize = value;
@@ -17,20 +24,20 @@ public abstract class OnlineLobby {
             Array.Resize(ref this.LobbySlots, (int)value);
         }
     }
-    public long[] LobbySlots = Array.Empty<long>();
+    public LobbyPlayer[] LobbySlots = Array.Empty<LobbyPlayer>();
 
     public OnlinePipe Pipe;
 
-    public abstract void DisconnectUser(long id);
+    public abstract void DisconnectUser(LobbyPlayer id);
 
-    public event EventHandler<long> UserJoined;
-    public event EventHandler<long> UserLeft;
-    public event EventHandler       Closed;
-    public event EventHandler       GeneralUpdate;
+    public event EventHandler<LobbyPlayer> UserJoined;
+    public event EventHandler<LobbyPlayer> UserLeft;
+    public event EventHandler              Closed;
+    public event EventHandler              GeneralUpdate;
 
     public bool Full() {
         for (int i = 0; i < this.LobbySlots.Length; i++)
-            if (this.LobbySlots[i] == 0)
+            if (this.LobbySlots[i] == null)
                 return false;
 
         return true;
@@ -39,7 +46,7 @@ public abstract class OnlineLobby {
     public int UsedSlots() {
         int count = 0;
         for (int i = 0; i < this.LobbySlots.Length; i++)
-            if (this.LobbySlots[i] != 0)
+            if (this.LobbySlots[i] != null)
                 count++;
 
         return count;
@@ -56,18 +63,16 @@ public abstract class OnlineLobby {
     /// <returns></returns>
     public int FirstEmptySlot() {
         for (int i = 0; i < this.LobbySlots.Length; i++)
-            if (this.LobbySlots[i] == 0)
+            if (this.LobbySlots[i] == null)
                 return i;
 
         return -1;
     }
 
-    public abstract string GetUsername(long id);
-
-    protected void OnUserJoined(long userid) {
+    protected void OnUserJoined(LobbyPlayer userid) {
         this.UserJoined?.Invoke(this, userid);
     }
-    protected void OnUserLeft(long userid) {
+    protected void OnUserLeft(LobbyPlayer userid) {
         this.UserLeft?.Invoke(this, userid);
     }
     protected void OnClosed() {

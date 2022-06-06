@@ -961,7 +961,10 @@ public class Discord : IDisposable {
     public void Dispose() {
         if (this.MethodsPtr != IntPtr.Zero)
             this.Methods.Destroy(this.MethodsPtr);
-        this.SelfHandle.Free();
+
+        if (this.SelfHandle.IsAllocated)
+            this.SelfHandle.Free();
+        
         Marshal.FreeHGlobal(this.EventsPtr);
         Marshal.FreeHGlobal(this.ApplicationEventsPtr);
         Marshal.FreeHGlobal(this.UserEventsPtr);

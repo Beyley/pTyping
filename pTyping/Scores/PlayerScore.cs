@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
-using pTyping.Online.Taiko_rs;
+using pTyping.Online.Tataku;
 using pTyping.Songs;
 
 namespace pTyping.Scores;
@@ -14,7 +14,7 @@ namespace pTyping.Scores;
 public class PlayerScore {
     public Song Song;
 
-    private const short TAIKO_RS_SCORE_VERSION = 2;
+    private const short TATAKU_SCORE_VERSION = 2;
     [JsonProperty]
     public double Accuracy = 1d;
     [JsonProperty]
@@ -94,7 +94,7 @@ public class PlayerScore {
     }
 
     [Pure]
-    public static PlayerScore TaikoRsDeserialize(TaikoRsReader reader) {
+    public static PlayerScore TatakuDeserialize(TatakuReader reader) {
         PlayerScore score = new();
 
         reader.ReadUInt16();// Version (we ignore rn)
@@ -118,8 +118,8 @@ public class PlayerScore {
         return score;
     }
 
-    public void TaikoRsSerialize(TaikoRsWriter writer) {
-        writer.Write(TAIKO_RS_SCORE_VERSION);
+    public void TatakuSerialize(TatakuWriter writer) {
+        writer.Write(TATAKU_SCORE_VERSION);
         writer.Write(this.Username);
         writer.Write(this.MapHash);
         writer.Write(PlayMode.pTyping.GetString());
@@ -147,11 +147,11 @@ public class PlayerScore {
     }
 
     [Pure]
-    public byte[] TaikoRsSerialize() {
-        MemoryStream  stream = new();
-        TaikoRsWriter writer = new(stream);
+    public byte[] TatakuSerialize() {
+        MemoryStream stream = new();
+        TatakuWriter writer = new(stream);
 
-        writer.Write(TAIKO_RS_SCORE_VERSION);
+        writer.Write(TATAKU_SCORE_VERSION);
         writer.Write(this.Username);
         writer.Write(this.MapHash);
         writer.Write(PlayMode.pTyping.GetString());
@@ -209,7 +209,7 @@ public struct ReplayFrame {
         writer.Write(this.Time / 1000d);
     }
 
-    public void TaikoRsSerialize(BinaryWriter writer) {
+    public void TatakuSerialize(BinaryWriter writer) {
         writer.Write((byte)2);//key press
 
         // We write this weirdly as the `MousePos` type requires 64bits of data
@@ -220,7 +220,7 @@ public struct ReplayFrame {
         writer.Write(float.NegativeInfinity);// 32 bits
     }
 
-    public void TaikoRsDeserialize(double time, BinaryReader reader) {
+    public void TatakuDeserialize(double time, BinaryReader reader) {
         this.Time      = time;
         reader.ReadByte();
         this.Character = reader.ReadChar();

@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using pTyping.Scores;
 
-namespace pTyping.Online.Taiko_rs;
+namespace pTyping.Online.Tataku;
 
 public enum SpectatorFrameDataType : byte {
     Play            = 0,
@@ -85,7 +85,7 @@ public abstract class SpectatorFrame {
 
     public abstract SpectatorFrameDataType Type { get; }
 
-    public void WriteFrame(TaikoRsWriter writer) {
+    public void WriteFrame(TatakuWriter writer) {
         writer.Write(this.Time);
         writer.Write((byte)this.Type);
 
@@ -108,14 +108,14 @@ public abstract class SpectatorFrame {
             case SpectatorFrameDataType.ReplayFrame: {
                 SpectatorFrameReplayFrame frame = (SpectatorFrameReplayFrame)this;
 
-                frame.Frame.TaikoRsSerialize(writer);
+                frame.Frame.TatakuSerialize(writer);
 
                 break;
             }
             case SpectatorFrameDataType.ScoreSync: {
                 SpectatorFrameScoreSync frame = (SpectatorFrameScoreSync)this;
 
-                frame.Score.TaikoRsSerialize(writer);
+                frame.Score.TatakuSerialize(writer);
 
                 break;
             }
@@ -133,7 +133,7 @@ public abstract class SpectatorFrame {
         }
     }
 
-    public static SpectatorFrame ReadFrame(TaikoRsReader reader) {
+    public static SpectatorFrame ReadFrame(TatakuReader reader) {
         SpectatorFrame frame;
 
         float time = reader.ReadSingle();
@@ -171,7 +171,7 @@ public abstract class SpectatorFrame {
                 SpectatorFrameReplayFrame tframe = new();
 
                 ReplayFrame rFrame = new();
-                rFrame.TaikoRsDeserialize(time, reader);
+                rFrame.TatakuDeserialize(time, reader);
 
                 tframe.Frame = rFrame;
 
@@ -181,7 +181,7 @@ public abstract class SpectatorFrame {
             case SpectatorFrameDataType.ScoreSync: {
                 SpectatorFrameScoreSync tframe = new();
 
-                tframe.Score = PlayerScore.TaikoRsDeserialize(reader);
+                tframe.Score = PlayerScore.TatakuDeserialize(reader);
 
                 frame = tframe;
                 break;

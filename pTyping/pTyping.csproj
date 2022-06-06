@@ -26,11 +26,12 @@
     <!--    </ItemGroup>-->
 
     <ItemGroup>
-        <None Update="Content/*.png" CopyToOutputDirectory="Always" />
-        <None Update="Content/*.wav" CopyToOutputDirectory="Always" />
-        <None Update="Content/*.ttf" CopyToOutputDirectory="Always" />
-        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
+        <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
+        <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
+        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always"/>
         <None Update="runtimes/**" CopyToOutputDirectory="Always"/>
+        <None Remove="Content\note.png~"/>
     </ItemGroup>
 
     <ItemGroup>

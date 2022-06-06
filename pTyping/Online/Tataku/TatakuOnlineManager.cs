@@ -17,15 +17,15 @@ using pTyping.Engine;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
-using pTyping.Online.Taiko_rs.Packets;
+using pTyping.Online.Tataku.Packets;
 using pTyping.Scores;
 using pTyping.Songs;
 using Websocket.Client;
 using Websocket.Client.Models;
 
-namespace pTyping.Online.Taiko_rs;
+namespace pTyping.Online.Tataku;
 
-public class TaikoRsOnlineManager : OnlineManager {
+public class TatakuOnlineManager : OnlineManager {
     public const ushort PROTOCOL_VERSION = 1;
 
     private readonly string     _getScoresUrl = "/get_scores";
@@ -41,7 +41,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
     private readonly Queue<ChatMessage> _chatQueue = new();
 
-    public TaikoRsOnlineManager(string wsUri, string httpUri) {
+    public TatakuOnlineManager(string wsUri, string httpUri) {
         this._wsUri   = new Uri(wsUri);
         this._httpUri = new Uri(httpUri);
 
@@ -272,8 +272,8 @@ public class TaikoRsOnlineManager : OnlineManager {
         while (this._sendPackets) {
             if (this._client.NativeClient.State == WebSocketState.Open) {
                 if (this.PacketQueue.TryDequeue(out Packet packet)) {
-                    using MemoryStream  s = new();
-                    using TaikoRsWriter w = new(s);
+                    using MemoryStream s = new();
+                    using TatakuWriter w = new(s);
 
                     packet.WriteDataToStream(w);
                     this._client.Send(s.ToArray());
@@ -282,8 +282,8 @@ public class TaikoRsOnlineManager : OnlineManager {
                 if (UnixTime.Now() - this._lastPing > 5) {
                     this._lastPing = UnixTime.Now();
 
-                    using MemoryStream  s = new();
-                    using TaikoRsWriter w = new(s);
+                    using MemoryStream s = new();
+                    using TatakuWriter w = new(s);
 
                     PingPacket pingPacket = new();
                     pingPacket.WriteDataToStream(w);
@@ -317,10 +317,10 @@ public class TaikoRsOnlineManager : OnlineManager {
         try {
             string finalUri = this._httpUri + this._scoreSubmitUrl;
 
-            MemoryStream  stream = new();
-            TaikoRsWriter writer = new(stream);
+            MemoryStream stream = new();
+            TatakuWriter writer = new(stream);
 
-            writer.Write(score.TaikoRsSerialize());
+            writer.Write(score.TatakuSerialize());
             writer.Write(this.Password());
 
             writer.Flush();
@@ -341,8 +341,8 @@ public class TaikoRsOnlineManager : OnlineManager {
         try {
             string finalUri = this._httpUri + this._getScoresUrl;
 
-            MemoryStream  stream = new();
-            TaikoRsWriter writer = new(stream);
+            MemoryStream stream = new();
+            TatakuWriter writer = new(stream);
             writer.Write(hash);
             writer.Write((byte)PlayMode.pTyping);
             writer.Flush();
@@ -353,12 +353,12 @@ public class TaikoRsOnlineManager : OnlineManager {
 
             await task;
 
-            TaikoRsReader reader = new(task.Result.Content.ReadAsStream());
+            TatakuReader reader = new(task.Result.Content.ReadAsStream());
 
             ulong length = reader.ReadUInt64();
 
             for (ulong i = 0; i < length; i++)
-                scores.Add(PlayerScore.TaikoRsDeserialize(reader));
+                scores.Add(PlayerScore.TatakuDeserialize(reader));
         }
         catch {
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Loading leaderboards failed!");
@@ -368,8 +368,8 @@ public class TaikoRsOnlineManager : OnlineManager {
     }
 
     private void HandleMessage(ResponseMessage args) {
-        MemoryStream  stream = new(args.Binary);
-        TaikoRsReader reader = new(stream);
+        MemoryStream stream = new(args.Binary);
+        TatakuReader reader = new(stream);
 
         PacketId pid = reader.ReadPacketId();
 
@@ -405,7 +405,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         if (!success) throw new Exception($"Error reading packet with PID: {pid}");
     }
 
-    private bool HandleServerSpectateResult(TaikoRsReader reader) {
+    private bool HandleServerSpectateResult(TatakuReader reader) {
         ServerSpectateResultPacket p = new();
 
         p.ReadDataFromStream(reader);
@@ -452,7 +452,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerSpectatorPlayingRequest(TaikoRsReader reader) {
+    private bool HandleServerSpectatorPlayingRequest(TatakuReader reader) {
         ServerSpectatorPlayingRequestPacket p = new();
 
         p.ReadDataFromStream(reader);
@@ -462,7 +462,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerErrorPacket(TaikoRsReader reader) {
+    private bool HandleServerErrorPacket(TatakuReader reader) {
         ServerErrorPacket p = new();
         p.ReadDataFromStream(reader);
 
@@ -471,7 +471,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerDropConnectionPacket(TaikoRsReader reader) {
+    private bool HandleServerDropConnectionPacket(TatakuReader reader) {
         ServerDropConnectionPacket p = new();
         p.ReadDataFromStream(reader);
 
@@ -507,7 +507,7 @@ public class TaikoRsOnlineManager : OnlineManager {
     }
 
 
-    private bool HandleServerNotificationPacket(TaikoRsReader reader) {
+    private bool HandleServerNotificationPacket(TatakuReader reader) {
         ServerNotificationPacket p = new();
         p.ReadDataFromStream(reader);
 
@@ -516,7 +516,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerSpectatorFrames(TaikoRsReader reader) {
+    private bool HandleServerSpectatorFrames(TatakuReader reader) {
         ulong length = reader.ReadUInt64();
 
         for (ulong i = 0; i < length; i++) {
@@ -646,7 +646,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerSpectatorLeftPacket(TaikoRsReader reader) {
+    private bool HandleServerSpectatorLeftPacket(TatakuReader reader) {
         ServerSpectatorLeftPacket p = new();
         p.ReadDataFromStream(reader);
 
@@ -675,7 +675,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerSpectatorJoinedPacket(TaikoRsReader reader) {
+    private bool HandleServerSpectatorJoinedPacket(TatakuReader reader) {
         ServerSpectatorJoinedPacket p = new();
         p.ReadDataFromStream(reader);
 
@@ -752,7 +752,7 @@ public class TaikoRsOnlineManager : OnlineManager {
 
     #region Handle packets
 
-    private bool HandleServerSendMessagePacket(TaikoRsReader reader) {
+    private bool HandleServerSendMessagePacket(TatakuReader reader) {
         ServerSendMessagePacket packet = new();
         packet.ReadDataFromStream(reader);
 
@@ -779,7 +779,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerScoreUpdatePacket(TaikoRsReader reader) {
+    private bool HandleServerScoreUpdatePacket(TatakuReader reader) {
         ServerScoreUpdatePacket packet = new();
         packet.ReadDataFromStream(reader);
 
@@ -806,7 +806,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerUserStatusUpdatePacket(TaikoRsReader reader) {
+    private bool HandleServerUserStatusUpdatePacket(TatakuReader reader) {
         ServerUserStatusUpdatePacket packet = new();
         packet.ReadDataFromStream(reader);
 
@@ -828,7 +828,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerUserLeftPacket(TaikoRsReader reader) {
+    private bool HandleServerUserLeftPacket(TatakuReader reader) {
         ServerUserLeftPacket packet = new();
         packet.ReadDataFromStream(reader);
 
@@ -842,7 +842,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         return true;
     }
 
-    private bool HandleServerLoginResponsePacket(TaikoRsReader reader) {
+    private bool HandleServerLoginResponsePacket(TatakuReader reader) {
         ServerLoginResponsePacket packet = new();
         packet.ReadDataFromStream(reader);
 
@@ -906,7 +906,7 @@ public class TaikoRsOnlineManager : OnlineManager {
         base.Update(time);
     }
 
-    private bool HandleServerUserJoinedPacket(TaikoRsReader reader) {
+    private bool HandleServerUserJoinedPacket(TatakuReader reader) {
         ServerUserJoinedPacket packet = new();
         packet.ReadDataFromStream(reader);
 
@@ -932,9 +932,9 @@ public class TaikoRsOnlineManager : OnlineManager {
     #endregion
 }
 
-public class TaikoRsReader : BinaryReader {
-    public TaikoRsReader(Stream input) : base(input, Encoding.UTF8) {}
-    public TaikoRsReader(Stream input, bool leaveOpen) : base(input, Encoding.UTF8, leaveOpen) {}
+public class TatakuReader : BinaryReader {
+    public TatakuReader(Stream input) : base(input, Encoding.UTF8) {}
+    public TatakuReader(Stream input, bool leaveOpen) : base(input, Encoding.UTF8, leaveOpen) {}
 
     public override string ReadString() {
         ulong length = this.ReadUInt64();
@@ -948,6 +948,23 @@ public class TaikoRsReader : BinaryReader {
         return "";
     }
 
+    public Dictionary<string, ushort> ReadStringUshortDictionary() {
+        Dictionary<string, ushort> dic = new();
+
+        ulong length = this.ReadUInt64();
+
+        while (length != 0) {
+            string key = this.ReadString();
+            ushort val = this.ReadUInt16();
+
+            dic.Add(key, val);
+
+            length--;
+        }
+
+        return dic;
+    }
+
     public PacketId ReadPacketId() => (PacketId)this.ReadUInt16();
 
     public SpectatorFrameDataType ReadSpectatorFrameType() => (SpectatorFrameDataType)this.ReadByte();
@@ -955,9 +972,9 @@ public class TaikoRsReader : BinaryReader {
     public PlayMode ReadPlayMode() => PlayModeMethods.FromString(this.ReadString());
 }
 
-public class TaikoRsWriter : BinaryWriter {
-    public TaikoRsWriter(Stream input) : base(input, Encoding.UTF8) {}
-    public TaikoRsWriter(Stream input, bool leaveOpen) : base(input, Encoding.UTF8, leaveOpen) {}
+public class TatakuWriter : BinaryWriter {
+    public TatakuWriter(Stream input) : base(input, Encoding.UTF8) {}
+    public TatakuWriter(Stream input, bool leaveOpen) : base(input, Encoding.UTF8, leaveOpen) {}
 
     public override void Write(string value) {
         byte[] bytes = Encoding.UTF8.GetBytes(value);
@@ -966,6 +983,15 @@ public class TaikoRsWriter : BinaryWriter {
 
         this.Write(length);
         this.Write(bytes);
+    }
+
+    public void Write(Dictionary<string, ushort> dic) {
+        this.Write((ulong)dic.Count);
+
+        foreach ((string key, ushort val) in dic) {
+            this.Write(key);
+            this.Write(val);
+        }
     }
 }
 

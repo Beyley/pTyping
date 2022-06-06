@@ -26,7 +26,7 @@ using pTyping.Graphics.Online;
 using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
-using pTyping.Online.Taiko_rs;
+using pTyping.Online.Tataku;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
@@ -396,7 +396,7 @@ public class pTypingGame : FurballGame {
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadUTypingReplay);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.LoadAutoReplay);
 
-        OnlineManager = new TaikoRsOnlineManager(pTypingConfig.Instance.ServerWebsocketUrl, pTypingConfig.Instance.ServerWebUrl);
+        OnlineManager = new TatakuOnlineManager(pTypingConfig.Instance.ServerWebsocketUrl, pTypingConfig.Instance.ServerWebUrl);
         OnlineManager.Initialize();
 
         OnlineManager.OnLogout += delegate {

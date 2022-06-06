@@ -25,8 +25,21 @@ public class DiscordOnlineLobby : OnlineLobby {
 
         this.LobbySize = this.GetDiscordLobby().Capacity;
 
-        this.UpdateSlots();
+        //If we are the host, the add ourselves, if we are not the host, then we'll wait for the host to send us the user information
+        if (this.lobby.Value!.Value.OwnerId == DiscordManager.User.Id)
+            this.OnMemberConnect(lobby.Value!.Value.Id, DiscordManager.User.Id);
     }
+
+    // private void DetectExistingPlayers() {
+    //     IEnumerable<User> memberUsers = DiscordManager.LobbyManager.GetMemberUsers(this.lobby.Value!.Value.Id);
+    //     IEnumerator<User> enumerator  = memberUsers.GetEnumerator();
+    //
+    //     while (enumerator.MoveNext()) {
+    //         User current = enumerator.Current;
+    //         
+    //         
+    //     }
+    // }
     private void OnLobbyDelete(long lobbyid, uint reason) {
         this.Dispose();
         this.OnClosed();
@@ -41,48 +54,51 @@ public class DiscordOnlineLobby : OnlineLobby {
 
     private Lobby GetDiscordLobby() => DiscordManager.LobbyManager.GetLobby(this.lobby.Value!.Value.Id);
 
-    private void UpdateSlots() {
-        IEnumerable<User>       memberUsers = DiscordManager.LobbyManager.GetMemberUsers(this.lobby.Value!.Value.Id);
-        using IEnumerator<User> enumerator  = memberUsers.GetEnumerator();
-        if (enumerator.MoveNext())
-            for (int i = 0; i < this.LobbySlots.Length; i++) {
-                User current = enumerator.Current;
-
-                this.LobbySlots[i] = current.Id;
-                enumerator.MoveNext();
-            }
-    }
-
     private void OnLobbyUpdate(long lobbyid) {
         this.LobbySize = this.GetDiscordLobby().Capacity;
 
-        this.lobby.Value = DiscordManager.LobbyManager.GetLobby(this.lobby.Value!.Value.Id);
+        this.lobby.Value = DiscordManager.LobbyManager.GetLobby(lobbyid);
 
         this.OnGeneralUpdate();
     }
+
+    private readonly Dictionary<long, int> UserIDToSlot = new();
+
     private void OnMemberConnect(long lobbyid, long userid) {
-        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"{this.GetUsername(userid)} has joined your lobby!");
-        this.UpdateSlots();
-        this.OnUserJoined(userid);
+        int slot = this.FirstEmptySlot();
+        if (slot != -1) {
+            User user = DiscordManager.LobbyManager.GetMemberUser(lobbyid, userid);
+
+            this.LobbySlots[slot] = new LobbyPlayer {
+                Username = user.Username,
+                Id       = user.Id,
+                Ready    = false
+            };
+
+            this.UserIDToSlot[userid] = slot;
+
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"{user.Username} has joined your lobby!");
+            this.OnUserJoined(this.LobbySlots[slot]);
+        } else {
+            throw new Exception("what? how did an extra user join, or did we forget to clear a slot properly, anyway report this pls");
+        }
     }
     private void OnMemberDisconnect(long lobbyid, long userid) {
-        DiscordManager.UserManager.GetUser(
-        userid,
-        (Result result, ref User user) => {
-            if (result != Result.Ok) {
-                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Unknown ({user.Id}) has left your lobby!");
-                return;
-            }
+        if (this.UserIDToSlot.TryGetValue(userid, out int slot)) {
+            LobbyPlayer player = this.LobbySlots[slot];
 
-            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"{user.Username} has left your lobby!");
+            this.UserIDToSlot.Remove(userid);
+            this.LobbySlots[slot] = null;
+
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"{player.Username} has left your lobby!");
+
+            this.OnUserLeft(player);
+        } else {
+            throw new Exception("who the fuck left?");
         }
-        );
-
-        this.UpdateSlots();
-        this.OnUserLeft(userid);
     }
 
-    public override void DisconnectUser(long id) {
+    public override void DisconnectUser(LobbyPlayer id) {
         throw new NotImplementedException();
     }
 
@@ -103,8 +119,6 @@ public class DiscordOnlineLobby : OnlineLobby {
             );
         }
     }
-    public override string GetUsername(long id) => DiscordManager.LobbyManager.GetMemberUser(this.lobby.Value!.Value.Id, id).Username;
-
     public override void Leave() {
         DiscordManager.LobbyManager.OnMemberConnect -= this.OnMemberConnect;
         this.Pipe.Disconnect();

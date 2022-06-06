@@ -2,25 +2,7 @@ using System;
 using System.Collections.Generic;
 using pTyping.Engine;
 
-namespace pTyping.Online.Taiko_rs.Packets;
-// public abstract class TaikoRsPacket {
-//     public TaikoRsPacketId PacketId;
-//     public void            ReadPacket(TaikoRsReader reader) => this.ReadData(reader);
-//
-//     protected abstract byte[] GetData();
-//     protected abstract void   ReadData(TaikoRsReader reader);
-//
-//     public byte[] GetPacket() {
-//         MemoryStream  stream = new();
-//         TaikoRsWriter writer = new(stream);
-//
-//         writer.Write((ushort)this.PacketId);
-//         writer.Write(this.GetData());
-//         writer.Flush();
-//
-//         return stream.ToArray();
-//     }
-// }
+namespace pTyping.Online.Tataku.Packets;
 
 public enum DataType {
     Byte,
@@ -45,7 +27,7 @@ public abstract class Packet {
     protected static readonly List<(string name, DataType type)> BLANK_DATA_DEFINITION = new();
     public virtual            List<(string name, DataType type)> DataDefinition => BLANK_DATA_DEFINITION;
 
-    public void ReadDataFromStream(TaikoRsReader reader) {
+    public void ReadDataFromStream(TatakuReader reader) {
         foreach ((string name, DataType type) in this.DataDefinition)
             switch (type) {
                 case DataType.Byte:
@@ -95,7 +77,7 @@ public abstract class Packet {
                     throw new ArgumentOutOfRangeException();
             }
     }
-    public void WriteDataToStream(TaikoRsWriter writer) {
+    public void WriteDataToStream(TatakuWriter writer) {
         #region Header
 
         writer.Write((ushort)this.Pid);
@@ -171,7 +153,7 @@ public class ClientUserLoginPacket : Packet {
     public ClientUserLoginPacket(string username, string password) {
         this.Username        = username;
         this.Password        = password;
-        this.ProtocolVersion = TaikoRsOnlineManager.PROTOCOL_VERSION;
+        this.ProtocolVersion = TatakuOnlineManager.PROTOCOL_VERSION;
         this.Game            = $"pTyping\n{Program.BuildVersion}";
     }
     public override PacketId Pid => PacketId.ClientUserLogin;

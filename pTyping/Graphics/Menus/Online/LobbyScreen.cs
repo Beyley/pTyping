@@ -81,11 +81,11 @@ public class LobbyScreen : pScreen {
         ScreenManager.ChangeScreen(new MenuScreen());
     }
 
-    private void OnUserLeft(object sender, long e) {
+    private void OnUserLeft(object sender, LobbyPlayer lobbyPlayer) {
         this.Update();
     }
 
-    private void OnUserJoin(object sender, long e) {
+    private void OnUserJoin(object sender, LobbyPlayer lobbyPlayer) {
         this.Update();
     }
 
@@ -94,9 +94,9 @@ public class LobbyScreen : pScreen {
 
         this._users.Text = "";
 
-        foreach (long userId in this._lobby.LobbySlots)
-            if (userId != 0)
-                this._users.Text += $"Username: {this._lobby.GetUsername(userId)} id:{userId}\n";
+        foreach (LobbyPlayer player in this._lobby.LobbySlots)
+            if (player != null)
+                this._users.Text += $"Username: {player.Username} id:{player.Id}\n";
             else
                 this._users.Text += "\n";
     }

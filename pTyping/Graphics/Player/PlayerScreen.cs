@@ -16,7 +16,7 @@ using ManagedBass;
 using pTyping.Engine;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
-using pTyping.Online.Taiko_rs;
+using pTyping.Online.Tataku;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
