@@ -29,14 +29,14 @@ namespace pTyping.Graphics.Player;
 public class Player : CompositeDrawable {
     public override Vector2 Size => new(FurballGame.DEFAULT_WINDOW_WIDTH, 100);
 
-    public const int SCORE_EXCELLENT = 1500;
-    public const int SCORE_GOOD      = 1000;
-    public const int SCORE_FAIR      = 500;
-    public const int SCORE_POOR      = 0;
+    public const uint SCORE_EXCELLENT = 1500;
+    public const uint SCORE_GOOD      = 1000;
+    public const uint SCORE_FAIR      = 500;
+    public const uint SCORE_POOR      = 0;
 
-    public const int SCORE_PER_CHARACTER = 500;
-    public const int SCORE_COMBO         = 10;
-    public const int SCORE_COMBO_MAX     = 1000;
+    public const uint SCORE_PER_CHARACTER = 500;
+    public const uint SCORE_COMBO         = 10;
+    public const uint SCORE_COMBO_MAX     = 1000;
 
     public float TIMING_EXCELLENT => 20  / (this.Song.Settings.Strictness / 5f);
     public float TIMING_GOOD      => 50  / (this.Song.Settings.Strictness / 5f);
@@ -147,6 +147,7 @@ public class Player : CompositeDrawable {
             mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
             speedMod *= mod.SpeedMultiplier();
         }
+        this.Score.Speed = speedMod;
         pTypingGame.MusicTrack.SetSpeed(speedMod);
     }
 
@@ -395,7 +396,7 @@ public class Player : CompositeDrawable {
             this.Score.Accuracy = numberHit / total;
 
         if (wasHit) {
-            int scoreToAdd = note.HitResult switch {
+            uint scoreToAdd = note.HitResult switch {
                 HitResult.Excellent => SCORE_EXCELLENT,
                 HitResult.Fair      => SCORE_FAIR,
                 HitResult.Good      => SCORE_GOOD,
@@ -403,7 +404,7 @@ public class Player : CompositeDrawable {
                 _                   => 0
             };
 
-            int scoreCombo = Math.Min(SCORE_COMBO * this.Score.Combo, SCORE_COMBO_MAX);
+            uint scoreCombo = Math.Min(SCORE_COMBO * this.Score.Combo, SCORE_COMBO_MAX);
             this.Score.AddScore(scoreToAdd + scoreCombo);
 
             if (note.HitResult == HitResult.Poor)

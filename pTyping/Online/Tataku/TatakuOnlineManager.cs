@@ -970,6 +970,8 @@ public class TatakuReader : BinaryReader {
     public SpectatorFrameDataType ReadSpectatorFrameType() => (SpectatorFrameDataType)this.ReadByte();
 
     public PlayMode ReadPlayMode() => PlayModeMethods.FromString(this.ReadString());
+
+    public DateTimeOffset ReadUnixEpoch() => DateTimeOffset.FromUnixTimeSeconds((long)this.ReadUInt64());
 }
 
 public class TatakuWriter : BinaryWriter {
@@ -992,6 +994,13 @@ public class TatakuWriter : BinaryWriter {
             this.Write(key);
             this.Write(val);
         }
+    }
+    public void Write(PlayMode mode) {
+        this.Write(mode.GetString());
+    }
+
+    public void Write(DateTimeOffset time) {
+        this.Write((ulong)time.ToUnixTimeSeconds());
     }
 }
 

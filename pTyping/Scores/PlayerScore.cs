@@ -14,20 +14,20 @@ namespace pTyping.Scores;
 public class PlayerScore {
     public Song Song;
 
-    private const short TATAKU_SCORE_VERSION = 2;
+    private const ushort TATAKU_SCORE_VERSION = 5;
     [JsonProperty]
     public double Accuracy = 1d;
     [JsonProperty]
-    public int Combo;
+    public ushort Combo;
 
     [JsonProperty]
-    public int ExcellentHits = 0;
+    public ushort ExcellentHits = 0;
     [JsonProperty]
-    public int FairHits = 0;
+    public ushort FairHits = 0;
     [JsonProperty]
-    public int GoodHits = 0;
+    public ushort GoodHits = 0;
     [JsonProperty]
-    public int PoorHits = 0;
+    public ushort PoorHits = 0;
 
     public List<PlayerMod> Mods = new();
 
@@ -39,22 +39,28 @@ public class PlayerScore {
     [JsonProperty]
     public string MapHash;
     [JsonProperty]
-    public int MaxCombo = 0;
+    public ushort MaxCombo = 0;
     [JsonProperty]
-    public long Score {
+    public ulong Score {
         get;
         protected set;
     }
 
     [JsonProperty]
-    public DateTime Time;
+    public DateTimeOffset Time;
 
-    public void AddScore(int score) {
-        this.Score += (int)(score * PlayerMod.ScoreMultiplier(this.Mods));
+    public void AddScore(uint score) {
+        this.Score += (uint)(score * PlayerMod.ScoreMultiplier(this.Mods));
     }
 
     [JsonProperty]
     public string Username;
+
+    [JsonProperty]
+    public PlayMode Mode = PlayMode.pTyping;
+
+    [JsonProperty]
+    public double Speed = 1f;
 
     public PlayerScore(string mapHash, string username) {
         this.MapHash  = mapHash;
@@ -97,53 +103,75 @@ public class PlayerScore {
     public static PlayerScore TatakuDeserialize(TatakuReader reader) {
         PlayerScore score = new();
 
-        reader.ReadUInt16();// Version (we ignore rn)
+        ushort scoreVersion = reader.ReadUInt16();
+
+        switch (scoreVersion) {
+            case < 5://this is the oldest version we support
+                throw new Exception("Your score version is too old!");
+            case > TATAKU_SCORE_VERSION://this is the newest version we support
+                throw new Exception("Your score version is too new to read!");
+        }
 
         score.Username = reader.ReadString();
         score.MapHash  = reader.ReadString();
-        reader.ReadPlayMode();// mode
-        score.Score         = reader.ReadInt64();
-        score.Combo         = reader.ReadInt16();
-        score.MaxCombo      = reader.ReadInt16();
-        score.PoorHits      = reader.ReadInt16();
-        score.FairHits      = reader.ReadInt16();
-        score.GoodHits      = reader.ReadInt16();
-        score.ExcellentHits = reader.ReadInt16();
-        reader.ReadInt16();// ignore katu
-        reader.ReadInt16();// ignore miss
-        score.Accuracy = reader.ReadDouble();
-        //TODO: handle speed
-        reader.ReadSingle();
+        score.Mode     = reader.ReadPlayMode();
+        score.Time     = reader.ReadUnixEpoch();
 
+        score.Score    = reader.ReadUInt64();
+        score.Combo    = reader.ReadUInt16();
+        score.MaxCombo = reader.ReadUInt16();
+
+        #region Judgements
+
+        Dictionary<string, ushort> judgements = reader.ReadStringUshortDictionary();
+
+        score.PoorHits      = judgements["poor"];
+        score.FairHits      = judgements["fair"];
+        score.GoodHits      = judgements["good"];
+        score.ExcellentHits = judgements["excellent"];
+
+        #endregion
+        
+        score.Accuracy = reader.ReadDouble();
+
+        //TODO: actually handle this speed
+        score.Speed = reader.ReadSingle();
+
+        //TODO: mods
+        string mods = reader.ReadString();
+
+        if (score.Mode != PlayMode.pTyping)
+            throw new NotSupportedException("Wrong mode!");
+        
         return score;
     }
 
     public void TatakuSerialize(TatakuWriter writer) {
         writer.Write(TATAKU_SCORE_VERSION);
-        writer.Write(this.Username);
-        writer.Write(this.MapHash);
-        writer.Write(PlayMode.pTyping.GetString());
-        writer.Write(this.Score);
-        writer.Write((short)this.Combo);
-        writer.Write((short)this.MaxCombo);
-        writer.Write((short)this.PoorHits);     // 50
-        writer.Write((short)this.FairHits);     // 100
-        writer.Write((short)this.GoodHits);     // 300
-        writer.Write((short)this.ExcellentHits);// geki
-        writer.Write((short)0);                 // katu
-        writer.Write((short)0);                 // miss
-        writer.Write(this.Accuracy);
 
-        float speed = 1f;
+        writer.Write(this.Username);   //string
+        writer.Write(this.MapHash);    //string
+        writer.Write(PlayMode.pTyping);//string
+        writer.Write(this.Time);       //u64 unix epoch
 
-        foreach (PlayerMod playerMod in this.Mods)
-            speed = playerMod switch {
-                HalfTimeMod   => 0.5f,
-                DoubleTimeMod => 1.5f,
-                _             => speed
-            };
+        writer.Write(this.Score);   //u64
+        writer.Write(this.Combo);   //u16
+        writer.Write(this.MaxCombo);//u16
 
-        writer.Write(speed);//Speed
+        writer.Write(
+        new Dictionary<string, ushort> {
+            ["poor"]      = this.PoorHits,
+            ["fair"]      = this.FairHits,
+            ["good"]      = this.GoodHits,
+            ["excellent"] = this.ExcellentHits
+        }
+        );//Dictionary<string, ushort>
+
+        writer.Write(this.Accuracy);// f64
+        writer.Write(this.Speed);   // f32
+
+        // TODO: mods
+        writer.Write(string.Empty);//string 
     }
 
     [Pure]

@@ -11,8 +11,8 @@ public static class AutoReplayCreator {
     public static PlayerScore CreateReplay(Song song) {
         PlayerScore score = new(song.MapHash, "p!auto");
 
-        score.ExcellentHits = song.Notes.Count;
-        score.Combo         = song.Notes.Count;
+        score.ExcellentHits = (ushort)song.Notes.Count;
+        score.Combo         = (ushort)song.Notes.Count;
 
         score.AddScore(69420);
 
