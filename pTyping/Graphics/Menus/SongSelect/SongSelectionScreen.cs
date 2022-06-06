@@ -328,6 +328,8 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
                 task.Wait();
 
                 origScores = task.Result;
+                foreach (PlayerScore playerScore in origScores)
+                    playerScore.IsOnline = true;
                 break;
             }
             case SongSelect.LeaderboardType.Local: {

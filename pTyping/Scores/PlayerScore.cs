@@ -32,9 +32,27 @@ public class PlayerScore {
     public List<PlayerMod> Mods = new();
 
     [JsonProperty]
+    public int ReplayId = -1;
+
+    [JsonProperty]
     public string ModsString = "";
+
+    public bool IsOnline = false;
+    
     [JsonProperty]
     public ReplayFrame[] ReplayFrames = Array.Empty<ReplayFrame>();
+    public bool ReplayCheck() {
+        if (this.IsOnline) return false;//TODO
+
+        if (pTypingGame.ScoreManager.GetReplayForScore(this)) {
+            if (this.ReplayFrames == null || this.ReplayFrames.Length == 0)
+                return false;
+        } else {
+            return false;
+        }
+
+        return true;
+    }
 
     [JsonProperty]
     public string MapHash;
@@ -114,7 +132,11 @@ public class PlayerScore {
 
         score.Username = reader.ReadString();
         score.MapHash  = reader.ReadString();
+        
         score.Mode     = reader.ReadPlayMode();
+        if (score.Mode != PlayMode.pTyping)
+            throw new NotSupportedException("Wrong mode!");
+        
         score.Time     = reader.ReadUnixEpoch();
 
         score.Score    = reader.ReadUInt64();
@@ -138,11 +160,8 @@ public class PlayerScore {
         score.Speed = reader.ReadSingle();
 
         //TODO: mods
-        string mods = reader.ReadString();
+        string mods = reader.ReadOptionString();
 
-        if (score.Mode != PlayMode.pTyping)
-            throw new NotSupportedException("Wrong mode!");
-        
         return score;
     }
 
@@ -171,42 +190,17 @@ public class PlayerScore {
         writer.Write(this.Speed);   // f32
 
         // TODO: mods
-        writer.Write(string.Empty);//string 
+        writer.WriteOptionString(null);//string 
     }
 
     [Pure]
     public byte[] TatakuSerialize() {
-        MemoryStream stream = new();
-        TatakuWriter writer = new(stream);
+        using MemoryStream stream = new();
+        using TatakuWriter writer = new(stream);
 
-        writer.Write(TATAKU_SCORE_VERSION);
-        writer.Write(this.Username);
-        writer.Write(this.MapHash);
-        writer.Write(PlayMode.pTyping.GetString());
-        writer.Write(this.Score);
-        writer.Write((short)this.Combo);
-        writer.Write((short)this.MaxCombo);
-        writer.Write((short)this.PoorHits);     // 50
-        writer.Write((short)this.FairHits);     // 100
-        writer.Write((short)this.GoodHits);     // 300
-        writer.Write((short)this.ExcellentHits);// geki
-        writer.Write((short)0);                 // katu
-        writer.Write((short)0);                 // miss
-        writer.Write(this.Accuracy);
-
-        float speed = 1f;
-
-        foreach (PlayerMod playerMod in this.Mods)
-            speed = playerMod switch {
-                HalfTimeMod   => 0.5f,
-                DoubleTimeMod => 1.5f,
-                _             => speed
-            };
-
-        writer.Write(speed);//Speed
-
+        this.TatakuSerialize(writer);
+        
         writer.Flush();
-        writer.Close();
 
         return stream.ToArray();
     }

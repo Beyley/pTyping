@@ -134,10 +134,7 @@ public class Player : CompositeDrawable {
 
         ConVars.Volume.OnChange    += this.OnVolumeChange;
         this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
-
-        //This wont be needed soon
-        this.Drawables = this.Drawables.OrderByDescending(o => o.Depth).ToList();
-
+        
         this.Play();
 
         this._sortDrawables = true;

@@ -972,6 +972,8 @@ public class TatakuReader : BinaryReader {
     public PlayMode ReadPlayMode() => PlayModeMethods.FromString(this.ReadString());
 
     public DateTimeOffset ReadUnixEpoch() => DateTimeOffset.FromUnixTimeSeconds((long)this.ReadUInt64());
+
+    public string ReadOptionString() => this.ReadByte() != 0 ? this.ReadString() : null;
 }
 
 public class TatakuWriter : BinaryWriter {
@@ -1001,6 +1003,11 @@ public class TatakuWriter : BinaryWriter {
 
     public void Write(DateTimeOffset time) {
         this.Write((ulong)time.ToUnixTimeSeconds());
+    }
+    public void WriteOptionString(string str) {
+        this.Write((byte)(str != null ? 1 : 0));
+        if (str != null)
+            this.Write(str);
     }
 }
 

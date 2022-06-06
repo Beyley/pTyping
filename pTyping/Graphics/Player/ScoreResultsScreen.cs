@@ -5,6 +5,7 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Scores;
@@ -71,6 +72,10 @@ public class ScoreResultsScreen : pScreen {
 
         EventHandler<(MouseButton, Point)> watchReplayOnClick = delegate {
             pTypingGame.MenuClickSound.PlayNew();
+            if (!this.Score.ReplayCheck()) {
+                pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "This score has no replay data!");
+                return;
+            }
             ScreenManager.ChangeScreen(new PlayerScreen(this.Score));
         };
 
