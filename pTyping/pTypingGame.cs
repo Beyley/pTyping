@@ -354,8 +354,6 @@ public class pTypingGame : FurballGame {
 
         pTypingConfig.Instance.Save();
 
-        DiscordManager.Client.Dispose();
-
         base.OnClosing();
     }
 

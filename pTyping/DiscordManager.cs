@@ -24,16 +24,25 @@ public static class DiscordManager {
         get;
     } = new(null);
     
+    public static bool Initialized { get; private set; }
+    
     public static void Initialize() {
-        Client             = new(CLIENT_ID, (ulong)CreateFlags.NoRequireDiscord);
-        ActivityManager    = Client.GetActivityManager();
-        ApplicationManager = Client.GetApplicationManager();
-        LobbyManager       = Client.GetLobbyManager();
-        UserManager        = Client.GetUserManager();
+        try {
+            Client             = new(CLIENT_ID, (ulong) CreateFlags.NoRequireDiscord);
+            ActivityManager    = Client.GetActivityManager();
+            ApplicationManager = Client.GetApplicationManager();
+            LobbyManager       = Client.GetLobbyManager();
+            UserManager        = Client.GetUserManager();
 
-        UserManager.OnCurrentUserUpdate += OnUserUpdate;
+            Initialized = true;
+            
+            UserManager.OnCurrentUserUpdate += OnUserUpdate;
 
-        ActivityManager.OnActivityJoin += OnActivityJoin;
+            ActivityManager.OnActivityJoin += OnActivityJoin;
+        }
+        catch {
+            Initialized = false;
+        }
     }
     private static void OnActivityJoin(string secret) {
         LobbyManager.ConnectLobbyWithActivitySecret(
@@ -61,7 +70,10 @@ public static class DiscordManager {
         );
     }
 
-    public static void CreateLobby() {
+    public static bool CreateLobby() {
+        if (!Initialized)
+            return false;
+        
         LobbyTransaction transaction = LobbyManager.GetLobbyCreateTransaction();
         transaction.SetType(LobbyType.Public);
         transaction.SetCapacity(8);
@@ -82,23 +94,39 @@ public static class DiscordManager {
             ScreenManager.ChangeScreen(new LobbyScreen());
         }
         );
+
+        return true;
     }
 
-    public static void UpdateLobbyObject() {
+    public static bool UpdateLobbyObject() {
+        if (!Initialized)
+            return false;
+        
         if (Lobby.Value.HasValue)
             Lobby.Value = LobbyManager.GetLobby(Lobby.Value.Value.Id);
+
+        return true;
     }
 
     private static void OnUserUpdate() {
+        if (!Initialized)
+            return;
+        
         User = UserManager.GetCurrentUser();
     }
     
     public static void Dispose() {
+        if (!Initialized)
+            return;
+        
         Client.Dispose();
     }
 
     private static double _Timer = 0;
     public static void Update(double deltaTime) {
+        if (!Initialized)
+            return;
+        
         Client.RunCallbacks();
 
         _Timer += deltaTime;
@@ -112,6 +140,9 @@ public static class DiscordManager {
     }
 
     private static void UpdatePresence() {
+        if (!Initialized)
+            return;
+        
         if (FurballGame.Instance.RunningScreen is pScreen screen) {
             Activity activity = new() {
                 State   = screen.State,
