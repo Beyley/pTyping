@@ -15,7 +15,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DiscordSDK\DiscordSDK.csproj"/>
+        <ProjectReference Include="..\DiscordSDK\DiscordSDK.csproj" />
         <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
     </ItemGroup>
 
@@ -26,12 +26,12 @@
     <!--    </ItemGroup>-->
 
     <ItemGroup>
-        <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
-        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always"/>
-        <None Update="runtimes/**" CopyToOutputDirectory="Always"/>
-        <None Remove="Content\note.png~"/>
+        <None Update="Content/*.png" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.wav" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.ttf" CopyToOutputDirectory="Always" />
+        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always" />
+        <None Update="runtimes/**" CopyToOutputDirectory="Always" />
+        <None Remove="Content\note.png~" />
     </ItemGroup>
 
     <ItemGroup>
@@ -44,7 +44,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="ParallelExtensionsCore" Version="2.1.0" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
-        <PackageReference Include="Websocket.Client" Version="4.4.43"/>
+        <PackageReference Include="Websocket.Client" Version="4.4.43" />
     </ItemGroup>
 
     <ItemGroup>

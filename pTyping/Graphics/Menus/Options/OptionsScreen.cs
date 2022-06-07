@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Localization.Languages;
 using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using pTyping.Engine;
+using Silk.NET.Windowing;
 
 namespace pTyping.Graphics.Menus.Options;
 
@@ -98,29 +99,49 @@ public class OptionsScreen : pScreen {
 
         #endregion
 
-        #region 1600x900 res button
+        #region Resolution dropdown
 
-        UiButtonDrawable res1600X900Button = new(new Vector2(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        IEnumerable<VideoMode> supportedResolutions = FurballGame.Instance.WindowManager.Monitor.GetAllVideoModes();
 
-        res1600X900Button.OnClick += delegate {
-            FurballGame.Instance.ChangeScreenSize(1600, 900);
-        };
+        List<string> items = new();
+        
+        foreach (VideoMode supportedResolution in supportedResolutions) {
+            if (Math.Abs((double)supportedResolution.Resolution!.Value.X / (double)supportedResolution.Resolution!.Value.Y - (16d / 9d)) > 0.05d)
+                continue;
+            
+            items.Add($"{supportedResolution.Resolution.Value.X}x{supportedResolution.Resolution.Value.Y} ({supportedResolution.RefreshRate}hz)");
+        }
 
-        this.Manager.Add(res1600X900Button);
-
+        UiDropdownDrawable resolutionDropdown = new(new Vector2(100, 300), items, new(200, 50), pTypingGame.JapaneseFont, 25);
+        
+        this.Manager.Add(resolutionDropdown);
+        
         #endregion
-
-        #region 1920x1080 res button
-
-        UiButtonDrawable res1920X1080Button = new(new Vector2(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
-
-        res1920X1080Button.OnClick += delegate {
-            FurballGame.Instance.ChangeScreenSize(1920, 1080);
-        };
-
-        this.Manager.Add(res1920X1080Button);
-
-        #endregion
+        
+        //
+        // #region 1600x900 res button
+        //
+        // UiButtonDrawable res1600X900Button = new(new Vector2(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        //
+        // res1600X900Button.OnClick += delegate {
+        //     FurballGame.Instance.ChangeScreenSize(1600, 900);
+        // };
+        //
+        // this.Manager.Add(res1600X900Button);
+        //
+        // #endregion
+        //
+        // #region 1920x1080 res button
+        //
+        // UiButtonDrawable res1920X1080Button = new(new Vector2(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        //
+        // res1920X1080Button.OnClick += delegate {
+        //     FurballGame.Instance.ChangeScreenSize(1920, 1080);
+        // };
+        //
+        // this.Manager.Add(res1920X1080Button);
+        //
+        // #endregion
 
         #region Language dropdown
 
