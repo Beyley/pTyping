@@ -36,13 +36,12 @@ public static class SongManager {
 
         List<Song> songs = JsonConvert.DeserializeObject<List<Song>>(databaseRaw);
 
-        //todo: should we do this? i dont know if we should scan for songs if we have an empty database, but im putting this here now
-        if (songs.Count == 0) {
-            UpdateSongs();
-        }
-        
         Songs.Clear();
         Songs.AddRange(songs);
+
+        //todo: should we do this? i dont know if we should scan for songs if we have an empty database, but im putting this here now
+        if (songs.Count == 0)
+            UpdateSongs();
     }
 
     public static void SaveDatabase() {
