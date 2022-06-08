@@ -74,27 +74,33 @@ public static class DiscordManager {
     public static bool CreateLobby() {
         if (!Initialized)
             return false;
-        
-        LobbyTransaction transaction = LobbyManager.GetLobbyCreateTransaction();
-        transaction.SetType(LobbyType.Public);
-        transaction.SetCapacity(8);
-        transaction.SetMetadata("name", $"{User.Username}'s game");
 
-        LobbyManager.CreateLobby(
-        transaction,
-        (Result result, ref Lobby lobby) => {
-            if (result != Result.Ok)
-                return;
+        try {
+            LobbyTransaction transaction = LobbyManager.GetLobbyCreateTransaction();
+            transaction.SetType(LobbyType.Public);
+            transaction.SetCapacity(8);
+            transaction.SetMetadata("name", $"{User.Username}'s game");
 
-            Lobby.Value = lobby;
+            LobbyManager.CreateLobby(
+            transaction,
+            (Result result, ref Lobby lobby) => {
+                if (result != Result.Ok)
+                    return;
 
-            UpdatePresence();
+                Lobby.Value = lobby;
 
-            pTypingGame.OnlineManager.OnlineLobby = new DiscordOnlineLobby(Lobby);
+                UpdatePresence();
 
-            ScreenManager.ChangeScreen(new LobbyScreen());
+                pTypingGame.OnlineManager.OnlineLobby = new DiscordOnlineLobby(Lobby);
+
+                ScreenManager.ChangeScreen(new LobbyScreen());
+            }
+            );
         }
-        );
+        catch {
+            Initialized = false;
+            return false;
+        }
 
         return true;
     }
@@ -147,33 +153,38 @@ public static class DiscordManager {
     private static void UpdatePresence() {
         if (!Initialized)
             return;
-        
-        if (FurballGame.Instance.RunningScreen is pScreen screen) {
-            Activity activity = new() {
-                State   = screen.State,
-                Details = screen.Details,
-                Assets = new ActivityAssets {
-                    LargeImage = "ptyping-mode-icon",
-                    LargeText  = "pTyping"
-                }
-            };
 
-            if (Lobby.Value.HasValue) {
-                Lobby lobby = Lobby.Value.Value;
-
-                activity.Party = new ActivityParty {
-                    Id = lobby.Id.ToString(),
-                    Size = {
-                        CurrentSize = LobbyManager.MemberCount(lobby.Id),
-                        MaxSize     = (int)lobby.Capacity
+        try {
+            if (FurballGame.Instance.RunningScreen is pScreen screen) {
+                Activity activity = new() {
+                    State   = screen.State,
+                    Details = screen.Details,
+                    Assets = new ActivityAssets {
+                        LargeImage = "ptyping-mode-icon",
+                        LargeText  = "pTyping"
                     }
                 };
-                activity.Secrets = new ActivitySecrets {
-                    Join = LobbyManager.GetLobbyActivitySecret(lobby.Id)
-                };
-            }
 
-            ActivityManager.UpdateActivity(activity, _ => {});
+                if (Lobby.Value.HasValue) {
+                    Lobby lobby = Lobby.Value.Value;
+
+                    activity.Party = new ActivityParty {
+                        Id = lobby.Id.ToString(),
+                        Size = {
+                            CurrentSize = LobbyManager.MemberCount(lobby.Id),
+                            MaxSize     = (int)lobby.Capacity
+                        }
+                    };
+                    activity.Secrets = new ActivitySecrets {
+                        Join = LobbyManager.GetLobbyActivitySecret(lobby.Id)
+                    };
+                }
+
+                ActivityManager.UpdateActivity(activity, _ => {});
+            }
+        }
+        catch {
+            Initialized = false;
         }
     }
 }
