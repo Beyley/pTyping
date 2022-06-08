@@ -31,6 +31,7 @@ public static class DiscordManager {
             Initialized = true;
 
             Client             = new(CLIENT_ID, (ulong)CreateFlags.NoRequireDiscord);
+
             ActivityManager    = Client.GetActivityManager();
             ApplicationManager = Client.GetApplicationManager();
             LobbyManager       = Client.GetLobbyManager();
@@ -126,17 +127,21 @@ public static class DiscordManager {
     public static void Update(double deltaTime) {
         if (!Initialized)
             return;
-        
-        Client.RunCallbacks();
+        try {
+            Client.RunCallbacks();
 
-        _Timer += deltaTime;
+            _Timer += deltaTime;
 
-        if (_Timer > 1) {
-            UpdatePresence();
-            _Timer = 0;
+            if (_Timer > 1) {
+                UpdatePresence();
+                _Timer = 0;
+            }
+
+            LobbyManager.FlushNetwork();
         }
-
-        LobbyManager.FlushNetwork();
+        catch {
+            Initialized = false;
+        }
     }
 
     private static void UpdatePresence() {

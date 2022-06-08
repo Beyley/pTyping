@@ -68,7 +68,7 @@ public class PlayerScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        this.Song = pTypingGame.CurrentSong.Value.Copy();
+        this.Song = SongManager.LoadFullSong(pTypingGame.CurrentSong.Value);
 
         #region song validation
 

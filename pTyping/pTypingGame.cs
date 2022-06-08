@@ -423,9 +423,18 @@ public class pTypingGame : FurballGame {
 
         DebugOverlayDrawableManager.Add(VolumeSelector);
 
-        HiraganaConversion.LoadConversion();
-        SongManager.UpdateSongs();
+        HiraganaConversion.LoadConversion(); //todo: support IMEs for more languages, and make it customizable by the user
 
+        try {
+            SongManager.LoadDatabase();
+        }
+        catch {
+            //If we somehow fail to load the database, just load from disk and save a new one
+            SongManager.UpdateSongs();
+            
+            //todo: notify user loading of database failed
+        }
+        
         MusicTrackScheduler = new Scheduler();
 
         OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;

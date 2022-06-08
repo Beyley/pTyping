@@ -57,8 +57,7 @@ public class EditorScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        //Create a copy of the song so that we dont edit it globally
-        this.EditorState = new EditorState(pTypingGame.CurrentSong.Value.Copy());
+        this.EditorState = new EditorState(SongManager.LoadFullSong(pTypingGame.CurrentSong.Value));
 
         pTypingGame.MusicTrack.Stop();
 

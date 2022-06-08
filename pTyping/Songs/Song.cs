@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Furball.Engine.Engine.Helpers;
@@ -19,7 +20,9 @@ public class Song {
     [JsonProperty]
     public int TimeSignature = 4;
 
+    [JsonProperty]
     public string FilePath;
+    [JsonProperty]
     public string FolderPath;
     
     public SongType Type;
@@ -61,27 +64,7 @@ public class Song {
     [JsonProperty]
     public SongSettings Settings { get; set; } = new();
 
-    public string MapHash {
-        get {
-            this.Notes.Sort((x, y) => (int)(x.Time - y.Time));
-
-            StringBuilder hash = new();
-
-            const string noteFormat        = "{0}:{1}:{2}:{3}:{4}";
-            const string eventFormat       = "{0}:{1}";
-            const string timingPointFormat = "{0}:{1}:{2}";
-
-            foreach (Note note in this.Notes)
-                hash.AppendFormat(noteFormat, note.Time, note.Color, note.Text, note.YOffset, note.Type);
-            foreach (Event @event in this.Events)
-                hash.AppendFormat(eventFormat, @event.Time, @event.Type);
-            foreach (TimingPoint timingPoint in this.TimingPoints)
-                hash.AppendFormat(timingPointFormat, timingPoint.Tempo, timingPoint.Time, timingPoint.ApproachMultiplier);
-            hash.AppendFormat("{0}:{1}", this.Settings.Strictness, this.Settings.GlobalApproachMultiplier);
-
-            return CryptoHelper.GetSha256(Encoding.Unicode.GetBytes(hash.ToString()));
-        }
-    }
+    public string MapHash => CryptoHelper.GetSha256(File.ReadAllBytes(this.FilePath)); //todo: decide if SHA256 is the right choice, it might be wise to go with SHA512 while we still have the chance
 
     public double BeatsPerMinute => 60000 / this.TimingPoints[0].Tempo;
 

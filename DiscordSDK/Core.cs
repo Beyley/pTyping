@@ -985,7 +985,7 @@ public class Discord : IDisposable {
     public void RunCallbacks() {
         Result res = this.Methods.RunCallbacks(this.MethodsPtr);
         if (res != Result.Ok)
-            throw new ResultException(res);
+                throw new ResultException(res);
     }
 
     [MonoPInvokeCallback]
