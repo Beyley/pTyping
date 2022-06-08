@@ -16,7 +16,6 @@ public class pTypingSongHandler : ISongHandler {
             TypeNameHandling = TypeNameHandling.Auto
         }
         );
-        song.FileInfo = fileInfo;
 
         song.Notes.Sort((x, y) => (int)((x.Time - y.Time) * 1000));
 
@@ -39,7 +38,7 @@ public class pTypingSongHandler : ISongHandler {
         song.Notes.ForEach(x => x.Text = x.Text.Trim());
 
         File.WriteAllText(
-        song.FileInfo.FullName,
+        song.FilePath,
         JsonConvert.SerializeObject(
         song,
         new JsonSerializerSettings {

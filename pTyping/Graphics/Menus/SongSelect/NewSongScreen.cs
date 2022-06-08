@@ -137,8 +137,10 @@ public class NewSongScreen : pScreen {
 
         // Open the filestream to the file
         FileStream stream = File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
-        // Set the fileinfo for the song
-        song.FileInfo = new FileInfo(stream.Name);
+
+        song.FilePath   = stream.Name;
+        song.FolderPath = Path.GetDirectoryName(stream.Name);
+        
         // Close the filestream
         stream.Close();
         // Save the song to the file

@@ -17,6 +17,7 @@ public class ScoreManager {
 
     public bool WantCreateFreshDatabase = false;
 
+    [Pure, NotNull]
     public List<PlayerScore> GetScores(string mapHash) => this._scores.Where(x => x.MapHash == mapHash).ToList();
 
     public void AddScore(PlayerScore score) {

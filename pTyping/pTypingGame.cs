@@ -211,7 +211,7 @@ public class pTypingGame : FurballGame {
 
             backgroundTex = DefaultBackground;
         } else {
-            string qualifiedBackgroundPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.BackgroundPath);
+            string qualifiedBackgroundPath = Path.Combine(song.FolderPath, song.BackgroundPath);
             backgroundTex = File.Exists(qualifiedBackgroundPath)
                                 ? ContentManager.LoadTextureFromFile(qualifiedBackgroundPath, ContentSource.External)
                                 : DefaultBackground;
@@ -462,7 +462,7 @@ public class pTypingGame : FurballGame {
             this.CurrentRealScreen = s;
     }
     private void OnSongChange(object sender, Song song) {
-        string qualifiedAudioPath = Path.Combine(song.FileInfo.DirectoryName ?? string.Empty, song.AudioPath);
+        string qualifiedAudioPath = Path.Combine(song.FolderPath, song.AudioPath);
 
         LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
         

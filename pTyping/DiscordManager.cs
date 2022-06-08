@@ -28,14 +28,14 @@ public static class DiscordManager {
     
     public static void Initialize() {
         try {
-            Client             = new(CLIENT_ID, (ulong) CreateFlags.NoRequireDiscord);
+            Initialized = true;
+
+            Client             = new(CLIENT_ID, (ulong)CreateFlags.NoRequireDiscord);
             ActivityManager    = Client.GetActivityManager();
             ApplicationManager = Client.GetApplicationManager();
             LobbyManager       = Client.GetLobbyManager();
             UserManager        = Client.GetUserManager();
 
-            Initialized = true;
-            
             UserManager.OnCurrentUserUpdate += OnUserUpdate;
 
             ActivityManager.OnActivityJoin += OnActivityJoin;

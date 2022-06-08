@@ -18,8 +18,7 @@ public class UTypingSongHandler : ISongHandler {
             Name       = "",
             Artist     = "",
             Creator    = "",
-            Difficulty = "",
-            FileInfo   = fileInfo
+            Difficulty = ""
         };
 
         string infoData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(fileInfo.FullName));

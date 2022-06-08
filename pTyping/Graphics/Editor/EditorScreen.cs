@@ -64,7 +64,7 @@ public class EditorScreen : pScreen {
 
         #region Gameplay preview
 
-        FileInfo[] noteFiles = this.EditorState.Song.FileInfo.Directory?.GetFiles("note.png");
+        FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.FolderPath).GetFiles("note.png");
 
         this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
                                : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,                             ContentSource.External);

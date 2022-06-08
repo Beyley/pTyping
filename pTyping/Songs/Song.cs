@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Text;
 using Furball.Engine.Engine.Helpers;
@@ -17,11 +16,12 @@ public enum SongType {
 
 [JsonObject(MemberSerialization.OptIn)]
 public class Song {
-    public FileInfo FileInfo;
-
     [JsonProperty]
     public int TimeSignature = 4;
 
+    public string FilePath;
+    public string FolderPath;
+    
     public SongType Type;
     [JsonProperty]
     public List<Note> Notes { get; set; } = new();

@@ -111,10 +111,10 @@ public class Player : CompositeDrawable {
 
         this.Drawables.Add(this._playfieldBackground);
 
-        FileInfo[] noteFiles = this.Song.FileInfo.Directory?.GetFiles("note.png");
+        FileInfo[] noteFiles = new DirectoryInfo(this.Song.FolderPath).GetFiles("note.png");
 
-        this._noteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
-                                : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,                             ContentSource.External);
+        this._noteTexture = noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
+                                : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,        ContentSource.External);
 
 
         this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
