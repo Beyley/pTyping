@@ -278,17 +278,18 @@ public class EditorScreen : pScreen {
 
         this._speedDropdown = new UiDropdownDrawable(
         new Vector2(10, 200),
-        new List<string> {
-            x025,
-            x050,
-            x075,
-            x100
+        new Dictionary<object, string>
+        {
+            {0.25d, "0.25x"},
+            {0.5d, "0.50x"},
+            {0.75d, "0.75x"},
+            {1d, "1.00x"},
         },
         new Vector2(100, 20),
         pTypingGame.JapaneseFont,
         20
         );
-        this._speedDropdown.SelectedItem.Value = x100;
+        this._speedDropdown.SelectedItem.Value = this._speedDropdown.Items.First(x => (double)x.Key == 1d);
 
         this._speedDropdown.SelectedItem.OnChange += ChangeSpeed;
 
@@ -326,25 +327,8 @@ public class EditorScreen : pScreen {
     private const string x050 = "x0.50";
     private const string x075 = "x0.75";
     private const string x100 = "x1.00";
-    private static void ChangeSpeed(object _, string s) {
-        switch (s) {
-            case x025: {
-                pTypingGame.MusicTrack.SetSpeed(0.25);
-                break;
-            }
-            case x050: {
-                pTypingGame.MusicTrack.SetSpeed(0.50);
-                break;
-            }
-            case x075: {
-                pTypingGame.MusicTrack.SetSpeed(0.75);
-                break;
-            }
-            case x100: {
-                pTypingGame.MusicTrack.SetSpeed(1);
-                break;
-            }
-        }
+    private static void ChangeSpeed(object _, KeyValuePair<object, string> keyValuePair) {
+        pTypingGame.MusicTrack.SetSpeed((double)keyValuePair.Key);
     }
 
     private void OnVolumeChange(object sender, Value.Number f) {

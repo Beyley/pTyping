@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -16,8 +17,6 @@ using Silk.NET.Windowing;
 namespace pTyping.Graphics.Menus.Options;
 
 public class OptionsScreen : pScreen {
-    private readonly Dictionary<string, Language> _languageDictionary = new();
-
     public override void Initialize() {
         base.Initialize();
 
@@ -103,13 +102,13 @@ public class OptionsScreen : pScreen {
 
         IEnumerable<VideoMode> supportedResolutions = FurballGame.Instance.WindowManager.Monitor.GetAllVideoModes();
 
-        List<string> items = new();
+        Dictionary<object, string> items = new();
         
         foreach (VideoMode supportedResolution in supportedResolutions) {
             if (Math.Abs((double)supportedResolution.Resolution!.Value.X / (double)supportedResolution.Resolution!.Value.Y - (16d / 9d)) > 0.05d)
                 continue;
             
-            items.Add($"{supportedResolution.Resolution.Value.X}x{supportedResolution.Resolution.Value.Y} ({supportedResolution.RefreshRate}hz)");
+            items.Add(supportedResolution, $"{supportedResolution.Resolution.Value.X}x{supportedResolution.Resolution.Value.Y} ({supportedResolution.RefreshRate}hz)");
         }
 
         UiDropdownDrawable resolutionDropdown = new(new Vector2(100, 300), items, new(200, 50), pTypingGame.JapaneseFont, 25);
@@ -145,19 +144,16 @@ public class OptionsScreen : pScreen {
 
         #region Language dropdown
 
-        List<string> languages = new();
+        Dictionary<object, string> languages = new();
 
         foreach (ISO639_2Code code in LocalizationManager.GetSupportedLanguages()) {
             Language language = LocalizationManager.GetLanguageFromCode(code)!;
 
-            string languageName = language.ToString();
-
-            languages.Add(languageName);
-            this._languageDictionary.Add(languageName, language);
+            languages.Add(language, language.ToString());
         }
 
         UiDropdownDrawable languageDropdown = new(new Vector2(800, 100), languages, new Vector2(175, 40), pTypingGame.JapaneseFontStroked, 20);
-        languageDropdown.SelectedItem.Value = LocalizationManager.CurrentLanguage.ToString();
+        languageDropdown.SelectedItem.Value = languages.First(x => ((Language) x.Key).Iso6392Code() == LocalizationManager.CurrentLanguage.Iso6392Code());
         languageDropdown.Update();
 
         languageDropdown.SelectedItem.OnChange += this.OnLanguageChange;
@@ -193,8 +189,8 @@ public class OptionsScreen : pScreen {
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
-    private void OnLanguageChange(object _, string s) {
-        LocalizationManager.CurrentLanguage = this._languageDictionary[s];
+    private void OnLanguageChange(object _, KeyValuePair<object, string> keyValuePair) {
+        LocalizationManager.CurrentLanguage = (Language) keyValuePair.Key;
     }
 
     private void BackgroundDimInputOnCommit(object sender, string e) {

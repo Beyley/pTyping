@@ -41,11 +41,14 @@ public class CreateEventTool : EditorTool {
         this.SelectedEventLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Event", LABELTEXTSIZE);
         this.SelectedEventLabel.SpaceAfter = LABELAFTERDISTANCE;
         this.SelectedEvent = UiElement.CreateDropdown(
-        new List<string> {
+        new Dictionary<object, string> {
             // BEAT_LINE_BEAT, // We dont allow the user to create this right now, it should be auto-generated
             // BEAT_LINE_BAR,  // ^
-            LYRIC,
-            TYPING_CUTOFF
+            {
+                LYRIC, LYRIC
+            }, {
+                TYPING_CUTOFF, TYPING_CUTOFF
+            }
         },
         DROPDOWNBUTTONSIZE,
         pTypingGame.JapaneseFont,
@@ -65,8 +68,8 @@ public class CreateEventTool : EditorTool {
         base.Initialize();
     }
 
-    private void OnSelectedEventChange(object sender, string e) {
-        switch (e) {
+    private void OnSelectedEventChange(object sender, KeyValuePair<object, string> keyValuePair) {
+        switch (keyValuePair.Value) {
             case LYRIC: {
                 this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInputLabel);
                 this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInput);
@@ -86,7 +89,7 @@ public class CreateEventTool : EditorTool {
 
         Event @event = null;
 
-        switch (this.SelectedEvent.AsDropdown().SelectedItem.Value) {
+        switch (this.SelectedEvent.AsDropdown().SelectedItem.Value.Key) {
             case BEAT_LINE_BAR: {
                 @event = new BeatLineBarEvent {
                     Time = this.EditorInstance.EditorState.MouseTime

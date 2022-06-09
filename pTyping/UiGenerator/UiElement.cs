@@ -30,7 +30,7 @@ public class UiElement {
         return element;
     }
 
-    public static UiElement CreateDropdown(List<string> items, Vector2 buttonSize, FontSystem font, int fontSize) {
+    public static UiElement CreateDropdown(Dictionary<object, string> items, Vector2 buttonSize, FontSystem font, int fontSize) {
         UiElement element = new(UiElementType.Dropdown) {
             Drawable = new UiDropdownDrawable(new Vector2(0f), items, buttonSize, font, fontSize)
         };
