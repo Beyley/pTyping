@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Furball.Engine.Engine.Helpers;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -24,7 +23,8 @@ public class Song {
     public string FilePath;
     [JsonProperty]
     public string FolderPath;
-    
+
+    [JsonProperty]
     public SongType Type;
     [JsonProperty]
     public List<Note> Notes { get; set; } = new();

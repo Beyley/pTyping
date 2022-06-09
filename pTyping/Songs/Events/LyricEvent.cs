@@ -8,5 +8,9 @@ public class LyricEvent : Event {
     public override EventType Type => EventType.Lyric;
 
     [JsonProperty]
+    public double EndTime { get; set; } = double.PositiveInfinity;
+    
+    [JsonProperty]
     public string Lyric { get; set; } = "";
+    
 }

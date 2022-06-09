@@ -84,8 +84,16 @@ public class UTypingSongHandler : ISongHandler {
                     string[] splitLine = line.Split(" ");
 
                     double time = double.Parse(splitLine[0]) * 1000d;
-                    string text = splitLine[1];
+                    string text = string.Join(' ', splitLine[1..]);
 
+                    if (song.Events.Any(x => x.Type == EventType.Lyric)) {
+                        LyricEvent ev = (LyricEvent)song.Events.Last(x => x.Type == EventType.Lyric);
+
+                        // ReSharper disable once CompareOfFloatsByEqualityOperator
+                        if (ev.EndTime == double.PositiveInfinity)
+                            ev.EndTime = time;
+                    }
+                    
                     song.Events.Add(
                     new LyricEvent {
                         Lyric = text.Trim(),
@@ -95,15 +103,26 @@ public class UTypingSongHandler : ISongHandler {
 
                     break;
                 }
-                //Prevents you from typing the previous note in the format of
+                //Prevents you from typing the previous note, and stops the currently lyric
                 // /TimeInSeconds
                 //ex. /17.982353
                 case "/": {
+                    double time = double.Parse(line) * 1000d;
+
+                    //Cut us off from hitting the previous note
                     song.Events.Add(
                     new TypingCutoffEvent {
-                        Time = double.Parse(line) * 1000d
+                        Time = time
                     }
                     );
+
+                    if (song.Events.Any(x => x.Type == EventType.Lyric)) {
+                        LyricEvent ev = (LyricEvent)song.Events.Last(x => x.Type == EventType.Lyric);
+
+                        // ReSharper disable once CompareOfFloatsByEqualityOperator
+                        if (ev.EndTime == double.PositiveInfinity)
+                            ev.EndTime = time;
+                    }
 
                     break;
                 }
