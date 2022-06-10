@@ -298,7 +298,7 @@ public class SongSelectionScreen : pScreen {
     public void UpdateSelectedSong(bool fromPrevScreen = false) {
         this._songInfo.Text = $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
 Created by {pTypingGame.CurrentSong.Value.Creator}
-BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}";
+BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
 
         if (!fromPrevScreen) {
             pTypingGame.PlayMusic();
