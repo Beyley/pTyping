@@ -30,6 +30,8 @@ public class Song {
     public List<Note> Notes { get; set; } = new();
 
     [JsonProperty]
+    public string Description { get; set; }
+    [JsonProperty]
     public string Name { get; set; }
     [JsonProperty]
     public string Artist { get; set; }

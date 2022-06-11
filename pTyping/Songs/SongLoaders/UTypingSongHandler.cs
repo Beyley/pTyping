@@ -16,6 +16,7 @@ public class UTypingSongHandler : ISongHandler {
     public Song LoadSong(FileInfo fileInfo) {
         Song song = new() {
             Name       = "",
+            
             Artist     = "",
             Creator    = "",
             Difficulty = ""
@@ -31,10 +32,17 @@ public class UTypingSongHandler : ISongHandler {
         song.Creator    = info[2];
         song.Difficulty = info[3];
         song.Type       = this.Type;
+        
+        string fumenFilename = info[4];
 
-        string dataFilename = info[4];
+        //info[5] is just the score filename, which we dont parse
+        //all lines after info[5] are description
 
-        string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, dataFilename)));
+        string[] descSplit = info[6..];
+
+        song.Description = string.Join("\n", descSplit);
+        
+        string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, fumenFilename)));
 
         if (mapData[0] != '@') return null;
 

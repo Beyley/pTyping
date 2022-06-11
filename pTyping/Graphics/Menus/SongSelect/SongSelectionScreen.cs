@@ -39,6 +39,7 @@ public class SongSelectionScreen : pScreen {
 
     private TextDrawable       _songInfo;
     private SongSelectDrawable _songSelectDrawable;
+    private SongInfoDrawable   _songInfoDrawable;
 
     public SongSelectionScreen(bool editor) => this._editor = editor;
     public override string Name  => "Song Select";
@@ -209,6 +210,14 @@ public class SongSelectionScreen : pScreen {
 
         #endregion
 
+        #region Song info
+
+        this.Manager.Add(this._songInfoDrawable = new SongInfoDrawable {
+            Position = new Vector2(100, 100)
+        });
+        
+        #endregion
+        
         if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0)
             pTypingGame.CurrentSong.Value = SongManager.Songs[0];
         else if (pTypingGame.CurrentSong?.Value != null)
@@ -300,6 +309,8 @@ public class SongSelectionScreen : pScreen {
 Created by {pTypingGame.CurrentSong.Value.Creator}
 BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
 
+        this._songInfoDrawable.SetSong(pTypingGame.CurrentSong);
+        
         if (!fromPrevScreen) {
             pTypingGame.PlayMusic();
         } else if (pTypingGame.MusicTrack.PlaybackState is PlaybackState.Paused or PlaybackState.Stopped) {
