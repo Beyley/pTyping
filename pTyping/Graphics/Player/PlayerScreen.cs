@@ -31,10 +31,10 @@ public class PlayerScreen : pScreen {
 
     private bool _endScheduled = false;
 
-    private UiButtonDrawable _quitButton;
-    private UiButtonDrawable _restartButton;
-    private UiButtonDrawable _resumeButton;
-    private UiButtonDrawable _skipButton;
+    private DrawableButton _quitButton;
+    private DrawableButton _restartButton;
+    private DrawableButton _resumeButton;
+    private DrawableButton _skipButton;
 
     private LyricDrawable _lyricDrawable;
 
@@ -128,11 +128,11 @@ public class PlayerScreen : pScreen {
         this.Manager.Add(this._accuracyDrawable);
         this.Manager.Add(this._comboDrawable);
 
-        this._skipButton = new UiButtonDrawable(
+        this._skipButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
-        "Skip Intro",
         FurballGame.DEFAULT_FONT,
         50,
+        "Skip Intro",
         Color.Blue,
         Color.White,
         Color.White,
@@ -151,11 +151,11 @@ public class PlayerScreen : pScreen {
 
         Vector2 pauseUiButtonSize = new(170, 50);
 
-        this._resumeButton = new UiButtonDrawable(
+        this._resumeButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
-        "Resume",
         FurballGame.DEFAULT_FONT,
         50,
+        "Resume",
         Color.Green,
         Color.White,
         Color.White,
@@ -165,11 +165,11 @@ public class PlayerScreen : pScreen {
             Depth      = -1f
         };
 
-        this._restartButton = new UiButtonDrawable(
+        this._restartButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.3f),
-        "Restart",
         FurballGame.DEFAULT_FONT,
         50,
+        "Restart",
         Color.Yellow,
         Color.White,
         Color.White,
@@ -179,11 +179,11 @@ public class PlayerScreen : pScreen {
             Depth      = -1f
         };
 
-        this._quitButton = new UiButtonDrawable(
+        this._quitButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f),
-        "Quit",
         FurballGame.DEFAULT_FONT,
         50,
+        "Quit",
         Color.Red,
         Color.White,
         Color.White,

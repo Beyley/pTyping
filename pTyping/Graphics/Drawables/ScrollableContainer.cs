@@ -74,12 +74,23 @@ public class ScrollableContainer : CompositeDrawable {
     }
 
     public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
+        batch.End();
+
         Rectangle rect = GraphicsBackend.Current.ScissorRect;
 
-        GraphicsBackend.Current.ScissorRect = new Rectangle(new((int) this.RealPosition.X, (int) this.RealPosition.Y), new((int) this._size.X, (int) this._size.Y));
-        base.Draw(time, batch, args);
+        Rectangle newRect = new(
+        new((int)(this.RealPosition.X * FurballGame.VerticalRatio), (int)(this.RealPosition.Y * FurballGame.VerticalRatio)),
+        new((int)(this._size.X        * FurballGame.VerticalRatio), (int)(this._size.Y        * FurballGame.VerticalRatio))
+        );
 
+        GraphicsBackend.Current.ScissorRect = newRect;
+
+        batch.Begin();
+        base.Draw(time, batch, args);
+        batch.End();
+        
         GraphicsBackend.Current.ScissorRect = rect;
+        batch.Begin();
     }
 
     public void RecalculateMax() {

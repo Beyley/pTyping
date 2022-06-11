@@ -47,12 +47,12 @@ public class OptionsScreen : pScreen {
         #region Background Dim
 
         TextDrawable backgroundDimInputLabel = new(new Vector2(100, 150), FurballGame.DEFAULT_FONT, "Background Dim:", 30);
-        UiTextBoxDrawable backgroundDimInput = new(
+        DrawableTextBox backgroundDimInput = new(
         new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
         FurballGame.DEFAULT_FONT,
-        ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture),
         30,
-        200
+        200,
+        ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture)
         );
 
         backgroundDimInput.OnCommit += this.BackgroundDimInputOnCommit;
@@ -65,7 +65,7 @@ public class OptionsScreen : pScreen {
         #region Target FPS
 
         // TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
-        // UiTextBoxDrawable targetFPSInput = new(
+        // DrawableTextBox targetFPSInput = new(
         // new Vector2(110 + targetFPSInputLabel.Size.X, 200),
         // FurballGame.DEFAULT_FONT,
         // ConVars.TargetFPS.Value.Value.ToString(CultureInfo.InvariantCulture),
@@ -83,12 +83,12 @@ public class OptionsScreen : pScreen {
         #region Username
 
         TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DEFAULT_FONT, "Username:", 30);
-        UiTextBoxDrawable usernameInput = new(
+        DrawableTextBox usernameInput = new(
         new Vector2(360 + usernameInputLabel.Size.X, 200),
         FurballGame.DEFAULT_FONT,
-        pTypingConfig.Instance.Username,
         30,
-        200
+        200,
+        pTypingConfig.Instance.Username
         );
 
         usernameInput.OnCommit += this.UsernameInputOnCommit;
@@ -111,7 +111,7 @@ public class OptionsScreen : pScreen {
             items.Add(supportedResolution, $"{supportedResolution.Resolution.Value.X}x{supportedResolution.Resolution.Value.Y} ({supportedResolution.RefreshRate}hz)");
         }
 
-        UiDropdownDrawable resolutionDropdown = new(new Vector2(100, 300), items, new(200, 50), pTypingGame.JapaneseFont, 25);
+        DrawableDropdown resolutionDropdown = new(new Vector2(100, 300), pTypingGame.JapaneseFont, 25, new(200, 50), items);
         
         this.Manager.Add(resolutionDropdown);
         
@@ -120,7 +120,7 @@ public class OptionsScreen : pScreen {
         //
         // #region 1600x900 res button
         //
-        // UiButtonDrawable res1600X900Button = new(new Vector2(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        // DrawableButton res1600X900Button = new(new Vector2(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
         //
         // res1600X900Button.OnClick += delegate {
         //     FurballGame.Instance.ChangeScreenSize(1600, 900);
@@ -132,7 +132,7 @@ public class OptionsScreen : pScreen {
         //
         // #region 1920x1080 res button
         //
-        // UiButtonDrawable res1920X1080Button = new(new Vector2(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
+        // DrawableButton res1920X1080Button = new(new Vector2(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
         //
         // res1920X1080Button.OnClick += delegate {
         //     FurballGame.Instance.ChangeScreenSize(1920, 1080);
@@ -152,8 +152,11 @@ public class OptionsScreen : pScreen {
             languages.Add(language, language.ToString());
         }
 
-        UiDropdownDrawable languageDropdown = new(new Vector2(800, 100), languages, new Vector2(175, 40), pTypingGame.JapaneseFontStroked, 20);
-        languageDropdown.SelectedItem.Value = languages.First(x => ((Language) x.Key).Iso6392Code() == LocalizationManager.CurrentLanguage.Iso6392Code());
+        DrawableDropdown languageDropdown = new(new Vector2(800, 100), pTypingGame.JapaneseFontStroked, 20, new Vector2(175, 40), languages) {
+            SelectedItem = {
+                Value = languages.First(x => ((Language)x.Key).Iso6392Code() == LocalizationManager.CurrentLanguage.Iso6392Code())
+            }
+        };
         languageDropdown.Update();
 
         languageDropdown.SelectedItem.OnChange += this.OnLanguageChange;
@@ -164,7 +167,7 @@ public class OptionsScreen : pScreen {
 
         #region Crash Button
 
-        UiButtonDrawable crash = new(new(400, 400), "Crash the game", pTypingGame.JapaneseFont, 30, Color.Red, Color.White, Color.Black, Vector2.Zero);
+        DrawableButton crash = new(new(400, 400), pTypingGame.JapaneseFont, 30, "Crash the game", Color.Red, Color.White, Color.Black, Vector2.Zero);
 
         crash.OnClick += delegate {
             throw new Exception("Manual crash.");
@@ -176,7 +179,7 @@ public class OptionsScreen : pScreen {
 
         #region Lobby test
 
-        UiButtonDrawable lobbyTest = new(new(400, 500), "Crate a lobby", pTypingGame.JapaneseFont, 30, Color.Red, Color.White, Color.Black, Vector2.Zero);
+        DrawableButton lobbyTest = new(new(400, 500), pTypingGame.JapaneseFont, 30, "Crate a lobby", Color.Red, Color.White, Color.Black, Vector2.Zero);
 
         lobbyTest.OnClick += delegate {
             DiscordManager.CreateLobby();

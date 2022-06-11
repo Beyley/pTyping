@@ -86,11 +86,11 @@ public class SongSelectionScreen : pScreen {
                 ScreenManager.ChangeScreen(new NewSongScreen());
             };
 
-            UiButtonDrawable createNewSongButton = new(
+            DrawableButton createNewSongButton = new(
             new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT),
-            "Create Song",
             FurballGame.DEFAULT_FONT,
             30,
+            "Create Song",
             Color.Blue,
             Color.White,
             Color.White,
@@ -121,11 +121,11 @@ public class SongSelectionScreen : pScreen {
 
         #region Start button
 
-        UiButtonDrawable startButton = new(
+        DrawableButton startButton = new(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
-        "Start!",
         FurballGame.DEFAULT_FONT,
         60,
+        "Start!",
         Color.Red,
         Color.White,
         Color.White,
@@ -188,11 +188,11 @@ public class SongSelectionScreen : pScreen {
             };
             this.Manager.Add(this._modScreen);
 
-            UiButtonDrawable toggleMods = new(
+            DrawableButton toggleMods = new(
             new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
-            "Mods",
             FurballGame.DEFAULT_FONT_STROKED,
             30,
+            "Mods",
             Color.Blue,
             Color.White,
             Color.White,

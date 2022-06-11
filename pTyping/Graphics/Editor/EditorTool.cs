@@ -22,7 +22,7 @@ public abstract class EditorTool : IComparable<EditorTool> {
     public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
     public const           float   LABELAFTERDISTANCE = 5f;
 
-    public UiTickboxDrawable TickBoxDrawable;
+    public DrawableTickbox TickBoxDrawable;
     [NotNull]
     public abstract string Name { get; }
     [NotNull]

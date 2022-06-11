@@ -24,7 +24,7 @@ public class UiElement {
 
     public static UiElement CreateButton(FontSystem font, string text, int size, Color buttonColor, Color textColor, Color outlineColor, Vector2 buttonSize) {
         UiElement element = new(UiElementType.Button) {
-            Drawable = new UiButtonDrawable(new Vector2(0f), text, font, size, buttonColor, textColor, outlineColor, buttonSize)
+            Drawable = new DrawableButton(new Vector2(0f), font, size, text, buttonColor, textColor, outlineColor, buttonSize)
         };
 
         return element;
@@ -32,7 +32,7 @@ public class UiElement {
 
     public static UiElement CreateDropdown(Dictionary<object, string> items, Vector2 buttonSize, FontSystem font, int fontSize) {
         UiElement element = new(UiElementType.Dropdown) {
-            Drawable = new UiDropdownDrawable(new Vector2(0f), items, buttonSize, font, fontSize)
+            Drawable = new DrawableDropdown(new Vector2(0f), font, fontSize, buttonSize, items)
         };
 
         return element;
@@ -40,7 +40,7 @@ public class UiElement {
 
     public static UiElement CreateProgressBar(FontSystem font, Vector2 size, Color outlineColor, Color textColor, Color barColor) {
         UiElement element = new(UiElementType.ProgressBar) {
-            Drawable = new UiProgressBarDrawable(new Vector2(0), font, size, outlineColor, barColor, textColor)
+            Drawable = new DrawableProgressBar(new Vector2(0), font, (int)(size.Y * 0.9f), size, outlineColor, barColor, textColor)
         };
 
         return element;
@@ -48,7 +48,7 @@ public class UiElement {
 
     public static UiElement CreateTextBox(FontSystem font, string text, int size, float width) {
         UiElement element = new(UiElementType.TextBox) {
-            Drawable = new UiTextBoxDrawable(new Vector2(0), font, text, size, width)
+            Drawable = new DrawableTextBox(new Vector2(0), font, size, width, text)
         };
 
         return element;
@@ -56,7 +56,7 @@ public class UiElement {
 
     public static UiElement CreateTickBox(string text, int size, bool initialState = false, bool managed = false) {
         UiElement element = new(UiElementType.TickBox) {
-            Drawable = new UiTickboxDrawable(new Vector2(0), text, size, initialState, managed)
+            Drawable = new DrawableTickbox(new Vector2(0), pTypingGame.JapaneseFont, size, text, initialState, managed)
         };
 
         return element;
@@ -72,7 +72,7 @@ public class UiElement {
 
     public static UiElement CreateColorPicker(FontSystem font, int size, Color initialColor) {
         UiElement element = new(UiElementType.ColorPicker) {
-            Drawable = new UiColorPickerDrawable(new Vector2(0), font, size, initialColor)
+            Drawable = new DrawableColorPicker(new Vector2(0), font, size, initialColor)
         };
 
         return element;
@@ -80,37 +80,37 @@ public class UiElement {
 
     #region Type Conversions
 
-    public UiButtonDrawable AsButton() {
+    public DrawableButton AsButton() {
         if (this.Type == UiElementType.Button)
-            return this.Drawable as UiButtonDrawable;
+            return this.Drawable as DrawableButton;
 
         throw new NotSupportedException();
     }
 
-    public UiDropdownDrawable AsDropdown() {
+    public DrawableDropdown AsDropdown() {
         if (this.Type == UiElementType.Dropdown)
-            return this.Drawable as UiDropdownDrawable;
+            return this.Drawable as DrawableDropdown;
 
         throw new NotSupportedException();
     }
 
-    public UiProgressBarDrawable AsProgressBar() {
+    public DrawableProgressBar AsProgressBar() {
         if (this.Type == UiElementType.ProgressBar)
-            return this.Drawable as UiProgressBarDrawable;
+            return this.Drawable as DrawableProgressBar;
 
         throw new NotSupportedException();
     }
 
-    public UiTextBoxDrawable AsTextBox() {
+    public DrawableTextBox AsTextBox() {
         if (this.Type == UiElementType.TextBox)
-            return this.Drawable as UiTextBoxDrawable;
+            return this.Drawable as DrawableTextBox;
 
         throw new NotSupportedException();
     }
 
-    public UiTickboxDrawable AsTickBox() {
+    public DrawableTickbox AsTickBox() {
         if (this.Type == UiElementType.TickBox)
-            return this.Drawable as UiTickboxDrawable;
+            return this.Drawable as DrawableTickbox;
 
         throw new NotSupportedException();
     }
@@ -122,9 +122,9 @@ public class UiElement {
         throw new NotSupportedException();
     }
 
-    public UiColorPickerDrawable AsColorPicker() {
+    public DrawableColorPicker AsColorPicker() {
         if (this.Type == UiElementType.ColorPicker)
-            return this.Drawable as UiColorPickerDrawable;
+            return this.Drawable as DrawableColorPicker;
 
         throw new NotSupportedException();
     }

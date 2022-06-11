@@ -33,9 +33,9 @@ namespace pTyping.Graphics.Editor;
 public class EditorScreen : pScreen {
     private TextDrawable _currentTimeDrawable;
 
-    public  Texture               NoteTexture;
-    private UiProgressBarDrawable _progressBar;
-    private TexturedDrawable      _recepticle;
+    public  Texture             NoteTexture;
+    private DrawableProgressBar _progressBar;
+    private TexturedDrawable    _recepticle;
 
     public EditorTool       CurrentTool;
     public List<EditorTool> EditorTools;
@@ -143,9 +143,10 @@ public class EditorScreen : pScreen {
 
         #region Progress bar
 
-        this._progressBar = new UiProgressBarDrawable(
+        this._progressBar = new DrawableProgressBar(
         new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT),
         FurballGame.DEFAULT_FONT,
+        (int)(40 * 0.9f),
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40),
         Color.Gray,
         Color.DarkGray,
@@ -254,7 +255,7 @@ public class EditorScreen : pScreen {
 
         float y = 10;
         foreach (EditorTool tool in this.EditorTools) {
-            UiTickboxDrawable tickboxDrawable = new(new Vector2(10, y), tool.Name, 35, false, true) {
+            DrawableTickbox tickboxDrawable = new(new Vector2(10, y), pTypingGame.JapaneseFontStroked, 35, tool.Name, false, true) {
                 ToolTip = tool.Tooltip
             };
 
@@ -276,18 +277,18 @@ public class EditorScreen : pScreen {
 
         #region Speed dropdown
 
-        this._speedDropdown = new UiDropdownDrawable(
+        this._speedDropdown = new DrawableDropdown(
         new Vector2(10, 200),
+        pTypingGame.JapaneseFont,
+        20,
+        new Vector2(100, 20),
         new Dictionary<object, string>
         {
             {0.25d, "0.25x"},
             {0.5d, "0.50x"},
             {0.75d, "0.75x"},
             {1d, "1.00x"},
-        },
-        new Vector2(100, 20),
-        pTypingGame.JapaneseFont,
-        20
+        }
         );
         this._speedDropdown.SelectedItem.Value = this._speedDropdown.Items.First(x => (double)x.Key == 1d);
 
@@ -686,8 +687,8 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
 
     public double CurrentApproachTime(double time) => ConVars.BASE_APPROACH_TIME / this.EditorState.Song.CurrentTimingPoint(time).ApproachMultiplier;
 
-    private double             _lastTime = 0;
-    private UiDropdownDrawable _speedDropdown;
+    private double           _lastTime = 0;
+    private DrawableDropdown _speedDropdown;
     public override void Update(double gameTime) {
         this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 

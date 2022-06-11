@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using EeveeTools.Helpers;
 using Furball.Engine.Engine.Platform;
+using Furball.Vixie.Backends.Shared.Backends;
 using Newtonsoft.Json;
 using Silk.NET.Windowing;
 
@@ -71,7 +72,7 @@ internal class Program {
             WindowBorder = WindowBorder.Fixed
         };
         if (RuntimeInfo.IsDebug())
-            game.Run(options);
+            game.Run(options, Backend.OpenGL41);
         else
             try {
                 game.Run(options);

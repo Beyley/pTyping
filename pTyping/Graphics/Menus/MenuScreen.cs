@@ -20,8 +20,8 @@ namespace pTyping.Graphics.Menus;
 public class MenuScreen : pScreen {
     private TextDrawable _musicTitle;
 
-    private ManagedDrawable       _userCard = null;
-    private UiProgressBarDrawable _songProgressBar;
+    private ManagedDrawable     _userCard = null;
+    private DrawableProgressBar _songProgressBar;
 
     public override void Initialize() {
         base.Initialize();
@@ -37,11 +37,11 @@ public class MenuScreen : pScreen {
 
         this.Manager.Add(gitVersionText);
 
-        UiButtonDrawable changelogButton = new(
+        DrawableButton changelogButton = new(
         new Vector2(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
-        GetLocalizedString(Localizations.Changelog),
         pTypingGame.JapaneseFont,
         30,
+        GetLocalizedString(Localizations.Changelog),
         Color.Blue,
         Color.White,
         Color.White,
@@ -139,9 +139,10 @@ public class MenuScreen : pScreen {
             OriginType = OriginType.TopRight
         };
 
-        this._songProgressBar = new UiProgressBarDrawable(
+        this._songProgressBar = new DrawableProgressBar(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
         pTypingGame.JapaneseFontStroked,
+        (int)(25 * 0.9f),
         new Vector2(250, 25),
         Color.White,
         Color.LightGray,

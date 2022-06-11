@@ -14,10 +14,10 @@ using Color=Furball.Vixie.Backends.Shared.Color;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class NewSongScreen : pScreen {
-    private UiTextBoxDrawable _songArtistTextBox;
-    private UiTextBoxDrawable _songCreatorTextBox;
-    private UiTextBoxDrawable _songDifficultyTextBox;
-    private UiTextBoxDrawable _songNameTextBox;
+    private DrawableTextBox _songArtistTextBox;
+    private DrawableTextBox _songCreatorTextBox;
+    private DrawableTextBox _songDifficultyTextBox;
+    private DrawableTextBox _songNameTextBox;
 
     public override void Initialize() {
         base.Initialize();
@@ -52,11 +52,11 @@ public class NewSongScreen : pScreen {
                 this.CreateSong(songInfo);
             };
 
-            UiButtonDrawable buttonForSong = new(
+            DrawableButton buttonForSong = new(
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y),
-            songInfo.Name,
             FurballGame.DEFAULT_FONT,
             25,
+            songInfo.Name,
             Color.Blue,
             Color.White,
             Color.White,
@@ -77,13 +77,13 @@ public class NewSongScreen : pScreen {
 
         y = 20f;
 
-        this._songNameTextBox       =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Name of Song", 50, 400f);
+        this._songNameTextBox       =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Name of Song");
         y                           += 20 + this._songNameTextBox.Size.Y;
-        this._songArtistTextBox     =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Artist", 50, 400f);
+        this._songArtistTextBox     =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Artist");
         y                           += 20 + this._songArtistTextBox.Size.Y;
-        this._songCreatorTextBox    =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Map Creator Name", 50, 400f);
+        this._songCreatorTextBox    =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Map Creator Name");
         y                           += 20 + this._songCreatorTextBox.Size.Y;
-        this._songDifficultyTextBox =  new UiTextBoxDrawable(new Vector2(20f, y), FurballGame.DEFAULT_FONT, "Difficulty Name", 50, 400f);
+        this._songDifficultyTextBox =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Difficulty Name");
 
         this.Manager.Add(this._songNameTextBox);
         this.Manager.Add(this._songArtistTextBox);

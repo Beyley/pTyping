@@ -54,11 +54,11 @@ public class ScoreResultsScreen : pScreen {
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
         };
 
-        UiButtonDrawable exitButton = new(
+        DrawableButton exitButton = new(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f),
-        "Exit",
         FurballGame.DEFAULT_FONT,
         40,
+        "Exit",
         Color.Red,
         Color.White,
         Color.White,
@@ -79,11 +79,11 @@ public class ScoreResultsScreen : pScreen {
             ScreenManager.ChangeScreen(new PlayerScreen(this.Score));
         };
 
-        UiButtonDrawable watchReplayButton = new(
+        DrawableButton watchReplayButton = new(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 80f),
-        "Watch Replay",
         FurballGame.DEFAULT_FONT,
         40,
+        "Watch Replay",
         Color.Blue,
         Color.White,
         Color.White,

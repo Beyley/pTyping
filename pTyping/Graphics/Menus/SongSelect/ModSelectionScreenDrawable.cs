@@ -10,7 +10,7 @@ using pTyping.Graphics.Player.Mods;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class ModSelectionScreenDrawable : CompositeDrawable {
-    private readonly List<(PlayerMod mod, UiButtonDrawable button)> _mods = new();
+    private readonly List<(PlayerMod mod, DrawableButton button)> _mods = new();
 
     private readonly Color _unselectedColor = Color.Red;
     private readonly Color _selectedColor   = Color.Blue;
@@ -26,11 +26,11 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
         for (int i = 0; i < PlayerMod.RegisteredMods.Count; i++) {
             PlayerMod mod = PlayerMod.RegisteredMods[i];
 
-            UiButtonDrawable modButton = new(
+            DrawableButton modButton = new(
             new Vector2(x, y),
-            mod.Name(),
             FurballGame.DEFAULT_FONT_STROKED,
             30,
+            mod.Name(),
             pTypingGame.SelectedMods.Contains(mod) ? this._selectedColor : this._unselectedColor,
             Color.White,
             Color.White,
@@ -63,14 +63,14 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
         this.Drawables.Add(this._scoreMultiplier);
     }
 
-    private void OnButtonClick(UiButtonDrawable modButton, PlayerMod mod) {
+    private void OnButtonClick(DrawableButton modButton, PlayerMod mod) {
         if (pTypingGame.SelectedMods.Contains(mod)) {
             pTypingGame.SelectedMods.Remove(mod);
             modButton.ButtonColor = this._unselectedColor;
             modButton.FadeColor(this._unselectedColor, 100);
         } else {
             for (int i = 0; i < this._mods.Count; i++) {
-                (PlayerMod playerMod, UiButtonDrawable button) = this._mods[i];
+                (PlayerMod playerMod, DrawableButton button) = this._mods[i];
 
                 if (mod.IncompatibleMods().Contains(playerMod.GetType()))
                     if (pTypingGame.SelectedMods.Contains(playerMod)) {
