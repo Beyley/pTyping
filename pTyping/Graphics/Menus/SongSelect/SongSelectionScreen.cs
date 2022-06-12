@@ -163,7 +163,7 @@ public class SongSelectionScreen : pScreen {
 
         #region Song info
 
-        this._songInfo = new TextDrawable(new Vector2(this._leaderboardButton.Size.X + 20, 10), pTypingGame.JapaneseFont, "", 35) {
+        this._songInfo = new TextDrawable(new Vector2(this._leaderboardButton.Size.X + 20, 10), pTypingGame.JapaneseFontStroked, "", 35) {
             Clickable   = false,
             CoverClicks = false
         };

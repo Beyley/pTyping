@@ -111,7 +111,7 @@ public class Player : CompositeDrawable {
 
         this.Drawables.Add(this._playfieldBackground);
 
-        FileInfo[] noteFiles = new DirectoryInfo(this.Song.FolderPath).GetFiles("note.png");
+        FileInfo[] noteFiles = new DirectoryInfo(this.Song.QualifiedFolderPath).GetFiles("note.png");
 
         this._noteTexture = noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
                                 : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,        ContentSource.External);

@@ -24,6 +24,7 @@ using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
+using pTyping.Songs.Events;
 using Silk.NET.Input;
 using sowelipisona;
 using Color=Furball.Vixie.Backends.Shared.Color;
@@ -63,7 +64,7 @@ public class EditorScreen : pScreen {
 
         #region Gameplay preview
 
-        FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.FolderPath).GetFiles("note.png");
+        FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.QualifiedFolderPath).GetFiles("note.png");
 
         this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
                                : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,                             ContentSource.External);
@@ -607,9 +608,18 @@ public class EditorScreen : pScreen {
                 break;
             }
             case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
+                List<LyricEvent> lyrics = this.EditorState.Song.Events.Where(x => x is LyricEvent).Cast<LyricEvent>().ToList();
+                lyrics.Sort((x, y) => (int)(x.Time - y.Time));
+                for (int i = 1; i < lyrics.Count; i++) {
+                    LyricEvent editorStateEvent     = lyrics[i];
+                    LyricEvent lastEditorStateEvent = lyrics[i - 1];
+
+                    lastEditorStateEvent.EndTime = editorStateEvent.Time;
+                }
+
                 // Save the song if ctrl+s is pressed
                 SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-                pTypingGame.CurrentSong.Value = this.EditorState.Song;
+                // pTypingGame.CurrentSong.Value = this.EditorState.Song;
                 SongManager.UpdateSongs();
 
                 this.SaveNeeded = false;

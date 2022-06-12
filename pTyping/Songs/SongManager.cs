@@ -56,17 +56,17 @@ public static class SongManager {
     }
 
     public static Song LoadFullSong(Song song) {
-        using FileStream stream = File.OpenRead(song.FilePath);
+        using FileStream   stream = File.OpenRead(song.QualifiedFilePath);
         using StreamReader reader = new(stream);
 
         Song tempSong = null;
         switch (song.Type) {
             case SongType.pTyping: {
-                tempSong = PTYPING_SONG_HANDLER.LoadSong(new FileInfo(song.FilePath));
+                tempSong = PTYPING_SONG_HANDLER.LoadSong(new FileInfo(song.QualifiedFilePath));
                 break;
             }
             case SongType.UTyping:
-                tempSong = UTYPING_SONG_HANDLER.LoadSong(new FileInfo(song.FilePath));
+                tempSong = UTYPING_SONG_HANDLER.LoadSong(new FileInfo(song.QualifiedFilePath));
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

@@ -33,12 +33,13 @@ public class pTypingSongHandler : ISongHandler {
 
     public void SaveSong(Song song) {
         song.Notes.Sort((x,        y) => (int)(x.Time - y.Time));
+        song.Events.Sort((x,       y) => (int)(x.Time - y.Time));
         song.TimingPoints.Sort((x, y) => (int)(x.Time - y.Time));
 
         song.Notes.ForEach(x => x.Text = x.Text.Trim());
 
         File.WriteAllText(
-        song.FilePath,
+        song.QualifiedFilePath,
         JsonConvert.SerializeObject(
         song,
         new JsonSerializerSettings {

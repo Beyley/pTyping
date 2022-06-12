@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using FontStashSharp;
@@ -36,7 +35,6 @@ using sowelipisona;
 using TagLib;
 using Color=Furball.Vixie.Backends.Shared.Color;
 using ConVars=pTyping.Engine.ConVars;
-using File=TagLib.File;
 using Point=System.Drawing.Point;
 
 namespace pTyping;
@@ -218,6 +216,8 @@ public class pTypingGame : FurballGame {
                     if (cover != null)
                         backgroundTex = GraphicsBackend.Current.CreateTexture(cover.Data.Data);
                 }
+
+                tags.Dispose();
             }
             catch (Exception ex) {
                 Logger.Log($"Failed to load song tags, i wonder why? {ex}", LoggerLevelSongManagerUpdateInfo.Instance);
@@ -227,9 +227,8 @@ public class pTypingGame : FurballGame {
 
             backgroundTex ??= DefaultBackground;
         } else {
-            string qualifiedBackgroundPath = Path.Combine(song.FolderPath, song.BackgroundPath);
-            backgroundTex = System.IO.File.Exists(qualifiedBackgroundPath)
-                                ? ContentManager.LoadTextureFromFile(qualifiedBackgroundPath, ContentSource.External)
+            backgroundTex = System.IO.File.Exists(song.QualifiedBackgroundPath)
+                                ? ContentManager.LoadTextureFromFile(song.QualifiedBackgroundPath, ContentSource.External)
                                 : DefaultBackground;
         }
 

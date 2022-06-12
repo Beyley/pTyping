@@ -24,8 +24,10 @@ public class Song {
     [JsonProperty]
     public string FolderPath;
 
-    public string QualifiedFilePath  => Path.Combine("songs", this.FolderPath, this.FilePath);
-    public string QualifiedAudioPath => Path.Combine("songs", this.FolderPath, this.AudioPath);
+    public string QualifiedFilePath       => Path.Combine("songs", this.FolderPath, this.FilePath);
+    public string QualifiedAudioPath      => Path.Combine("songs", this.FolderPath, this.AudioPath);
+    public string QualifiedBackgroundPath => Path.Combine("songs", this.FolderPath, this.BackgroundPath);
+    public string QualifiedFolderPath     => Path.Combine("songs", this.FolderPath);
     
     [JsonProperty]
     public SongType Type;
