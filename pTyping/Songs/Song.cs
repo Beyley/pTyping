@@ -24,6 +24,9 @@ public class Song {
     [JsonProperty]
     public string FolderPath;
 
+    public string QualifiedFilePath  => Path.Combine("songs", this.FolderPath, this.FilePath);
+    public string QualifiedAudioPath => Path.Combine("songs", this.FolderPath, this.AudioPath);
+    
     [JsonProperty]
     public SongType Type;
     [JsonProperty]
@@ -66,7 +69,10 @@ public class Song {
     [JsonProperty]
     public SongSettings Settings { get; set; } = new();
 
-    public string MapHash => CryptoHelper.GetSha256(File.ReadAllBytes(this.FilePath)); //todo: decide if SHA256 is the right choice, it might be wise to go with SHA512 while we still have the chance
+    public string MapHash
+        => CryptoHelper.GetSha256(
+        File.ReadAllBytes(this.QualifiedFilePath)
+        );//todo: decide if SHA256 is the right choice, it might be wise to go with SHA512 while we still have the chance
 
     public double BeatsPerMinute => 60000 / this.TimingPoints[0].Tempo;
 

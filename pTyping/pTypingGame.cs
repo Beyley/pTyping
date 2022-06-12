@@ -18,6 +18,7 @@ using Furball.Engine.Engine.Timing;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
+using Kettu;
 using ManagedBass;
 using pTyping.Engine;
 using pTyping.Graphics;
@@ -32,8 +33,10 @@ using pTyping.Songs;
 using Silk.NET.Input;
 using SixLabors.ImageSharp;
 using sowelipisona;
+using TagLib;
 using Color=Furball.Vixie.Backends.Shared.Color;
 using ConVars=pTyping.Engine.ConVars;
+using File=TagLib.File;
 using Point=System.Drawing.Point;
 
 namespace pTyping;
@@ -205,14 +208,27 @@ public class pTypingGame : FurballGame {
     }
 
     public static void LoadBackgroundFromSong(Song song) {
-        Texture backgroundTex;
+        Texture backgroundTex = null;
         if (song.BackgroundPath == null) {
+            try {
+                File tags = File.Create(song.QualifiedAudioPath);
+
+                if (tags.Tag.Pictures.Length != 0) {
+                    IPicture cover = tags.Tag.Pictures.FirstOrDefault(x => x.Type == PictureType.FrontCover, null);
+                    if (cover != null)
+                        backgroundTex = GraphicsBackend.Current.CreateTexture(cover.Data.Data);
+                }
+            }
+            catch (Exception ex) {
+                Logger.Log($"Failed to load song tags, i wonder why? {ex}", LoggerLevelSongManagerUpdateInfo.Instance);
+            }
+
             DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
 
-            backgroundTex = DefaultBackground;
+            backgroundTex ??= DefaultBackground;
         } else {
             string qualifiedBackgroundPath = Path.Combine(song.FolderPath, song.BackgroundPath);
-            backgroundTex = File.Exists(qualifiedBackgroundPath)
+            backgroundTex = System.IO.File.Exists(qualifiedBackgroundPath)
                                 ? ContentManager.LoadTextureFromFile(qualifiedBackgroundPath, ContentSource.External)
                                 : DefaultBackground;
         }
@@ -471,9 +487,7 @@ public class pTypingGame : FurballGame {
             this.CurrentRealScreen = s;
     }
     private void OnSongChange(object sender, Song song) {
-        string qualifiedAudioPath = Path.Combine(song.FolderPath, song.AudioPath);
-
-        LoadMusic(ContentManager.LoadRawAsset(qualifiedAudioPath, ContentSource.External));
+        LoadMusic(ContentManager.LoadRawAsset(song.QualifiedAudioPath, ContentSource.External));
         
         LoadBackgroundFromSong(song);
 

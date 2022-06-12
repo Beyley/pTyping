@@ -97,8 +97,8 @@ public static class SongManager {
             Song tempSong = PTYPING_SONG_HANDLER.LoadSong(file);
 
             if (tempSong is not null) {
-                tempSong.FilePath   = file.FullName;
-                tempSong.FolderPath = file.Directory!.FullName;//todo: handle this being null (why would it ever be?)
+                tempSong.FilePath   = file.Name;
+                tempSong.FolderPath = file.Directory!.Name;//todo: handle this being null (why would it ever be?)
 
                 //This saves a lot of memory, as the list can be freed
                 tempSong.Notes  = null;
@@ -119,8 +119,8 @@ public static class SongManager {
             Song tempSong = UTYPING_SONG_HANDLER.LoadSong(file);
 
             if (tempSong is not null) {
-                tempSong.FilePath   = file.FullName;
-                tempSong.FolderPath = file.Directory!.FullName;//todo: handle this being null (why would it ever be?)
+                tempSong.FilePath   = file.Name;
+                tempSong.FolderPath = file.Directory!.Name;//todo: handle this being null (why would it ever be?)
 
                 //This saves a lot of memory, as the list can be freed
                 tempSong.Notes  = null;

@@ -10,6 +10,7 @@ using pTyping.Engine;
 using pTyping.Songs;
 using Silk.NET.Input;
 using Color=Furball.Vixie.Backends.Shared.Color;
+using File=TagLib.File;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -47,14 +48,14 @@ public class NewSongScreen : pScreen {
         float y = 20f;
         foreach (string songPath in songs) {
             FileInfo songInfo = new(songPath);
-
+            
             EventHandler<(MouseButton, Point)> songOnClick = delegate {
                 this.CreateSong(songInfo);
             };
 
             DrawableButton buttonForSong = new(
             new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y),
-            FurballGame.DEFAULT_FONT,
+            pTypingGame.JapaneseFontStroked,
             25,
             songInfo.Name,
             Color.Blue,
@@ -77,13 +78,13 @@ public class NewSongScreen : pScreen {
 
         y = 20f;
 
-        this._songNameTextBox       =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Name of Song");
+        this._songNameTextBox       =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Name of Song");
         y                           += 20 + this._songNameTextBox.Size.Y;
-        this._songArtistTextBox     =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Artist");
+        this._songArtistTextBox     =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Artist");
         y                           += 20 + this._songArtistTextBox.Size.Y;
-        this._songCreatorTextBox    =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Map Creator Name");
+        this._songCreatorTextBox    =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Map Creator Name");
         y                           += 20 + this._songCreatorTextBox.Size.Y;
-        this._songDifficultyTextBox =  new DrawableTextBox(new Vector2(20f, y), FurballGame.DEFAULT_FONT, 50, 400f, "Difficulty Name");
+        this._songDifficultyTextBox =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Difficulty Name");
 
         this.Manager.Add(this._songNameTextBox);
         this.Manager.Add(this._songArtistTextBox);
@@ -97,6 +98,15 @@ public class NewSongScreen : pScreen {
 
     private void CreateSong(FileInfo musicFileInfo) {
         if (musicFileInfo.DirectoryName is null) throw new Exception("Song directory is null? how???? wtf are you doing??????");
+
+        File tags = File.Create(musicFileInfo.FullName);
+
+        string performers = tags.Tag.JoinedPerformers;
+        if (performers != null)
+            this._songArtistTextBox.Text = performers;
+        string title = tags.Tag.Title;
+        if (title != null)
+            this._songNameTextBox.Text = title;
 
         Song song = new() {
             Name       = this._songNameTextBox.Text,
@@ -136,11 +146,11 @@ public class NewSongScreen : pScreen {
         musicFileInfo.MoveTo(Path.Combine(newSongFolder, Path.GetFileName(musicFileInfo.FullName)));
 
         // Open the filestream to the file
-        FileStream stream = File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
+        FileStream stream = System.IO.File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
 
-        song.FilePath   = stream.Name;
-        song.FolderPath = Path.GetDirectoryName(stream.Name);
-        
+        song.FilePath   = Path.GetFileName(stream.Name);
+        song.FolderPath = newSongFolder;
+
         // Close the filestream
         stream.Close();
         // Save the song to the file

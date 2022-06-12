@@ -232,7 +232,8 @@ public class SongSelectionScreen : pScreen {
 
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
 
-        this._modScreen.OnModAdd += this.ModScreenOnOnModAdd;
+        if (!this._editor)
+            this._modScreen.OnModAdd += this.ModScreenOnOnModAdd;
     }
 
     private void ModScreenOnOnModAdd(object sender, EventArgs e) {
