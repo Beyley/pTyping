@@ -408,7 +408,8 @@ public class EditorScreen : pScreen {
             },
             Scale      = new Vector2(0.55f, 0.55f),
             OriginType = OriginType.Center,
-            Note       = note
+            Note       = note,
+            Depth      = -1f
         };
 
         noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), true, true));
