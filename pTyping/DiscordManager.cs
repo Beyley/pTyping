@@ -127,6 +127,7 @@ public static class DiscordManager {
             return;
         
         Client.Dispose();
+        Initialized = false;
     }
 
     private static double _Timer = 0;
