@@ -72,7 +72,7 @@ internal class Program {
             WindowBorder = WindowBorder.Fixed
         };
         if (RuntimeInfo.IsDebug())
-            game.Run(options, Backend.OpenGL41);
+            game.Run(options, Backend.Veldrid);
         else
             try {
                 game.Run(options);
