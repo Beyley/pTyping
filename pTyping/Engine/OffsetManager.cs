@@ -21,7 +21,7 @@ public static class OffsetManager {
     }
 
     public static double GetOffset(Song song) {
-        if (OffsetConfig.Instance.Values.TryGetValue(song.MapHash, out Value offset))
+        if (OffsetConfig.Instance.Values.TryGetValue($"__{song.MapHash}", out Value offset))
             return offset.ToNumber().Value;
 
         return 0;
@@ -30,6 +30,6 @@ public static class OffsetManager {
     public static void SetOffset(Song song, double offset) {
         offset = Math.Clamp(offset, -200, 200);
 
-        OffsetConfig.Instance.Values[song.MapHash] = new Value.Number(offset);
+        OffsetConfig.Instance.Values[$"__{song.MapHash}"] = new Value.Number(offset);
     }
 }
