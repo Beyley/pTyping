@@ -29,8 +29,8 @@ public class pTypingConfig : VolpeConfig {
         this.Values["unlimited_fps_menu"]     = new Value.Boolean(false);
         this.Values["unlimited_fps_gameplay"] = new Value.Boolean(false);
 
-        this.Values["server_websocket_url"] = new Value.String("ws://192.168.0.201:8098");
-        this.Values["server_web_url"]       = new Value.String("http://127.0.0.1:8000");
+        this.Values["server_websocket_url"] = new Value.String("wss://server.tataku.ca");
+        this.Values["server_web_url"]       = new Value.String("https://scores.tataku.ca");
 
         this.Values["username"] = new Value.String("");
         this.Values["password"] = new Value.String("");

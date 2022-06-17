@@ -130,7 +130,7 @@ public class UserCardDrawable : CompositeDrawable {
             PlayMode.Taiko    => "taiko-mode.icon.png",
             PlayMode.Catch    => "catch-mode-icon.png",
             PlayMode.Mania    => "mania-mode-icon.png",
-            PlayMode.pTyping  => "ptyping-mode.icon.png",
+            PlayMode.pTyping  => "ptyping-mode-icon.png",
             PlayMode.Unknown  => "none",
             _                 => throw new ArgumentOutOfRangeException(nameof (mode), mode, null)
         };
