@@ -132,6 +132,7 @@ public class UserCardDrawable : CompositeDrawable {
             PlayMode.Mania    => "mania-mode-icon.png",
             PlayMode.pTyping  => "ptyping-mode-icon.png",
             PlayMode.Unknown  => "none",
+            PlayMode.Adofai   => "none",//TODO: add adofai icon
             _                 => throw new ArgumentOutOfRangeException(nameof (mode), mode, null)
         };
     }
