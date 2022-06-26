@@ -30,9 +30,12 @@ public abstract class PlayerMod {
     public abstract List<Type> IncompatibleMods();
 
     public abstract string Name();
+    public abstract string ToolTip();
     public abstract string ShorthandName();
     public abstract double ScoreMultiplier();
-    public virtual double SpeedMultiplier() => 1f;
+    public virtual  double SpeedMultiplier() => 1f;
+
+    public abstract string IconFilename();
 
     public virtual void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
         Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) initialized!", LoggerLevelModInfo.Instance);

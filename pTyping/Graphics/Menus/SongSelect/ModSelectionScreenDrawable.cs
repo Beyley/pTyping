@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player.Mods;
@@ -10,83 +10,79 @@ using pTyping.Graphics.Player.Mods;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class ModSelectionScreenDrawable : CompositeDrawable {
-    private readonly List<(PlayerMod mod, DrawableButton button)> _mods = new();
+    private readonly List<ModButtonDrawable> _mods = new();
 
     private readonly Color _unselectedColor = Color.Red;
     private readonly Color _selectedColor   = Color.Blue;
 
-    private readonly TextDrawable _scoreMultiplier;
-    public event EventHandler     OnModAdd;
+    // private readonly TextDrawable     _scoreMultiplier;
 
+    private readonly LinePrimitiveDrawable line;
+    // private          bool             test2;
+
+    public event EventHandler OnModAdd;
+
+    public void OnModClick(object sender, bool added) {
+        ModButtonDrawable modButton = (ModButtonDrawable)sender;
+
+        foreach (ModButtonDrawable modButtonDrawable in this._mods)
+            if (modButton != modButtonDrawable)
+                modButtonDrawable.ModStateChange(modButton, added);
+    }
+    
     public ModSelectionScreenDrawable(Vector2 pos) {
         this.Position = pos;
 
-        float x = 0;
-        float y = 0;
-        for (int i = 0; i < PlayerMod.RegisteredMods.Count; i++) {
-            PlayerMod mod = PlayerMod.RegisteredMods[i];
-
-            DrawableButton modButton = new(
-            new Vector2(x, y),
-            FurballGame.DEFAULT_FONT_STROKED,
-            30,
-            mod.Name(),
-            pTypingGame.SelectedMods.Contains(mod) ? this._selectedColor : this._unselectedColor,
-            Color.White,
-            Color.White,
-            new Vector2(0)
-            );
-
-            modButton.OnClick += delegate {
-                this.OnButtonClick(modButton, mod);
-            };
-
-            this._mods.Add((mod, modButton));
-            this.Drawables.Add(modButton);
-
-            x += modButton.Size.X + 30;
-            if ((i + 1) % 4 == 0 && i != PlayerMod.RegisteredMods.Count - 1) {
-                x =  0;
-                y += modButton.Size.Y + 25;
-            }
-
-            if (i == PlayerMod.RegisteredMods.Count - 1)
-                y += modButton.Size.Y + 25;
+        int   lineAmounts = (int)Math.Ceiling(PlayerMod.RegisteredMods.Count / 5d);
+        float lineY       = 0;
+        for (int i = 0; i < lineAmounts; i++) {
+            this.Drawables.Add(this.line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
+            this.Drawables.Add(this.line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray,  2f));
+            lineY += 100;
         }
 
-        this._scoreMultiplier = new TextDrawable(
-        new Vector2(0, y + 10),
-        FurballGame.DEFAULT_FONT_STROKED,
-        $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x",
-        30
-        );
-        this.Drawables.Add(this._scoreMultiplier);
+        float x = 75;
+        float y = 0;
+        for (int i = 0; i < PlayerMod.RegisteredMods.Count; i++) {
+            PlayerMod         registeredMod = PlayerMod.RegisteredMods[i];
+            ModButtonDrawable modButton     = new(registeredMod, new(x, y), this.OnModClick);
+
+            this.Drawables.Add(modButton);
+            this._mods.Add(modButton);
+
+            x += 15 + modButton.Size.X;
+
+            if (i != 0 && i % 4 == 0) {
+                x =  75;
+                y += 100;
+            }
+        }
     }
 
     private void OnButtonClick(DrawableButton modButton, PlayerMod mod) {
-        if (pTypingGame.SelectedMods.Contains(mod)) {
-            pTypingGame.SelectedMods.Remove(mod);
-            modButton.ButtonColor = this._unselectedColor;
-            modButton.FadeColor(this._unselectedColor, 100);
-        } else {
-            for (int i = 0; i < this._mods.Count; i++) {
-                (PlayerMod playerMod, DrawableButton button) = this._mods[i];
-
-                if (mod.IncompatibleMods().Contains(playerMod.GetType()))
-                    if (pTypingGame.SelectedMods.Contains(playerMod)) {
-                        button.ButtonColor = this._unselectedColor;
-                        button.FadeColor(this._unselectedColor, 100);
-                        pTypingGame.SelectedMods.Remove(playerMod);
-                    }
-            }
-
-            pTypingGame.SelectedMods.Add(mod);
-            modButton.ButtonColor = this._selectedColor;
-            modButton.FadeColor(this._selectedColor, 100);
-        }
+        // if (pTypingGame.SelectedMods.Contains(mod)) {
+        //     pTypingGame.SelectedMods.Remove(mod);
+        //     modButton.ButtonColor = this._unselectedColor;
+        //     modButton.FadeColor(this._unselectedColor, 100);
+        // } else {
+        //     for (int i = 0; i < this._mods.Count; i++) {
+        //         (PlayerMod playerMod, DrawableButton button) = this._mods[i];
+        //
+        //         if (mod.IncompatibleMods().Contains(playerMod.GetType()))
+        //             if (pTypingGame.SelectedMods.Contains(playerMod)) {
+        //                 button.ButtonColor = this._unselectedColor;
+        //                 button.FadeColor(this._unselectedColor, 100);
+        //                 pTypingGame.SelectedMods.Remove(playerMod);
+        //             }
+        //     }
+        //
+        //     pTypingGame.SelectedMods.Add(mod);
+        //     modButton.ButtonColor = this._selectedColor;
+        //     modButton.FadeColor(this._selectedColor, 100);
+        // }
 
         this.OnModAdd?.Invoke(this, EventArgs.Empty);
 
-        this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
+        // this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
     }
 }

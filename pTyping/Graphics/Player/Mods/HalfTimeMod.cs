@@ -10,7 +10,9 @@ public class HalfTimeMod : PlayerMod {
     };
 
     public override string Name()            => "Half Time";
+    public override string ToolTip()         => "Slowin' down, are we?";
     public override string ShorthandName()   => "HT";
     public override double ScoreMultiplier() => 0.75d;
     public override double SpeedMultiplier() => 0.5d;
+    public override string IconFilename()    => "mod-half-time.png";
 }

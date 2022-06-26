@@ -181,7 +181,7 @@ public class SongSelectionScreen : pScreen {
         #region mods
 
         if (!this._editor) {
-            this._modScreen = new ModSelectionScreenDrawable(new Vector2(25, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
+            this._modScreen = new ModSelectionScreenDrawable(new Vector2(100, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
                 Visible    = false,
                 OriginType = OriginType.BottomLeft,
                 Depth      = 0.5f
@@ -213,7 +213,8 @@ public class SongSelectionScreen : pScreen {
         #region Song info
 
         this.Manager.Add(this._songInfoDrawable = new SongInfoDrawable {
-            Position = new Vector2(100, 100)
+            Position = new Vector2(100, 100),
+            Depth    = 0.75f
         });
         
         #endregion

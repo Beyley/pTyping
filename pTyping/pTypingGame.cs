@@ -122,6 +122,9 @@ public class pTypingGame : FurballGame {
     private ChatDrawable    _chatDrawable;
 
     public static List<PlayerMod> SelectedMods = new();
+    public static PlayerMod IsModIncompatible(PlayerMod toCheck) {
+        return SelectedMods.FirstOrDefault(mod => mod.IncompatibleMods().Contains(toCheck.GetType()) || toCheck.IncompatibleMods().Contains(mod.GetType()));
+    }
 
     public static  NotificationManager NotificationManager;
     private static TextDrawable        _OnlineUsersText;
@@ -398,6 +401,8 @@ public class pTypingGame : FurballGame {
 
         // this.LoadContent();
         base.Initialize();
+
+        TooltipDrawable.TextDrawable.SetFont(JapaneseFont, 20);
 
         ScreenManager.SetBlankTransition();
 

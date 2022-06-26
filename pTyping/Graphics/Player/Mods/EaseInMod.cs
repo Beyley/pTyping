@@ -13,9 +13,11 @@ public class EaseInMod : PlayerMod {
     };
 
     public override string Name()            => "Ease In";
+    public override string ToolTip()         => "You should drink a little less!";
     public override string ShorthandName()   => "EI";
     public override double ScoreMultiplier() => 1.025d;
 
+    public override string IconFilename() => "mod-ease-in.png";
     public override void OnMapStart(AudioStream musicTrack, List<NoteDrawable> notes, Player player) {
         foreach (Tween noteTween in notes.SelectMany(note => note.Tweens.Where(noteTween => noteTween.TweenType == TweenType.Movement)))
             noteTween.Easing = Easing.In;
