@@ -381,7 +381,6 @@ public class EditorScreen : pScreen {
         double time = value * pTypingGame.MusicTrack.Length;
 
         pTypingGame.MusicTrack.CurrentPosition = time;
-        this._video?.Seek(time);
 
         if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
             foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
