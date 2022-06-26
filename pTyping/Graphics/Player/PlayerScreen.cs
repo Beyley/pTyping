@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using JetBrains.Annotations;
 using Kettu;
 using ManagedBass;
 using pTyping.Engine;
@@ -51,6 +52,9 @@ public class PlayerScreen : pScreen {
 
     public bool                 IsSpectating   = false;
     public List<SpectatorFrame> SpectatorQueue = new();
+
+    [CanBeNull]
+    private VideoDrawable _video = null;
 
     /// <summary>
     ///     Used to play a replay
@@ -232,6 +236,37 @@ public class PlayerScreen : pScreen {
 
         #endregion
 
+        #region Background video
+
+        if (pTypingConfig.Instance.VideoBackgrounds && this.Song.VideoPath != null)
+            try {
+                this._video = new VideoDrawable(
+                this.Song.QualifiedVideoPath,
+                this.Player.Score.Speed,
+                pTypingGame.MusicTrackTimeSource,
+                new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+                ) {
+                    OriginType = OriginType.Center,
+                    Depth      = 1f
+                };
+
+                this._video.Scale = new Vector2(1f / ((float)this._video.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
+
+                this._video.StartTime = 0;
+
+                this.Manager.Add(this._video);
+            }
+            catch {
+                pTypingConfig.Instance.VideoBackgrounds = false;
+                this._video                             = null;
+                pTypingGame.NotificationManager.CreateNotification(
+                NotificationManager.NotificationImportance.Error,
+                "Unable to load background video! Disabling video support..."
+                );
+            }
+
+        #endregion
+
         #endregion
 
         this.Player.OnComboUpdate += this.OnComboUpdate;
@@ -289,8 +324,8 @@ public class PlayerScreen : pScreen {
     private void SkipButtonClick(object sender, (MouseButton, Point) tuple) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
+        this._video?.Seek(this.Song.Notes.First().Time - 2999);
     }
-
 
     public override void Dispose() {
         FurballGame.InputManager.OnKeyDown   -= this.OnKeyPress;
@@ -301,6 +336,8 @@ public class PlayerScreen : pScreen {
 
         if (pTypingGame.OnlineManager.GameScene == this)
             pTypingGame.OnlineManager.GameScene = null;
+
+        this._video?.Dispose();
 
         base.Dispose();
     }
@@ -379,6 +416,7 @@ public class PlayerScreen : pScreen {
                             pTypingGame.OnlineManager.SpectatorState = SpectatorState.Paused;
                             pTypingGame.MusicTrack.Pause();
                             pTypingGame.MusicTrack.CurrentPosition = f.Time;
+                            this._video?.Seek(f.Time);
                             break;
                         }
                         // case SpectatorFrameDataType.Resume: {
@@ -394,6 +432,7 @@ public class PlayerScreen : pScreen {
                             if (currentTime - f.Time > 100) {
                                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "We got too far ahead!");
                                 pTypingGame.MusicTrack.CurrentPosition = currentTime - 2000;
+                                this._video?.Seek(currentTime - 2000);
                             }
 
                             break;

@@ -27,6 +27,7 @@ public class Song {
     public string QualifiedFilePath       => Path.Combine("songs", this.FolderPath, this.FilePath);
     public string QualifiedAudioPath      => Path.Combine("songs", this.FolderPath, this.AudioPath);
     public string QualifiedBackgroundPath => Path.Combine("songs", this.FolderPath, this.BackgroundPath);
+    public string QualifiedVideoPath      => Path.Combine("songs", this.FolderPath, this.VideoPath);
     public string QualifiedFolderPath     => Path.Combine("songs", this.FolderPath);
     
     [JsonProperty]
@@ -59,6 +60,8 @@ public class Song {
     public string AudioPath { get; set; }
     [JsonProperty]
     public string BackgroundPath { get; set; }
+    [JsonProperty]
+    public string VideoPath { get; set; }
 
     [JsonObject(MemberSerialization.OptIn)]
     public class SongSettings {

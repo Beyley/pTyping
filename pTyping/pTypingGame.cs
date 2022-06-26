@@ -199,7 +199,7 @@ public class pTypingGame : FurballGame {
         BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
     }
 
-    public static void SetBackgroundTexture(Texture tex) {
+    private static void SetBackgroundTexture(Texture tex) {
         CurrentSongBackground.SetTexture(tex);
 
         CurrentSongBackground.Scale = new Vector2(1f / ((float) CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
@@ -207,6 +207,7 @@ public class pTypingGame : FurballGame {
 
     public static void LoadBackgroundFromSong(Song song) {
         Texture backgroundTex = null;
+
         if (song.BackgroundPath == null) {
             try {
                 File tags = File.Create(song.QualifiedAudioPath);

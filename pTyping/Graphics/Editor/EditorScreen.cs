@@ -132,6 +132,37 @@ public class EditorScreen : pScreen {
         
         #endregion
 
+        #region Video background
+
+        if (pTypingConfig.Instance.VideoBackgrounds && this.EditorState.Song.VideoPath != null)
+            try {
+                this._video = new VideoDrawable(
+                this.EditorState.Song.QualifiedVideoPath,
+                1f,
+                pTypingGame.MusicTrackTimeSource,
+                new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+                ) {
+                    OriginType = OriginType.Center,
+                    Depth      = 1f
+                };
+
+                this._video.Scale = new Vector2(1f / ((float)this._video.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
+
+                this._video.StartTime = 0;
+
+                this.Manager.Add(this._video);
+            }
+            catch {
+                pTypingConfig.Instance.VideoBackgrounds = false;
+                this._video                             = null;
+                pTypingGame.NotificationManager.CreateNotification(
+                NotificationManager.NotificationImportance.Error,
+                "Unable to load background video! Disabling video support..."
+                );
+            }
+
+        #endregion
+
         #endregion
 
         #region Visualization drawables
@@ -156,8 +187,9 @@ public class EditorScreen : pScreen {
             OriginType = OriginType.BottomLeft
         };
 
-        this._progressBar.OnDrag  += this.ProgressBarOnInteract;
-        this._progressBar.OnClick += this.ProgressBarOnInteract;
+        this._progressBar.OnDrag    += this.ProgressBarOnInteract;
+        this._progressBar.OnClick   += this.ProgressBarOnInteract;
+        this._progressBar.OnClickUp += this.ProgressBarOnInteractUp;
 
         this.Manager.Add(this._progressBar);
 
@@ -228,7 +260,7 @@ public class EditorScreen : pScreen {
         leftButton.OnClick += delegate {
             if (this.EditorState.Song.Notes.Count > 0) {
                 pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.First().Time;
-
+                this._video?.Seek(this.EditorState.Song.Notes.First().Time);
                 foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
                     note.EditorHitSoundQueued = true;
             }
@@ -237,6 +269,7 @@ public class EditorScreen : pScreen {
         rightButton.OnClick += delegate {
             if (this.EditorState.Song.Notes.Count > 0) {
                 pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.Last().Time;
+                this._video?.Seek(this.EditorState.Song.Notes.Last().Time);
 
                 foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
                     note.EditorHitSoundQueued = true;
@@ -314,6 +347,9 @@ public class EditorScreen : pScreen {
         ConVars.Volume.OnChange    += this.OnVolumeChange;
         this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
     }
+    private void ProgressBarOnInteractUp(object sender, (MouseButton button, Point pos) e) {
+        this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
+    }
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Editing;
 
@@ -345,6 +381,7 @@ public class EditorScreen : pScreen {
         double time = value * pTypingGame.MusicTrack.Length;
 
         pTypingGame.MusicTrack.CurrentPosition = time;
+        this._video?.Seek(time);
 
         if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
             foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
@@ -483,7 +520,7 @@ public class EditorScreen : pScreen {
 
         ConVars.Volume.OnChange -= this.OnVolumeChange;
 
-        // SongManager.UpdateSongs();
+        this._video?.Dispose();
 
         base.Dispose();
     }
@@ -506,6 +543,7 @@ public class EditorScreen : pScreen {
             timeToSeekTo -= noteLength;
 
         pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
+        this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
 
         if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
             foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
@@ -700,6 +738,8 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
 
     private double           _lastTime = 0;
     private DrawableDropdown _speedDropdown;
+    [CanBeNull]
+    private VideoDrawable _video;
     public override void Update(double gameTime) {
         this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 

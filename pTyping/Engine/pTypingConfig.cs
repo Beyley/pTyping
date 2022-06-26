@@ -13,6 +13,11 @@ public class pTypingConfig : VolpeConfig {
     public bool   UnlimitedFpsMenu     => this.Values["unlimited_fps_menu"].ToBoolean().Value;
     public bool   UnlimitedFpsGameplay => this.Values["unlimited_fps_gameplay"].ToBoolean().Value;
 
+    public bool VideoBackgrounds {
+        get => this.Values["video_backgrounds"].ToBoolean().Value;
+        set => this.Values["video_backgrounds"] = new Value.Boolean(value);
+    }
+
     public string ServerWebsocketUrl => this.Values["server_websocket_url"].ToStringValue().Value;
     public string ServerWebUrl       => this.Values["server_web_url"].ToStringValue().Value;
     
@@ -28,6 +33,8 @@ public class pTypingConfig : VolpeConfig {
 
         this.Values["unlimited_fps_menu"]     = new Value.Boolean(false);
         this.Values["unlimited_fps_gameplay"] = new Value.Boolean(false);
+
+        this.Values["video_backgrounds"] = new Value.Boolean(true);
 
         this.Values["server_websocket_url"] = new Value.String("wss://server.tataku.ca");
         this.Values["server_web_url"]       = new Value.String("https://scores.tataku.ca");
