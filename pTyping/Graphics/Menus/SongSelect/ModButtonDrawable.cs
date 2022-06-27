@@ -57,6 +57,46 @@ public class ModButtonDrawable : TexturedDrawable {
         this._actionClick = onModClick;
     }
 
+    public void Hide(bool instant = false) {
+        float time = instant ? 0 : 500;
+
+        this.Tweens.Add(
+        new VectorTween(TweenType.Movement, this.Position, this._originalPosition - new Vector2(300, 0), FurballGame.Time, FurballGame.Time + time, Easing.Out)
+        );
+        this.Tweens.Add(new FloatTween(TweenType.Fade,     this.ColorOverride.Af, 0f,             FurballGame.Time, FurballGame.Time + time));
+        this.Tweens.Add(new FloatTween(TweenType.Rotation, this.Rotation,         -MathF.PI * 2f, FurballGame.Time, FurballGame.Time + time, Easing.Out));
+
+        FurballGame.GameTimeScheduler.ScheduleMethod(
+        _ => {
+            this.Clickable = false;
+        },
+        FurballGame.Time + time
+        );
+    }
+
+    public void Show() {
+        const float time = 500;
+
+        Vector2 posOffset = Vector2.Zero;
+        float   rot       = 0;
+        if (pTypingGame.SelectedMods.Contains(this.Mod)) {
+            posOffset += CLICKED_MOVE;
+            rot       =  CLICKED_ROT;
+        }
+
+        this.Tweens.Add(new VectorTween(TweenType.Movement, this.Position, this._originalPosition + posOffset, FurballGame.Time, FurballGame.Time + time, Easing.Out));
+        this.Tweens.Add(new FloatTween(TweenType.Fade,     this.ColorOverride.Af, 1f,  FurballGame.Time, FurballGame.Time + time));
+        this.Tweens.Add(new FloatTween(TweenType.Rotation, this.Rotation,         rot, FurballGame.Time, FurballGame.Time + time, Easing.Out));
+
+        FurballGame.GameTimeScheduler.ScheduleMethod(
+        _ => {
+            if (this.incompat == null)
+                this.Clickable = true;
+        },
+        FurballGame.Time + time
+        );
+    }
+
     private static readonly Color   CLICKED_COLOR  = new(210, 210, 255);
     private static readonly Color   DISABLED_COLOR = new(255, 180, 180);
     private const           float   CLICKED_ROT    = MathF.PI / 10;

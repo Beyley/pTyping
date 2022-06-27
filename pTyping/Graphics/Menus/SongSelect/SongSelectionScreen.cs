@@ -182,10 +182,11 @@ public class SongSelectionScreen : pScreen {
 
         if (!this._editor) {
             this._modScreen = new ModSelectionScreenDrawable(new Vector2(100, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
-                Visible    = false,
+                // Visible    = false,
                 OriginType = OriginType.BottomLeft,
                 Depth      = 0.5f
             };
+            this._modScreen.Hide(true);
             this.Manager.Add(this._modScreen);
 
             DrawableButton toggleMods = new(
@@ -202,7 +203,10 @@ public class SongSelectionScreen : pScreen {
             };
 
             toggleMods.OnClick += delegate {
-                this._modScreen.Visible = !this._modScreen.Visible;
+                if (this._modScreen.Shown)
+                    this._modScreen.Hide();
+                else
+                    this._modScreen.Show();
             };
 
             this.Manager.Add(toggleMods);

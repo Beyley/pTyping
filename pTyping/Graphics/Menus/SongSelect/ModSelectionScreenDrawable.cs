@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player.Mods;
@@ -17,9 +20,6 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
 
     // private readonly TextDrawable     _scoreMultiplier;
 
-    private readonly LinePrimitiveDrawable line;
-    // private          bool             test2;
-
     public event EventHandler OnModAdd;
 
     public void OnModClick(object sender, bool added) {
@@ -29,6 +29,32 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
             if (modButton != modButtonDrawable)
                 modButtonDrawable.ModStateChange(modButton, added);
     }
+
+    public bool Shown = true;
+
+    private readonly List<LinePrimitiveDrawable> Lines = new();
+
+    public void Hide(bool force = false) {
+        foreach (ModButtonDrawable modButtonDrawable in this._mods)
+            modButtonDrawable.Hide(force);
+        this.Shown = false;
+
+        float time = force ? 0 : 500;
+
+        foreach (LinePrimitiveDrawable line in this.Lines)
+            line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
+    }
+
+    public void Show() {
+        foreach (ModButtonDrawable modButtonDrawable in this._mods)
+            modButtonDrawable.Show();
+        this.Shown = true;
+
+        const float time = 500;
+
+        foreach (LinePrimitiveDrawable line in this.Lines)
+            line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
+    }
     
     public ModSelectionScreenDrawable(Vector2 pos) {
         this.Position = pos;
@@ -36,8 +62,11 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
         int   lineAmounts = (int)Math.Ceiling(PlayerMod.RegisteredMods.Count / 5d);
         float lineY       = 0;
         for (int i = 0; i < lineAmounts; i++) {
-            this.Drawables.Add(this.line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
-            this.Drawables.Add(this.line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray,  2f));
+            LinePrimitiveDrawable line;
+            this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
+            this.Lines.Add(line);
+            this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray, 2f));
+            this.Lines.Add(line);
             lineY += 100;
         }
 
