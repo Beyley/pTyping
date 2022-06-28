@@ -79,8 +79,8 @@ public class ScrollableContainer : CompositeDrawable {
         Rectangle rect = GraphicsBackend.Current.ScissorRect;
 
         Rectangle newRect = new(
-        new((int)(this.RealPosition.X * FurballGame.VerticalRatio), (int)(this.RealPosition.Y * FurballGame.VerticalRatio)),
-        new((int)(this._size.X        * FurballGame.VerticalRatio), (int)(this._size.Y        * FurballGame.VerticalRatio))
+        new((int)this.RealPosition.X, (int)this.RealPosition.Y),
+        new((int)this._size.X, (int)this._size.Y)
         );
 
         GraphicsBackend.Current.ScissorRect = newRect;

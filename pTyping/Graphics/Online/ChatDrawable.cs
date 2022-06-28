@@ -57,10 +57,10 @@ public class ChatContentsDrawable : CompositeDrawable {
         // Rectangle originalRect = FurballGame.Instance.GraphicsDevice.ScissorRectangle;
         //
         // FurballGame.Instance.GraphicsDevice.ScissorRectangle = new(
-        // (int)(this.RealRectangle.X      * FurballGame.VerticalRatio),
-        // (int)(this.RealRectangle.Y      * FurballGame.VerticalRatio),
-        // (int)(this.RealRectangle.Width  * FurballGame.VerticalRatio),
-        // (int)(this.RealRectangle.Height * FurballGame.VerticalRatio)
+        // (int)(this.RealRectangle.X      ),
+        // (int)(this.RealRectangle.Y      ),
+        // (int)(this.RealRectangle.Width  ),
+        // (int)(this.RealRectangle.Height )
         // );
         //
         batch.Begin();

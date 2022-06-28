@@ -234,12 +234,12 @@ public class NoteDrawable : CompositeDrawable {
     // public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
     //     batch.SpriteBatch.Draw(
     //     this.Texture,
-    //     args.Position * FurballGame.VerticalRatio,
+    //     args.Position ,
     //     null,
     //     args.Color,
     //     args.Rotation,
     //     Vector2.Zero,
-    //     args.Scale * FurballGame.VerticalRatio,
+    //     args.Scale ,
     //     args.Effects,
     //     0f
     //     );
