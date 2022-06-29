@@ -6,19 +6,15 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player.Mods;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
-public class ModSelectionScreenDrawable : CompositeDrawable {
+public class ModSelectionMenuDrawable : CompositeDrawable {
     private readonly List<ModButtonDrawable> _mods = new();
 
-    private readonly Color _unselectedColor = Color.Red;
-    private readonly Color _selectedColor   = Color.Blue;
-
-    // private readonly TextDrawable     _scoreMultiplier;
+    private readonly TextDrawable _scoreMultiplier;
 
     public event EventHandler OnModAdd;
 
@@ -28,6 +24,14 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
         foreach (ModButtonDrawable modButtonDrawable in this._mods)
             if (modButton != modButtonDrawable)
                 modButtonDrawable.ModStateChange(modButton, added);
+
+        this.UpdateScoreMultiplierText();
+
+        this.OnModAdd?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void UpdateScoreMultiplierText() {
+        this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
     }
 
     public bool Shown = true;
@@ -43,6 +47,8 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
 
         foreach (LinePrimitiveDrawable line in this.Lines)
             line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
+
+        this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
     }
 
     public void Show() {
@@ -54,9 +60,11 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
 
         foreach (LinePrimitiveDrawable line in this.Lines)
             line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
+
+        this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
     }
-    
-    public ModSelectionScreenDrawable(Vector2 pos) {
+
+    public ModSelectionMenuDrawable(Vector2 pos) {
         this.Position = pos;
 
         int   lineAmounts = (int)Math.Ceiling(PlayerMod.RegisteredMods.Count / 5d);
@@ -86,32 +94,9 @@ public class ModSelectionScreenDrawable : CompositeDrawable {
                 y += 100;
             }
         }
-    }
 
-    private void OnButtonClick(DrawableButton modButton, PlayerMod mod) {
-        // if (pTypingGame.SelectedMods.Contains(mod)) {
-        //     pTypingGame.SelectedMods.Remove(mod);
-        //     modButton.ButtonColor = this._unselectedColor;
-        //     modButton.FadeColor(this._unselectedColor, 100);
-        // } else {
-        //     for (int i = 0; i < this._mods.Count; i++) {
-        //         (PlayerMod playerMod, DrawableButton button) = this._mods[i];
-        //
-        //         if (mod.IncompatibleMods().Contains(playerMod.GetType()))
-        //             if (pTypingGame.SelectedMods.Contains(playerMod)) {
-        //                 button.ButtonColor = this._unselectedColor;
-        //                 button.FadeColor(this._unselectedColor, 100);
-        //                 pTypingGame.SelectedMods.Remove(playerMod);
-        //             }
-        //     }
-        //
-        //     pTypingGame.SelectedMods.Add(mod);
-        //     modButton.ButtonColor = this._selectedColor;
-        //     modButton.FadeColor(this._selectedColor, 100);
-        // }
+        this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFontStroked, "", 30));
 
-        this.OnModAdd?.Invoke(this, EventArgs.Empty);
-
-        // this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
+        this.UpdateScoreMultiplierText();
     }
 }

@@ -33,7 +33,7 @@ public class SongSelectionScreen : pScreen {
     private          TexturedDrawable          _leaderboardButton;
     private          LeaderboardDrawable       _leaderboardDrawable;
 
-    private ModSelectionScreenDrawable _modScreen;
+    private ModSelectionMenuDrawable _modMenu;
 
     private float _movingDirection;
 
@@ -181,13 +181,13 @@ public class SongSelectionScreen : pScreen {
         #region mods
 
         if (!this._editor) {
-            this._modScreen = new ModSelectionScreenDrawable(new Vector2(100, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
+            this._modMenu = new ModSelectionMenuDrawable(new Vector2(100, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
                 // Visible    = false,
                 OriginType = OriginType.BottomLeft,
                 Depth      = 0.5f
             };
-            this._modScreen.Hide(true);
-            this.Manager.Add(this._modScreen);
+            this._modMenu.Hide(true);
+            this.Manager.Add(this._modMenu);
 
             DrawableButton toggleMods = new(
             new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
@@ -203,10 +203,10 @@ public class SongSelectionScreen : pScreen {
             };
 
             toggleMods.OnClick += delegate {
-                if (this._modScreen.Shown)
-                    this._modScreen.Hide();
+                if (this._modMenu.Shown)
+                    this._modMenu.Hide();
                 else
-                    this._modScreen.Show();
+                    this._modMenu.Show();
             };
 
             this.Manager.Add(toggleMods);
@@ -238,10 +238,10 @@ public class SongSelectionScreen : pScreen {
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
 
         if (!this._editor)
-            this._modScreen.OnModAdd += this.ModScreenOnOnModAdd;
+            this._modMenu.OnModAdd += this.ModMenuOnOnModAdd;
     }
 
-    private void ModScreenOnOnModAdd(object sender, EventArgs e) {
+    private void ModMenuOnOnModAdd(object sender, EventArgs e) {
         double speed = 1f;
         foreach (PlayerMod moditer in pTypingGame.SelectedMods)
             speed *= moditer.SpeedMultiplier();
