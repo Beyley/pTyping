@@ -209,7 +209,7 @@ public class MenuScreen : pScreen {
 
         #endregion
 
-        this.UpdateUserCard(this, null);
+        this.UpdateUserCard(this, EventArgs.Empty);
 
         pTypingGame.OnlineManager.OnLoginComplete += this.UpdateUserCard;
         pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
@@ -242,21 +242,26 @@ public class MenuScreen : pScreen {
         base.Dispose();
     }
 
+    private bool _usercardAdded = false;
     public void UpdateUserCard(object sender, EventArgs e) {
-        // if(pTypingGame.OnlineManager.State is ConnectionState.Disconnected or ConnectionState.Connected )
-        FurballGame.GameTimeScheduler.ScheduleMethod(
-        _ => {
-            this.Manager.Remove(this._userCard);
+        if (this._usercardAdded)
+            return;
 
-            this.Manager.Add(this._userCard = pTypingGame.GetUserCard());
+        ManagedDrawable userCard = pTypingGame.GetUserCard();
 
-            this._userCard.MoveTo(new Vector2(10f));
+        if (userCard == null)
+            return;
 
-            if (sender != this)
-                this._userCard.FadeInFromZero(100);
-        },
-        FurballGame.Time
-        );
+        this.Manager.Add(this._userCard = userCard);
+
+        if (!this._usercardAdded && sender != this) {
+            this._userCard.ColorOverride = new(1f, 1f, 1f, 0f);
+            this._userCard.FadeInFromZero(150);
+        }
+
+        this._usercardAdded = true;
+
+        this._userCard.Position = new Vector2(10);
     }
 
     public void UpdateStats() {

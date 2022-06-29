@@ -875,7 +875,12 @@ public class TatakuOnlineManager : OnlineManager {
         this.Player.UserId.Value            = packet.UserId;
         this.State                          = ConnectionState.LoggedIn;
 
-        this.InvokeOnLoginComplete(this);
+        FurballGame.GameTimeScheduler.ScheduleMethod(
+        _ => {
+            this.InvokeOnLoginComplete(this);
+        },
+        0
+        );
 
         lock (this.OnlinePlayers) {
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);

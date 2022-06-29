@@ -17,6 +17,7 @@ using Furball.Engine.Engine.Timing;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
+using JetBrains.Annotations;
 using Kettu;
 using ManagedBass;
 using pTyping.Engine;
@@ -140,9 +141,10 @@ public class pTypingGame : FurballGame {
         BypassFurballFPSLimit = pTypingConfig.Instance.FpsBasedOnMonitorHz;
     }
 
+    [CanBeNull]
     public static ManagedDrawable GetUserCard() {
         if (OnlineManager.State != ConnectionState.LoggedIn)
-            return new BlankDrawable();
+            return null;
 
         if (MenuPlayerUserCard is not null)
             return MenuPlayerUserCard;

@@ -37,6 +37,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
     public bool Shown = true;
 
     private readonly List<LinePrimitiveDrawable> Lines = new();
+    private readonly RectanglePrimitiveDrawable  _background;
 
     public void Hide(bool force = false) {
         foreach (ModButtonDrawable modButtonDrawable in this._mods)
@@ -49,6 +50,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
             line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
 
         this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
+        this._background.Tweens.Add(new FloatTween(TweenType.Fade,      this._background.ColorOverride.Af,      0f, FurballGame.Time, FurballGame.Time + time));
     }
 
     public void Show() {
@@ -61,7 +63,8 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
         foreach (LinePrimitiveDrawable line in this.Lines)
             line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
 
-        this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
+        this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 1f,    FurballGame.Time, FurballGame.Time + time));
+        this._background.Tweens.Add(new FloatTween(TweenType.Fade,      this._background.ColorOverride.Af,      0.75f, FurballGame.Time, FurballGame.Time + time));
     }
 
     public ModSelectionMenuDrawable(Vector2 pos) {
@@ -98,5 +101,14 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
         this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFontStroked, "", 30));
 
         this.UpdateScoreMultiplierText();
+
+        this.Drawables.Add(
+        this._background = new RectanglePrimitiveDrawable(new(-2, -66), new(410, this.Size.Y + 4), 2, true) {
+            ColorOverride = new(50, 50, 50, 175),
+            Depth         = -1f
+        }
+        );
     }
+
+    public sealed override Vector2 Size => base.Size;
 }
