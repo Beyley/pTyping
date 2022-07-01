@@ -80,9 +80,9 @@ public abstract class EditorTool : IComparable<EditorTool> {
 
     public virtual void OnNoteDelete(NoteDrawable note) {}
 
-    public virtual void OnEventCreate(ManagedDrawable @event, bool isNew) {}
+    public virtual void OnEventCreate(Drawable @event, bool isNew) {}
 
-    public virtual void OnEventDelete(ManagedDrawable note) {}
+    public virtual void OnEventDelete(Drawable note) {}
 
     public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
 }

@@ -60,7 +60,7 @@ public class NotificationManager : DrawableManager {
 
     public override void Update(double time) {
         for (int i = 0; i < this.Drawables.Count; i++) {
-            BaseDrawable baseDrawable = this.Drawables[i];
+            Drawable baseDrawable = this.Drawables[i];
             if (baseDrawable is not NotificationDrawable drawable || drawable.ScheduledForRemoval)
                 continue;
 
@@ -88,7 +88,7 @@ public class NotificationManager : DrawableManager {
     }
 
     private void UpdatePopups() {
-        foreach (BaseDrawable baseDrawable in this.Drawables) {
+        foreach (Drawable baseDrawable in this.Drawables) {
             if (baseDrawable is not NotificationDrawable drawable) continue;
             
             if(drawable.Type == NotificationType.MiddlePopup && !drawable.ScheduledForRemoval) {
@@ -109,7 +109,7 @@ public class NotificationManager : DrawableManager {
         const float x = FurballGame.DEFAULT_WINDOW_WIDTH - 10;
         float       y = FurballGame.DEFAULT_WINDOW_HEIGHT - 10;
 
-        foreach (BaseDrawable baseDrawable in this.Drawables) {
+        foreach (Drawable baseDrawable in this.Drawables) {
             if (baseDrawable is not NotificationDrawable drawable || drawable.Type != NotificationType.BottomRight) continue;
 
             drawable.MoveTo(new Vector2(x, y), 100);

@@ -17,7 +17,7 @@ public class ScoreResultsDrawable : CompositeDrawable {
     private readonly TextDrawable _poor;
     private readonly TextDrawable _mods;
 
-    private static ManagedDrawable SetRotOrigin(ManagedDrawable drawable) {
+    private static Drawable SetRotOrigin(Drawable drawable) {
         drawable.RotationOrigin = new Vector2(-300, drawable.Size.Y / 2f);
 
         return drawable;

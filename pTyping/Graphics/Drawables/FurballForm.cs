@@ -13,7 +13,7 @@ using Color=Furball.Vixie.Backends.Shared.Color;
 namespace pTyping.Graphics.Drawables;
 
 public class FurballForm : CompositeDrawable {
-    public ManagedDrawable Contents {
+    public Drawable Contents {
         get;
     }
 
@@ -24,7 +24,7 @@ public class FurballForm : CompositeDrawable {
 
     public event EventHandler OnTryClose;
 
-    public FurballForm(string title, ManagedDrawable contents, OriginType startPosition = OriginType.Center) {
+    public FurballForm(string title, Drawable contents, OriginType startPosition = OriginType.Center) {
         this.Contents = contents;
 
         this._title = new TextDrawable(new Vector2(2), pTypingGame.JapaneseFont, title, 20) {

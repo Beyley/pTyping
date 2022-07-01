@@ -31,7 +31,7 @@ public class SelectTool : EditorTool {
             note.OnDrag      += this.OnObjectDrag;
             note.OnDragEnd   += this.OnObjectDragEnd;
         }
-        foreach (ManagedDrawable @event in this.EditorInstance.EditorState.Events) {
+        foreach (Drawable @event in this.EditorInstance.EditorState.Events) {
             @event.OnClick     += this.OnObjectClick;
             @event.OnDragBegin += this.OnObjectDragBegin;
             @event.OnDrag      += this.OnObjectDrag;
@@ -89,7 +89,7 @@ public class SelectTool : EditorTool {
     private void OnObjectColourChange(object sender, Color color) {
         if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-        foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+        foreach (Drawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
             if (selectedObject is NoteDrawable note) {
                 note.Note.Color                = color;
                 this.EditorInstance.SaveNeeded = true;
@@ -100,7 +100,7 @@ public class SelectTool : EditorTool {
     private void OnObjectTextCommit(object sender, string e) {
         if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-        foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+        foreach (Drawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
             switch (selectedObject) {
                 case NoteDrawable note:
                     note.Note.Text                 = this.ObjectText.AsTextBox().Text;
@@ -123,7 +123,7 @@ public class SelectTool : EditorTool {
             return;
         }
 
-        ManagedDrawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
+        Drawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
 
         switch (selectedObject) {
             case NoteDrawable note:
@@ -150,7 +150,7 @@ public class SelectTool : EditorTool {
             note.OnDrag      -= this.OnObjectDrag;
             note.OnDragEnd   -= this.OnObjectDragEnd;
         }
-        foreach (ManagedDrawable @event in this.EditorInstance.EditorState.Events) {
+        foreach (Drawable @event in this.EditorInstance.EditorState.Events) {
             @event.OnClick     -= this.OnObjectClick;
             @event.OnDragBegin -= this.OnObjectDragBegin;
             @event.OnDrag      -= this.OnObjectDrag;
@@ -224,7 +224,7 @@ public class SelectTool : EditorTool {
                         break;
                 }
             else
-                foreach (ManagedDrawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+                foreach (Drawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
                     switch (selectedObject) {
                         case NoteDrawable noteDrawable:
                             noteDrawable.Note.Time += timeDifference;
@@ -266,7 +266,7 @@ public class SelectTool : EditorTool {
 
         bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft) || FurballGame.InputManager.HeldKeys.Contains(Key.ControlRight);
 
-        if (sender is not ManagedDrawable drawable) return;
+        if (sender is not Drawable drawable) return;
 
         if (ctrlHeld) {
             if (!this.EditorInstance.EditorState.SelectedObjects.Remove(drawable))

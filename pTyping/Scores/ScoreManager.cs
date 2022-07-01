@@ -124,8 +124,6 @@ public class ScoreManager {
             this._scores.Add(tempScore);
         }
 
-        //TODO
-
         #endregion
 
         this.SaveDatabase();

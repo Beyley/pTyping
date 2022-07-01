@@ -12,7 +12,7 @@ namespace pTyping.UiGenerator;
 public class UiElement {
     public UiElementType Type { get; }
 
-    public ManagedDrawable Drawable = null;
+    public Drawable Drawable = null;
 
     public bool InUse = false;
 

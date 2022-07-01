@@ -116,8 +116,8 @@ public class pTypingGame : FurballGame {
     public static Texture FriendLeaderboardButtonTexture;
     public static Texture GlobalLeaderboardButtonTexture;
 
-    private          double                _musicTrackSchedulerDelta = 0;
-    private readonly List<ManagedDrawable> _userPanelDrawables       = new();
+    private          double         _musicTrackSchedulerDelta = 0;
+    private readonly List<Drawable> _userPanelDrawables       = new();
 
     private DrawableManager _userPanelManager;
     private ChatDrawable    _chatDrawable;
@@ -129,8 +129,8 @@ public class pTypingGame : FurballGame {
 
     public static  NotificationManager NotificationManager;
     private static TextDrawable        _OnlineUsersText;
-    private static MusicLoopState      CurrentLoopState;
-    private        pScreen             CurrentRealScreen;
+    private static MusicLoopState      _CurrentLoopState;
+    private        pScreen             _currentRealScreen;
 
     public pTypingGame() : base(new MenuScreen()) {
         // this.Window.AllowUserResizing = true;
@@ -142,7 +142,7 @@ public class pTypingGame : FurballGame {
     }
 
     [CanBeNull]
-    public static ManagedDrawable GetUserCard() {
+    public static Drawable GetUserCard() {
         if (OnlineManager.State != ConnectionState.LoggedIn)
             return null;
 
@@ -168,7 +168,7 @@ public class pTypingGame : FurballGame {
 
     public static void PlayMusic() {
         MusicTrack.Play();
-        // if (MusicTrack.IsValidHandle)
+        
         MusicTrack.Volume = ConVars.Volume.Value.Value;
     }
 
@@ -184,20 +184,16 @@ public class pTypingGame : FurballGame {
     }
 
     public static void LoadMusic(byte[] data) {
-        // if (MusicTrack.IsValidHandle) {
         if (MusicTrack != null) {
             MusicTrack.Stop();
             AudioEngine.DisposeStream(MusicTrack);
         }
-        // MusicTrack.Free();
-        // }
+        
         MusicTrack                   = AudioEngine.CreateStream(data);
         MusicTrackTimeSourceNoOffset = new AudioStreamTimeSource(MusicTrack);
         MusicTrackTimeSource         = new OffsetTimeSource(MusicTrackTimeSourceNoOffset, 0);
 
-        SetSongLoopState(CurrentLoopState);
-        
-        // MusicTrack.TempoFrequencyLock = true;
+        SetSongLoopState(_CurrentLoopState);
     }
 
     public static void LoadBackButtonTexture() {
@@ -246,12 +242,9 @@ public class pTypingGame : FurballGame {
         MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
         MenuClickSound.Volume = ConVars.Volume.Value.Value;
-        // if (MusicTrack.IsValidHandle)
-        // MusicTrack.Volume = ConVars.Volume.Value;
 
         ConVars.Volume.OnChange += delegate(object _, Value.Number volume) {
             MenuClickSound.Volume = volume.Value;
-            // if (MusicTrack.IsValidHandle)
             MusicTrack.Volume = ConVars.Volume.Value.Value;
 
             if (VolumeSelector is not null)
@@ -318,14 +311,14 @@ public class pTypingGame : FurballGame {
         DiscordManager.Update(deltaTime);
 
         if (MusicTrack != null) {
-            if (CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
+            if (_CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
                 PlayMusic();
 
-            if (CurrentLoopState         == MusicLoopState.LoopFromPreviewPoint &&
+            if (_CurrentLoopState        == MusicLoopState.LoopFromPreviewPoint &&
                 MusicTrack.PlaybackState == PlaybackState.Stopped)//TODO: Set playback position to non-existant preview point i have yet to add.
                 PlayMusic();
 
-            if (CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
+            if (_CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
                 SelectNewSong();
                 PlayMusic();
             }
@@ -366,7 +359,6 @@ public class pTypingGame : FurballGame {
     protected override void OnClosing() {
         MusicTrackScheduler.Dispose(0);
 
-        // if (OnlineManager.State == ConnectionState.LoggedIn)
         OnlineManager.Logout();
 
         DiscordManager.Dispose();
@@ -401,7 +393,6 @@ public class pTypingGame : FurballGame {
 
         ScreenManager.SetBlankTransition();
 
-        // this.LoadContent();
         base.Initialize();
 
         TooltipDrawable.TextDrawable.SetFont(JapaneseFont, 20);
@@ -491,14 +482,14 @@ public class pTypingGame : FurballGame {
     
     private void BeforeOnScreenChange(object sender, Screen e) {
         if (e is pScreen s)
-            this.CurrentRealScreen = s;
+            this._currentRealScreen = s;
     }
     private void OnSongChange(object sender, Song song) {
         LoadMusic(ContentManager.LoadRawAsset(song.QualifiedAudioPath, ContentSource.External));
         
         LoadBackgroundFromSong(song);
 
-        UpdateCurrentOnlineStatus(this.CurrentRealScreen);
+        UpdateCurrentOnlineStatus(this._currentRealScreen);
     }
 
     public static void UpdateCurrentOnlineStatus(pScreen screen) {
@@ -546,7 +537,7 @@ public class pTypingGame : FurballGame {
 
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (actualScreen != null) {
-            this.CurrentRealScreen = actualScreen;
+            this._currentRealScreen = actualScreen;
             
             if (actualScreen.BackgroundFadeAmount != -1f)
                 CurrentSongBackground.Tweens.Add(
@@ -588,7 +579,7 @@ public class pTypingGame : FurballGame {
         }
     }
     private static void SetSongLoopState(MusicLoopState loopState) {
-        CurrentLoopState = loopState;
+        _CurrentLoopState = loopState;
         switch (loopState) {
             case MusicLoopState.Loop:
                 MusicTrack.Loop = true;
@@ -628,25 +619,25 @@ public class pTypingGame : FurballGame {
         switch (e) {
             case Key.Escape:
                 if (!this._userPanelManager.Visible) break;
-                goto case Key.F8;
-            case Key.F8:
-            case Key.F9:
+                goto case Key.F1;
+            // case Key.F8:
+            case Key.F1:
                 if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
                 this._userPanelManager.Visible = !this._userPanelManager.Visible;
 
                 this._chatDrawable.MessageInputDrawable.Selected = false;
 
-                foreach (BaseDrawable drawable in this._userPanelManager.Drawables)
+                foreach (Drawable drawable in this._userPanelManager.Drawables)
                     drawable.Visible = this._userPanelManager.Visible;
 
                 break;
-            case Key.F11: {
-                this.ChangeScreenSize((int) this.WindowManager.WindowSize.X, (int) this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
-                break;
-            }
             case Key.F2: {
                 GraphicsBackend.Current.TakeScreenshot();
+                break;
+            }
+            case Key.F3: {
+                this.ChangeScreenSize((int) this.WindowManager.WindowSize.X, (int) this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
                 break;
             }
         }

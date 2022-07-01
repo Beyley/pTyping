@@ -11,10 +11,10 @@ using pTyping.UiGenerator;
 namespace pTyping.Graphics.Editor;
 
 public class EditorState {
-    public readonly List<NoteDrawable>    Notes  = new();
-    public readonly List<ManagedDrawable> Events = new();
+    public readonly List<NoteDrawable> Notes  = new();
+    public readonly List<Drawable>     Events = new();
 
-    public readonly ObservableCollection<ManagedDrawable> SelectedObjects = new();
+    public readonly ObservableCollection<Drawable> SelectedObjects = new();
 
     public double CurrentTime;
     public double MouseTime;

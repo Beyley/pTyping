@@ -43,7 +43,7 @@ public class EditorScreen : pScreen {
 
     public EditorState EditorState;
 
-    private readonly List<ManagedDrawable> _selectionRects = new();
+    private readonly List<Drawable> _selectionRects = new();
 
     public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
     public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
@@ -392,7 +392,7 @@ public class EditorScreen : pScreen {
 
         this._selectionRects.Clear();
 
-        foreach (ManagedDrawable @object in this.EditorState.SelectedObjects) {
+        foreach (Drawable @object in this.EditorState.SelectedObjects) {
             RectanglePrimitiveDrawable rect = new() {
                 RectSize      = @object.Size + new Vector2(20f),
                 Filled        = false,
@@ -419,7 +419,7 @@ public class EditorScreen : pScreen {
     }
 
     public void CreateEvent(Event @event, bool isNew = false) {
-        ManagedDrawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time), true, true));
+        Drawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time), true, true));
 
         if (eventDrawable == null) return;
 
@@ -550,7 +550,7 @@ public class EditorScreen : pScreen {
     }
 
     public void DeleteSelectedObjects() {
-        foreach (ManagedDrawable @object in this.EditorState.SelectedObjects)
+        foreach (Drawable @object in this.EditorState.SelectedObjects)
             if (@object is NoteDrawable note) {
                 this.Manager.Remove(note);
                 this.EditorState.Song.Notes.Remove(note.Note);
@@ -667,7 +667,7 @@ public class EditorScreen : pScreen {
                 if (this.EditorState.SelectedObjects.Count == 0) return;
 
                 List<NoteDrawable> sortedNotes = new();
-                foreach (ManagedDrawable @object in this.EditorState.SelectedObjects)
+                foreach (Drawable @object in this.EditorState.SelectedObjects)
                     if (@object is NoteDrawable note)
                         sortedNotes.Add(note);
                 sortedNotes = sortedNotes.OrderBy(x => x.Note.Time).ToList();
@@ -708,7 +708,7 @@ public class EditorScreen : pScreen {
         }
     }
 
-    private readonly List<ManagedDrawable> _timingPoints = new();
+    private readonly List<Drawable> _timingPoints = new();
 
     public void UpdateTimingPointDisplay() {
         this._timingPoints.ForEach(x => this.Manager.Remove(x));
@@ -754,7 +754,7 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
                     note.EditorHitSoundQueued = false;
                 }
             }
-            foreach (ManagedDrawable managedDrawable in this.EditorState.Events) {
+            foreach (Drawable managedDrawable in this.EditorState.Events) {
                 double time = managedDrawable switch {
                     TypingCutoffEventDrawable cutoff       => cutoff.Event.Time,
                     BeatLineBarEventDrawable beatLineBar   => beatLineBar.Event.Time,

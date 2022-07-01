@@ -15,8 +15,8 @@ public abstract class Event {
     public double Time { get; set; }
 
     [Pure, CanBeNull]
-    public static ManagedDrawable CreateEventDrawable(Event @event, Texture noteTexture, GameplayDrawableTweenArgs tweenArgs) {
-        ManagedDrawable drawable = null;
+    public static Drawable CreateEventDrawable(Event @event, Texture noteTexture, GameplayDrawableTweenArgs tweenArgs) {
+        Drawable drawable = null;
 
         switch (@event.Type) {
             case EventType.BeatLineBar: {

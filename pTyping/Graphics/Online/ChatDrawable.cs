@@ -19,7 +19,7 @@ using Color=Furball.Vixie.Backends.Shared.Color;
 namespace pTyping.Graphics.Online;
 
 public class ChatContentsDrawable : CompositeDrawable {
-    public List<ManagedDrawable> PublicDrawables => this.Drawables;
+    public List<Drawable> PublicDrawables => this.Drawables;
     
     public float TargetScroll = 0;
 
@@ -37,7 +37,7 @@ public class ChatContentsDrawable : CompositeDrawable {
         if (this.Drawables.Count != 0) {
             this.TargetScroll = Math.Max(this.TargetScroll, 0);
 
-            foreach (ManagedDrawable drawable in this.Drawables) {
+            foreach (Drawable drawable in this.Drawables) {
                 float startY = float.Parse(drawable.Tags.First());
 
                 float targetY = startY + this.TargetScroll;

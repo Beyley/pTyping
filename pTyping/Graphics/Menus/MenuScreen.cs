@@ -20,7 +20,7 @@ namespace pTyping.Graphics.Menus;
 public class MenuScreen : pScreen {
     private TextDrawable _musicTitle;
 
-    private ManagedDrawable     _userCard = null;
+    private Drawable            _userCard = null;
     private DrawableProgressBar _songProgressBar;
 
     public override void Initialize() {
@@ -215,9 +215,6 @@ public class MenuScreen : pScreen {
         pTypingGame.OnlineManager.OnLogout        += this.UpdateUserCard;
         pTypingGame.CurrentSong.OnChange          += this.OnCurrentSongOnOnChange;
         
-        // if (pTypingGame.CurrentSong is null || pTypingGame.CurrentSong?.Value is null)
-        //     this.LoadSong();
-        // else
         this.UpdateStats();
     }
 
@@ -247,7 +244,7 @@ public class MenuScreen : pScreen {
         if (this._usercardAdded)
             return;
 
-        ManagedDrawable userCard = pTypingGame.GetUserCard();
+        Drawable userCard = pTypingGame.GetUserCard();
 
         if (userCard == null)
             return;

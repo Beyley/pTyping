@@ -69,8 +69,8 @@ public class Player : CompositeDrawable {
         set => this._typingIndicators[this._currentTypingIndicatorIndex] = value;
     }
 
-    private readonly List<NoteDrawable>                 _notes  = new();
-    private readonly List<Tuple<ManagedDrawable, bool>> _events = new();
+    private readonly List<NoteDrawable>          _notes  = new();
+    private readonly List<Tuple<Drawable, bool>> _events = new();
 
     public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
 
@@ -156,13 +156,13 @@ public class Player : CompositeDrawable {
         for (int i = 0; i < this.Song.Events.Count; i++) {
             Event @event = this.Song.Events[i];
 
-            ManagedDrawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time)));
+            Drawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time)));
 
             if (drawable != null) {
                 drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
                 drawable.Depth      = 0f;
 
-                this._events.Add(new Tuple<ManagedDrawable, bool>(drawable, false));
+                this._events.Add(new Tuple<Drawable, bool>(drawable, false));
             }
         }
     }
@@ -222,7 +222,7 @@ public class Player : CompositeDrawable {
             this.ReplayFrames.Add(f);
         }
 
-        //If we already hit all the notes in the song, wtf are we dont here? stop hitting your keyboard you monkey
+        //If we already hit all the notes in the song, wtf are we doing here? stop hitting your keyboard you monkey
         if (this.Song.AllNotesHit()) return;
 
         //The drawable for the note we are going to check
@@ -465,14 +465,14 @@ public class Player : CompositeDrawable {
         }
 
         for (int i = 0; i < this._events.Count; i++) {
-            (ManagedDrawable drawable, bool added) = this._events[i];
+            (Drawable drawable, bool added) = this._events[i];
 
             if (added) continue;
 
             if (currentTime < drawable.Tweens[0].StartTime) continue;
 
             this.Drawables.Add(drawable);
-            this._events[i] = new Tuple<ManagedDrawable, bool>(drawable, true);
+            this._events[i] = new Tuple<Drawable, bool>(drawable, true);
         }
 
         #endregion

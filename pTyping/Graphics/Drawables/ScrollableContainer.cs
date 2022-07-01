@@ -27,7 +27,7 @@ public class ScrollableContainer : CompositeDrawable {
         this._realHovered = this.RealContains(e.position.ToPoint());
     }
 
-    public void Add(ManagedDrawable drawable) {
+    public void Add(Drawable drawable) {
         //Save the original Y position
         drawable.Tags.Add(drawable.Position.Y.ToString(CultureInfo.InvariantCulture));
         
@@ -54,7 +54,7 @@ public class ScrollableContainer : CompositeDrawable {
     private float _lastMax          = 0;
 
     public override void Update(double time) {
-        foreach (ManagedDrawable drawable in this.Drawables) {
+        foreach (Drawable drawable in this.Drawables) {
             float origY = float.Parse(drawable.Tags[0]);
 
             float target = origY - this._targetScroll;
@@ -96,10 +96,9 @@ public class ScrollableContainer : CompositeDrawable {
     public void RecalculateMax() {
         this._lastMax = 0;
 
-        foreach (ManagedDrawable drawable in this.Drawables) {
+        foreach (Drawable drawable in this.Drawables)
             if (drawable.Position.Y + drawable.Size.Y - this.Size.Y > this._lastMax) {
                 this._lastMax = Math.Max(0, drawable.Position.Y + drawable.Size.Y - this.Size.Y);
             }
-        }
     }
 }
