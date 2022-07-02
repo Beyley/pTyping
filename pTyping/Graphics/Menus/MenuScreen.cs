@@ -10,6 +10,7 @@ using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
+using pTyping.Graphics.UiMaker;
 using pTyping.Songs;
 using Silk.NET.Input;
 using static Furball.Engine.Engine.Localization.LocalizationManager;
@@ -53,6 +54,23 @@ public class MenuScreen : pScreen {
         changelogButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new ChangelogScreen());
 
         this.Manager.Add(changelogButton);
+
+        DrawableButton uiEditorButton = new(
+        new Vector2(changelogButton.Position.X + changelogButton.Size.X, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        pTypingGame.JapaneseFont,
+        30,
+        "Ui Maker",
+        Color.Blue,
+        Color.White,
+        Color.White,
+        new Vector2(0)
+        ) {
+            OriginType = OriginType.BottomLeft
+        };
+
+        uiEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new UiMakerScreen("test"));
+
+        this.Manager.Add(uiEditorButton);
 
         #region Title
 

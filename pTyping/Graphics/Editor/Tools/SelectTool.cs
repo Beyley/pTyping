@@ -51,12 +51,17 @@ public class SelectTool : EditorTool {
         this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColourLabel);
         this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColour);
 
-        this.ObjectText.AsTextBox().OnCommit             += this.OnObjectTextCommit;
+        this.ObjectText.AsTextBox().OnFocusChange        += this.OnObjectTextCommit;
         this.ObjectColour.AsColorPicker().Color.OnChange += this.OnObjectColourChange;
 
         this.EditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChange;
 
         base.Initialize();
+    }
+
+    private void OnObjectTextCommit(object sender, bool selected) {
+        if (!selected)
+            this.OnObjectTextCommit(sender, this.ObjectText.AsTextBox().Text);
     }
 
     public override void OnNoteCreate(NoteDrawable note, bool isNew) {
