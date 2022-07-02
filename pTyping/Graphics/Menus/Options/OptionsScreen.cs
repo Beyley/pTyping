@@ -12,6 +12,7 @@ using Furball.Engine.Engine.Localization.Languages;
 using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using pTyping.Engine;
+using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
 namespace pTyping.Graphics.Menus.Options;
@@ -100,7 +101,8 @@ public class OptionsScreen : pScreen {
 
         #region Resolution dropdown
 
-        IEnumerable<VideoMode> supportedResolutions = FurballGame.Instance.WindowManager.Monitor.GetAllVideoModes();
+        List<VideoMode> supportedResolutions = FurballGame.Instance.WindowManager.Monitor.GetAllVideoModes().ToList();
+        supportedResolutions.Add(new VideoMode(new Vector2D<int>(1600, 900)));
 
         Dictionary<object, string> items = new();
         
@@ -112,35 +114,16 @@ public class OptionsScreen : pScreen {
         }
 
         DrawableDropdown resolutionDropdown = new(new Vector2(100, 300), pTypingGame.JapaneseFont, 25, new(200, 50), items);
+
+        resolutionDropdown.SelectedItem.OnChange += delegate(object _, KeyValuePair<object, string> pair) {
+            VideoMode mode = (VideoMode)pair.Key;
+
+            FurballGame.Instance.ChangeScreenSize(mode.Resolution.Value.X, mode.Resolution.Value.Y);
+        };
         
         this.Manager.Add(resolutionDropdown);
         
         #endregion
-        
-        //
-        // #region 1600x900 res button
-        //
-        // DrawableButton res1600X900Button = new(new Vector2(100, 300), "1600x900", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
-        //
-        // res1600X900Button.OnClick += delegate {
-        //     FurballGame.Instance.ChangeScreenSize(1600, 900);
-        // };
-        //
-        // this.Manager.Add(res1600X900Button);
-        //
-        // #endregion
-        //
-        // #region 1920x1080 res button
-        //
-        // DrawableButton res1920X1080Button = new(new Vector2(100, 400), "1920x1080", FurballGame.DEFAULT_FONT, 30, Color.Blue, Color.White, Color.White, Vector2.Zero);
-        //
-        // res1920X1080Button.OnClick += delegate {
-        //     FurballGame.Instance.ChangeScreenSize(1920, 1080);
-        // };
-        //
-        // this.Manager.Add(res1920X1080Button);
-        //
-        // #endregion
 
         #region Language dropdown
 
