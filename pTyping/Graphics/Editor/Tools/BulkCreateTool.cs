@@ -123,29 +123,34 @@ public class BulkCreateTool : EditorTool {
 
         double time = this.EditorInstance.EditorState.CurrentTime;
 
-        double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
+        try {
+            double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
 
-        List<Note> notes = new();
+            List<Note> notes = new();
 
-        foreach (string text in splitText) {
-            if (string.IsNullOrEmpty(text.Trim())) {
+            foreach (string text in splitText) {
+                if (string.IsNullOrEmpty(text.Trim())) {
+                    time += spacing;
+
+                    continue;
+                }
+
+                Note note = new() {
+                    Text  = text.Trim(),
+                    Time  = time,
+                    Color = this.Color.AsColorPicker().Color
+                };
+
+                notes.Add(note);
+
                 time += spacing;
-
-                continue;
             }
 
-            Note note = new() {
-                Text  = text.Trim(),
-                Time  = time,
-                Color = this.Color.AsColorPicker().Color
-            };
-
-            notes.Add(note);
-
-            time += spacing;
+            return notes;
         }
-
-        return notes;
+        catch {
+            return new List<Note>();
+        }
     }
 
     public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
