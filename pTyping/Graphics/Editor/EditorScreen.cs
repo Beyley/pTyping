@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -28,6 +29,7 @@ using pTyping.Songs.Events;
 using Silk.NET.Input;
 using sowelipisona;
 using Color=Furball.Vixie.Backends.Shared.Color;
+using Drawable=Furball.Engine.Engine.Graphics.Drawables.Drawable;
 
 namespace pTyping.Graphics.Editor;
 
@@ -620,19 +622,16 @@ public class EditorScreen : pScreen {
                 }
 
                 if (this.SaveNeeded) {
-                    //TODO: reimplement this somehow, maybe use `FurballForm`?
-                    // ResponseType responseType = EtoHelper.MessageDialog(
-                    // "Are you sure?",
-                    // "Do you want to save before quitting?",
-                    // MessageType.Question,
-                    // ButtonsType.YesNo
-                    // );
-                    //
-                    // if (responseType == ResponseType.Yes) {
-                    //     SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-                    //     pTypingGame.CurrentSong.Value = this.EditorState.Song;
-                    //     SongManager.UpdateSongs();
-                    // }
+                    DialogResult responseType = EtoHelper.MessageDialog("Do you want to save before quitting?", MessageBoxButtons.YesNoCancel);
+
+                    if (responseType == DialogResult.Cancel)
+                        return;
+
+                    if (responseType == DialogResult.Yes) {
+                        SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                        pTypingGame.CurrentSong.Value = this.EditorState.Song;
+                        SongManager.UpdateSongs();
+                    }
                 }
 
                 pTypingGame.MenuClickSound.PlayNew();
