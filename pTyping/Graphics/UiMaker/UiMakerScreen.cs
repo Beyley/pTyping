@@ -9,6 +9,7 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
 using Newtonsoft.Json;
 using Silk.NET.Input;
@@ -31,6 +32,9 @@ public class UiMakerElement {
     public  Drawable      Drawable;
     private UiMakerScreen Screen;
 
+    public Vector2 DragBeginOffset;
+    public bool    ClickedButNotDragged;
+
     public void SetDrawableProperties(UiMakerScreen screen) {
         this.Screen = screen;
 
@@ -49,7 +53,7 @@ public class UiMakerElement {
         }
 
         this.Drawable.OriginType     = this.OriginType;
-        this.Drawable.Position       = this.Position;
+        this.UpdatePosition();
         this.Drawable.Rotation       = this.Rotation;
         this.Drawable.Scale          = this.Scale;
         this.Drawable.RotationOrigin = this.RotationOrigin;
@@ -57,12 +61,44 @@ public class UiMakerElement {
         this.Drawable.Depth          = this.Depth;
     }
 
+    public void UpdatePosition() {
+        this.Drawable.Position = this.Position;
+    }
+    
     public void SetEvents() {
-        this.Drawable.OnClick += this.OnClick;
+        this.Drawable.OnClick   += this.OnClick;
+        this.Drawable.OnClickUp += this.OnClickUp;
+
+        this.Drawable.OnDragBegin += this.OnDragBegin;
+        this.Drawable.OnDragEnd   += this.OnDragEnd;
+        this.Drawable.OnDrag      += this.OnDrag;
+    }
+
+    private void OnDragBegin(object sender, Point e) {
+        if (!this.Screen.Selected.Contains(this))
+            return;
+
+        this.Screen.DragBegin(e);
+    }
+    private void OnDrag(object sender, Point e) {
+        if (!this.Screen.Selected.Contains(this))
+            return;
+
+        this.Screen.Drag(e);
+    }
+    private void OnDragEnd(object sender, Point e) {
+        if (!this.Screen.Selected.Contains(this))
+            return;
+
+        this.Screen.DragEnd(e);
     }
 
     private void OnClick(object sender, (MouseButton button, Point pos) e) {
-        if (e.button == MouseButton.Left) {
+        this.ClickedButNotDragged = true;
+    }
+
+    private void OnClickUp(object sender, (MouseButton button, Point pos) e) {
+        if (e.button == MouseButton.Left && this.ClickedButNotDragged) {
             if (!FurballGame.InputManager.ControlHeld)
                 this.Screen.Selected.Clear();
 
@@ -206,6 +242,26 @@ public class UiMakerScreen : pScreen {
         FurballGame.InputManager.OnKeyDown += this.OnKeyDown;
     }
 
+    public void DragBegin(Point e) {
+        foreach (UiMakerElement element in this.Selected) {
+            element.ClickedButNotDragged = false;
+
+            element.DragBeginOffset = e.ToVector2() - element.Position;
+        }
+    }
+
+    public void Drag(Point e) {
+        foreach (UiMakerElement element in this.Selected) {
+            element.Position = e.ToVector2() - element.DragBeginOffset;
+
+            element.UpdatePosition();
+        }
+    }
+
+    public void DragEnd(Point e) {
+        //
+    }
+    
     private void OnKeyDown(object sender, Key e) {
         switch (e) {
             case Key.Escape: {
