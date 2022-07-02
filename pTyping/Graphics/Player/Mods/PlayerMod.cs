@@ -12,6 +12,7 @@ namespace pTyping.Graphics.Player.Mods;
 
 public abstract class PlayerMod {
     public static List<PlayerMod> RegisteredMods = new() {
+        new ThreeQuarterTimeMod(),
         new HalfTimeMod(),
         new DoubleTimeMod(),
         new HiddenMod(),
