@@ -37,25 +37,27 @@ public class UiMakerElement {
     public Vector2 DragBeginOffset;
     public bool    ClickedButNotDragged;
 
-    public void SetDrawableProperties(UiMakerScreen screen) {
+    public void SetDrawableProperties(UiMakerScreen screen, bool disableHeavy = true) {
         this._screen = screen;
 
         switch (this.Drawable) {
             case TextDrawable text:
                 text.Text = this.Text;
-                text.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+                if (!disableHeavy)
+                    this.UpdateFontSize();
 
                 break;
             case TexturedDrawable texture:
-                texture.SetTexture(screen.GetTexture(this.Texture));
-
+                if (!disableHeavy)
+                    this.UpdateTexture();
+                
                 break;
             default:
                 throw new NotSupportedException("That drawable type is not supported!");
         }
 
-        this.Drawable.OriginType = this.OriginType;
-        this.UpdatePosition();
+        this.Drawable.OriginType     = this.OriginType;
+        this.Drawable.Position       = this.Position;
         this.Drawable.Rotation       = this.Rotation;
         this.Drawable.Scale          = this.Scale;
         this.Drawable.RotationOrigin = this.RotationOrigin;
@@ -63,8 +65,16 @@ public class UiMakerElement {
         this.Drawable.Depth          = this.Depth;
     }
 
-    public void UpdatePosition() {
-        this.Drawable.Position = this.Position;
+    public void UpdateFontSize() {
+        TextDrawable text = (TextDrawable)this.Drawable;
+
+        text.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+    }
+
+    public void UpdateTexture() {
+        TexturedDrawable texture = (TexturedDrawable)this.Drawable;
+
+        texture.SetTexture(this._screen.GetTexture(this.Texture));
     }
 
     public void SetEvents() {
@@ -264,7 +274,7 @@ public class UiMakerScreen : pScreen {
                 Type       = UiMakerElementType.Text,
                 FontSize   = 24,
                 Text       = "This element was added at runtime!",
-                Color      = Color.Green,
+                Color      = Color.White,
                 Rotation   = 0f,
                 Position   = new Vector2(50, 50)
             }
@@ -292,7 +302,7 @@ public class UiMakerScreen : pScreen {
                 Identifier = this.GetDefaultIdentifier(),
                 Type       = UiMakerElementType.Texture,
                 Texture    = "note.png",
-                Color      = Color.Green,
+                Color      = Color.White,
                 Rotation   = 0f,
                 Position   = new Vector2(50, 50)
             }
@@ -300,6 +310,17 @@ public class UiMakerScreen : pScreen {
 
             this.ResetLayout();
         };
+
+        DrawableColorPicker picker = new(new(FurballGame.DEFAULT_WINDOW_WIDTH, 0), pTypingGame.JapaneseFontStroked, 20, Color.White) {
+            OriginType = OriginType.TopRight
+        };
+        picker.Color.OnChange += delegate(object sender, Color e) {
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.Color = e;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
+        this.Manager.Add(picker);
     }
 
     public void DragBegin(Point e) {
@@ -314,7 +335,7 @@ public class UiMakerScreen : pScreen {
         foreach (UiMakerElement element in this.Selected) {
             element.Position = e.ToVector2() - element.DragBeginOffset;
 
-            element.UpdatePosition();
+            element.SetDrawableProperties(this);
         }
     }
 
@@ -358,7 +379,7 @@ public class UiMakerScreen : pScreen {
 
         element.Drawable = drawable;
 
-        element.SetDrawableProperties(this);
+        element.SetDrawableProperties(this, false);
 
         element.SetEvents();
 
