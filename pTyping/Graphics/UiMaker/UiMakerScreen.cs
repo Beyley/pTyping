@@ -19,6 +19,7 @@ using Color=Furball.Vixie.Backends.Shared.Color;
 namespace pTyping.Graphics.UiMaker;
 
 public enum UiMakerElementType {
+    None,
     Text,
     Texture
 }
@@ -28,7 +29,7 @@ public class UiMakerElement {
     [JsonProperty]
     public string Identifier;
     [JsonProperty]
-    public UiMakerElementType Type;
+    public UiMakerElementType Type = UiMakerElementType.None;
 
     public  Drawable      Drawable;
     private UiMakerScreen _screen;
@@ -182,6 +183,9 @@ public class SelectBoxDrawable : RectanglePrimitiveDrawable {
 }
 
 public class UiMakerScreen : pScreen {
+    private int    _defaultIdentifierIndex = 0;
+    private string GetDefaultIdentifier() => $"item{this._defaultIdentifierIndex++}";
+
     private readonly UiMakerElementContainer _currentContainer;
 
     private const string UI_ELEMENTS_FOLDER = "uielements";
@@ -215,14 +219,14 @@ public class UiMakerScreen : pScreen {
         FurballGame.DrawInputOverlay = true;
 
         this.Content = new() {
-            Position = new(20),
+            Position = new(50),
             Depth    = 1f
         };
         this.Manager.Add(this.Content);
 
         this._currentContainer.Elements.Add(
         new UiMakerElement {
-            Identifier = "test",
+            Identifier = this.GetDefaultIdentifier(),
             Type       = UiMakerElementType.Text,
             FontSize   = 24,
             Text       = "This is a test!"
@@ -231,7 +235,7 @@ public class UiMakerScreen : pScreen {
 
         this._currentContainer.Elements.Add(
         new UiMakerElement {
-            Identifier = "test2",
+            Identifier = this.GetDefaultIdentifier(),
             Type       = UiMakerElementType.Text,
             FontSize   = 24,
             Text       = "This is also a test!",
@@ -256,10 +260,38 @@ public class UiMakerScreen : pScreen {
         button.OnClick += delegate {
             this._currentContainer.Elements.Add(
             new UiMakerElement {
-                Identifier = "test3",
+                Identifier = this.GetDefaultIdentifier(),
                 Type       = UiMakerElementType.Text,
                 FontSize   = 24,
                 Text       = "This element was added at runtime!",
+                Color      = Color.Green,
+                Rotation   = 0f,
+                Position   = new Vector2(50, 50)
+            }
+            );
+
+            this.ResetLayout();
+        };
+
+        button = new(
+        button.Size with {
+            X = 0
+        },
+        pTypingGame.JapaneseFontStroked,
+        20,
+        "Add texture object",
+        Color.Blue,
+        Color.White,
+        Color.Black,
+        Vector2.Zero
+        );
+        this.Manager.Add(button);
+        button.OnClick += delegate {
+            this._currentContainer.Elements.Add(
+            new UiMakerElement {
+                Identifier = this.GetDefaultIdentifier(),
+                Type       = UiMakerElementType.Texture,
+                Texture    = "note.png",
                 Color      = Color.Green,
                 Rotation   = 0f,
                 Position   = new Vector2(50, 50)
