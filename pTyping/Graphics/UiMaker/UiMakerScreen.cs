@@ -9,6 +9,7 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
 using Newtonsoft.Json;
@@ -30,13 +31,13 @@ public class UiMakerElement {
     public UiMakerElementType Type;
 
     public  Drawable      Drawable;
-    private UiMakerScreen Screen;
+    private UiMakerScreen _screen;
 
     public Vector2 DragBeginOffset;
     public bool    ClickedButNotDragged;
 
     public void SetDrawableProperties(UiMakerScreen screen) {
-        this.Screen = screen;
+        this._screen = screen;
 
         switch (this.Drawable) {
             case TextDrawable text:
@@ -52,7 +53,7 @@ public class UiMakerElement {
                 throw new NotSupportedException("That drawable type is not supported!");
         }
 
-        this.Drawable.OriginType     = this.OriginType;
+        this.Drawable.OriginType = this.OriginType;
         this.UpdatePosition();
         this.Drawable.Rotation       = this.Rotation;
         this.Drawable.Scale          = this.Scale;
@@ -64,7 +65,7 @@ public class UiMakerElement {
     public void UpdatePosition() {
         this.Drawable.Position = this.Position;
     }
-    
+
     public void SetEvents() {
         this.Drawable.OnClick   += this.OnClick;
         this.Drawable.OnClickUp += this.OnClickUp;
@@ -75,22 +76,22 @@ public class UiMakerElement {
     }
 
     private void OnDragBegin(object sender, Point e) {
-        if (!this.Screen.Selected.Contains(this))
+        if (!this._screen.Selected.Contains(this))
             return;
 
-        this.Screen.DragBegin(e);
+        this._screen.DragBegin(e);
     }
     private void OnDrag(object sender, Point e) {
-        if (!this.Screen.Selected.Contains(this))
+        if (!this._screen.Selected.Contains(this))
             return;
 
-        this.Screen.Drag(e);
+        this._screen.Drag(e);
     }
     private void OnDragEnd(object sender, Point e) {
-        if (!this.Screen.Selected.Contains(this))
+        if (!this._screen.Selected.Contains(this))
             return;
 
-        this.Screen.DragEnd(e);
+        this._screen.DragEnd(e);
     }
 
     private void OnClick(object sender, (MouseButton button, Point pos) e) {
@@ -100,12 +101,12 @@ public class UiMakerElement {
     private void OnClickUp(object sender, (MouseButton button, Point pos) e) {
         if (e.button == MouseButton.Left && this.ClickedButNotDragged) {
             if (!FurballGame.InputManager.ControlHeld)
-                this.Screen.Selected.Clear();
+                this._screen.Selected.Clear();
 
-            if (this.Screen.Selected.Contains(this))
-                this.Screen.Selected.Remove(this);
+            if (this._screen.Selected.Contains(this))
+                this._screen.Selected.Remove(this);
             else
-                this.Screen.Selected.Add(this);
+                this._screen.Selected.Add(this);
         }
     }
 
@@ -190,7 +191,7 @@ public class UiMakerScreen : pScreen {
     public readonly ObservableCollection<UiMakerElement> Selected = new();
 
     public List<Drawable> SelectedDrawables = new();
-    
+
     public UiMakerScreen(string name) {
         if (!Directory.Exists(UI_ELEMENTS_FOLDER))
             Directory.CreateDirectory(UI_ELEMENTS_FOLDER);
@@ -211,7 +212,12 @@ public class UiMakerScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        this.Content = new();
+        FurballGame.DrawInputOverlay = true;
+
+        this.Content = new() {
+            Position = new(20),
+            Depth    = 1f
+        };
         this.Manager.Add(this.Content);
 
         this._currentContainer.Elements.Add(
@@ -237,9 +243,31 @@ public class UiMakerScreen : pScreen {
 
         this.ResetLayout();
 
+        this.AddUi();
+
         this.Selected.CollectionChanged += this.OnCollectionChanged;
 
         FurballGame.InputManager.OnKeyDown += this.OnKeyDown;
+    }
+
+    private void AddUi() {
+        DrawableButton button = new(Vector2.Zero, pTypingGame.JapaneseFontStroked, 20, "Add text object", Color.Blue, Color.White, Color.Black, Vector2.Zero);
+        this.Manager.Add(button);
+        button.OnClick += delegate {
+            this._currentContainer.Elements.Add(
+            new UiMakerElement {
+                Identifier = "test3",
+                Type       = UiMakerElementType.Text,
+                FontSize   = 24,
+                Text       = "This element was added at runtime!",
+                Color      = Color.Green,
+                Rotation   = 0f,
+                Position   = new Vector2(50, 50)
+            }
+            );
+
+            this.ResetLayout();
+        };
     }
 
     public void DragBegin(Point e) {
@@ -261,7 +289,7 @@ public class UiMakerScreen : pScreen {
     public void DragEnd(Point e) {
         //
     }
-    
+
     private void OnKeyDown(object sender, Key e) {
         switch (e) {
             case Key.Escape: {
@@ -314,7 +342,7 @@ public class UiMakerScreen : pScreen {
 
         return tex;
     }
-    
+
     public override void Dispose() {
         base.Dispose();
 
@@ -324,6 +352,8 @@ public class UiMakerScreen : pScreen {
         this.Selected.CollectionChanged -= this.OnCollectionChanged;
 
         FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
+
+        FurballGame.DrawInputOverlay = false;
     }
 
     private void ResetLayout() {
