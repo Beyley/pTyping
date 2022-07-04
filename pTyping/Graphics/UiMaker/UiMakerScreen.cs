@@ -210,6 +210,9 @@ public class UiMakerScreen : pScreen {
     private UiContainer _editThingsContainer;
 
     private UiElement _colourPicker;
+    private UiElement _depthPicker;
+    private UiElement _textPicker;
+    private UiElement _texturePicker;
 
     public UiMakerScreen(string name) {
         if (!Directory.Exists(UI_ELEMENTS_FOLDER))
@@ -272,7 +275,7 @@ public class UiMakerScreen : pScreen {
     private void AddUi() {
         this.Manager.Add(this._createThingsContainer = new UiContainer(OriginType.TopLeft));
         this.Manager.Add(
-        this._editThingsContainer = new UiContainer(OriginType.TopRight) {
+        this._editThingsContainer = new UiContainer(OriginType.TopLeft) {
             OriginType = OriginType.TopRight,
             Position   = new(FurballGame.DEFAULT_WINDOW_WIDTH, 0)
         }
@@ -317,14 +320,44 @@ public class UiMakerScreen : pScreen {
 
         this._createThingsContainer.RegisterElement(button);
 
-        this._colourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White);
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Colour:", 25));
+        this._editThingsContainer.RegisterElement(this._colourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White));
         this._colourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
             foreach (UiMakerElement uiMakerElement in this.Selected) {
                 uiMakerElement.Color = e;
                 uiMakerElement.SetDrawableProperties(this);
             }
         };
-        this._editThingsContainer.RegisterElement(this._colourPicker);
+
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Depth:", 25));
+        this._editThingsContainer.RegisterElement(this._depthPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "0", 20, 100));
+        this._depthPicker.AsTextBox().OnCommit += delegate(object _, string e) {
+            if (!float.TryParse(e, out float res))
+                return;
+
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.Depth = res;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
+
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Text:", 25));
+        this._editThingsContainer.RegisterElement(this._textPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "", 20, 300));
+        this._textPicker.AsTextBox().OnCommit += delegate(object _, string e) {
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.Text = e;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
+
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Texture:", 25));
+        this._editThingsContainer.RegisterElement(this._texturePicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "", 20, 300));
+        this._texturePicker.AsTextBox().OnCommit += delegate(object _, string e) {
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.Texture = e;
+                uiMakerElement.UpdateTexture();
+            }
+        };
     }
 
     private void UpdateUi() {
@@ -332,8 +365,10 @@ public class UiMakerScreen : pScreen {
             UiMakerElement selected = this.Selected[0];
 
             this._colourPicker.AsColorPicker().Color.Value = selected.Color;
+            this._depthPicker.AsTextBox().Text             = $"{selected.Depth:0.###}";
+            this._textPicker.AsTextBox().Text              = selected.Text;
+            this._texturePicker.AsTextBox().Text           = selected.Texture;
         }
-
     }
 
     public void DragBegin(Point e) {
