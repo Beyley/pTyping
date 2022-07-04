@@ -9,10 +9,10 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
 using Newtonsoft.Json;
+using pTyping.UiGenerator;
 using Silk.NET.Input;
 using Color=Furball.Vixie.Backends.Shared.Color;
 
@@ -206,6 +206,11 @@ public class UiMakerScreen : pScreen {
 
     public List<Drawable> SelectedDrawables = new();
 
+    private UiContainer _createThingsContainer;
+    private UiContainer _editThingsContainer;
+
+    private UiElement _colourPicker;
+
     public UiMakerScreen(string name) {
         if (!Directory.Exists(UI_ELEMENTS_FOLDER))
             Directory.CreateDirectory(UI_ELEMENTS_FOLDER);
@@ -265,9 +270,17 @@ public class UiMakerScreen : pScreen {
     }
 
     private void AddUi() {
-        DrawableButton button = new(Vector2.Zero, pTypingGame.JapaneseFontStroked, 20, "Add text object", Color.Blue, Color.White, Color.Black, Vector2.Zero);
-        this.Manager.Add(button);
-        button.OnClick += delegate {
+        this.Manager.Add(this._createThingsContainer = new UiContainer(OriginType.TopLeft));
+        this.Manager.Add(
+        this._editThingsContainer = new UiContainer(OriginType.TopRight) {
+            OriginType = OriginType.TopRight,
+            Position   = new(FurballGame.DEFAULT_WINDOW_WIDTH, 0)
+        }
+        );
+
+        UiElement button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Add Text Object", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+
+        button.AsButton().OnClick += delegate {
             this._currentContainer.Elements.Add(
             new UiMakerElement {
                 Identifier = this.GetDefaultIdentifier(),
@@ -283,20 +296,11 @@ public class UiMakerScreen : pScreen {
             this.ResetLayout();
         };
 
-        button = new(
-        button.Size with {
-            X = 0
-        },
-        pTypingGame.JapaneseFontStroked,
-        20,
-        "Add texture object",
-        Color.Blue,
-        Color.White,
-        Color.Black,
-        Vector2.Zero
-        );
-        this.Manager.Add(button);
-        button.OnClick += delegate {
+        this._createThingsContainer.RegisterElement(button);
+
+        button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Add Texture Object", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+
+        button.AsButton().OnClick += delegate {
             this._currentContainer.Elements.Add(
             new UiMakerElement {
                 Identifier = this.GetDefaultIdentifier(),
@@ -311,16 +315,25 @@ public class UiMakerScreen : pScreen {
             this.ResetLayout();
         };
 
-        DrawableColorPicker picker = new(new(FurballGame.DEFAULT_WINDOW_WIDTH, 0), pTypingGame.JapaneseFontStroked, 20, Color.White) {
-            OriginType = OriginType.TopRight
-        };
-        picker.Color.OnChange += delegate(object sender, Color e) {
+        this._createThingsContainer.RegisterElement(button);
+
+        this._colourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White);
+        this._colourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
             foreach (UiMakerElement uiMakerElement in this.Selected) {
                 uiMakerElement.Color = e;
                 uiMakerElement.SetDrawableProperties(this);
             }
         };
-        this.Manager.Add(picker);
+        this._editThingsContainer.RegisterElement(this._colourPicker);
+    }
+
+    private void UpdateUi() {
+        if (this.Selected.Count == 1) {
+            UiMakerElement selected = this.Selected[0];
+
+            this._colourPicker.AsColorPicker().Color.Value = selected.Color;
+        }
+
     }
 
     public void DragBegin(Point e) {
@@ -365,6 +378,8 @@ public class UiMakerScreen : pScreen {
             this.SelectedDrawables.Add(drawable);
             this.Content.Drawables.Add(drawable);
         }
+
+        this.UpdateUi();
     }
 
     private readonly Dictionary<string, Texture> _textureCache = new();
