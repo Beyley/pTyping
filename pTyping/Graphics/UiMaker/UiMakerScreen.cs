@@ -4,13 +4,17 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
@@ -31,7 +35,9 @@ public class UiMakerElement {
     [JsonProperty]
     public UiMakerElementType Type = UiMakerElementType.None;
 
-    public  Drawable      Drawable;
+    public Drawable Drawable;
+    [CanBeNull]
+    public SelectBoxDrawable SelectDrawable;
     private UiMakerScreen _screen;
 
     public Vector2 DragBeginOffset;
@@ -63,6 +69,9 @@ public class UiMakerElement {
         this.Drawable.RotationOrigin = this.RotationOrigin;
         this.Drawable.ColorOverride  = this.Color;
         this.Drawable.Depth          = this.Depth;
+
+        if (this.SelectDrawable != null)
+            this.SelectDrawable.OriginType = this.OriginType;
     }
 
     public void UpdateFontSize() {
@@ -166,7 +175,9 @@ public class UiMakerElementContainer {
     public List<UiMakerElement> Elements = new();
 }
 
-public class UiMakerScreenContent : CompositeDrawable {}
+public class UiMakerScreenContent : CompositeDrawable {
+    public UiMakerScreenContent() => this.InvisibleToInput = true;
+}
 
 public class SelectBoxDrawable : RectanglePrimitiveDrawable {
     public Drawable Parent;
@@ -211,8 +222,10 @@ public class UiMakerScreen : pScreen {
 
     private UiElement _colourPicker;
     private UiElement _depthPicker;
+    private UiElement _rotationPicker;
     private UiElement _textPicker;
     private UiElement _texturePicker;
+    private UiElement _originTypePicker;
 
     public UiMakerScreen(string name) {
         if (!Directory.Exists(UI_ELEMENTS_FOLDER))
@@ -332,11 +345,39 @@ public class UiMakerScreen : pScreen {
         this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Depth:", 25));
         this._editThingsContainer.RegisterElement(this._depthPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "0", 20, 100));
         this._depthPicker.AsTextBox().OnCommit += delegate(object _, string e) {
-            if (!float.TryParse(e, out float res))
+            if (!float.TryParse(e, out float res)) {
+                this._depthPicker.AsTextBox().Tweens.Add(
+                new ColorTween(TweenType.Color, this._depthPicker.AsTextBox().ColorOverride, Color.Red, FurballGame.Time, FurballGame.Time + 100)
+                );
                 return;
+            }
+
+            this._depthPicker.AsTextBox().Tweens.Add(
+            new ColorTween(TweenType.Color, this._depthPicker.AsTextBox().ColorOverride, Color.White, FurballGame.Time, FurballGame.Time + 100)
+            );
 
             foreach (UiMakerElement uiMakerElement in this.Selected) {
                 uiMakerElement.Depth = res;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
+
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Rotation:", 25));
+        this._editThingsContainer.RegisterElement(this._rotationPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "0", 20, 100));
+        this._rotationPicker.AsTextBox().OnCommit += delegate(object _, string e) {
+            if (!float.TryParse(e, out float res)) {
+                this._rotationPicker.AsTextBox().Tweens.Add(
+                new ColorTween(TweenType.Color, this._rotationPicker.AsTextBox().ColorOverride, Color.Red, FurballGame.Time, FurballGame.Time + 100)
+                );
+                return;
+            }
+
+            this._rotationPicker.AsTextBox().Tweens.Add(
+            new ColorTween(TweenType.Color, this._rotationPicker.AsTextBox().ColorOverride, Color.White, FurballGame.Time, FurballGame.Time + 100)
+            );
+
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.Rotation = res;
                 uiMakerElement.SetDrawableProperties(this);
             }
         };
@@ -358,16 +399,37 @@ public class UiMakerScreen : pScreen {
                 uiMakerElement.UpdateTexture();
             }
         };
+
+        Dictionary<object, string> items = new();
+        items.Add(OriginType.TopLeft,      "Top Left");
+        items.Add(OriginType.TopRight,     "Top Right");
+        items.Add(OriginType.BottomLeft,   "Bottom Left");
+        items.Add(OriginType.BottomRight,  "Bottom Right");
+        items.Add(OriginType.Center,       "Center");
+        items.Add(OriginType.TopCenter,    "Top Center");
+        items.Add(OriginType.BottomCenter, "Bottom Center");
+        items.Add(OriginType.LeftCenter,   "Left Center");
+        items.Add(OriginType.RightCenter,  "Right Center");
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Origin Type:", 25));
+        this._editThingsContainer.RegisterElement(this._originTypePicker = UiElement.CreateDropdown(items, new(100, 30), pTypingGame.JapaneseFontStroked, 20));
+        this._originTypePicker.AsDropdown().SelectedItem.OnChange += (_, pair) => {
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.OriginType = (OriginType)pair.Key;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
     }
 
     private void UpdateUi() {
         if (this.Selected.Count == 1) {
             UiMakerElement selected = this.Selected[0];
 
-            this._colourPicker.AsColorPicker().Color.Value = selected.Color;
-            this._depthPicker.AsTextBox().Text             = $"{selected.Depth:0.###}";
-            this._textPicker.AsTextBox().Text              = selected.Text;
-            this._texturePicker.AsTextBox().Text           = selected.Texture;
+            this._colourPicker.AsColorPicker().Color.Value         = selected.Color;
+            this._depthPicker.AsTextBox().Text                     = $"{selected.Depth:0.###}";
+            this._rotationPicker.AsTextBox().Text                  = $"{selected.Rotation:0.###}";
+            this._textPicker.AsTextBox().Text                      = selected.Text;
+            this._texturePicker.AsTextBox().Text                   = selected.Texture;
+            this._originTypePicker.AsDropdown().SelectedItem.Value = this._originTypePicker.AsDropdown().Items.First(x => (OriginType)x.Key == selected.OriginType);
         }
     }
 
@@ -405,11 +467,15 @@ public class UiMakerScreen : pScreen {
         foreach (Drawable d in this.SelectedDrawables)
             this.Content.Drawables.Remove(d);
 
+        this._currentContainer.Elements.ForEach(x => x.SelectDrawable = null);
         this.SelectedDrawables.Clear();
 
-        foreach (UiMakerElement uiMakerElement in this.Selected) {
-            SelectBoxDrawable drawable = new(uiMakerElement.Drawable);
+        foreach (UiMakerElement element in this.Selected) {
+            SelectBoxDrawable drawable = new(element.Drawable) {
+                OriginType = element.OriginType
+            };
 
+            element.SelectDrawable = drawable;
             this.SelectedDrawables.Add(drawable);
             this.Content.Drawables.Add(drawable);
         }

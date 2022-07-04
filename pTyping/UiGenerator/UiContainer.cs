@@ -28,6 +28,8 @@ public class UiContainer : CompositeDrawable {
 
         this._elements.CollectionChanged += this.Recalculate;
         this.ElementOriginType.OnChange  += this.OnOriginTypeChange;
+
+        this.InvisibleToInput = true;
     }
 
     private void OnOriginTypeChange(object sender, OriginType e) {
