@@ -133,35 +133,44 @@ public class UiMakerElement {
     #region Global
 
     [JsonProperty]
-    public Vector2 Position;
+    public Vector2 Position = Vector2.Zero;
     [JsonProperty]
-    public Vector2 RotationOrigin;
+    public Vector2 RotationOrigin = Vector2.Zero;
     [JsonProperty]
     public Vector2 Scale = Vector2.One;
     [JsonProperty]
     public Color Color = Color.White;
     [JsonProperty]
-    public float Rotation;
+    public float Rotation = 0f;
     [JsonProperty]
     public OriginType OriginType = OriginType.TopLeft;
     [JsonProperty]
-    public float Depth;
+    public float Depth = 0f;
+
+    [JsonProperty]
+    public string OnClickFuncName = "";
+    [JsonProperty]
+    public string OnClickUpFuncName = "";
+    [JsonProperty]
+    public string OnHoverFuncName = "";
+    [JsonProperty]
+    public string OnHoverLostFuncName = "";
 
     #endregion
 
     #region Text
 
     [JsonProperty]
-    public string Text;
+    public string Text = "";
     [JsonProperty]
-    public int FontSize;
+    public int FontSize = 20;
 
     #endregion
 
     #region Texture
 
     [JsonProperty]
-    public string Texture;
+    public string Texture = "";
 
     #endregion
 }
@@ -329,6 +338,14 @@ public class UiMakerScreen : pScreen {
             );
 
             this.ResetLayout();
+        };
+
+        this._createThingsContainer.RegisterElement(button);
+
+        button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Run code generation", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+
+        button.AsButton().OnClick += delegate {
+            File.WriteAllText("Output.cs", UiMakerCodeGen.GenerateClass(this._currentContainer));
         };
 
         this._createThingsContainer.RegisterElement(button);
