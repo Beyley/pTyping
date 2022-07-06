@@ -12,6 +12,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
@@ -25,7 +26,8 @@ namespace pTyping.Graphics.UiMaker;
 public enum UiMakerElementType {
     None,
     Text,
-    Texture
+    Texture,
+    Button
 }
 
 [JsonObject(MemberSerialization.OptIn)]
@@ -46,22 +48,6 @@ public class UiMakerElement {
     public void SetDrawableProperties(UiMakerScreen screen, bool disableHeavy = true) {
         this._screen = screen;
 
-        switch (this.Drawable) {
-            case TextDrawable text:
-                text.Text = this.Text;
-                if (!disableHeavy)
-                    this.UpdateFontSize();
-
-                break;
-            case TexturedDrawable texture:
-                if (!disableHeavy)
-                    this.UpdateTexture();
-                
-                break;
-            default:
-                throw new NotSupportedException("That drawable type is not supported!");
-        }
-
         this.Drawable.OriginType     = this.OriginType;
         this.Drawable.Position       = this.Position;
         this.Drawable.Rotation       = this.Rotation;
@@ -72,12 +58,50 @@ public class UiMakerElement {
 
         if (this.SelectDrawable != null)
             this.SelectDrawable.OriginType = this.OriginType;
+        
+        switch (this.Drawable) {
+            case TextDrawable text:
+                text.Text = this.Text;
+                if (!disableHeavy)
+                    this.UpdateFontSize();
+
+                break;
+            case TexturedDrawable texture:
+                if (!disableHeavy)
+                    this.UpdateTexture();
+
+                break;
+            case DrawableButton button:
+                button.ButtonColor   = this.ButtonColor;
+                button.ColorOverride = this.ButtonColor;
+                button.OutlineColor  = this.ButtonOutlineColor;
+                button.TextColor     = this.Color;
+                button.ButtonSize    = this.ButtonSize;
+
+                button.Tweens.Add(new ColorTween(TweenType.Color, button.ColorOverride, this.ButtonColor, FurballGame.Time, FurballGame.Time + 100));
+
+                button.Text = this.Text;
+
+                if (!disableHeavy)
+                    this.UpdateFontSize();
+                
+                break;
+            default:
+                throw new NotSupportedException("That drawable type is not supported!");
+        }
     }
 
     public void UpdateFontSize() {
-        TextDrawable text = (TextDrawable)this.Drawable;
-
-        text.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+        switch (this.Drawable) {
+            case TextDrawable text: {
+                text.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+                break;
+            }
+            case DrawableButton button: {
+                button.TextDrawable.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+                break;
+            }
+        }
     }
 
     public void UpdateTexture() {
@@ -158,6 +182,17 @@ public class UiMakerElement {
 
     #endregion
 
+    #region Button
+
+    [JsonProperty]
+    public Vector2 ButtonSize = Vector2.Zero;
+    [JsonProperty]
+    public Color ButtonColor = Color.Blue;
+    [JsonProperty]
+    public Color ButtonOutlineColor = Color.Black;
+
+    #endregion
+    
     #region Text
 
     [JsonProperty]
@@ -230,6 +265,8 @@ public class UiMakerScreen : pScreen {
     private UiContainer _editThingsContainer;
 
     private UiElement _colourPicker;
+    private UiElement _buttonColourPicker;
+    private UiElement _buttonOutlineColourPicker;
     private UiElement _depthPicker;
     private UiElement _rotationPicker;
     private UiElement _textPicker;
@@ -342,6 +379,27 @@ public class UiMakerScreen : pScreen {
 
         this._createThingsContainer.RegisterElement(button);
 
+        button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Add Button", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+
+        button.AsButton().OnClick += delegate {
+            this._currentContainer.Elements.Add(
+            new UiMakerElement {
+                Identifier         = this.GetDefaultIdentifier(),
+                Type               = UiMakerElementType.Button,
+                Text               = "Button Text",
+                Color              = Color.White,
+                ButtonColor        = Color.Blue,
+                ButtonOutlineColor = Color.Black,
+                Rotation           = 0f,
+                Position           = new Vector2(50, 50)
+            }
+            );
+
+            this.ResetLayout();
+        };
+
+        this._createThingsContainer.RegisterElement(button);
+
         button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Run code generation", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
 
         button.AsButton().OnClick += delegate {
@@ -355,6 +413,24 @@ public class UiMakerScreen : pScreen {
         this._colourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
             foreach (UiMakerElement uiMakerElement in this.Selected) {
                 uiMakerElement.Color = e;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
+
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Button Colour:", 25));
+        this._editThingsContainer.RegisterElement(this._buttonColourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White));
+        this._buttonColourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.ButtonColor = e;
+                uiMakerElement.SetDrawableProperties(this);
+            }
+        };
+
+        this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Button Outline Colour:", 25));
+        this._editThingsContainer.RegisterElement(this._buttonOutlineColourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White));
+        this._buttonOutlineColourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
+            foreach (UiMakerElement uiMakerElement in this.Selected) {
+                uiMakerElement.ButtonOutlineColor = e;
                 uiMakerElement.SetDrawableProperties(this);
             }
         };
@@ -441,11 +517,13 @@ public class UiMakerScreen : pScreen {
         if (this.Selected.Count == 1) {
             UiMakerElement selected = this.Selected[0];
 
-            this._colourPicker.AsColorPicker().Color.Value         = selected.Color;
-            this._depthPicker.AsTextBox().Text                     = $"{selected.Depth:0.###}";
-            this._rotationPicker.AsTextBox().Text                  = $"{selected.Rotation:0.###}";
-            this._textPicker.AsTextBox().Text                      = selected.Text;
-            this._texturePicker.AsTextBox().Text                   = selected.Texture;
+            this._colourPicker.AsColorPicker().Color.Value = selected.Color;
+            this._buttonColourPicker.AsColorPicker().Color.Value = selected.ButtonColor;
+            this._buttonOutlineColourPicker.AsColorPicker().Color.Value = selected.ButtonOutlineColor;
+            this._depthPicker.AsTextBox().Text = $"{selected.Depth:0.###}";
+            this._rotationPicker.AsTextBox().Text = $"{selected.Rotation:0.###}";
+            this._textPicker.AsTextBox().Text = selected.Text;
+            this._texturePicker.AsTextBox().Text = selected.Texture;
             this._originTypePicker.AsDropdown().SelectedItem.Value = this._originTypePicker.AsDropdown().Items.First(x => (OriginType)x.Key == selected.OriginType);
         }
     }
@@ -507,6 +585,16 @@ public class UiMakerScreen : pScreen {
         Drawable drawable = element.Type switch {
             UiMakerElementType.Text    => new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, element.Text, element.FontSize),
             UiMakerElementType.Texture => new TexturedDrawable(null, Vector2.Zero),
+            UiMakerElementType.Button => new DrawableButton(
+            Vector2.Zero,
+            pTypingGame.JapaneseFontStroked,
+            element.FontSize,
+            element.Text,
+            element.ButtonColor,
+            element.Color,
+            element.ButtonOutlineColor,
+            element.ButtonSize
+            ),
             _                          => throw new ArgumentOutOfRangeException(nameof (element))
         };
 
