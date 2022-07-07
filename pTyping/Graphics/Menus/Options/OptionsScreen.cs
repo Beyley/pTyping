@@ -165,7 +165,8 @@ public class OptionsScreen : pScreen {
         DrawableButton lobbyTest = new(new(400, 500), pTypingGame.JapaneseFont, 30, "Crate a lobby", Color.Red, Color.White, Color.Black, Vector2.Zero);
 
         lobbyTest.OnClick += delegate {
-            DiscordManager.CreateLobby();
+            // TODO
+            // DiscordManager.CreateLobby();
         };
 
         this.Manager.Add(lobbyTest);

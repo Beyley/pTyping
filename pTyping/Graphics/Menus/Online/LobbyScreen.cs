@@ -52,7 +52,6 @@ public class LobbyScreen : pScreen {
         this._backButton.OnClick += delegate {
             this._lobby.Leave();
 
-            DiscordManager.Lobby.Value            = null;
             pTypingGame.OnlineManager.OnlineLobby = null;
 
             ScreenManager.ChangeScreen(new MenuScreen());
