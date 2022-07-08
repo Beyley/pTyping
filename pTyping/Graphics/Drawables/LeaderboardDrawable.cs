@@ -4,6 +4,7 @@ using System.Numerics;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
@@ -17,6 +18,8 @@ public class LeaderboardDrawable : CompositeDrawable {
     private readonly List<PlayerScore> _scores;
 
     public LeaderboardDrawable(List<PlayerScore> scores) {
+        Texture tex = ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User);
+        
         this.Clickable   = false;
         this.CoverClicks = false;
         this.Hoverable   = false;
@@ -27,7 +30,7 @@ public class LeaderboardDrawable : CompositeDrawable {
         float y = 0;
         for (int i = 0; i < this._scores.GetRange(0, Math.Min(8, scores.Count)).Count; i++) {
             PlayerScore score = this._scores.GetRange(0, Math.Min(8, scores.Count))[i];
-            LeaderboardElementDrawable drawable = new(score) {
+            LeaderboardElementDrawable drawable = new(score, tex) {
                 Position = new Vector2(0, y)
             };
 
@@ -49,11 +52,11 @@ public class LeaderboardDrawable : CompositeDrawable {
 
         public readonly PlayerScore Score;
 
-        public LeaderboardElementDrawable(PlayerScore score) {
+        public LeaderboardElementDrawable(PlayerScore score, Texture tex) {
             this.Score = score;
 
             this.Drawables.Add(
-            this._backgroundDrawable = new TexturedDrawable(ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User), Vector2.Zero) {
+            this._backgroundDrawable = new TexturedDrawable(tex, Vector2.Zero) {
                 Scale = new Vector2(0.2f)
             }
             );

@@ -234,6 +234,7 @@ public class SongSelectionScreen : pScreen {
         FurballGame.InputManager.OnKeyUp   += this.OnKeyUp;
 
         FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+        FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
 
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
 
@@ -269,8 +270,14 @@ public class SongSelectionScreen : pScreen {
         this.UpdateScores();
     }
 
+    private bool _selectHovered = false;
+    private void OnMouseMove(object sender, (Vector2 position, string cursorName) e) {
+        this._selectHovered = this._songSelectDrawable.RealContains(e.position.ToPoint());
+    }
+    
     private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
-        this._songSelectDrawable.TargetScroll += e.scroll.scrollAmount * 10;
+        if (this._selectHovered)
+            this._songSelectDrawable.TargetScroll += e.scroll.scrollAmount * 10;
     }
 
     public override void Update(double gameTime) {
