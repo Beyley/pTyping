@@ -216,7 +216,7 @@ public class pTypingGame : FurballGame {
                 if (tags.Tag.Pictures.Length != 0) {
                     IPicture cover = tags.Tag.Pictures.FirstOrDefault(x => x.Type == PictureType.FrontCover, null);
                     if (cover != null)
-                        backgroundTex = GraphicsBackend.Current.CreateTexture(cover.Data.Data);
+                        backgroundTex = Resources.CreateTexture(cover.Data.Data);
                 }
 
                 tags.Dispose();
