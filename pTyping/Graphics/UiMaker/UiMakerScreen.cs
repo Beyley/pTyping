@@ -609,7 +609,7 @@ public class UiMakerScreen : pScreen {
 
     public Texture GetTexture(string name) {
         if (!this._textureCache.TryGetValue(name, out Texture tex)) {
-            tex = ContentManager.LoadTextureFromFile(name, ContentSource.User);
+            tex = ContentManager.LoadTextureFromFileCached(name, ContentSource.User);
 
             this._textureCache[name] = tex;
         }

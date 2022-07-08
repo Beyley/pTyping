@@ -105,7 +105,7 @@ public class Player : CompositeDrawable {
         this.Score.Mods       = pTypingGame.SelectedMods;
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 
-        this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User), new Vector2(0)) {
+        this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User), new Vector2(0)) {
             Depth = -0.95f
         };
 
@@ -113,8 +113,8 @@ public class Player : CompositeDrawable {
 
         FileInfo[] noteFiles = new DirectoryInfo(this.Song.QualifiedFolderPath).GetFiles("note.png");
 
-        this._noteTexture = noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
-                                : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,        ContentSource.External);
+        this._noteTexture = noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
+                                : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,        ContentSource.External);
 
 
         this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {

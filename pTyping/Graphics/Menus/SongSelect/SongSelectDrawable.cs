@@ -18,7 +18,7 @@ public class SongSelectDrawable : CompositeDrawable {
     public SongSelectDrawable(Vector2 pos, IEnumerable<Song> songList) {
         this.Position = pos;
 
-        Texture backgroundTexture = ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User);
+        Texture backgroundTexture = ContentManager.LoadTextureFromFileCached("song-button-background.png", ContentSource.User);
 
         float y = 0;
         foreach (Song song in songList) {

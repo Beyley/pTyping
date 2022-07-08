@@ -91,7 +91,7 @@ public class MenuScreen : pScreen {
 
         #region Main buttons
 
-        Texture menuButtonsTexture = ContentManager.LoadTextureFromFile("menubuttons.png", ContentSource.User);
+        Texture menuButtonsTexture = ContentManager.LoadTextureFromFileCached("menubuttons.png", ContentSource.User);
 
         float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
@@ -172,7 +172,7 @@ public class MenuScreen : pScreen {
         };
         this._songProgressBar.OnClick += OnProgressBarClick;
 
-        Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
+        Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFileCached("editorbuttons.png", ContentSource.User);
 
         TexturedDrawable musicPlayButton = new(
         editorButtonsTexture2D,

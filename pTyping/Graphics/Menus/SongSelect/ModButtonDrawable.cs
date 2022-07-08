@@ -27,7 +27,7 @@ public class ModButtonDrawable : TexturedDrawable {
         if (TEXTURE_CACHE.TryGetValue(mod.IconFilename(), out Texture tex))
             this._texture = tex;
         else
-            TEXTURE_CACHE.Add(mod.IconFilename(), this._texture = ContentManager.LoadTextureFromFile(mod.IconFilename(), ContentSource.User));
+            TEXTURE_CACHE.Add(mod.IconFilename(), this._texture = ContentManager.LoadTextureFromFileCached(mod.IconFilename(), ContentSource.User));
 
         this.Scale          = new(0.125f);
         this.OriginType     = OriginType.Center;

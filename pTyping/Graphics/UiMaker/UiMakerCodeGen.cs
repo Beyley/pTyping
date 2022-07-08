@@ -54,7 +54,7 @@ public static class UiMakerCodeGen {
         foreach (UiMakerElement element in container.Elements) {
             string args = element.Type switch {
                 UiMakerElementType.Text    => $"{FormatVector2(element.Position)}, pTyping.pTypingGame.JapaneseFontStroked, \"{element.Text}\", {element.FontSize}",
-                UiMakerElementType.Texture => $"ContentManager.LoadTextureFromFile(\"{element.Texture}\"), {FormatVector2(element.Position)}",
+                UiMakerElementType.Texture => $"ContentManager.LoadTextureFromFileCached(\"{element.Texture}\"), {FormatVector2(element.Position)}",
                 UiMakerElementType.Button =>
                     $"{FormatVector2(element.Position)}, pTypingGame.JapaneseFontStroked, {element.FontSize}, \"{element.Text}\", {FormatColor(element.ButtonColor)}, {FormatColor(element.Color)}, {FormatColor(element.ButtonOutlineColor)}, {FormatVector2(element.ButtonSize)}",
                 _                          => throw new Exception("Unknown element type!")

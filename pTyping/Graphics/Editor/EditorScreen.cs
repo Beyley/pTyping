@@ -68,8 +68,8 @@ public class EditorScreen : pScreen {
 
         FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.QualifiedFolderPath).GetFiles("note.png");
 
-        this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFile("note.png", ContentSource.User)
-                               : ContentManager.LoadTextureFromFile(noteFiles[0].FullName,                             ContentSource.External);
+        this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
+                               : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,                             ContentSource.External);
 
         Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
         this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
@@ -112,7 +112,7 @@ public class EditorScreen : pScreen {
         // this.Manager.Add(playfieldBottomLine);
 
         TexturedDrawable playfieldBackgroundCover = new(
-        ContentManager.LoadTextureFromFile("playfield-background.png", ContentSource.User),
+        ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User),
         new Vector2(0, recepticlePos.Y - 50)
         ) {
             Depth       = -0.95f,
@@ -215,7 +215,7 @@ public class EditorScreen : pScreen {
 
         #region Playback buttons
 
-        Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFile("editorbuttons.png", ContentSource.User);
+        Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFileCached("editorbuttons.png", ContentSource.User);
 
         TexturedDrawable playButton = new(
         editorButtonsTexture2D,

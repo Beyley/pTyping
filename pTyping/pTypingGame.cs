@@ -202,7 +202,7 @@ public class pTypingGame : FurballGame {
     }
 
     public static void LoadBackButtonTexture() {
-        BackButtonTexture ??= ContentManager.LoadTextureFromFile("backbutton.png", ContentSource.User);
+        BackButtonTexture ??= ContentManager.LoadTextureFromFileCached("backbutton.png", ContentSource.User);
     }
 
     private static void SetBackgroundTexture(Texture tex) {
@@ -230,12 +230,12 @@ public class pTypingGame : FurballGame {
                 Logger.Log($"Failed to load song tags, i wonder why? {ex}", LoggerLevelSongManagerUpdateInfo.Instance);
             }
 
-            DefaultBackground ??= ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
+            DefaultBackground ??= ContentManager.LoadTextureFromFileCached("background.png", ContentSource.User);
 
             backgroundTex ??= DefaultBackground;
         } else {
             backgroundTex = System.IO.File.Exists(song.QualifiedBackgroundPath)
-                                ? ContentManager.LoadTextureFromFile(song.QualifiedBackgroundPath, ContentSource.External)
+                                ? ContentManager.LoadTextureFromFileCached(song.QualifiedBackgroundPath, ContentSource.External)
                                 : DefaultBackground;
         }
 
@@ -256,7 +256,7 @@ public class pTypingGame : FurballGame {
                 VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100d:00.##}";
         };
 
-        DefaultBackground = ContentManager.LoadTextureFromFile("background.png", ContentSource.User);
+        DefaultBackground = ContentManager.LoadTextureFromFileCached("background.png", ContentSource.User);
 
         JapaneseFontData = ContentManager.LoadRawAsset("unifont.ttf", ContentSource.User);
 
@@ -289,9 +289,9 @@ public class pTypingGame : FurballGame {
         FurballFontRegular.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf",        ContentSource.User, true));
         FurballFontRegularStroked.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf", ContentSource.User, true));
 
-        LocalLeaderboardButtonTexture  = ContentManager.LoadTextureFromFile("local-leaderboard-button.png");
-        FriendLeaderboardButtonTexture = ContentManager.LoadTextureFromFile("friend-leaderboard-button.png");
-        GlobalLeaderboardButtonTexture = ContentManager.LoadTextureFromFile("global-leaderboard-button.png");
+        LocalLeaderboardButtonTexture  = ContentManager.LoadTextureFromFileCached("local-leaderboard-button.png");
+        FriendLeaderboardButtonTexture = ContentManager.LoadTextureFromFileCached("friend-leaderboard-button.png");
+        GlobalLeaderboardButtonTexture = ContentManager.LoadTextureFromFileCached("global-leaderboard-button.png");
     }
 
     public static void ChangeGlobalVolume(float mouseScroll) {

@@ -28,7 +28,7 @@ public class UserCardDrawable : CompositeDrawable {
         this.Position = position;
 
         this.Drawables.Add(
-        this._backgroundDrawable = new TexturedDrawable(ContentManager.LoadTextureFromFile("user-card.png", ContentSource.User), new Vector2(0f)) {
+        this._backgroundDrawable = new TexturedDrawable(ContentManager.LoadTextureFromFileCached("user-card.png", ContentSource.User), new Vector2(0f)) {
             Clickable   = false,
             CoverClicks = false,
             CoverHovers = false,
@@ -143,7 +143,7 @@ public class UserCardDrawable : CompositeDrawable {
         if (_TextureCache.TryGetValue(mode, out Texture tex))
             return tex;
 
-        tex = ContentManager.LoadTextureFromFile(mode, ContentSource.User);
+        tex = ContentManager.LoadTextureFromFileCached(mode, ContentSource.User);
 
         _TextureCache[mode] = tex;
 

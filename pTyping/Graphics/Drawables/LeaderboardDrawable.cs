@@ -18,7 +18,7 @@ public class LeaderboardDrawable : CompositeDrawable {
     private readonly List<PlayerScore> _scores;
 
     public LeaderboardDrawable(List<PlayerScore> scores) {
-        Texture tex = ContentManager.LoadTextureFromFile("song-button-background.png", ContentSource.User);
+        Texture tex = ContentManager.LoadTextureFromFileCached("song-button-background.png", ContentSource.User);
         
         this.Clickable   = false;
         this.CoverClicks = false;
