@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie.OpenGLDetecto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie.Backends.Vulkan", "Furball\Furball.Vixie\Furball.Vixie.Backends.Vulkan\Furball.Vixie.Backends.Vulkan.csproj", "{774877C6-2BED-47D4-9823-74E71C3E2D10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Game", "Furball\Furball.Game\Furball.Game.csproj", "{37C91D8F-6254-4419-BB56-20615813AA61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{774877C6-2BED-47D4-9823-74E71C3E2D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{774877C6-2BED-47D4-9823-74E71C3E2D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{774877C6-2BED-47D4-9823-74E71C3E2D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37C91D8F-6254-4419-BB56-20615813AA61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37C91D8F-6254-4419-BB56-20615813AA61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37C91D8F-6254-4419-BB56-20615813AA61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37C91D8F-6254-4419-BB56-20615813AA61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}
