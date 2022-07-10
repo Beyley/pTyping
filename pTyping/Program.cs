@@ -6,9 +6,7 @@ using System.Reflection;
 using System.Text;
 using EeveeTools.Helpers;
 using Furball.Engine.Engine.Platform;
-using Furball.Vixie.Backends.Shared.Backends;
 using Newtonsoft.Json;
-using Silk.NET.Windowing;
 
 namespace pTyping;
 
@@ -67,15 +65,11 @@ internal class Program {
         
         using pTypingGame game = new();
 
-        WindowOptions options = WindowOptions.Default with {
-            VSync = false,
-            WindowBorder = WindowBorder.Fixed
-        };
         if (RuntimeInfo.IsDebug())
-            game.Run(options);
+            game.Run();
         else
             try {
-                game.Run(options);
+                game.Run();
             }
             catch (Exception ex) {
                 using FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
