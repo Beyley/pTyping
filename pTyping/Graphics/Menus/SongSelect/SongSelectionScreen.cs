@@ -110,9 +110,10 @@ public class SongSelectionScreen : pScreen {
 
         IEnumerable<Song> songList = this._editor ? SongManager.Songs.Where(x => x.Type == SongType.pTyping) : SongManager.Songs;
 
-        this._songSelectDrawable = new SongSelectDrawable(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10), songList) {
-            OriginType = OriginType.TopRight,
-            Depth      = 0.8f
+        this._songSelectDrawable = new SongSelectDrawable(new Vector2(10, 10), songList) {
+            OriginType       = OriginType.TopRight,
+            ScreenOriginType = OriginType.TopRight,
+            Depth            = 0.8f
         };
 
         this.Manager.Add(this._songSelectDrawable);
@@ -121,18 +122,10 @@ public class SongSelectionScreen : pScreen {
 
         #region Start button
 
-        DrawableButton startButton = new(
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
-        FurballGame.DEFAULT_FONT,
-        60,
-        "Start!",
-        Color.Red,
-        Color.White,
-        Color.White,
-        new Vector2(0)
-        ) {
-            OriginType = OriginType.BottomRight,
-            Depth      = 0f
+        DrawableButton startButton = new(new Vector2(5), FurballGame.DEFAULT_FONT, 60, "Start!", Color.Red, Color.White, Color.White, new Vector2(0)) {
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight,
+            Depth            = 0f
         };
 
         startButton.OnClick += delegate {
