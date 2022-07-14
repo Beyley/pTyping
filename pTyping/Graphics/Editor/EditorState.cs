@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Numerics;
-using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using JetBrains.Annotations;
 using pTyping.Graphics.Player;
@@ -25,7 +24,8 @@ public class EditorState {
     public EditorState(Song song) => this.Song = song;
 
     public readonly UiContainer EditorToolUiContainer = new(OriginType.TopRight) {
-        Position = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 10, 10),
-        Depth    = -1f
+        Position         = new Vector2(10, 10),
+        Depth            = -1f,
+        ScreenOriginType = OriginType.TopRight
     };
 }

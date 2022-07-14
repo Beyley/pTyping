@@ -25,8 +25,9 @@ public class NotificationManager : DrawableManager {
 
     public NotificationDrawable CreateNotification(NotificationImportance importance, string text) {
         NotificationDrawable drawable = new(importance, NotificationType.BottomRight, text) {
-            OriginType = OriginType.BottomRight,
-            Position   = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH + 500, FurballGame.DEFAULT_WINDOW_HEIGHT + 500)
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight,
+            Position         = new Vector2(-500, -500)
         };
         drawable.OnClick += this.OnDrawableClick;
         drawable.FadeInFromZero(100);
@@ -39,7 +40,8 @@ public class NotificationManager : DrawableManager {
 
     public NotificationDrawable CreatePopup(string text) {
         NotificationDrawable drawable = new(NotificationImportance.Info, NotificationType.MiddlePopup, text) {
-            OriginType = OriginType.Center, Position = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+            OriginType = OriginType.Center,
+            Position   = new Vector2(FurballGame.WindowWidth / 2f, FurballGame.WindowHeight / 2f)
         };
         drawable.FadeInFromZero(100);
         
@@ -106,8 +108,8 @@ public class NotificationManager : DrawableManager {
     }
     
     public void UpdateNotifications() {
-        const float x = FurballGame.DEFAULT_WINDOW_WIDTH - 10;
-        float       y = FurballGame.DEFAULT_WINDOW_HEIGHT - 10;
+        const float x = 10;
+        float       y = 10;
 
         foreach (Drawable baseDrawable in this.Drawables) {
             if (baseDrawable is not NotificationDrawable drawable || drawable.Type != NotificationType.BottomRight) continue;

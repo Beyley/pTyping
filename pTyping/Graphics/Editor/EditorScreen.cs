@@ -92,24 +92,6 @@ public class EditorScreen : pScreen {
 
         #region Playfield decorations
 
-        // LinePrimitiveDrawable playfieldTopLine = new(
-        // new Vector2(1,                                recepticlePos.Y - 50),
-        // new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y - 50),
-        // Color.Gray
-        // ) {
-        //     Clickable     = false,
-        //     CoverClicks   = false
-        // };
-        // LinePrimitiveDrawable playfieldBottomLine = new(
-        // new Vector2(1,                                recepticlePos.Y + 50),
-        // new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, recepticlePos.Y + 50),
-        // Color.Gray
-        // ) {
-        //     Clickable     = false,
-        //     CoverClicks   = false
-        // };
-        // this.Manager.Add(playfieldTopLine);
-        // this.Manager.Add(playfieldBottomLine);
 
         TexturedDrawable playfieldBackgroundCover = new(
         ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User),
@@ -120,12 +102,6 @@ public class EditorScreen : pScreen {
             CoverClicks = false
         };
 
-        // RectanglePrimitiveDrawable playfieldBackgroundCover = new(new(0, recepticlePos.Y - 50), new(FurballGame.DEFAULT_WINDOW_WIDTH, 100), 0f, true) {
-        //     ColorOverride = new(100, 100, 100, 100),
-        //     Depth         = 0.9f,
-        //     Clickable     = false,
-        //     CoverClicks   = false
-        // };
         this.Manager.Add(playfieldBackgroundCover);
 
         #region background image
@@ -156,7 +132,9 @@ public class EditorScreen : pScreen {
             }
             catch {
                 pTypingConfig.Instance.VideoBackgrounds = false;
-                this._video                             = null;
+
+                this._video = null;
+                
                 pTypingGame.NotificationManager.CreateNotification(
                 NotificationManager.NotificationImportance.Error,
                 "Unable to load background video! Disabling video support..."
@@ -178,7 +156,7 @@ public class EditorScreen : pScreen {
         #region Progress bar
 
         this._progressBar = new DrawableProgressBar(
-        new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(0, 0),
         FurballGame.DEFAULT_FONT,
         (int)(40 * 0.9f),
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40),
@@ -186,7 +164,8 @@ public class EditorScreen : pScreen {
         Color.DarkGray,
         Color.White
         ) {
-            OriginType = OriginType.BottomLeft
+            OriginType       = OriginType.BottomLeft,
+            ScreenOriginType = OriginType.BottomLeft
         };
 
         this._progressBar.OnDrag    += this.ProgressBarOnInteract;
@@ -217,49 +196,53 @@ public class EditorScreen : pScreen {
 
         Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFileCached("editorbuttons.png", ContentSource.User);
 
-        TexturedDrawable playButton = new(
+        this._playButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 150, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(150, 0),
         TexturePositions.EDITOR_PLAY
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.BottomRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            ScreenOriginType = OriginType.BottomRight,
+            OriginType       = OriginType.BottomRight
         };
-        TexturedDrawable pauseButton = new(
+        this._pauseButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 100, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(100, 0),
         TexturePositions.EDITOR_PAUSE
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.BottomRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            ScreenOriginType = OriginType.BottomRight,
+            OriginType       = OriginType.BottomRight
         };
-        TexturedDrawable rightButton = new(
+        this._rightButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(0, 0),
         TexturePositions.EDITOR_RIGHT
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.BottomRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            ScreenOriginType = OriginType.BottomRight,
+            OriginType       = OriginType.BottomRight
         };
-        TexturedDrawable leftButton = new(
+        this._leftButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 50, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(50, 0),
         TexturePositions.EDITOR_LEFT
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.BottomRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight
         };
 
-        playButton.OnClick += delegate {
+        this._playButton.OnClick += delegate {
             pTypingGame.PlayMusic();
             ChangeSpeed(null, this._speedDropdown.SelectedItem);
         };
 
-        pauseButton.OnClick += delegate {
+        this._pauseButton.OnClick += delegate {
             pTypingGame.PauseResumeMusic();
         };
 
-        leftButton.OnClick += delegate {
+        this._leftButton.OnClick += delegate {
             if (this.EditorState.Song.Notes.Count > 0) {
                 pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.First().Time;
                 this._video?.Seek(this.EditorState.Song.Notes.First().Time);
@@ -268,7 +251,7 @@ public class EditorScreen : pScreen {
             }
         };
 
-        rightButton.OnClick += delegate {
+        this._rightButton.OnClick += delegate {
             if (this.EditorState.Song.Notes.Count > 0) {
                 pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.Last().Time;
                 this._video?.Seek(this.EditorState.Song.Notes.Last().Time);
@@ -278,10 +261,10 @@ public class EditorScreen : pScreen {
             }
         };
 
-        this.Manager.Add(playButton);
-        this.Manager.Add(pauseButton);
-        this.Manager.Add(rightButton);
-        this.Manager.Add(leftButton);
+        this.Manager.Add(this._playButton);
+        this.Manager.Add(this._pauseButton);
+        this.Manager.Add(this._rightButton);
+        this.Manager.Add(this._leftButton);
 
         #endregion
 
@@ -349,6 +332,16 @@ public class EditorScreen : pScreen {
         ConVars.Volume.OnChange    += this.OnVolumeChange;
         this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
     }
+
+    public override void Relayout(float newWidth, float newHeight) {
+        base.Relayout(newWidth, newHeight);
+
+        this._progressBar.BarSize = new Vector2(newWidth - 200, 40);
+
+        if (this._video != null)
+            this._video.Position = new Vector2(newWidth / 2f, newHeight / 2f);
+    }
+
     private void ProgressBarOnInteractUp(object sender, (MouseButton button, Point pos) e) {
         this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
     }
@@ -738,6 +731,10 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
     private DrawableDropdown _speedDropdown;
     [CanBeNull]
     private VideoDrawable _video;
+    private TexturedDrawable _playButton;
+    private TexturedDrawable _pauseButton;
+    private TexturedDrawable _rightButton;
+    private TexturedDrawable _leftButton;
     public override void Update(double gameTime) {
         this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
