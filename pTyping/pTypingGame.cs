@@ -634,7 +634,7 @@ public class pTypingGame : FurballGame {
         NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Screenshot taken as {filename}!");
     }
 
-    public override void InitializeLocalizations() {
+    protected override void InitializeLocalizations() {
         //default language is already english, and im an english speaker, so no need to set it here
 
         LocalizationManager.AddDefaultTranslation(Localizations.MenuRevision, "Revision {0}");
