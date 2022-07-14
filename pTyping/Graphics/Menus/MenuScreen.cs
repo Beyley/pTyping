@@ -29,18 +29,19 @@ public class MenuScreen : pScreen {
         base.Initialize();
 
         TextDrawable gitVersionText = new(
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        new Vector2(10, 10),
         pTypingGame.JapaneseFont,
         string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion),
         30
         ) {
-            OriginType = OriginType.BottomRight
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight
         };
 
         this.Manager.Add(gitVersionText);
 
         DrawableButton changelogButton = new(
-        new Vector2(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        new Vector2(10, 10),
         pTypingGame.JapaneseFont,
         30,
         GetLocalizedString(Localizations.Changelog),
@@ -49,7 +50,8 @@ public class MenuScreen : pScreen {
         Color.White,
         new Vector2(0)
         ) {
-            OriginType = OriginType.BottomLeft
+            OriginType       = OriginType.BottomLeft,
+            ScreenOriginType = OriginType.BottomLeft
         };
 
         changelogButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new ChangelogScreen());
@@ -57,7 +59,7 @@ public class MenuScreen : pScreen {
         this.Manager.Add(changelogButton);
 
         DrawableButton uiEditorButton = new(
-        new Vector2(changelogButton.Position.X + changelogButton.Size.X, FurballGame.DEFAULT_WINDOW_HEIGHT - 10),
+        new Vector2(changelogButton.Position.X + changelogButton.Size.X + 10, 10),
         pTypingGame.JapaneseFont,
         30,
         "Ui Maker",
@@ -66,7 +68,8 @@ public class MenuScreen : pScreen {
         Color.White,
         new Vector2(0)
         ) {
-            OriginType = OriginType.BottomLeft
+            OriginType       = OriginType.BottomLeft,
+            ScreenOriginType = OriginType.BottomLeft
         };
 
         uiEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new UiMakerScreen("test"));
@@ -76,16 +79,16 @@ public class MenuScreen : pScreen {
 
         #region Title
 
-        TextDrawable titleText = new(
+        this.Manager.Add(
+        this._titleText = new(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
         FurballGame.DEFAULT_FONT,
         "pTyping",
         75
         ) {
             OriginType = OriginType.Center
-        };
-
-        this.Manager.Add(titleText);
+        }
+        );
 
         #endregion
 
@@ -95,72 +98,73 @@ public class MenuScreen : pScreen {
 
         float y = FurballGame.DEFAULT_WINDOW_HEIGHT * 0.35f;
 
-        TexturedDrawable playButton = new(menuButtonsTexture, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
+        this._playButton = new(menuButtonsTexture, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
             OriginType = OriginType.Center,
             Scale      = new Vector2(0.75f),
             ToolTip    = "gordon this is a tool tip"
         };
-        TexturedDrawable editButton = new(
+        this._editButton = new(
         menuButtonsTexture,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += playButton.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += this._playButton.Size.Y + 10),
         TexturePositions.MENU_EDIT_BUTTON
         ) {
             OriginType = OriginType.Center,
             Scale      = new Vector2(0.75f),
             ToolTip    = "you can use it to get across big pits!"
         };
-        TexturedDrawable optionsButton = new(
+        this._optionsButton = new(
         menuButtonsTexture,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += editButton.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += this._editButton.Size.Y + 10),
         TexturePositions.MENU_OPTIONS_BUTTON
         ) {
             OriginType = OriginType.Center,
             Scale      = new Vector2(0.75f)
         };
-        TexturedDrawable exitButton = new(
+        this._exitButton = new(
         menuButtonsTexture,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += optionsButton.Size.Y + 10),
+        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y += this._optionsButton.Size.Y + 10),
         TexturePositions.MENU_EXIT_BUTTON
         ) {
             OriginType = OriginType.Center,
             Scale      = new Vector2(0.75f)
         };
 
-        playButton.OnClick += delegate {
+        this._playButton.OnClick += delegate {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
         };
 
-        editButton.OnClick += delegate {
+        this._editButton.OnClick += delegate {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new SongSelectionScreen(true));
         };
 
-        exitButton.OnClick += delegate {
+        this._exitButton.OnClick += delegate {
             pTypingGame.MenuClickSound.PlayNew();
             FurballGame.Instance.WindowManager.Close();
         };
 
-        optionsButton.OnClick += delegate {
+        this._optionsButton.OnClick += delegate {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new OptionsScreen());
         };
 
-        this.Manager.Add(playButton);
-        this.Manager.Add(editButton);
-        this.Manager.Add(optionsButton);
-        this.Manager.Add(exitButton);
+        this.Manager.Add(this._playButton);
+        this.Manager.Add(this._editButton);
+        this.Manager.Add(this._optionsButton);
+        this.Manager.Add(this._exitButton);
 
         #endregion
 
         #region Menu music
 
-        this._musicTitle = new TextDrawable(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, 5), pTypingGame.JapaneseFont, "None", 40) {
-            OriginType = OriginType.TopRight
+        this._musicTitle = new TextDrawable(new Vector2(5, 5), pTypingGame.JapaneseFont, "None", 40) {
+            OriginType       = OriginType.TopRight,
+            ScreenOriginType = OriginType.TopRight
         };
 
         this._songProgressBar = new DrawableProgressBar(
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
+        new Vector2(5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
         pTypingGame.JapaneseFontStroked,
         (int)(25 * 0.9f),
         new Vector2(250, 25),
@@ -168,7 +172,8 @@ public class MenuScreen : pScreen {
         Color.LightGray,
         Color.White
         ) {
-            OriginType = OriginType.TopRight
+            OriginType       = OriginType.TopRight,
+            ScreenOriginType = OriginType.TopRight
         };
         this._songProgressBar.OnClick += OnProgressBarClick;
 
@@ -176,27 +181,30 @@ public class MenuScreen : pScreen {
 
         TexturedDrawable musicPlayButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 105, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
+        new Vector2(105, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_PLAY
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.TopRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            OriginType       = OriginType.TopRight,
+            ScreenOriginType = OriginType.TopRight
         };
         TexturedDrawable musicPauseButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 55, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
+        new Vector2(55, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_PAUSE
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.TopRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            OriginType       = OriginType.TopRight,
+            ScreenOriginType = OriginType.TopRight
         };
         TexturedDrawable musicNextButton = new(
         editorButtonsTexture2D,
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 5, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
+        new Vector2(5, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
         TexturePositions.EDITOR_RIGHT
         ) {
-            Scale      = new Vector2(0.5f, 0.5f),
-            OriginType = OriginType.TopRight
+            Scale            = new Vector2(0.5f, 0.5f),
+            OriginType       = OriginType.TopRight,
+            ScreenOriginType = OriginType.TopRight
         };
 
         musicPlayButton.OnClick += delegate {
@@ -238,6 +246,17 @@ public class MenuScreen : pScreen {
         this.UpdateStats();
     }
 
+    public override void Relayout(float newWidth, float newHeight) {
+        base.Relayout(newWidth, newHeight);
+
+        this._titleText.Position = new Vector2(newWidth / 2f, newHeight * 0.2f);
+
+        this._playButton.Position.X    = newWidth / 2f;
+        this._editButton.Position.X    = newWidth / 2f;
+        this._optionsButton.Position.X = newWidth / 2f;
+        this._exitButton.Position.X    = newWidth / 2f;
+    }
+
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
     private void OnProgressBarClick(object sender, (MouseButton button, Point pos) e) {
@@ -259,7 +278,12 @@ public class MenuScreen : pScreen {
         base.Dispose();
     }
 
-    private bool _usercardAdded = false;
+    private bool             _usercardAdded = false;
+    private TextDrawable     _titleText;
+    private TexturedDrawable _playButton;
+    private TexturedDrawable _editButton;
+    private TexturedDrawable _optionsButton;
+    private TexturedDrawable _exitButton;
     public void UpdateUserCard(object sender, EventArgs e) {
         if (this._usercardAdded)
             return;

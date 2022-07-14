@@ -392,6 +392,10 @@ public class pTypingGame : FurballGame {
             CoverHovers = false
         };
 
+        this.OnRelayout += delegate(object sender, Vector2 newSize) {
+            CurrentSongBackground.Position = new Vector2(newSize.X / 2f, newSize.Y / 2f);
+        };
+
         ScoreManager.Load();
 
         NotificationManager = new NotificationManager();
