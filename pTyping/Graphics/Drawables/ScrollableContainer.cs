@@ -14,8 +14,8 @@ namespace pTyping.Graphics.Drawables;
 public class ScrollableContainer : CompositeDrawable {
     private float _targetScroll;
 
-    private Vector2 _size;
-    public override Vector2 Size => this._size;
+    private         Vector2 _size;
+    public override Vector2 Size => this._size * this.Scale;
 
     public ScrollableContainer(Vector2 size) {
         FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;

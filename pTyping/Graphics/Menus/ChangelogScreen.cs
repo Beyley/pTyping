@@ -41,7 +41,7 @@ public class ChangeLogDrawable : CompositeDrawable {
         private readonly TextDrawable _summary;
         private readonly TextDrawable _bottomLine;
 
-        public override Vector2 Size => new(1, 60);
+        public override Vector2 Size => new Vector2(1, 60) * this.Scale;
 
         private readonly GitLogEntry _entry;
 

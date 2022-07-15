@@ -17,8 +17,8 @@ public class AccuracyBarDrawable : CompositeDrawable {
 
     public float Width = 300;
     public float Height;
-    
-    public override Vector2 Size => new(this.Width, this.Height);
+
+    public override Vector2 Size => new Vector2(this.Width, this.Height) * this.Scale;
 
     public AccuracyBarDrawable(Vector2 position, Player player, float height = 10) {
         this._player  = player;

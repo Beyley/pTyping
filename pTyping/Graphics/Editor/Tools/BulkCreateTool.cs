@@ -72,7 +72,7 @@ public class BulkCreateTool : EditorTool {
         this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ColorLabel);
         this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Color);
 
-        this._previewNotes.ForEach(x => this.DrawableManager.Remove(x));
+        this._previewNotes.ForEach(x => this.DrawableManager.Drawables.Remove(x));
         this._previewNotes.Clear();
     }
 
@@ -85,7 +85,7 @@ public class BulkCreateTool : EditorTool {
     }
 
     private void Update() {
-        this._previewNotes.ForEach(x => this.DrawableManager.Remove(x));
+        this._previewNotes.ForEach(x => this.DrawableManager.Drawables.Remove(x));
         this._previewNotes.Clear();
 
         List<Note> notes = this.GenerateNotes();
@@ -106,15 +106,15 @@ public class BulkCreateTool : EditorTool {
             drawable.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            EditorScreen.NOTE_START_POS,
-            EditorScreen.RECEPTICLE_POS,
+            Player.Player.NOTE_START_POS,
+            Player.Player.RECEPTICLE_POS,
             (int)(note.Time - ConVars.BASE_APPROACH_TIME),
             (int)note.Time
             )
             );
 
             this._previewNotes.Add(drawable);
-            this.DrawableManager.Add(drawable);
+            this.DrawableManager.Drawables.Add(drawable);
         }
     }
 
@@ -154,7 +154,7 @@ public class BulkCreateTool : EditorTool {
     }
 
     public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
-        if (!EditorScreen.InPlayfield(args.position)) return;
+        if (!this.EditorInstance.InPlayfield(args.position)) return;
 
         List<Note> notes = this.GenerateNotes();
         notes.ForEach(x => this.EditorInstance.CreateNote(x, true));

@@ -29,7 +29,7 @@ public class CreateNoteTool : EditorTool {
             Scale      = new Vector2(1, 80)
         };
 
-        this.DrawableManager.Add(this._createLine);
+        this.DrawableManager.Drawables.Add(this._createLine);
 
         this._defaultNoteTextLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", LABELTEXTSIZE);
         this._defaultNoteTextLabel.SpaceAfter = LABELAFTERDISTANCE;
@@ -49,16 +49,16 @@ public class CreateNoteTool : EditorTool {
 
     public override void OnMouseMove(Vector2 position) {
         //Only show the create line if we are inside of the playfield, as thats the only time we are able to place notes
-        this._createLine.Visible = EditorScreen.InPlayfield(position);
+        this._createLine.Visible = this.EditorInstance.InPlayfield(position);
 
         //Update the position of the preview line
-        if (EditorScreen.InPlayfield(position)) {
+        if (this.EditorInstance.InPlayfield(position)) {
             this._createLine.Tweens.Clear();
             this._createLine.Tweens.Add(
             new VectorTween(
             TweenType.Movement,
-            new Vector2(EditorScreen.NOTE_START_POS.X, EditorScreen.NOTE_START_POS.Y - 40),
-            new Vector2(EditorScreen.RECEPTICLE_POS.X, EditorScreen.RECEPTICLE_POS.Y - 40),
+            new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y - 40),
+            new Vector2(Player.Player.RECEPTICLE_POS.X, Player.Player.RECEPTICLE_POS.Y - 40),
             (int)(this.EditorInstance.EditorState.MouseTime - this.EditorInstance.CurrentApproachTime(this.EditorInstance.EditorState.MouseTime)),
             (int)this.EditorInstance.EditorState.MouseTime
             )
@@ -69,7 +69,7 @@ public class CreateNoteTool : EditorTool {
     }
 
     public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
-        if (!EditorScreen.InPlayfield(args.position)) return;
+        if (!this.EditorInstance.InPlayfield(args.position)) return;
         if (args.mouseButton != MouseButton.Left) return;
 
         Note noteToAdd = new() {
@@ -84,7 +84,7 @@ public class CreateNoteTool : EditorTool {
     }
 
     public override void Deinitialize() {
-        this.DrawableManager.Remove(this._createLine);
+        this.DrawableManager.Drawables.Remove(this._createLine);
 
         this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteTextLabel);
         this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteText);

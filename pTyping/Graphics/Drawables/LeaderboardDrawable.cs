@@ -66,7 +66,7 @@ public class LeaderboardDrawable : CompositeDrawable {
             this.UpdateText();
         }
 
-        public override Vector2 Size => this._backgroundDrawable.Size;
+        public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
         public void UpdateText() {
             this._usernameInfoDrawable.Text = this.Score.Username;

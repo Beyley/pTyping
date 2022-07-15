@@ -40,16 +40,14 @@ public class EditorScreen : pScreen {
     private DrawableProgressBar _progressBar;
     private TexturedDrawable    _recepticle;
 
+    private EditorDrawable EditorDrawable;
+
     public EditorTool       CurrentTool;
     public List<EditorTool> EditorTools;
 
     public EditorState EditorState;
 
     private readonly List<Drawable> _selectionRects = new();
-
-    public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-    public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-    public static readonly Vector2 NOTE_END_POS   = new(-100, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
 
     public bool SaveNeeded = false;
 
@@ -66,13 +64,19 @@ public class EditorScreen : pScreen {
 
         #region Gameplay preview
 
+        this.Manager.Add(
+        this.EditorDrawable = new EditorDrawable {
+            OriginType = OriginType.LeftCenter,
+            Position   = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
+        }
+        );
+        
         FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.QualifiedFolderPath).GetFiles("note.png");
 
         this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
                                : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,                             ContentSource.External);
 
-        Vector2 recepticlePos = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f);
-        this._recepticle = new TexturedDrawable(this.NoteTexture, recepticlePos) {
+        this._recepticle = new TexturedDrawable(this.NoteTexture, Player.Player.RECEPTICLE_POS) {
             Scale       = new Vector2(0.55f),
             OriginType  = OriginType.Center,
             Clickable   = false,
@@ -81,7 +85,7 @@ public class EditorScreen : pScreen {
             CoverHovers = false
         };
 
-        this.Manager.Add(this._recepticle);
+        this.EditorDrawable.Drawables.Add(this._recepticle);
 
         foreach (Note note in this.EditorState.Song.Notes)
             this.CreateNote(note);
@@ -92,17 +96,13 @@ public class EditorScreen : pScreen {
 
         #region Playfield decorations
 
-
-        TexturedDrawable playfieldBackgroundCover = new(
-        ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User),
-        new Vector2(0, recepticlePos.Y - 50)
-        ) {
+        this._playfieldBackgroundCover = new(ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User), Vector2.Zero) {
             Depth       = -0.95f,
             Clickable   = false,
             CoverClicks = false
         };
 
-        this.Manager.Add(playfieldBackgroundCover);
+        this.EditorDrawable.Drawables.Add(this._playfieldBackgroundCover);
 
         #region background image
 
@@ -340,6 +340,10 @@ public class EditorScreen : pScreen {
 
         if (this._video != null)
             this._video.Position = new Vector2(newWidth / 2f, newHeight / 2f);
+
+        this.EditorDrawable.Scale = new(newWidth / FurballGame.DEFAULT_WINDOW_WIDTH);
+
+        this.EditorDrawable.OverrideSize = this._playfieldBackgroundCover.Size;
     }
 
     private void ProgressBarOnInteractUp(object sender, (MouseButton button, Point pos) e) {
@@ -383,7 +387,7 @@ public class EditorScreen : pScreen {
     }
 
     public void UpdateSelectionRects(object _, NotifyCollectionChangedEventArgs __) {
-        this._selectionRects.ForEach(x => this.Manager.Remove(x));
+        this._selectionRects.ForEach(x => this.EditorDrawable.Drawables.Remove(x));
 
         this._selectionRects.Clear();
 
@@ -405,7 +409,7 @@ public class EditorScreen : pScreen {
 
             this._selectionRects.Add(rect);
 
-            this.Manager.Add(rect);
+            this.EditorDrawable.Drawables.Add(rect);
         }
     }
 
@@ -418,7 +422,7 @@ public class EditorScreen : pScreen {
 
         if (eventDrawable == null) return;
 
-        this.Manager.Add(eventDrawable);
+        this.EditorDrawable.Drawables.Add(eventDrawable);
         this.EditorState.Events.Add(eventDrawable);
         if (isNew) {
             this.EditorState.Song.Events.Add(@event);
@@ -429,7 +433,12 @@ public class EditorScreen : pScreen {
     }
 
     public void CreateNote(Note note, bool isNew = false) {
-        NoteDrawable noteDrawable = new(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this.NoteTexture, pTypingGame.JapaneseFont, 50) {
+        NoteDrawable noteDrawable = new(
+        new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y + note.YOffset),
+        this.NoteTexture,
+        pTypingGame.JapaneseFont,
+        50
+        ) {
             TimeSource = pTypingGame.MusicTrackTimeSource,
             NoteTexture = {
                 ColorOverride = note.Color
@@ -445,7 +454,7 @@ public class EditorScreen : pScreen {
 
         noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), true, true));
 
-        this.Manager.Add(noteDrawable);
+        this.EditorDrawable.Drawables.Add(noteDrawable);
         this.EditorState.Notes.Add(noteDrawable);
         if (isNew) {
             this.EditorState.Song.Notes.Add(note);
@@ -467,13 +476,13 @@ public class EditorScreen : pScreen {
 
         this.CurrentTool = newTool;
 
-        newTool?.SelectTool(this, ref this.Manager);
+        newTool?.SelectTool(this, ref this.EditorDrawable);
     }
 
     private void OnMouseMove(object sender, (Vector2 position, string cursorName) e) {
         double currentTime  = this.EditorState.CurrentTime;
-        double reticuleXPos = this._recepticle.RealPosition.X + (this._recepticle.Size.X / 2f);
-        double noteStartPos = FurballGame.DEFAULT_WINDOW_WIDTH + 100;
+        double reticuleXPos = this._recepticle.RealPosition.X + this._recepticle.RealSize.X / 2f;
+        double noteStartPos = (FurballGame.DEFAULT_WINDOW_WIDTH + 100) * this.EditorDrawable.Scale.X;
 
         double speed = (noteStartPos - reticuleXPos) / this.CurrentApproachTime(currentTime);
 
@@ -499,7 +508,7 @@ public class EditorScreen : pScreen {
     }
 
     [Pure]
-    public static bool InPlayfield(Vector2 pos) => pos.Y < RECEPTICLE_POS.Y + 40f && pos.Y > RECEPTICLE_POS.Y - 40f;
+    public bool InPlayfield(Vector2 pos) => this._playfieldBackgroundCover.RealContains(pos);
 
     public override void Dispose() {
         FurballGame.InputManager.OnKeyDown     -= this.OnKeyPress;
@@ -735,6 +744,7 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
     private TexturedDrawable _pauseButton;
     private TexturedDrawable _rightButton;
     private TexturedDrawable _leftButton;
+    private TexturedDrawable _playfieldBackgroundCover;
     public override void Update(double gameTime) {
         this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 

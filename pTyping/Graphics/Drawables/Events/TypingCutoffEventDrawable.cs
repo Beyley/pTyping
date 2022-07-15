@@ -3,7 +3,6 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Vixie.Backends.Shared;
-using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
 
@@ -23,9 +22,9 @@ public class TypingCutoffEventDrawable : TexturedDrawable {
     public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
         this.Tweens.Clear();
 
-        Vector2 noteStartPos  = tweenArgs.IsEditor ? EditorScreen.NOTE_START_POS : Player.Player.NOTE_START_POS;
-        Vector2 noteEndPos    = tweenArgs.IsEditor ? EditorScreen.NOTE_END_POS : Player.Player.NOTE_END_POS;
-        Vector2 recepticlePos = tweenArgs.IsEditor ? EditorScreen.RECEPTICLE_POS : Player.Player.RECEPTICLE_POS;
+        Vector2 noteStartPos  = Player.Player.NOTE_START_POS;
+        Vector2 noteEndPos    = Player.Player.NOTE_END_POS;
+        Vector2 recepticlePos = Player.Player.RECEPTICLE_POS;
 
         float travelDistance = noteStartPos.X - recepticlePos.X;
         float travelRatio    = (float)(tweenArgs.ApproachTime / travelDistance);

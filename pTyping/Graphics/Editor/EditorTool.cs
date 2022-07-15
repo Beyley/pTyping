@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using JetBrains.Annotations;
@@ -28,8 +27,8 @@ public abstract class EditorTool : IComparable<EditorTool> {
     [NotNull]
     public abstract string Tooltip { get; }
 
-    protected DrawableManager DrawableManager;
-    protected EditorScreen    EditorInstance;
+    protected EditorDrawable DrawableManager;
+    protected EditorScreen   EditorInstance;
 
     public int CompareTo(EditorTool other) {
         if (ReferenceEquals(this, other))
@@ -42,7 +41,7 @@ public abstract class EditorTool : IComparable<EditorTool> {
         return string.Compare(this.Tooltip, other.Tooltip, StringComparison.Ordinal);
     }
 
-    public void SelectTool(EditorScreen editor, ref DrawableManager drawableManager) {
+    public void SelectTool(EditorScreen editor, ref EditorDrawable drawableManager) {
         this.DrawableManager = drawableManager;
         this.EditorInstance  = editor;
 

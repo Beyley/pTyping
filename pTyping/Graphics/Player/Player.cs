@@ -27,7 +27,7 @@ using Path=Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPath
 namespace pTyping.Graphics.Player;
 
 public class Player : CompositeDrawable {
-    public override Vector2 Size => new(FurballGame.DEFAULT_WINDOW_WIDTH, 100);
+    public override Vector2 Size => new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, 100) * this.Scale;
 
     public const uint SCORE_EXCELLENT = 1500;
     public const uint SCORE_GOOD      = 1000;

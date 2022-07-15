@@ -123,7 +123,7 @@ public class NotificationManager : DrawableManager {
     public class NotificationDrawable : CompositeDrawable {
         public bool ScheduledForRemoval;
 
-        public override Vector2 Size => this._backgroundDrawable.Size;
+        public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
         private readonly TextDrawable               _textDrawable;
         private readonly RectanglePrimitiveDrawable _backgroundDrawable;

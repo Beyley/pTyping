@@ -49,7 +49,7 @@ public class SongSelectDrawable : CompositeDrawable {
         private readonly TexturedDrawable _backgroundDrawable;
         private readonly TextDrawable     _titleDrawable;
 
-        public override Vector2 Size => this._backgroundDrawable.Size;
+        public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
         public SongButtonDrawable(Vector2 pos, Song song, Texture backgroundTexture) {
             this.Song     = song;

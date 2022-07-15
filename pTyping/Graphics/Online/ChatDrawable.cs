@@ -25,7 +25,7 @@ public class ChatContentsDrawable : CompositeDrawable {
 
     public override Vector2 Size {
         get;
-    }
+    }//TODO
 
     public ChatContentsDrawable(Vector2 size) => this.Size = size;
 
@@ -82,7 +82,7 @@ public class ChatDrawable : CompositeDrawable {
 
     public override Vector2 Size {
         get;
-    }
+    }//TODO
 
     private readonly List<DrawableButton> _channelButtons = new();
 
