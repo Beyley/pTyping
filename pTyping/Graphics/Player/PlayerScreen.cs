@@ -133,7 +133,7 @@ public class PlayerScreen : pScreen {
         this.Manager.Add(this._comboDrawable);
 
         this._skipButton = new DrawableButton(
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH, FurballGame.DEFAULT_WINDOW_HEIGHT),
+        new Vector2(5),
         FurballGame.DEFAULT_FONT,
         50,
         "Skip Intro",
@@ -142,9 +142,11 @@ public class PlayerScreen : pScreen {
         Color.White,
         new Vector2(0),
         this.SkipButtonClick
-        );
-        this._skipButton.OriginType = OriginType.BottomRight;
-        this._skipButton.Visible    = false;
+        ) {
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight,
+            Visible          = false
+        };
 
         this.Manager.Add(this._skipButton);
 
@@ -284,6 +286,22 @@ public class PlayerScreen : pScreen {
 
         if (!this._playingReplay)
             pTypingGame.OnlineManager.GameScene = this;
+    }
+
+    public override void Relayout(float newWidth, float newHeight) {
+        base.Relayout(newWidth, newHeight);
+
+        this._accuracyBar.Position = new Vector2(newWidth / 2f, newHeight);
+        if (this._video != null)
+            this._video.Position.X = newWidth / 2f;
+
+        this._resumeButton.Position.X  = newWidth / 2f;
+        this._restartButton.Position.X = newWidth / 2f;
+        this._quitButton.Position.X    = newWidth / 2f;
+
+        float horiScale = newWidth / FurballGame.DEFAULT_WINDOW_WIDTH;
+
+        this.Player.Scale = new(horiScale);
     }
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Playing;
