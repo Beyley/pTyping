@@ -556,31 +556,31 @@ public class EditorScreen : pScreen {
     public void DeleteSelectedObjects() {
         foreach (Drawable @object in this.EditorState.SelectedObjects)
             if (@object is NoteDrawable note) {
-                this.Manager.Remove(note);
+                this.EditorDrawable.Drawables.Remove(note);
                 this.EditorState.Song.Notes.Remove(note.Note);
                 this.EditorState.Notes.Remove(note);
 
                 this.CurrentTool?.OnNoteDelete(note);
             } else if (@object is BeatLineBarEventDrawable barEvent) {
-                this.Manager.Remove(barEvent);
+                this.EditorDrawable.Drawables.Remove(barEvent);
                 this.EditorState.Song.Events.Remove(barEvent.Event);
                 this.EditorState.Events.Remove(barEvent);
 
                 this.CurrentTool?.OnEventDelete(barEvent);
             } else if (@object is BeatLineBeatEventDrawable beatEvent) {
-                this.Manager.Remove(beatEvent);
+                this.EditorDrawable.Drawables.Remove(beatEvent);
                 this.EditorState.Song.Events.Remove(beatEvent.Event);
                 this.EditorState.Events.Remove(beatEvent);
 
                 this.CurrentTool?.OnEventDelete(beatEvent);
             } else if (@object is TypingCutoffEventDrawable cutoffEvent) {
-                this.Manager.Remove(cutoffEvent);
+                this.EditorDrawable.Drawables.Remove(cutoffEvent);
                 this.EditorState.Song.Events.Remove(cutoffEvent.Event);
                 this.EditorState.Events.Remove(cutoffEvent);
 
                 this.CurrentTool?.OnEventDelete(cutoffEvent);
             } else if (@object is LyricEventDrawable lyricEvent) {
-                this.Manager.Remove(lyricEvent);
+                this.EditorDrawable.Drawables.Remove(lyricEvent);
                 this.EditorState.Song.Events.Remove(lyricEvent.Event);
                 this.EditorState.Events.Remove(lyricEvent);
 
