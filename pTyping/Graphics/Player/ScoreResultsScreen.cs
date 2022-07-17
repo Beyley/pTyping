@@ -55,7 +55,7 @@ public class ScoreResultsScreen : pScreen {
         };
 
         DrawableButton exitButton = new(
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 20f),
+        new Vector2(20f, 20f),
         FurballGame.DEFAULT_FONT,
         40,
         "Exit",
@@ -65,7 +65,8 @@ public class ScoreResultsScreen : pScreen {
         Vector2.Zero,
         exitOnClick
         ) {
-            OriginType = OriginType.BottomRight
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight
         };
 
         this.Manager.Add(exitButton);
@@ -80,7 +81,7 @@ public class ScoreResultsScreen : pScreen {
         };
 
         DrawableButton watchReplayButton = new(
-        new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20f, FurballGame.DEFAULT_WINDOW_HEIGHT - 80f),
+        new Vector2(20f, 80f),
         FurballGame.DEFAULT_FONT,
         40,
         "Watch Replay",
@@ -90,7 +91,8 @@ public class ScoreResultsScreen : pScreen {
         Vector2.Zero,
         watchReplayOnClick
         ) {
-            OriginType = OriginType.BottomRight
+            OriginType       = OriginType.BottomRight,
+            ScreenOriginType = OriginType.BottomRight
         };
 
         this.Manager.Add(watchReplayButton);

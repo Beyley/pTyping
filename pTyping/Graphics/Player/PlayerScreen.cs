@@ -252,6 +252,15 @@ public class PlayerScreen : pScreen {
                     Depth      = 1f
                 };
 
+                this._video.FadeColor(
+                new Color(
+                (float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
+                (float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
+                (float)(1f * (1f - ConVars.BackgroundDim.Value.Value))
+                ),
+                1000
+                );
+
                 this._video.Scale = new Vector2(1f / ((float)this._video.Texture.Height / FurballGame.DEFAULT_WINDOW_HEIGHT));
 
                 this._video.StartTime = 0;
