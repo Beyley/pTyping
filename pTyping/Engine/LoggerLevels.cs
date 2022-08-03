@@ -49,14 +49,6 @@ public class LoggerLevelEditorInfo : LoggerLevel {
     public static LoggerLevelEditorInfo Instance = new();
 }
 
-public class LoggerLevelFurballFormInfo : LoggerLevel {
-    private LoggerLevelFurballFormInfo() {}
-
-    public override string Name => "FurballFormInfo";
-
-    public static LoggerLevelFurballFormInfo Instance = new();
-}
-
 public class LoggerLevelPlayerInfo : LoggerLevel {
     private LoggerLevelPlayerInfo() {}
 
