@@ -349,9 +349,9 @@ public class pTypingGame : FurballGame {
         base.Draw(gameTime);
 
         if (this._userPanelManager.Visible)
-            this._userPanelManager.Draw(gameTime, DrawableBatch, new DrawableManagerArgs());
+            this._userPanelManager.Draw(gameTime, DrawableBatch);
 
-        NotificationManager.Draw(gameTime, DrawableBatch, new DrawableManagerArgs());
+        NotificationManager.Draw(gameTime, DrawableBatch);
     }
 
     public static void SubmitScore(Song song, PlayerScore score) {
@@ -565,7 +565,7 @@ public class pTypingGame : FurballGame {
     private void OnScreenChange(object _, Screen screen) {
         pScreen actualScreen = screen as pScreen;
 
-        this.WindowManager.SetWindowTitle(screen is not pScreen ? "pTyping" : $"pTyping - {actualScreen.Name}");
+        this.WindowManager.WindowTitle = screen is not pScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
 
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (actualScreen != null) {
