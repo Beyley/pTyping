@@ -32,37 +32,34 @@ internal class Program {
         ReleaseStream = "release";
     }
 
+    private static string ReadManifestResource(string name) {
+        using Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitversion.txt");
+
+        using StreamReader reader = new(stream!);
+
+        return reader.ReadToEnd().Trim();
+    }
+
+    private static List<GitLogEntry> GetGitLog() {
+        string gitlog = "pTyping.gitlog.json";
+
+        //evil hack to get around evil commit messages
+        gitlog = gitlog.Replace("\"",         "\\\"");
+        gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
+
+        return JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
+    }
+    
     [STAThread]
     private static void Main() {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         SetReleaseStream();
-        using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitversion.txt")) {
-            using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
-                GitVersion = reader.ReadToEnd().Trim();
-            }
-        }
+        GitVersion = ReadManifestResource("pTyping.gitversion.txt");
+        GitLog     = GetGitLog();
 
-        using (Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitlog.json")) {
-            using (StreamReader reader = new(stream ?? throw new Exception("Somehow the code we are executing is not in an assembly?"))) {
-                string gitlog = reader.ReadToEnd().Trim();
+        GetGitLog();
 
-                //evil hack to get around evil commit messages
-                gitlog = gitlog.Replace("\"",         "\\\"");
-                gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
-
-                GitLog = JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
-            }
-        }
-        if (Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID") == null) {
-            Process[] processes    = Process.GetProcesses();
-            int       processCount = -1;
-            foreach (Process process in processes)
-                if (process.ProcessName.Contains("pTyping"))
-                    processCount++;
-            Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", processCount.ToString());
-        }
-        
         using pTypingGame game = new();
 
         if (RuntimeInfo.IsDebug())
