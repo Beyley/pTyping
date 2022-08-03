@@ -134,9 +134,6 @@ public class pTypingGame : FurballGame {
     private static MusicLoopState      _CurrentLoopState;
     private        pScreen             _currentRealScreen;
 
-    private FurballForm _textureDisplayForm;
-    private bool        _textureDisplayFormAdded;
-
     public pTypingGame() : base(new MenuScreen()) {
         // this.Window.AllowUserResizing = true;
 
@@ -487,29 +484,6 @@ public class pTypingGame : FurballGame {
 
         SelectNewSong();
         PlayMusic();
-
-        #region Texture debugger
-
-        ScrollableContainer scrollable = new(new(400, 500));
-
-        scrollable.ScrollSpeed       *= 2;
-        scrollable.InfiniteScrolling =  true;
-
-        DebugTextureDisplayDrawable debug = new();
-
-        scrollable.Add(debug);
-
-        this._textureDisplayForm = new("Currently bound textures", scrollable) {
-            Depth = -10
-        };
-
-        this._textureDisplayForm.OnTryClose += delegate {
-            this._textureDisplayFormAdded = false;
-
-            DebugOverlayDrawableManager.Remove(this._textureDisplayForm);
-        };
-
-        #endregion
     }
     
     private void BeforeOnScreenChange(object sender, Screen e) {
@@ -670,13 +644,6 @@ public class pTypingGame : FurballGame {
             }
             case Key.F3: {
                 this.ChangeScreenSize((int) this.WindowManager.WindowSize.X, (int) this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
-                break;
-            }
-            case Key.F4: {
-                if (!this._textureDisplayFormAdded) {
-                    DebugOverlayDrawableManager.Add(this._textureDisplayForm);
-                    this._textureDisplayFormAdded = true;
-                }
                 break;
             }
         }
