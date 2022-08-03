@@ -21,9 +21,7 @@ using JetBrains.Annotations;
 using Kettu;
 using ManagedBass;
 using pTyping.Engine;
-using pTyping.Engine.Debug;
 using pTyping.Graphics;
-using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Online;
 using pTyping.Graphics.Player;
@@ -60,12 +58,12 @@ public class pTypingGame : FurballGame {
     public static SoundEffectPlayer     MenuClickSound               = null;
     public static Scheduler             MusicTrackScheduler;
 
-    public static Bindable<Song> CurrentSong = new(null);
+    public static readonly Bindable<Song> CurrentSong = new(null);
 
     public static TextDrawable     VolumeSelector;
     public static TexturedDrawable CurrentSongBackground;
 
-    public static ScoreManager ScoreManager = new();
+    public static readonly ScoreManager ScoreManager = new();
 
     public static OnlineManager OnlineManager;
 
@@ -91,7 +89,7 @@ public class pTypingGame : FurballGame {
         TextureHeight        = 2048
     }
     );
-    public static FontSystem FurballFontRegular = new(
+    public static readonly FontSystem FurballFontRegular = new(
     new FontSystemSettings {
         FontResolutionFactor = 2f,
         KernelWidth          = 1,
@@ -100,7 +98,7 @@ public class pTypingGame : FurballGame {
         TextureHeight        = 2048
     }
     );
-    public static FontSystem FurballFontRegularStroked = new(
+    public static readonly FontSystem FurballFontRegularStroked = new(
     new FontSystemSettings {
         FontResolutionFactor = 2f,
         KernelWidth          = 1,
@@ -124,7 +122,7 @@ public class pTypingGame : FurballGame {
     private DrawableManager _userPanelManager;
     private ChatDrawable    _chatDrawable;
 
-    public static List<PlayerMod> SelectedMods = new();
+    public static readonly List<PlayerMod> SelectedMods = new();
     public static PlayerMod IsModIncompatible(PlayerMod toCheck) {
         return SelectedMods.FirstOrDefault(mod => mod.IncompatibleMods().Contains(toCheck.GetType()) || toCheck.IncompatibleMods().Contains(mod.GetType()));
     }
@@ -179,10 +177,6 @@ public class pTypingGame : FurballGame {
             MusicTrack.Pause();
         else
             MusicTrack.Resume();
-    }
-
-    public static void StopMusic() {
-        MusicTrack.Stop();
     }
 
     public static void LoadMusic(byte[] data) {
@@ -308,24 +302,28 @@ public class pTypingGame : FurballGame {
         CurrentSong.Value = SongManager.Songs[Random.Next(SongManager.Songs.Count)];
     }
 
+    private static void CheckMusicState() {
+        if (MusicTrack == null)
+            return;
+
+        if (_CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
+            PlayMusic();
+
+        if (_CurrentLoopState        == MusicLoopState.LoopFromPreviewPoint &&
+            MusicTrack.PlaybackState == PlaybackState.Stopped)//TODO: Set playback position to non-existant preview point i have yet to add.
+            PlayMusic();
+
+        if (_CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
+            SelectNewSong();
+            PlayMusic();
+        }
+    }
+    
     protected override void Update(double deltaTime) {
         base.Update(deltaTime);
         DiscordManager.Update(deltaTime);
 
-        if (MusicTrack != null) {
-            if (_CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
-                PlayMusic();
-
-            if (_CurrentLoopState        == MusicLoopState.LoopFromPreviewPoint &&
-                MusicTrack.PlaybackState == PlaybackState.Stopped)//TODO: Set playback position to non-existant preview point i have yet to add.
-                PlayMusic();
-
-            if (_CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
-                SelectNewSong();
-                PlayMusic();
-            }
-        }
-
+        CheckMusicState();
 
         this._musicTrackSchedulerDelta += deltaTime * 1000;
         if (this._musicTrackSchedulerDelta > 10) {
@@ -389,7 +387,7 @@ public class pTypingGame : FurballGame {
             CoverHovers = false
         };
 
-        this.OnRelayout += delegate(object sender, Vector2 newSize) {
+        this.OnRelayout += delegate(object _, Vector2 newSize) {
             CurrentSongBackground.Position = new Vector2(newSize.X / 2f, newSize.Y / 2f);
         };
 
@@ -405,9 +403,11 @@ public class pTypingGame : FurballGame {
 
         ScreenManager.SetBlankTransition();
 
+        //TODO: move these to the config (please)
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
         DevConsole.VolpeEnvironment.SetVariable(ConVars.BackgroundDim);
 
+        //TODO: move these functions into an array and add them as an array
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Login);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.SendMessage);
         DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Logout);
@@ -417,14 +417,8 @@ public class pTypingGame : FurballGame {
         OnlineManager = new TatakuOnlineManager(pTypingConfig.Instance.ServerWebsocketUrl, pTypingConfig.Instance.ServerWebUrl);
         OnlineManager.Initialize();
 
-        OnlineManager.OnLogout += delegate {
-            if (this._userPanelManager != null)
-                this._userPanelManager.Visible = false;
-        };
-        OnlineManager.OnDisconnect += delegate {
-            if (this._userPanelManager != null)
-                this._userPanelManager.Visible = false;
-        }; 
+        OnlineManager.OnLogout     += this.OnLogout;
+        OnlineManager.OnDisconnect += this.OnDisconnect; 
 
         if (pTypingConfig.Instance.Username != string.Empty)
             OnlineManager.Login();
@@ -485,7 +479,17 @@ public class pTypingGame : FurballGame {
         SelectNewSong();
         PlayMusic();
     }
-    
+
+    private void OnDisconnect(object sender, EventArgs e) {
+        if (this._userPanelManager != null)
+            this._userPanelManager.Visible = false;
+    }
+
+    private void OnLogout(object sender, EventArgs e) {
+        if (this._userPanelManager != null)
+            this._userPanelManager.Visible = false;
+    }
+
     private void BeforeOnScreenChange(object sender, Screen e) {
         if (e is pScreen s)
             this._currentRealScreen = s;
@@ -535,55 +539,53 @@ public class pTypingGame : FurballGame {
 
         OnlineManager.ChangeUserAction(new UserAction(actionType, final));
     }
+
+    private void SetBackgroundFadeFromScreen() {
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (this._currentRealScreen.BackgroundFadeAmount != -1f)
+            CurrentSongBackground.Tweens.Add(
+            new ColorTween(
+            TweenType.Color,
+            CurrentSongBackground.ColorOverride,
+            new Color(this._currentRealScreen.BackgroundFadeAmount, this._currentRealScreen.BackgroundFadeAmount, this._currentRealScreen.BackgroundFadeAmount),
+            CurrentSongBackground.TimeSource.GetCurrentTime(),
+            CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
+            )
+            );
+    }
     
     private void OnScreenChange(object _, Screen screen) {
         pScreen actualScreen = screen as pScreen;
 
         this.WindowManager.WindowTitle = screen is not pScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
 
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (actualScreen != null) {
-            this._currentRealScreen = actualScreen;
-            
-            if (actualScreen.BackgroundFadeAmount != -1f)
-                CurrentSongBackground.Tweens.Add(
-                new ColorTween(
-                TweenType.Color,
-                CurrentSongBackground.ColorOverride,
-                new Color(actualScreen.BackgroundFadeAmount, actualScreen.BackgroundFadeAmount, actualScreen.BackgroundFadeAmount),
-                CurrentSongBackground.TimeSource.GetCurrentTime(),
-                CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
-                )
-                );
+        if (actualScreen == null)
+            return;
 
-            if (actualScreen.ForceSpeedReset)
-                MusicTrack.SetSpeed(1f);
-            
-            SetSongLoopState(actualScreen.LoopState);
+        this._currentRealScreen = actualScreen;
 
-            if (pTypingConfig.Instance.FpsBasedOnMonitorHz) {
-                int? videoModeRefreshRate = this.WindowManager.Monitor.VideoMode.RefreshRate ?? 60;
+        this.SetBackgroundFadeFromScreen();
 
-                switch (actualScreen.ScreenType) {
-                    case ScreenType.Gameplay:
-                        if (pTypingConfig.Instance.UnlimitedFpsGameplay)
-                            this.SetTargetFps(-1);
-                        else
-                            this.SetTargetFps((int)(videoModeRefreshRate.Value * pTypingConfig.Instance.GameplayFpsMult));
-                        break;
-                    case ScreenType.Menu:
-                        if (pTypingConfig.Instance.UnlimitedFpsMenu)
-                            this.SetTargetFps(-1);
-                        else
-                            this.SetTargetFps((int)(videoModeRefreshRate.Value * pTypingConfig.Instance.MenuFpsMult));
-                        break;
-                    default: throw new ArgumentOutOfRangeException();
-                }
-            }
+        if (actualScreen.ForceSpeedReset)
+            MusicTrack.SetSpeed(1f);
 
-            UpdateCurrentOnlineStatus(actualScreen);
-        }
+        SetSongLoopState(actualScreen.LoopState);
+
+        UpdateCurrentOnlineStatus(actualScreen);
+
+        if (pTypingConfig.Instance.FpsBasedOnMonitorHz) {
+            int? videoModeRefreshRate = this.WindowManager.Monitor.VideoMode.RefreshRate ?? 60;
+
+            double targetFps = actualScreen.ScreenType switch {
+                ScreenType.Gameplay => pTypingConfig.Instance.UnlimitedFpsGameplay ? -1 : videoModeRefreshRate.Value * pTypingConfig.Instance.GameplayFpsMult,
+                ScreenType.Menu     => pTypingConfig.Instance.UnlimitedFpsMenu ? -1 : videoModeRefreshRate.Value     * pTypingConfig.Instance.MenuFpsMult,
+                _                   => throw new ArgumentOutOfRangeException()
+            };
+
+            this.SetTargetFps(targetFps);
+        } 
     }
+    
     private static void SetSongLoopState(MusicLoopState loopState) {
         _CurrentLoopState = loopState;
         switch (loopState) {
