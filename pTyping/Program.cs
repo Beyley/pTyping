@@ -33,7 +33,7 @@ internal class Program {
     }
 
     [STAThread]
-    private static void Main(string[] args) {
+    private static void Main() {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         SetReleaseStream();
@@ -56,11 +56,11 @@ internal class Program {
         }
         if (Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID") == null) {
             Process[] processes    = Process.GetProcesses();
-            int       pTypingCount = -1;
+            int       processCount = -1;
             foreach (Process process in processes)
                 if (process.ProcessName.Contains("pTyping"))
-                    pTypingCount++;
-            Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", pTypingCount.ToString());
+                    processCount++;
+            Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", processCount.ToString());
         }
         
         using pTypingGame game = new();
