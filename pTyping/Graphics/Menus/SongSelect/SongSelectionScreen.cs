@@ -196,10 +196,19 @@ public class SongSelectionScreen : pScreen {
             };
 
             toggleMods.OnClick += delegate {
-                if (this._modMenu.Shown)
+                if (this._modMenu.Shown) {
                     this._modMenu.Hide();
-                else
+                    this._modMenu.Clickable   = false;
+                    this._modMenu.CoverClicks = false;
+                    this._modMenu.Hoverable   = false;
+                    this._modMenu.CoverHovers = false;
+                } else {
                     this._modMenu.Show();
+                    this._modMenu.Clickable   = true;
+                    this._modMenu.CoverClicks = true;
+                    this._modMenu.Hoverable   = true;
+                    this._modMenu.CoverHovers = true;
+                }
             };
 
             this.Manager.Add(toggleMods);

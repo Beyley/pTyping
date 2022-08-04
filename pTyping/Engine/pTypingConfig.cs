@@ -13,6 +13,12 @@ public class pTypingConfig : VolpeConfig {
     public bool   UnlimitedFpsMenu     => this.Values["unlimited_fps_menu"].ToBoolean().Value;
     public bool   UnlimitedFpsGameplay => this.Values["unlimited_fps_gameplay"].ToBoolean().Value;
 
+    public bool  Letterboxing  => this.Values["letterboxing"].ToBoolean().Value;
+    public float LetterboxingX => (float)this.Values["letterboxing_x"].ToNumber().Value;
+    public float LetterboxingY => (float)this.Values["letterboxing_y"].ToNumber().Value;
+    public float LetterboxingW => (float)this.Values["letterboxing_w"].ToNumber().Value;
+    public float LetterboxingH => (float)this.Values["letterboxing_h"].ToNumber().Value;
+
     public bool VideoBackgrounds {
         get => this.Values["video_backgrounds"].ToBoolean().Value;
         set => this.Values["video_backgrounds"] = new Value.Boolean(value);
@@ -33,6 +39,12 @@ public class pTypingConfig : VolpeConfig {
 
         this.Values["unlimited_fps_menu"]     = new Value.Boolean(false);
         this.Values["unlimited_fps_gameplay"] = new Value.Boolean(false);
+
+        this.Values["letterboxing"]   = new Value.Boolean(false);
+        this.Values["letterboxing_x"] = new Value.Number(0);
+        this.Values["letterboxing_y"] = new Value.Number(0);
+        this.Values["letterboxing_w"] = new Value.Number(1280);
+        this.Values["letterboxing_h"] = new Value.Number(720);
 
         this.Values["video_backgrounds"] = new Value.Boolean(true);
 

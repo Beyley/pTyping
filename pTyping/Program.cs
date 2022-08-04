@@ -33,7 +33,7 @@ internal class Program {
     }
 
     private static string ReadManifestResource(string name) {
-        using Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream("pTyping.gitversion.txt");
+        using Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream(name);
 
         using StreamReader reader = new(stream!);
 
@@ -41,7 +41,7 @@ internal class Program {
     }
 
     private static List<GitLogEntry> GetGitLog() {
-        string gitlog = "pTyping.gitlog.json";
+        string gitlog = ReadManifestResource("pTyping.gitlog.json");
 
         //evil hack to get around evil commit messages
         gitlog = gitlog.Replace("\"",         "\\\"");

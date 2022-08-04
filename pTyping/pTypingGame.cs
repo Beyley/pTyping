@@ -374,7 +374,7 @@ public class pTypingGame : FurballGame {
         DiscordManager.Initialize();
         
         this.BeforeScreenChange += this.BeforeOnScreenChange;
-        this.AfterScreenChange  += this.OnScreenChange;
+        this.AfterScreenChange  += this.AfterOnScreenChange;
 
         OffsetManager.Initialize();
 
@@ -387,9 +387,7 @@ public class pTypingGame : FurballGame {
             CoverHovers = false
         };
 
-        this.OnRelayout += delegate(object _, Vector2 newSize) {
-            CurrentSongBackground.Position = new Vector2(newSize.X / 2f, newSize.Y / 2f);
-        };
+        this.OnRelayout += this.RelayoutBackgroundDrawable;
 
         ScoreManager.Load();
 
@@ -479,6 +477,12 @@ public class pTypingGame : FurballGame {
         SelectNewSong();
         PlayMusic();
     }
+    private void RelayoutBackgroundDrawable(object _, Vector2 newSize) {
+        if (this._currentRealScreen?.Manager.EffectedByScaling ?? false)
+            newSize = new(this._currentRealScreen.Manager.Size.X / this._currentRealScreen.Manager.Size.Y * 720f, WindowHeight);
+
+        CurrentSongBackground.Position = new Vector2(newSize.X / 2f, newSize.Y / 2f);
+    }
 
     private void OnDisconnect(object sender, EventArgs e) {
         if (this._userPanelManager != null)
@@ -553,8 +557,22 @@ public class pTypingGame : FurballGame {
             )
             );
     }
-    
-    private void OnScreenChange(object _, Screen screen) {
+
+    public void UpdateLetterboxing() {
+        if (!pTypingConfig.Instance.Letterboxing) {
+            this._currentRealScreen.Manager.EffectedByScaling = false;
+            return;
+        }
+
+        this._currentRealScreen.Manager.EffectedByScaling = true;
+
+        this._currentRealScreen.Manager.Position = new Vector2(pTypingConfig.Instance.LetterboxingX, pTypingConfig.Instance.LetterboxingY);
+        this._currentRealScreen.Manager.Size     = new Vector2(pTypingConfig.Instance.LetterboxingW, pTypingConfig.Instance.LetterboxingH);
+
+        this.RelayoutBackgroundDrawable(this, new Vector2(WindowWidth, WindowHeight));
+    }
+
+    private void AfterOnScreenChange(object _, Screen screen) {
         pScreen actualScreen = screen as pScreen;
 
         this.WindowManager.WindowTitle = screen is not pScreen ? "pTyping" : $"pTyping - {actualScreen.Name}";
@@ -583,7 +601,9 @@ public class pTypingGame : FurballGame {
             };
 
             this.SetTargetFps(targetFps);
-        } 
+        }
+
+        this.UpdateLetterboxing();
     }
     
     private static void SetSongLoopState(MusicLoopState loopState) {
