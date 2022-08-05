@@ -12,6 +12,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
 using Furball.Vixie;
@@ -470,13 +471,65 @@ public class pTypingGame : FurballGame {
         };
         this._userPanelManager.Add(this._chatDrawable);
 
-        InputManager.OnKeyDown                  += this.OnKeyDown;
         GraphicsBackend.Current.ScreenshotTaken += this.OnScreenshotTaken;
         CurrentSong.OnChange                    += this.OnSongChange;
 
         SelectNewSong();
         PlayMusic();
     }
+
+    // ReSharper disable once InconsistentNaming
+    private enum pTypingKeybinds {
+        TakeScreenshot,
+        ToggleFullscreen,
+        ToggleUserPanel
+    }
+
+    private Keybind _takeScreenshot;
+    private Keybind _toggleFullscreen;
+    private Keybind _toggleUserPanel;
+    public override void RegisterKeybinds() {
+        base.RegisterKeybinds();
+
+        this._toggleUserPanel = new Keybind(pTypingKeybinds.ToggleUserPanel, "Toggle User Panel", Key.F1, this.ToggleUserPanel);
+        this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot,  "Take Screenshot",   Key.F2, GraphicsBackend.Current.TakeScreenshot);
+        this._toggleFullscreen = new Keybind(
+        pTypingKeybinds.ToggleFullscreen,
+        "Toggle Fullscreen",
+        Key.F3,
+        () => {
+            this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
+        }
+        );
+
+        InputManager.RegisterKeybind(this._takeScreenshot);
+        InputManager.RegisterKeybind(this._toggleFullscreen);
+        InputManager.RegisterKeybind(this._toggleUserPanel);
+    }
+
+    public override void UnregisterKeybinds() {
+        base.UnregisterKeybinds();
+
+        InputManager.UnregisterKeybind(this._takeScreenshot);
+        InputManager.UnregisterKeybind(this._toggleFullscreen);
+        InputManager.UnregisterKeybind(this._toggleUserPanel);
+    }
+
+    public void ToggleUserPanel() {
+        //If we arent logged in, ignore this press
+        if (OnlineManager.State != ConnectionState.LoggedIn) return;
+
+        //Toggle visibility
+        this._userPanelManager.Visible = !this._userPanelManager.Visible;
+
+        //Deselect the chat text input field
+        this._chatDrawable.MessageInputDrawable.Selected = false;
+
+        //Set the visibility of all drawables in the user panel
+        foreach (Drawable drawable in this._userPanelManager.Drawables)
+            drawable.Visible = this._userPanelManager.Visible;
+    }
+
     private void RelayoutBackgroundDrawable(object _, Vector2 newSize) {
         if (this._currentRealScreen?.Manager.EffectedByScaling ?? false)
             newSize = new(this._currentRealScreen.Manager.Size.X / this._currentRealScreen.Manager.Size.Y * 720f, WindowHeight);
@@ -641,34 +694,6 @@ public class pTypingGame : FurballGame {
         LocalizationManager.AddDefaultTranslation(Localizations.Changelog,    "Changelog");
 
         base.InitializeLocalizations();
-    }
-
-    private void OnKeyDown(object sender, Key e) {
-        switch (e) {
-            case Key.Escape:
-                if (!this._userPanelManager.Visible) break;
-                goto case Key.F1;
-            // case Key.F8:
-            case Key.F1:
-                if (OnlineManager.State != ConnectionState.LoggedIn) return;
-
-                this._userPanelManager.Visible = !this._userPanelManager.Visible;
-
-                this._chatDrawable.MessageInputDrawable.Selected = false;
-
-                foreach (Drawable drawable in this._userPanelManager.Drawables)
-                    drawable.Visible = this._userPanelManager.Visible;
-
-                break;
-            case Key.F2: {
-                GraphicsBackend.Current.TakeScreenshot();
-                break;
-            }
-            case Key.F3: {
-                this.ChangeScreenSize((int) this.WindowManager.WindowSize.X, (int) this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
-                break;
-            }
-        }
     }
 
     private void UpdateUserPanel(object sender, object e) {
