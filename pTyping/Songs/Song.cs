@@ -63,6 +63,9 @@ public class Song {
     [JsonProperty]
     public string VideoPath { get; set; }
 
+    [JsonProperty]
+    public double PreviewPoint { get; set; } = 0;
+
     [JsonObject(MemberSerialization.OptIn)]
     public class SongSettings {
         [JsonProperty]

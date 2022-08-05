@@ -310,9 +310,10 @@ public class pTypingGame : FurballGame {
         if (_CurrentLoopState == MusicLoopState.Loop && MusicTrack.PlaybackState == PlaybackState.Stopped)
             PlayMusic();
 
-        if (_CurrentLoopState        == MusicLoopState.LoopFromPreviewPoint &&
-            MusicTrack.PlaybackState == PlaybackState.Stopped)//TODO: Set playback position to non-existant preview point i have yet to add.
+        if (_CurrentLoopState == MusicLoopState.LoopFromPreviewPoint && MusicTrack.PlaybackState == PlaybackState.Stopped) {
             PlayMusic();
+            MusicTrack.CurrentPosition = CurrentSong.Value?.PreviewPoint ?? 0;
+        }
 
         if (_CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
             SelectNewSong();
