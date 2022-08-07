@@ -255,7 +255,7 @@ public class UiMakerScreen : pScreen {
 
     private const string UI_ELEMENTS_FOLDER = "uielements";
 
-    private UiMakerScreenContent Content;
+    private UiMakerScreenContent _content;
 
     public readonly ObservableCollection<UiMakerElement> Selected = new();
 
@@ -295,11 +295,11 @@ public class UiMakerScreen : pScreen {
 
         FurballGame.DrawInputOverlay = true;
 
-        this.Content = new() {
+        this._content = new() {
             Position = new(50),
             Depth    = 1f
         };
-        this.Manager.Add(this.Content);
+        this.Manager.Add(this._content);
 
         this._currentContainer.Elements.Add(
         new UiMakerElement {
@@ -560,7 +560,7 @@ public class UiMakerScreen : pScreen {
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         foreach (Drawable d in this.SelectedDrawables)
-            this.Content.Drawables.Remove(d);
+            this._content.Drawables.Remove(d);
 
         this._currentContainer.Elements.ForEach(x => x.SelectDrawable = null);
         this.SelectedDrawables.Clear();
@@ -572,7 +572,7 @@ public class UiMakerScreen : pScreen {
 
             element.SelectDrawable = drawable;
             this.SelectedDrawables.Add(drawable);
-            this.Content.Drawables.Add(drawable);
+            this._content.Drawables.Add(drawable);
         }
 
         this.UpdateUi();
@@ -631,12 +631,12 @@ public class UiMakerScreen : pScreen {
     }
 
     private void ResetLayout() {
-        this.Content.Drawables.Clear();
+        this._content.Drawables.Clear();
 
         foreach (UiMakerElement element in this._currentContainer.Elements) {
             Drawable drawable = this.CreateDrawableFromElement(element);
 
-            this.Content.Drawables.Add(drawable);
+            this._content.Drawables.Add(drawable);
         }
     }
 

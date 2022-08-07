@@ -23,6 +23,7 @@ using Kettu;
 using ManagedBass;
 using pTyping.Engine;
 using pTyping.Graphics;
+using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Online;
 using pTyping.Graphics.Player;
@@ -121,6 +122,7 @@ public class pTypingGame : FurballGame {
     private readonly List<Drawable> _userPanelDrawables       = new();
 
     private DrawableManager _userPanelManager;
+    private DrawableManager _settingsManager;
     private ChatDrawable    _chatDrawable;
 
     public static readonly List<PlayerMod> SelectedMods = new();
@@ -339,6 +341,9 @@ public class pTypingGame : FurballGame {
         if (this._userPanelManager.Visible)
             this._userPanelManager.Update(deltaTime);
 
+        if (this._settingsManager.Visible)
+            this._settingsManager.Update(deltaTime);
+
         NotificationManager.Update(deltaTime);
     }
 
@@ -347,6 +352,9 @@ public class pTypingGame : FurballGame {
 
         if (this._userPanelManager.Visible)
             this._userPanelManager.Draw(gameTime, DrawableBatch);
+
+        if (this._settingsManager.Visible)
+            this._settingsManager.Draw(gameTime, DrawableBatch);
 
         NotificationManager.Draw(gameTime, DrawableBatch);
     }
@@ -453,6 +461,8 @@ public class pTypingGame : FurballGame {
 
         OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
 
+        this._settingsManager = new DrawableManager();
+
         this._userPanelManager = new DrawableManager();
         this._userPanelManager.Add(
         new TexturedDrawable(WhitePixel, new Vector2(0)) {
@@ -483,12 +493,14 @@ public class pTypingGame : FurballGame {
     private enum pTypingKeybinds {
         TakeScreenshot,
         ToggleFullscreen,
-        ToggleUserPanel
+        ToggleUserPanel,
+        OpenSettings
     }
 
     private Keybind _takeScreenshot;
     private Keybind _toggleFullscreen;
     private Keybind _toggleUserPanel;
+    private Keybind _openSettings;
     public override void RegisterKeybinds() {
         base.RegisterKeybinds();
 
@@ -502,10 +514,48 @@ public class pTypingGame : FurballGame {
             this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
         }
         );
+        this._openSettings = new Keybind(pTypingKeybinds.OpenSettings, "Open Settings Menu", Key.O, this.ToggleSettingsMenu);
 
         InputManager.RegisterKeybind(this._takeScreenshot);
         InputManager.RegisterKeybind(this._toggleFullscreen);
         InputManager.RegisterKeybind(this._toggleUserPanel);
+        InputManager.RegisterKeybind(this._openSettings);
+    }
+
+    private void ToggleSettingsMenu() {
+        this.ToggleSettingsMenu(true);
+    }
+
+    private SettingsForm _settings;
+    public void ToggleSettingsMenu(bool needControl) {
+        //If we arent holding control, ignore this keypress
+        if (!InputManager.ControlHeld && needControl) return;
+
+        if (this._settings == null) {
+            this._settings = new SettingsForm {
+                Visible = false,
+                Depth   = -100
+            };
+            this._settings.OnTryClose += (_, _) => this.ToggleSettingsMenu(false);
+            this._settingsManager.Add(this._settings);
+        }
+
+        //If the form is already changing state, then stop it from being changed until its done
+        if (this._settings.StateChanging) return;
+
+        if (this._settings.Visible)
+            this._settings.FadeOutFromOne(100);
+        else
+            this._settings.FadeInFromZero(100);
+
+        this._settings.StateChanging = true;
+        GameTimeScheduler.ScheduleMethod(
+        _ => {
+            this._settings.Visible       = !this._settings.Visible;
+            this._settings.StateChanging = false;
+        },
+        Time + 100
+        );
     }
 
     public override void UnregisterKeybinds() {
@@ -514,6 +564,7 @@ public class pTypingGame : FurballGame {
         InputManager.UnregisterKeybind(this._takeScreenshot);
         InputManager.UnregisterKeybind(this._toggleFullscreen);
         InputManager.UnregisterKeybind(this._toggleUserPanel);
+        InputManager.UnregisterKeybind(this._openSettings);
     }
 
     public void ToggleUserPanel() {
