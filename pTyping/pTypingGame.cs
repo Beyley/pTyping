@@ -524,7 +524,7 @@ public class pTypingGame : FurballGame {
         this._userPanelManager.Visible = !this._userPanelManager.Visible;
 
         //Deselect the chat text input field
-        this._chatDrawable.MessageInputDrawable.Selected = false;
+        InputManager.ReleaseTextFocus(this._chatDrawable.MessageInputDrawable);
 
         //Set the visibility of all drawables in the user panel
         foreach (Drawable drawable in this._userPanelManager.Drawables)
