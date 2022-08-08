@@ -215,7 +215,7 @@ public class pTypingGame : FurballGame {
                 if (tags.Tag.Pictures.Length != 0) {
                     IPicture cover = tags.Tag.Pictures.FirstOrDefault(x => x.Type == PictureType.FrontCover, null);
                     if (cover != null)
-                        backgroundTex = Resources.CreateTexture(cover.Data.Data);
+                        backgroundTex = Resources.CreateTextureFromByteArray(cover.Data.Data);
                 }
 
                 tags.Dispose();
@@ -388,7 +388,7 @@ public class pTypingGame : FurballGame {
 
         OffsetManager.Initialize();
 
-        CurrentSongBackground = new TexturedDrawable(Resources.CreateTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+        CurrentSongBackground = new TexturedDrawable(Resources.CreateWhitePixelTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
             Depth       = 1f,
             OriginType  = OriginType.Center,
             Hoverable   = false,
