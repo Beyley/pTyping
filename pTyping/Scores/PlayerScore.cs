@@ -87,12 +87,11 @@ public class PlayerScore {
 
     public PlayerScore() {}
 
-    [Pure]
-    public static PlayerScore LoadUTypingReplay(string path) {
-        FileStream   stream = File.OpenRead(path);
+    public static PlayerScore LoadUTypingReplay(byte[] arr) {
+        MemoryStream stream = new(arr);
         BinaryReader reader = new(stream);
 
-        PlayerScore replay = new(pTypingGame.CurrentSong.Value.MapHash, "UTyping");
+        PlayerScore replay = new(pTypingGame.CurrentSong.Value?.MapHash ?? "", "UTyping");
 
         List<ReplayFrame> frames = new();
 
@@ -105,6 +104,9 @@ public class PlayerScore {
 
         return replay;
     }
+
+    [Pure]
+    public static PlayerScore LoadUTypingReplay(string path) => LoadUTypingReplay(File.ReadAllBytes(path));
 
     public void SaveUTypingReplay(string path) {
         FileStream   stream = File.Create(path);
