@@ -7,6 +7,7 @@ using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Platform;
+using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;

@@ -4,6 +4,7 @@ using System.Numerics;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;

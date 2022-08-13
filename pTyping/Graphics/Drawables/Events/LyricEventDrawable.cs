@@ -2,6 +2,7 @@ using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player;
 using pTyping.Songs;
