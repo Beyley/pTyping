@@ -6,13 +6,17 @@ using pTyping.Songs;
 
 namespace pTyping.Graphics.Player;
 
+//TODO: Create a `ReplayFactory` class that takes in something and spits back out a replay
+//This will let us have a single interface for auto replays and replay conversions and such
 public static class AutoReplayCreator {
     [Pure]
     public static PlayerScore CreateReplay(Song song) {
-        PlayerScore score = new(song.MapHash, "p!auto");
+        song = SongManager.LoadFullSong(song);
 
-        score.ExcellentHits = (ushort)song.Notes.Count;
-        score.Combo         = (ushort)song.Notes.Count;
+        PlayerScore score = new(song.MapHash, "p!auto") {
+            ExcellentHits = (ushort)song.Notes.Count,
+            Combo         = (ushort)song.Notes.Count
+        };
 
         score.AddScore(69420);
 
@@ -24,7 +28,7 @@ public static class AutoReplayCreator {
             double time = note.Time;
             string text = "";
             for (int i2 = 0; i2 < note.Text.Length; i2++) {
-                char[] currentRomaji = note.GetTypableRomaji(text).Romaji.First().ToCharArray();
+                string currentRomaji = note.GetTypableRomaji(text).Romaji.First();
                 text += note.Text[i2];
 
                 foreach (char s in currentRomaji) {

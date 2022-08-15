@@ -42,7 +42,10 @@ public class ConVars {
     0,
     (context, parameters) => {
         Logger.Log("Loading Auto replay", LoggerLevelPlayerInfo.Instance);
-        ScreenManager.ChangeScreen(new PlayerScreen(AutoReplayCreator.CreateReplay(pTypingGame.CurrentSong.Value)));
+
+        PlayerScore playerScore = AutoReplayCreator.CreateReplay(pTypingGame.CurrentSong.Value);
+
+        ScreenManager.ChangeScreen(new PlayerScreen(playerScore));
 
         return Value.DefaultVoid;
     }
