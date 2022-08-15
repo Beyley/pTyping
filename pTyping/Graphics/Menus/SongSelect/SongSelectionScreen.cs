@@ -12,7 +12,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie;
-using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
 using ManagedBass;
 using pTyping.Engine;
@@ -176,9 +175,12 @@ public class SongSelectionScreen : pScreen {
 
         if (!this._editor) {
             this._modMenu = new ModSelectionMenuDrawable(new Vector2(100, FurballGame.DEFAULT_WINDOW_HEIGHT - backButton.Size.Y - 25)) {
-                // Visible    = false,
-                OriginType = OriginType.BottomLeft,
-                Depth      = 0.5f
+                OriginType  = OriginType.BottomLeft,
+                Depth       = 0.5f,
+                Clickable   = false,
+                CoverClicks = false,
+                Hoverable   = false,
+                CoverHovers = false
             };
             this._modMenu.Hide(true);
             this.Manager.Add(this._modMenu);
