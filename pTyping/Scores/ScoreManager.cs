@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using Furball.Engine.Engine.Helpers;
 using JetBrains.Annotations;
+using Kettu;
 using Newtonsoft.Json;
+using pTyping.Engine;
 using pTyping.Graphics.Player.Mods;
 
 namespace pTyping.Scores;
@@ -95,8 +97,14 @@ public class ScoreManager {
             if (score.ModsString is "") continue;
         
             string[] splitMods = score.ModsString.Split(',');
-            foreach (string mod in splitMods)//this is dumb shit;
-                score.Mods.Add(Activator.CreateInstance(Type.GetType(mod)) as PlayerMod);
+            foreach (string mod in splitMods) {
+                Type type = Type.GetType(mod);
+                if (type == null) {
+                    Logger.Log($"Unable to find mod {mod}", LoggerLevelSongInfo.Instance);
+                    continue;
+                }
+                score.Mods.Add(Activator.CreateInstance(type) as PlayerMod);
+            }
         }
     }
     private void CreateFreshDatabase() {
