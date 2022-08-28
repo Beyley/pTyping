@@ -14,7 +14,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie;
-using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using ManagedBass;
@@ -625,22 +624,37 @@ public class EditorScreen : pScreen {
                 }
 
                 if (this.SaveNeeded) {
-                    DialogResult responseType = EtoHelper.MessageDialog("Do you want to save before quitting?", MessageBoxButtons.YesNoCancel);
+                    EtoHelper.MessageDialog(
+                    (o, responseType) => {
+                        FurballGame.GameTimeScheduler.ScheduleMethod(
+                        _ => {
+                            switch (responseType) {
+                                case DialogResult.Cancel:
+                                    return;
+                                case DialogResult.No:
+                                    pTypingGame.MenuClickSound.PlayNew();
 
-                    if (responseType == DialogResult.Cancel)
-                        return;
+                                    // Exit the editor
+                                    ScreenManager.ChangeScreen(new SongSelectionScreen(true));
+                                    break;
+                                case DialogResult.Yes:
+                                    SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                                    pTypingGame.CurrentSong.Value = this.EditorState.Song;
+                                    SongManager.UpdateSongs();
 
-                    if (responseType == DialogResult.Yes) {
-                        SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-                        pTypingGame.CurrentSong.Value = this.EditorState.Song;
-                        SongManager.UpdateSongs();
-                    }
+                                    pTypingGame.MenuClickSound.PlayNew();
+
+                                    // Exit the editor
+                                    ScreenManager.ChangeScreen(new SongSelectionScreen(true));
+                                    break;
+                            }
+                        }
+                        );
+                    },
+                    "Do you want to save before quitting?",
+                    MessageBoxButtons.YesNoCancel
+                    );
                 }
-
-                pTypingGame.MenuClickSound.PlayNew();
-
-                // Exit the editor
-                ScreenManager.ChangeScreen(new SongSelectionScreen(true));
                 break;
             case Key.Delete: {
                 // Delete the selected objects

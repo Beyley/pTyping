@@ -886,7 +886,11 @@ public class TatakuOnlineManager : OnlineManager {
             this.OnlinePlayers.Add(this.Player.UserId, this.Player);
         }
 
-        pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Login complete! Welcome {this.Player.Username}!");
+        FurballGame.GameTimeScheduler.ScheduleMethod(
+        _ => {
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Login complete! Welcome {this.Player.Username}!");
+        }
+        );
 
         this.PacketQueue.Enqueue(new ClientStatusUpdatePacket(new UserAction(UserActionType.Idle, "")));
         this.PacketQueue.Enqueue(new ClientNotifyScoreUpdatePacket());
