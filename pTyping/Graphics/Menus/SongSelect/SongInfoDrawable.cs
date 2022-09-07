@@ -1,7 +1,6 @@
 using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-using pTyping.Graphics.Drawables;
 using pTyping.Songs;
 
 namespace pTyping.Graphics.Menus.SongSelect; 
@@ -26,7 +25,7 @@ public class SongInfoDrawable : CompositeDrawable {
     }
 
     public void SetSong(Song song) {
-        this._descriptionDrawable.Text = song.Description;
+        this._descriptionDrawable.Text = song.Description ?? "";
         this._descriptionDrawable.Wrap(this.Size.X);
 
         this._scrollableContainer.RecalculateMax();

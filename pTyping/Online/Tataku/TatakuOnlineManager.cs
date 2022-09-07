@@ -28,11 +28,11 @@ namespace pTyping.Online.Tataku;
 public class TatakuOnlineManager : OnlineManager {
     public const ushort PROTOCOL_VERSION = 1;
 
-    private readonly string     _getScoresUrl = "/get_scores";
+    private readonly string     _getScoresUrl = "get_scores";
     private readonly HttpClient _httpClient;
     private readonly Uri        _httpUri;
 
-    private readonly string _scoreSubmitUrl = "/score_submit";
+    private const string SCORE_SUBMIT_URL = "score_submit_raw";
 
     private readonly Uri             _wsUri;
     private          WebsocketClient _client;
@@ -315,22 +315,35 @@ public class TatakuOnlineManager : OnlineManager {
 
     protected override async Task ClientSubmitScore(PlayerScore score) {
         try {
-            string finalUri = this._httpUri + this._scoreSubmitUrl;
+            string finalUri = $"{this._httpUri}{SCORE_SUBMIT_URL}";
 
-            MemoryStream stream = new();
-            TatakuWriter writer = new(stream);
+            using MemoryStream       str    = new();
+            await using TatakuWriter writer = new(str);
 
-            writer.Write(score.TatakuSerialize());
-            writer.Write(this.Password());
+            writer.Write(pTypingConfig.Instance.Username);
+            writer.Write(pTypingConfig.Instance.Password);
+            writer.Write("pTyping");
+            //REPLAY
+            writer.Write((byte)1);//this marks the data as being there
+            writer.Write((ushort)4);
+            score.TatakuSerialize(writer);
+            writer.Write(new Dictionary<string, string>(0));
+            writer.Write(score.ReplayFrames);
+            //END REPLAY
+            //SCORE MAP INFO
+            writer.Write("pTyping");
+            writer.Write(score.MapHash);
+            writer.Write(PlayMode.pTyping);
+            //END SCORE MAP INFO
 
-            writer.Flush();
+            HttpContent content = new ByteArrayContent(str.ToArray());
 
-            HttpContent content = new ByteArrayContent(stream.ToArray());
+            HttpResponseMessage response = await this._httpClient.PostAsync(finalUri, content);
 
-            await this._httpClient.PostAsync(finalUri, content);
+            byte[] responseArr = await response.Content.ReadAsByteArrayAsync();
         }
-        catch {
-            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Score submission failed!");
+        catch (Exception ex) {
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Score submission failed! {ex.GetType()}");
         }
 
         this.SendUpdateScoreRequest();
@@ -566,8 +579,7 @@ public class TatakuOnlineManager : OnlineManager {
                         );
 
                         this.SpectatorState = SpectatorState.Playing;
-                    },
-                    0
+                    }
                     );
 
                     break;
@@ -595,7 +607,7 @@ public class TatakuOnlineManager : OnlineManager {
                     },
                     FurballGame.Time + 5000
                     );
-                    
+
 
                     break;
                 }
@@ -784,7 +796,7 @@ public class TatakuOnlineManager : OnlineManager {
         packet.ReadDataFromStream(reader);
 
         lock (this.OnlinePlayers) {
-            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player))
                 FurballGame.GameTimeScheduler.ScheduleMethod(
                 _ => {
                     player.TotalScore.Value  = packet.TotalScore;
@@ -797,10 +809,8 @@ public class TatakuOnlineManager : OnlineManager {
                     $"Got score update packet: {player.Username}: {player.TotalScore}:{player.RankedScore}:{player.Accuracy}:{player.PlayCount}",
                     LoggerLevelOnlineInfo.Instance
                     );
-                },
-                0
+                }
                 );
-            }
         }
 
         return true;
@@ -811,7 +821,7 @@ public class TatakuOnlineManager : OnlineManager {
         packet.ReadDataFromStream(reader);
 
         lock (this.OnlinePlayers) {
-            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player)) {
+            if (this.OnlinePlayers.TryGetValue(packet.UserId, out OnlinePlayer player))
                 FurballGame.GameTimeScheduler.ScheduleMethod(
                 _ => {
                     player.Action.Value = packet.Action;
@@ -819,10 +829,8 @@ public class TatakuOnlineManager : OnlineManager {
                     $"{player.Username} changed status to {player.Action.Value.Action} : {player.Action.Value.ActionText}! Mode: {packet.Action.Mode.Value}",
                     LoggerLevelOnlineInfo.Instance
                     );
-                },
-                0
+                }
                 );
-            }
         }
 
         return true;
@@ -878,8 +886,7 @@ public class TatakuOnlineManager : OnlineManager {
         FurballGame.GameTimeScheduler.ScheduleMethod(
         _ => {
             this.InvokeOnLoginComplete(this);
-        },
-        0
+        }
         );
 
         lock (this.OnlinePlayers) {
@@ -1006,6 +1013,14 @@ public class TatakuWriter : BinaryWriter {
             this.Write(val);
         }
     }
+    public void Write(Dictionary<string, string> dic) {
+        this.Write((ulong)dic.Count);
+
+        foreach ((string key, string val) in dic) {
+            this.Write(key);
+            this.Write(val);
+        }
+    }
     public void Write(PlayMode mode) {
         this.Write(mode.GetString());
     }
@@ -1017,6 +1032,17 @@ public class TatakuWriter : BinaryWriter {
         this.Write((byte)(str != null ? 1 : 0));
         if (str != null)
             this.Write(str);
+    }
+    public void Write(ReplayFrame[] scoreReplayFrames) {
+        this.Write((ulong)scoreReplayFrames.Length);
+
+        foreach (ReplayFrame scoreReplayFrame in scoreReplayFrames) {
+            this.Write((float)scoreReplayFrame.Time);
+            this.Write(scoreReplayFrame);
+        }
+    }
+    private void Write(ReplayFrame scoreReplayFrames) {
+        scoreReplayFrames.TatakuSerialize(this);
     }
 }
 
