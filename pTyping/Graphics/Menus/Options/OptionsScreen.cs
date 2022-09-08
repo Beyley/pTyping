@@ -47,10 +47,10 @@ public class OptionsScreen : pScreen {
 
         #region Background Dim
 
-        TextDrawable backgroundDimInputLabel = new(new Vector2(100, 150), FurballGame.DEFAULT_FONT, "Background Dim:", 30);
+        TextDrawable backgroundDimInputLabel = new(new Vector2(100, 150), FurballGame.DefaultFont, "Background Dim:", 30);
         DrawableTextBox backgroundDimInput = new(
         new Vector2(110 + backgroundDimInputLabel.Size.X, 150),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         30,
         200,
         ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture)
@@ -65,10 +65,10 @@ public class OptionsScreen : pScreen {
 
         #region Target FPS
 
-        // TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DEFAULT_FONT, "Target FPS:", 30);
+        // TextDrawable targetFPSInputLabel = new(new Vector2(100, 200), FurballGame.DefaultFont, "Target FPS:", 30);
         // DrawableTextBox targetFPSInput = new(
         // new Vector2(110 + targetFPSInputLabel.Size.X, 200),
-        // FurballGame.DEFAULT_FONT,
+        // FurballGame.DefaultFont,
         // ConVars.TargetFPS.Value.Value.ToString(CultureInfo.InvariantCulture),
         // 30,
         // 200
@@ -83,10 +83,10 @@ public class OptionsScreen : pScreen {
 
         #region Username
 
-        TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DEFAULT_FONT, "Username:", 30);
+        TextDrawable usernameInputLabel = new(new Vector2(350, 200), FurballGame.DefaultFont, "Username:", 30);
         DrawableTextBox usernameInput = new(
         new Vector2(360 + usernameInputLabel.Size.X, 200),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         30,
         200,
         pTypingConfig.Instance.Username

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -13,7 +12,9 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
+using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using ManagedBass;
@@ -28,8 +29,8 @@ using pTyping.Songs;
 using pTyping.Songs.Events;
 using Silk.NET.Input;
 using sowelipisona;
-using Color=Furball.Vixie.Backends.Shared.Color;
 using Drawable=Furball.Engine.Engine.Graphics.Drawables.Drawable;
+using KeyEventArgs=Furball.Engine.Engine.Input.Events.KeyEventArgs;
 
 namespace pTyping.Graphics.Editor;
 
@@ -157,7 +158,7 @@ public class EditorScreen : pScreen {
 
         this._progressBar = new DrawableProgressBar(
         new Vector2(0, 0),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         (int)(40 * 0.9f),
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 200, 40),
         Color.Gray,
@@ -184,7 +185,7 @@ public class EditorScreen : pScreen {
 
         #region Current time
 
-        this._currentTimeDrawable = new TextDrawable(new Vector2(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 50), FurballGame.DEFAULT_FONT, "", 30) {
+        this._currentTimeDrawable = new TextDrawable(new Vector2(10, FurballGame.DEFAULT_WINDOW_HEIGHT - 50), FurballGame.DefaultFont, "", 30) {
             OriginType = OriginType.BottomLeft
         };
 
@@ -332,6 +333,9 @@ public class EditorScreen : pScreen {
         ConVars.Volume.OnChange    += this.OnVolumeChange;
         this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
     }
+    private void ProgressBarOnInteract(object sender, MouseButtonEventArgs e) {
+        this.ProgressBarOnInteract(sender, new MouseDragEventArgs(Vector2.Zero, Vector2.Zero, Vector2.Zero, e.Button, e.Mouse));
+    }
 
     public override void Relayout(float newWidth, float newHeight) {
         base.Relayout(newWidth, newHeight);
@@ -346,15 +350,15 @@ public class EditorScreen : pScreen {
         this.EditorDrawable.OverrideSize = this._playfieldBackgroundCover.Size;
     }
 
-    private void ProgressBarOnInteractUp(object sender, (MouseButton button, Point pos) e) {
+    private void ProgressBarOnInteractUp(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
     }
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Editing;
 
-    private void ProgressBarOnInteract(object sender, Point e) {
-        this.ProgressBarOnInteract(sender, (MouseButton.Left, e));
-    }
+    // private void ProgressBarOnInteract(object sender, Point e) {
+    // this.ProgressBarOnInteract(sender, (MouseButton.Left, e));
+    // }
 
     // private void ProgressBarOnInteract(object sender, Point e) {
     //     this.ProgressBarOnInteract(sender, (e, MouseButton.LeftButton));
@@ -372,8 +376,8 @@ public class EditorScreen : pScreen {
         this.HitSoundNormal.Volume = f.Value;
     }
 
-    private void ProgressBarOnInteract(object sender, (MouseButton button, Point pos) e) {
-        Vector2 adjustedPoint = e.pos.ToVector2() - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
+    private void ProgressBarOnInteract(object sender, MouseDragEventArgs e) {
+        Vector2 adjustedPoint = e.Position - this._progressBar.Position - this._progressBar.LastCalculatedOrigin;
 
         double value = (double)adjustedPoint.X / this._progressBar.Size.X;
 
@@ -413,8 +417,8 @@ public class EditorScreen : pScreen {
         }
     }
 
-    private void OnMouseDrag(object sender, ((Vector2 lastPosition, Vector2 newPosition), string cursorName) e) {
-        this.CurrentTool?.OnMouseDrag(e.Item1.newPosition);
+    private void OnMouseDrag(object sender, MouseDragEventArgs e) {
+        this.CurrentTool?.OnMouseDrag(e.Position);
     }
 
     public void CreateEvent(Event @event, bool isNew = false) {
@@ -479,14 +483,14 @@ public class EditorScreen : pScreen {
         newTool?.SelectTool(this, ref this.EditorDrawable);
     }
 
-    private void OnMouseMove(object sender, (Vector2 position, string cursorName) e) {
+    private void OnMouseMove(object sender, MouseMoveEventArgs e) {
         double currentTime  = this.EditorState.CurrentTime;
         double reticuleXPos = this._recepticle.RealPosition.X + this._recepticle.RealSize.X / 2f;
         double noteStartPos = (FurballGame.DEFAULT_WINDOW_WIDTH + 100) * this.EditorDrawable.Scale.X;
 
         double speed = (noteStartPos - reticuleXPos) / this.CurrentApproachTime(currentTime);
 
-        double relativeMousePosition = (e.position.X - reticuleXPos) * 0.925;
+        double relativeMousePosition = (e.Position.X - reticuleXPos) * 0.925;
 
         double timeAtCursor = relativeMousePosition / speed + currentTime;
 
@@ -500,11 +504,11 @@ public class EditorScreen : pScreen {
 
         this.EditorState.MouseTime = roundedTime;
 
-        this.CurrentTool?.OnMouseMove(e.position);
+        this.CurrentTool?.OnMouseMove(e.Position);
     }
 
-    private void OnClick(object sender, ((MouseButton mouseButton, Vector2 position) args, string cursorName) e) {
-        this.CurrentTool?.OnMouseClick(e.args);
+    private void OnClick(object sender, MouseButtonEventArgs e) {
+        this.CurrentTool?.OnMouseClick((e.Button, e.Mouse.Position));
     }
 
     [Pure]
@@ -528,8 +532,8 @@ public class EditorScreen : pScreen {
         base.Dispose();
     }
 
-    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) args) {
-        this.TimelineMove(args.scroll.scrollAmount <= 0);
+    private void OnMouseScroll(object sender, MouseScrollEventArgs e) {
+        this.TimelineMove(e.ScrollAmount.Y <= 0);
     }
 
     public void TimelineMove(bool right) {
@@ -591,10 +595,10 @@ public class EditorScreen : pScreen {
         this.SaveNeeded = true;
     }
 
-    private void OnKeyPress(object sender, Key key) {
-        this.CurrentTool?.OnKeyPress(key);
+    private void OnKeyPress(object sender, KeyEventArgs e) {
+        this.CurrentTool?.OnKeyPress(e.Key);
 
-        switch (key) {
+        switch (e.Key) {
             case Key.Space:
                 this.ToggleMusicPlay();
                 break;

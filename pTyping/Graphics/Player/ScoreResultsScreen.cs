@@ -1,16 +1,15 @@
 using System;
-using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Scores;
-using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Player;
 
@@ -49,14 +48,14 @@ public class ScoreResultsScreen : pScreen {
 
         #region Buttons
 
-        EventHandler<(MouseButton, Point)> exitOnClick = delegate {
+        EventHandler<MouseButtonEventArgs> exitOnClick = delegate {
             pTypingGame.MenuClickSound.PlayNew();
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
         };
 
         DrawableButton exitButton = new(
         new Vector2(20f, 20f),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         40,
         "Exit",
         Color.Red,
@@ -71,7 +70,7 @@ public class ScoreResultsScreen : pScreen {
 
         this.Manager.Add(exitButton);
 
-        EventHandler<(MouseButton, Point)> watchReplayOnClick = delegate {
+        EventHandler<MouseButtonEventArgs> watchReplayOnClick = delegate {
             pTypingGame.MenuClickSound.PlayNew();
             if (!this.Score.ReplayCheck()) {
                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "This score has no replay data!");
@@ -82,7 +81,7 @@ public class ScoreResultsScreen : pScreen {
 
         DrawableButton watchReplayButton = new(
         new Vector2(20f, 80f),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         40,
         "Watch Replay",
         Color.Blue,

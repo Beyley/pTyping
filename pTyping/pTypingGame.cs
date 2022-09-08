@@ -13,10 +13,10 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
 using Furball.Vixie;
-using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using Kettu;
@@ -33,12 +33,12 @@ using pTyping.Online.Tataku;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using sowelipisona;
 using TagLib;
 using Color=Furball.Vixie.Backends.Shared.Color;
 using ConVars=pTyping.Engine.ConVars;
-using Point=System.Drawing.Point;
 
 namespace pTyping;
 
@@ -141,7 +141,7 @@ public class pTypingGame : FurballGame {
         pTypingConfig.Instance.Load();
 
         //We set this flag so that we can fully control the FPS without the engine mucking it up
-        BypassFurballFPSLimit = pTypingConfig.Instance.FpsBasedOnMonitorHz;
+        BypassFurballFpsLimit = pTypingConfig.Instance.FpsBasedOnMonitorHz;
     }
 
     [CanBeNull]
@@ -200,7 +200,7 @@ public class pTypingGame : FurballGame {
     }
 
     private static void SetBackgroundTexture(Texture tex) {
-        CurrentSongBackground.SetTexture(tex);
+        CurrentSongBackground.Texture = tex;
 
         CurrentSongBackground.Scale = new Vector2(1f / ((float) CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
     }
@@ -257,14 +257,19 @@ public class pTypingGame : FurballGame {
         try {
             JapaneseFont = ContentManager.LoadSystemFont(
             "Aller",
+            FontStyle.Regular,
             new FontSystemSettings {
-                FontResolutionFactor = 2f, KernelWidth = 1, KernelHeight = 1, Effect = FontSystemEffect.None
+                FontResolutionFactor = 2f,
+                KernelWidth          = 1,
+                KernelHeight         = 1,
+                Effect               = FontSystemEffect.None
             }
             );
             JapaneseFont.AddFont(JapaneseFontData);
 
             JapaneseFontStroked = ContentManager.LoadSystemFont(
             "Aller",
+            FontStyle.Regular,
             new FontSystemSettings {
                 FontResolutionFactor = 2f,
                 KernelWidth          = 1,
@@ -431,16 +436,16 @@ public class pTypingGame : FurballGame {
         if (pTypingConfig.Instance.Username != string.Empty)
             OnlineManager.Login();
 
-        VolumeSelector = new TextDrawable(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DEFAULT_FONT, $"Volume {ConVars.Volume.Value.Value}", 50) {
+        VolumeSelector = new TextDrawable(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DefaultFont, $"Volume {ConVars.Volume.Value.Value}", 50) {
             OriginType = OriginType.BottomRight, Clickable = false, CoverClicks = false
         };
 
         //Set the opacity to 0
         VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 0f, 0f, 0, 0));
 
-        InputManager.OnMouseScroll += delegate(object _, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) eventArgs) {
+        InputManager.OnMouseScroll += delegate(object _, MouseScrollEventArgs eventArgs) {
             if (InputManager.HeldKeys.Contains(Key.AltLeft))
-                ChangeGlobalVolume(eventArgs.scroll.scrollAmount);
+                ChangeGlobalVolume(eventArgs.ScrollAmount.Y);
         };
 
         DebugOverlayDrawableManager.Add(VolumeSelector);
@@ -505,12 +510,12 @@ public class pTypingGame : FurballGame {
         base.RegisterKeybinds();
 
         this._toggleUserPanel = new Keybind(pTypingKeybinds.ToggleUserPanel, "Toggle User Panel", Key.F1, this.ToggleUserPanel);
-        this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot,  "Take Screenshot",   Key.F2, GraphicsBackend.Current.TakeScreenshot);
+        this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot,  "Take Screenshot",   Key.F2, _ => GraphicsBackend.Current.TakeScreenshot());
         this._toggleFullscreen = new Keybind(
         pTypingKeybinds.ToggleFullscreen,
         "Toggle Fullscreen",
         Key.F3,
-        () => {
+        _ => {
             this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
         }
         );
@@ -522,7 +527,7 @@ public class pTypingGame : FurballGame {
         InputManager.RegisterKeybind(this._openSettings);
     }
 
-    private void ToggleSettingsMenu() {
+    private void ToggleSettingsMenu(FurballKeyboard keyboard) {
         this.ToggleSettingsMenu(true);
     }
 
@@ -567,7 +572,7 @@ public class pTypingGame : FurballGame {
         InputManager.UnregisterKeybind(this._openSettings);
     }
 
-    public void ToggleUserPanel() {
+    public void ToggleUserPanel(FurballKeyboard keyboard) {
         //If we arent logged in, ignore this press
         if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
@@ -768,8 +773,8 @@ public class pTypingGame : FurballGame {
                 }
 
                 drawable.ClearEvents();
-                drawable.OnClick += delegate(object _, (MouseButton button, Point pos) a) {
-                    switch (a.button) {
+                drawable.OnClick += delegate(object _, MouseButtonEventArgs a) {
+                    switch (a.Button) {
                         case MouseButton.Left: {
                             lock (OnlineManager.KnownChannels) {
                                 if (!OnlineManager.KnownChannels.Contains(player.Username))

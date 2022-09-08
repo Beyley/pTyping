@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
@@ -18,7 +20,6 @@ using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using pTyping.Songs.Events;
-using Silk.NET.Input;
 using sowelipisona;
 using Path=Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween.Path;
 
@@ -138,7 +139,7 @@ public class Player : CompositeDrawable {
         
         this.Play();
 
-        this._sortDrawables = true;
+        this.SortDrawables = true;
 
         double speedMod = 1f;
         foreach (PlayerMod mod in pTypingGame.SelectedMods) {
@@ -185,7 +186,7 @@ public class Player : CompositeDrawable {
             },
             RawTextDrawable = {
                 Text      = $"{note.Text}",
-                Colors    = new System.Drawing.Color[note.Text.Length],
+                Colors    = new FSColor[note.Text.Length],
                 ColorType = TextColorType.Repeating
             },
             ToTypeTextDrawable = {
@@ -198,7 +199,7 @@ public class Player : CompositeDrawable {
         };
         
         for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++) {
-            noteDrawable.RawTextDrawable.Colors[i] = System.Drawing.Color.White;
+            noteDrawable.RawTextDrawable.Colors[i] = FSColor.White;
         }
 
         noteDrawable.UpdateTextPositions();
@@ -208,16 +209,17 @@ public class Player : CompositeDrawable {
         return noteDrawable;
     }
 
-    public void TypeCharacter(object sender, char e) => this.TypeCharacter(e);
-    public void TypeCharacter(char @char, bool checkingNext = false) {
+    public void TypeCharacter(object sender, char           e) => this.TypeCharacter(new CharInputEvent(e, null));
+    public void TypeCharacter(object sender, CharInputEvent e) => this.TypeCharacter(e);
+    public void TypeCharacter(CharInputEvent e, bool checkingNext = false) {
         //Ignore control chars (fuck control chars all my homies hate control chars)
-        if (char.IsControl(@char))
+        if (char.IsControl(e.Char))
             return;
 
         //If we are recording a replay or we are spectating someone, record the keypress
         if (this.RecordReplay || this.IsSpectating) {
             ReplayFrame f = new() {
-                Character = @char,
+                Character = e.Char,
                 Time      = pTypingGame.MusicTrackTimeSource.GetCurrentTime()
             };
             this.ReplayFrames.Add(f);
@@ -254,7 +256,7 @@ public class Player : CompositeDrawable {
             //For all the possible romaji options,
             foreach (string romaji in filteredRomaji) {
                 //Check if the next romaji to type is the character we typed
-                if (romaji[note.TypedRomaji.Length] == @char) {
+                if (romaji[note.TypedRomaji.Length] == e.Char) {
                     //If we are checking the next note, and the current note is not hit,
                     if (checkingNext && !this._notes[this._noteToType].Note.IsHit) {
                         //Miss the current note
@@ -278,10 +280,10 @@ public class Player : CompositeDrawable {
                         //Update the current note to the note after the one we are checking right now
                         this._noteToType += checkingNext ? 2 : 1;
                     }
-                    this.ShowTypingIndicator(@char);
+                    this.ShowTypingIndicator(e.Char);
                     
                     foreach (PlayerMod mod in pTypingGame.SelectedMods)
-                        mod.OnCharacterTyped(note, @char.ToString(), true);
+                        mod.OnCharacterTyped(note, e.Char.ToString(), true);
 
                     break;
                 }
@@ -289,14 +291,14 @@ public class Player : CompositeDrawable {
                 //If we are not on the last note of the song, we are not checking the next note, and we are after the current note,
                 if (this._noteToType != this.Song.Notes.Count - 1 && !checkingNext && currentTime > note.Time) {
                     //Then check the next note instead
-                    this.TypeCharacter(@char, true);
+                    this.TypeCharacter(e, true);
                     return;
                 }
 
-                this.ShowTypingIndicator(@char, true);
+                this.ShowTypingIndicator(e.Char, true);
 
                 foreach (PlayerMod mod in pTypingGame.SelectedMods)
-                    mod.OnCharacterTyped(note, @char.ToString(), false);
+                    mod.OnCharacterTyped(note, e.Char.ToString(), false);
             }
         }
 
@@ -354,9 +356,9 @@ public class Player : CompositeDrawable {
         
         for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++) {
             if(i < noteDrawable.Note.Typed.Length)
-                noteDrawable.RawTextDrawable.Colors[i] = System.Drawing.Color.Gray;
+                noteDrawable.RawTextDrawable.Colors[i] = FSColor.Gray;
             else
-                noteDrawable.RawTextDrawable.Colors[i] = System.Drawing.Color.White;
+                noteDrawable.RawTextDrawable.Colors[i] = FSColor.White;
         }
         
         noteDrawable.UpdateTextPositions();
@@ -547,7 +549,7 @@ public class Player : CompositeDrawable {
         else
             pTypingGame.MusicTrack.Stop();
     }
-    public void TypeCharacter(object sender, (IKeyboard keyboard, char character) e) {
-        this.TypeCharacter(sender, e.character);
-    }
+    // public void TypeCharacter(object sender, (IKeyboard keyboard, char character) e) {
+    // this.TypeCharacter(sender, e.character);
+    // }
 }

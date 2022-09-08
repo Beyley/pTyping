@@ -1,13 +1,12 @@
 using System;
-using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
-using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Engine;
 
@@ -51,7 +50,7 @@ public class NotificationManager : DrawableManager {
         return drawable;
     }
 
-    private void OnDrawableClick(object sender, (MouseButton button, Point pos) tuple) {
+    private void OnDrawableClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         if (sender is not NotificationDrawable drawable)
             return;
 

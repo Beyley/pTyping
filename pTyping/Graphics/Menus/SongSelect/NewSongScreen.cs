@@ -1,15 +1,14 @@
 using System;
-using System.Drawing;
 using System.IO;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Songs;
-using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 using File=TagLib.File;
 
 namespace pTyping.Graphics.Menus.SongSelect;
@@ -48,8 +47,8 @@ public class NewSongScreen : pScreen {
         float y = 20f;
         foreach (string songPath in songs) {
             FileInfo songInfo = new(songPath);
-            
-            EventHandler<(MouseButton, Point)> songOnClick = delegate {
+
+            EventHandler<MouseButtonEventArgs> songOnClick = delegate {
                 this.CreateSong(songInfo);
             };
 

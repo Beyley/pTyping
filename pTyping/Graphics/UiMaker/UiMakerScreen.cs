@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -13,14 +12,13 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.UiMaker;
 
@@ -108,7 +106,7 @@ public class UiMakerElement {
     public void UpdateTexture() {
         TexturedDrawable texture = (TexturedDrawable)this.Drawable;
 
-        texture.SetTexture(this._screen.GetTexture(this.Texture));
+        texture.Texture = this._screen.GetTexture(this.Texture);
     }
 
     public void SetEvents() {
@@ -120,31 +118,31 @@ public class UiMakerElement {
         this.Drawable.OnDrag      += this.OnDrag;
     }
 
-    private void OnDragBegin(object sender, Point e) {
+    private void OnDragBegin(object sender, MouseDragEventArgs mouseDragEventArgs) {
         if (!this._screen.Selected.Contains(this))
             return;
 
-        this._screen.DragBegin(e);
+        this._screen.DragBegin(mouseDragEventArgs.Position);
     }
-    private void OnDrag(object sender, Point e) {
+    private void OnDrag(object sender, MouseDragEventArgs mouseDragEventArgs) {
         if (!this._screen.Selected.Contains(this))
             return;
 
-        this._screen.Drag(e);
+        this._screen.Drag(mouseDragEventArgs.Position);
     }
-    private void OnDragEnd(object sender, Point e) {
+    private void OnDragEnd(object sender, MouseDragEventArgs mouseDragEventArgs) {
         if (!this._screen.Selected.Contains(this))
             return;
 
-        this._screen.DragEnd(e);
+        this._screen.DragEnd(mouseDragEventArgs.Position);
     }
 
-    private void OnClick(object sender, (MouseButton button, Point pos) e) {
+    private void OnClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         this.ClickedButNotDragged = true;
     }
 
-    private void OnClickUp(object sender, (MouseButton button, Point pos) e) {
-        if (e.button == MouseButton.Left && this.ClickedButNotDragged) {
+    private void OnClickUp(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
+        if (mouseButtonEventArgs.Button == MouseButton.Left && this.ClickedButNotDragged) {
             if (!FurballGame.InputManager.ControlHeld)
                 this._screen.Selected.Clear();
 
@@ -529,28 +527,28 @@ public class UiMakerScreen : pScreen {
         }
     }
 
-    public void DragBegin(Point e) {
+    public void DragBegin(Vector2 e) {
         foreach (UiMakerElement element in this.Selected) {
             element.ClickedButNotDragged = false;
 
-            element.DragBeginOffset = e.ToVector2() - element.Position;
+            element.DragBeginOffset = e - element.Position;
         }
     }
 
-    public void Drag(Point e) {
+    public void Drag(Vector2 e) {
         foreach (UiMakerElement element in this.Selected) {
-            element.Position = e.ToVector2() - element.DragBeginOffset;
+            element.Position = e - element.DragBeginOffset;
 
             element.SetDrawableProperties(this);
         }
     }
 
-    public void DragEnd(Point e) {
+    public void DragEnd(Vector2 e) {
         //
     }
 
-    private void OnKeyDown(object sender, Key e) {
-        switch (e) {
+    private void OnKeyDown(object sender, KeyEventArgs keyEventArgs) {
+        switch (keyEventArgs.Key) {
             case Key.Escape: {
                 this.Selected.Clear();
 

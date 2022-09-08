@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Helpers;
-using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
+using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 
 namespace pTyping.Graphics.Menus;
 
@@ -115,7 +114,7 @@ public class ChangeLogDrawable : CompositeDrawable {
             base.Dispose();
         }
 
-        private void OnClicked(object sender, (MouseButton button, Point pos) tuple) {
+        private void OnClicked(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
             LinkHelper.OpenLink($"https://github.com/Beyley/pTyping/commit/{this._entry.Commit}");
         }
     }
@@ -174,8 +173,8 @@ public class ChangelogScreen : pScreen {
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
-    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
-        this.TargetScroll += e.scroll.scrollAmount;
+    private void OnMouseScroll(object sender, MouseScrollEventArgs mouseScrollEventArgs) {
+        this.TargetScroll += mouseScrollEventArgs.ScrollAmount.Y;
     }
 
     public override void Update(double gameTime) {

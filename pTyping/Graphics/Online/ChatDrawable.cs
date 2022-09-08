@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using FontStashSharp;
@@ -12,9 +11,9 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 using pTyping.Online;
-using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Online;
 
@@ -95,7 +94,7 @@ public class ChatDrawable : CompositeDrawable {
 
             float x = 0f;
             foreach (string channel in pTypingGame.OnlineManager.KnownChannels) {
-                DrawableButton button = new(new Vector2(x, 0), FurballGame.DEFAULT_FONT, 30, channel, Color.Blue, Color.White, Color.Black, new Vector2(100, 32)) {
+                DrawableButton button = new(new Vector2(x, 0), FurballGame.DefaultFont, 30, channel, Color.Blue, Color.White, Color.Black, new Vector2(100, 32)) {
                     OriginType = OriginType.BottomLeft
                 };
                 x += button.Size.X;
@@ -153,15 +152,15 @@ public class ChatDrawable : CompositeDrawable {
         pTypingGame.OnlineManager.KnownChannels.CollectionChanged += this.UpdateChannelButtons;
     }
 
-    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
+    private void OnMouseScroll(object sender, MouseScrollEventArgs mouseScrollEventArgs) {
         if (!this.IsHovered) return;
 
-        this._channelContents.TargetScroll += e.scroll.scrollAmount;
+        this._channelContents.TargetScroll += mouseScrollEventArgs.ScrollAmount.Y;
     }
 
-    private void OnThisClick(object sender, (MouseButton button, Point pos) e) {
-        if (this.Visible)
-            this.MessageInputDrawable.OnMouseDown(this, ((MouseButton.Left, e.pos.ToVector2() - this.Position + this.LastCalculatedOrigin), ""));
+    private void OnThisClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
+        if (this.Visible)//((MouseButton.Left, mouseButtonEventArgs.Mouse.Position - this.Position + this.LastCalculatedOrigin), "")
+            this.MessageInputDrawable.OnMouseDown(this, mouseButtonEventArgs);
     }
 
     private void SelectedChannelOnChange(object sender, string e) => this.RecalculateAndUpdate_wait_thats_bars();
@@ -174,7 +173,7 @@ public class ChatDrawable : CompositeDrawable {
         public ChatMessageDrawable(ChatDrawable d, Vector2 position, FontSystem font, string text, int size) : base(position, font, text, size) => this._chat = d;
 
         public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
-            if (this._chat.RealContains(this.RealPosition.ToPoint()))
+            if (this._chat.RealContains(this.RealPosition))
                 base.Draw(time, batch, args);
         }
     }
@@ -198,7 +197,7 @@ public class ChatDrawable : CompositeDrawable {
 
                 if (message.Message.Contains("trans")) {
                     messageDrawable.Colors = new[] {
-                        System.Drawing.Color.Cyan, System.Drawing.Color.Pink, System.Drawing.Color.White, System.Drawing.Color.Pink
+                        FSColor.Cyan, FSColor.Pink, FSColor.White, FSColor.Pink
                     };
                     messageDrawable.ColorType = TextColorType.Repeating;
                 }

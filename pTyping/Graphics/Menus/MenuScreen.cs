@@ -1,11 +1,11 @@
 using System;
-using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Engine.Engine.Platform;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
@@ -14,9 +14,7 @@ using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.UiMaker;
 using pTyping.Songs;
-using Silk.NET.Input;
 using static Furball.Engine.Engine.Localization.LocalizationManager;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Menus;
 
@@ -83,7 +81,7 @@ public class MenuScreen : pScreen {
         this.Manager.Add(
         this._titleText = new(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         "pTyping",
         75
         ) {
@@ -260,8 +258,8 @@ public class MenuScreen : pScreen {
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
 
-    private void OnProgressBarClick(object sender, (MouseButton button, Point pos) e) {
-        float x = e.pos.X - this._songProgressBar.RealPosition.X;
+    private void OnProgressBarClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
+        float x = mouseButtonEventArgs.Mouse.Position.X - this._songProgressBar.RealPosition.X;
 
         float targetProgress = x / this._songProgressBar.Size.X;
 

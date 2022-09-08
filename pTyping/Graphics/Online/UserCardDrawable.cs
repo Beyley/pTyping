@@ -161,11 +161,11 @@ Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Va
 
         string f = GetFilenameForModeIcon(this.Player.Value.Action.Value.Mode);
         if (f == "none") {
-            this._modeIconDrawable.SetTexture(FurballGame.WhitePixel);
-            this._modeIconDrawable.Scale = new Vector2(0f);
+            this._modeIconDrawable.Texture = FurballGame.WhitePixel;
+            this._modeIconDrawable.Scale   = new Vector2(0f);
         } else {
-            this._modeIconDrawable.SetTexture(GetTextureForMode(f));
-            this._modeIconDrawable.Scale = new Vector2(0.175f);
+            this._modeIconDrawable.Texture = GetTextureForMode(f);
+            this._modeIconDrawable.Scale   = new Vector2(0.175f);
         }
 
         Color color = this.Player.Value.Action.Value.Action.Value switch {

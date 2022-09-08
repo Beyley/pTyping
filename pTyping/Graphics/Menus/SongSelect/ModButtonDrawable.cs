@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player.Mods;
-using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -26,9 +24,9 @@ public class ModButtonDrawable : TexturedDrawable {
         this.Mod = mod;
 
         if (TEXTURE_CACHE.TryGetValue(mod.IconFilename(), out Texture tex))
-            this._texture = tex;
+            this.Texture = tex;
         else
-            TEXTURE_CACHE.Add(mod.IconFilename(), this._texture = ContentManager.LoadTextureFromFileCached(mod.IconFilename(), ContentSource.User));
+            TEXTURE_CACHE.Add(mod.IconFilename(), this.Texture = ContentManager.LoadTextureFromFileCached(mod.IconFilename(), ContentSource.User));
 
         this.Scale          = new(0.125f);
         this.OriginType     = OriginType.Center;
@@ -103,7 +101,7 @@ public class ModButtonDrawable : TexturedDrawable {
     private const           float   CLICKED_ROT    = MathF.PI / 10;
     private static readonly Vector2 CLICKED_MOVE   = new(10, 0);
 
-    private void OnModClick(object sender, (MouseButton button, Point pos) e) {
+    private void OnModClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         const float tweenTime = 100;
 
         if (pTypingGame.SelectedMods.Contains(this.Mod)) {

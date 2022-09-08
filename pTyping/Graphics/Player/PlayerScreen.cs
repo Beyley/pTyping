@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -11,6 +10,8 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
 using Kettu;
 using ManagedBass;
@@ -21,7 +22,6 @@ using pTyping.Online.Tataku;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Player;
 
@@ -112,16 +112,16 @@ public class PlayerScreen : pScreen {
 
         #region UI
 
-        this._scoreDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DEFAULT_FONT, $"{this.Player.Score.Score:00000000}", 60);
+        this._scoreDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DefaultFont, $"{this.Player.Score.Score:00000000}", 60);
         this._accuracyDrawable = new TextDrawable(
         new Vector2(5, 5 + this._scoreDrawable.Size.Y),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         $"{this.Player.Score.Accuracy * 100:0.00}%",
         60
         );
         this._comboDrawable = new TextDrawable(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f - 70),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         $"{this.Player.Score.Combo}x",
         70
         ) {
@@ -134,7 +134,7 @@ public class PlayerScreen : pScreen {
 
         this._skipButton = new DrawableButton(
         new Vector2(5),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         50,
         "Skip Intro",
         Color.Blue,
@@ -159,7 +159,7 @@ public class PlayerScreen : pScreen {
 
         this._resumeButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         50,
         "Resume",
         Color.Green,
@@ -173,7 +173,7 @@ public class PlayerScreen : pScreen {
 
         this._restartButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.3f),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         50,
         "Restart",
         Color.Yellow,
@@ -187,7 +187,7 @@ public class PlayerScreen : pScreen {
 
         this._quitButton = new DrawableButton(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.4f),
-        FurballGame.DEFAULT_FONT,
+        FurballGame.DefaultFont,
         50,
         "Quit",
         Color.Red,
@@ -284,7 +284,7 @@ public class PlayerScreen : pScreen {
 
         FurballGame.InputManager.OnKeyDown += this.OnKeyPress;
         if (!this._playingReplay)
-            FurballGame.InputManager.OnCharInput += this.Player.TypeCharacter;
+            FurballGame.InputManager.OnCharInput += this.Player.TypeCharacter;//TODO: make this use the input stack system
 
         double offset = OffsetManager.GetOffset(this.Song);
 
@@ -330,25 +330,25 @@ public class PlayerScreen : pScreen {
         );
     }
 
-    private void ResumeButtonClick(object sender, (MouseButton button, Point pos) tuple) {
+    private void ResumeButtonClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.PauseResumeMusic();
 
         pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
     }
 
-    private void RestartButtonClick(object sender, (MouseButton button, Point pos) tuple) {
+    private void RestartButtonClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = 0;
         ScreenManager.ChangeScreen(new PlayerScreen());
     }
 
-    private void QuitButtonClick(object sender, (MouseButton button, Point pos) tuple) {
+    private void QuitButtonClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         pTypingGame.MenuClickSound.PlayNew();
         ScreenManager.ChangeScreen(new SongSelectionScreen(false));
     }
 
-    private void SkipButtonClick(object sender, (MouseButton, Point) tuple) {
+    private void SkipButtonClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         pTypingGame.MenuClickSound.PlayNew();
         pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
         this._video?.Seek(this.Song.Notes.First().Time - 2999);
@@ -370,11 +370,11 @@ public class PlayerScreen : pScreen {
     }
 
     private double lastPress;
-    private void OnKeyPress(object sender, Key key) {
-        if (key != Key.Minus && key != Key.Equal)
+    private void OnKeyPress(object sender, KeyEventArgs e) {
+        if (e.Key != Key.Minus && e.Key != Key.Equal)
             this.lastPress = FurballGame.Time;
 
-        switch (key) {
+        switch (e.Key) {
             case Key.Escape when this._endScheduled: {
                 return;
             }

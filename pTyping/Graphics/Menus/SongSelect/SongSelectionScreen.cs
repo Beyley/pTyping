@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -11,7 +10,9 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
+using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
 using ManagedBass;
 using pTyping.Engine;
@@ -22,7 +23,6 @@ using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 using pTyping.Songs;
 using Silk.NET.Input;
-using Color=Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -81,14 +81,14 @@ public class SongSelectionScreen : pScreen {
         #region Create new song button
 
         if (this._editor) {
-            EventHandler<(MouseButton, Point)> newSongOnClick = delegate {
+            EventHandler<MouseButtonEventArgs> newSongOnClick = delegate {
                 pTypingGame.MenuClickSound.PlayNew();
                 ScreenManager.ChangeScreen(new NewSongScreen());
             };
 
             DrawableButton createNewSongButton = new(
             new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT),
-            FurballGame.DEFAULT_FONT,
+            FurballGame.DefaultFont,
             30,
             "Create Song",
             Color.Blue,
@@ -122,7 +122,7 @@ public class SongSelectionScreen : pScreen {
 
         #region Start button
 
-        DrawableButton startButton = new(new Vector2(5), FurballGame.DEFAULT_FONT, 60, "Start!", Color.Red, Color.White, Color.White, new Vector2(0)) {
+        DrawableButton startButton = new(new Vector2(5), FurballGame.DefaultFont, 60, "Start!", Color.Red, Color.White, Color.White, new Vector2(0)) {
             OriginType       = OriginType.BottomRight,
             ScreenOriginType = OriginType.BottomRight,
             Depth            = 0f
@@ -187,7 +187,7 @@ public class SongSelectionScreen : pScreen {
 
             DrawableButton toggleMods = new(
             new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
-            FurballGame.DEFAULT_FONT_STROKED,
+            FurballGame.DefaultFontStroked,
             30,
             "Mods",
             Color.Blue,
@@ -256,7 +256,7 @@ public class SongSelectionScreen : pScreen {
 
     public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.ChoosingSong;
 
-    private void ChangeLeaderboardType(object sender, (MouseButton button, Point pos) tuple) {
+    private void ChangeLeaderboardType(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         LeaderboardType.Value = LeaderboardType.Value switch {
             SongSelect.LeaderboardType.Local  => SongSelect.LeaderboardType.Global,
             SongSelect.LeaderboardType.Global => SongSelect.LeaderboardType.Friend,
@@ -264,7 +264,7 @@ public class SongSelectionScreen : pScreen {
             _                                 => LeaderboardType.Value
         };
 
-        this._leaderboardButton.SetTexture(TextureFromLeaderboardType(LeaderboardType));
+        this._leaderboardButton.Texture = TextureFromLeaderboardType(LeaderboardType);
 
         // this._leaderboardButton.Tweens.Clear();
         this._leaderboardButton.Tweens.Add(new VectorTween(TweenType.Scale, this._leaderboardButton.Scale, new Vector2(0.055f), FurballGame.Time, FurballGame.Time + 50));
@@ -276,13 +276,13 @@ public class SongSelectionScreen : pScreen {
     }
 
     private bool _selectHovered = false;
-    private void OnMouseMove(object sender, (Vector2 position, string cursorName) e) {
-        this._selectHovered = this._songSelectDrawable.RealContains(e.position.ToPoint());
+    private void OnMouseMove(object sender, MouseMoveEventArgs mouseMoveEventArgs) {
+        this._selectHovered = this._songSelectDrawable.RealContains(mouseMoveEventArgs.Position);
     }
-    
-    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
+
+    private void OnMouseScroll(object sender, MouseScrollEventArgs mouseScrollEventArgs) {
         if (this._selectHovered)
-            this._songSelectDrawable.TargetScroll += e.scroll.scrollAmount * 10;
+            this._songSelectDrawable.TargetScroll += mouseScrollEventArgs.ScrollAmount.Y * 10;
     }
 
     public override void Update(double gameTime) {
@@ -292,22 +292,22 @@ public class SongSelectionScreen : pScreen {
         base.Update(gameTime);
     }
 
-    private void OnKeyDown(object sender, Key e) {
-        this._movingDirection = e switch {
+    private void OnKeyDown(object sender, KeyEventArgs keyEventArgs) {
+        this._movingDirection = keyEventArgs.Key switch {
             Key.Up   => 1f,
             Key.Down => -1f,
             _        => this._movingDirection
         };
 
-        if (e == Key.F5) {
+        if (keyEventArgs.Key == Key.F5) {
             SongManager.UpdateSongs();
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
             ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor)); //TODO: implement dynamic song select
         }
     }
 
-    private void OnKeyUp(object sender, Key e) {
-        this._movingDirection = e switch {
+    private void OnKeyUp(object sender, KeyEventArgs keyEventArgs) {
+        this._movingDirection = keyEventArgs.Key switch {
             Key.Up or Key.Down => 0f,
             _                  => this._movingDirection
         };

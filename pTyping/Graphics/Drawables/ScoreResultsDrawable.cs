@@ -1,6 +1,7 @@
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Input.Events;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
 
@@ -36,9 +37,9 @@ public class ScoreResultsDrawable : CompositeDrawable {
 
         FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
     }
-    
-    private void OnMouseScroll(object sender, ((int scrollWheelId, float scrollAmount) scroll, string cursorName) e) {
-        this._targetRotation += e.scroll.scrollAmount / 16f;
+
+    private void OnMouseScroll(object sender, MouseScrollEventArgs mouseScrollEventArgs) {
+        this._targetRotation += mouseScrollEventArgs.ScrollAmount.Y / 16f;
     }
 
     public override void Dispose() {
