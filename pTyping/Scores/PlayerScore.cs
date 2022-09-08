@@ -188,8 +188,8 @@ public class PlayerScore {
         }
         );//Dictionary<string, ushort>
 
-        writer.Write(this.Accuracy);// f64
-        writer.Write(this.Speed);   // f32
+        writer.Write(this.Accuracy);    // f64
+        writer.Write((float)this.Speed);// f32
 
         // TODO: mods
         writer.WriteOptionString(null);//string 

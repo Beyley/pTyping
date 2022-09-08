@@ -128,7 +128,7 @@ public class UserCardDrawable : CompositeDrawable {
     public static string GetFilenameForModeIcon(PlayMode mode) {
         return mode switch {
             PlayMode.Standard => "standard-mode-icon.png",
-            PlayMode.Taiko    => "taiko-mode.icon.png",
+            PlayMode.Taiko    => "taiko-mode-icon.png",
             PlayMode.Catch    => "catch-mode-icon.png",
             PlayMode.Mania    => "mania-mode-icon.png",
             PlayMode.pTyping  => "ptyping-mode-icon.png",

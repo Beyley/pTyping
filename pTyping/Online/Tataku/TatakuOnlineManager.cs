@@ -324,11 +324,12 @@ public class TatakuOnlineManager : OnlineManager {
             writer.Write(pTypingConfig.Instance.Password);
             writer.Write("pTyping");
             //REPLAY
-            writer.Write((byte)1);//this marks the data as being there
-            writer.Write((ushort)4);
-            score.TatakuSerialize(writer);
-            writer.Write(new Dictionary<string, string>(0));
-            writer.Write(score.ReplayFrames);
+            writer.Write((ushort)4);                        //replay verison
+            writer.Write((byte)1);                          //this marks the data as being there
+            score.TatakuSerialize(writer);                  //score
+            writer.Write(new Dictionary<string, string>(0));//game info
+            writer.Write(score.ReplayFrames);               //replay frames
+            // writer.Write(Array.Empty<ReplayFrame>());
             //END REPLAY
             //SCORE MAP INFO
             writer.Write("pTyping");
@@ -336,13 +337,24 @@ public class TatakuOnlineManager : OnlineManager {
             writer.Write(PlayMode.pTyping);
             //END SCORE MAP INFO
 
+            File.WriteAllBytes("pain", str.ToArray());
+
             HttpContent content = new ByteArrayContent(str.ToArray());
 
             HttpResponseMessage response = await this._httpClient.PostAsync(finalUri, content);
 
-            byte[] responseArr = await response.Content.ReadAsByteArrayAsync();
+            byte[] responseContent = await response.Content.ReadAsByteArrayAsync();
+
+            string responseJson = Encoding.UTF8.GetString(responseContent);
+
+            Logger.Log($"Score submit response: {responseJson}", LoggerLevelOnlineInfo.Instance);
+
+            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, responseJson);
         }
         catch (Exception ex) {
+            if (RuntimeInfo.IsDebug())
+                throw;
+
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Score submission failed! {ex.GetType()}");
         }
 
