@@ -745,7 +745,11 @@ public class pTypingGame : FurballGame {
             if (OnlineManager.State == ConnectionState.LoggedIn) {
                 string id = OnlineManager.SendScreenshot(e);
 
+                InputManager.Clipboard = $"{pTypingConfig.Instance.ServerWebUrl}/screenshots/{id}";
+
                 ScreenshotManager.SaveScreenshot(e, true, id);
+
+                NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Screenshot uploaded and copied to clipboard!");
             } else {
                 ScreenshotManager.SaveScreenshot(e, false);
             }

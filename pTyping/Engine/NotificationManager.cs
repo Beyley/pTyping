@@ -110,12 +110,14 @@ public class NotificationManager : DrawableManager {
         const float x = 10;
         float       y = 10;
 
-        foreach (Drawable baseDrawable in this.Drawables) {
-            if (baseDrawable is not NotificationDrawable drawable || drawable.Type != NotificationType.BottomRight) continue;
+        foreach (Drawable drawable in this.Drawables) {
+            if (drawable is not NotificationDrawable {
+                    Type: NotificationType.BottomRight
+                } notification) continue;
 
-            drawable.MoveTo(new Vector2(x, y), 100);
+            notification.MoveTo(new Vector2(x, y), 100);
 
-            y -= drawable.Size.Y + 10;
+            y += notification.Size.Y + 10;
         }
     }
 
@@ -185,6 +187,8 @@ public class NotificationManager : DrawableManager {
                 this.CoverHovers = false;
             }
 
+            this.Depth = -1;
+            
             this.Drawables.Add(this._backgroundDrawable);
             this.Drawables.Add(this._outlineDrawable);
             this.Drawables.Add(this._textDrawable);
