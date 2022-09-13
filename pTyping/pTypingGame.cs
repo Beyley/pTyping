@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -393,6 +394,8 @@ public class pTypingGame : FurballGame {
 
         OffsetManager.Initialize();
 
+        ScreenshotManager.Initialize();
+
         CurrentSongBackground = new TexturedDrawable(Texture.CreateWhitePixelTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
             Depth       = 1f,
             OriginType  = OriginType.Center,
@@ -737,11 +740,12 @@ public class pTypingGame : FurballGame {
     }
 
     private void OnScreenshotTaken(object sender, Image e) {
-        string filename = "screenshot.png";//TODO: Dont just overwrite the image again and again, and maybe add a `screenshots` folder?
-
-        e.SaveAsPng(filename);
-
-        NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Screenshot taken as {filename}!");
+        Task.Factory.StartNew(
+        () => {
+            ScreenshotManager.SaveScreenshot(e);
+        }
+        );
+        NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Saving screenshot!");
     }
 
     protected override void InitializeLocalizations() {
