@@ -742,7 +742,13 @@ public class pTypingGame : FurballGame {
     private void OnScreenshotTaken(object sender, Image e) {
         Task.Factory.StartNew(
         () => {
-            ScreenshotManager.SaveScreenshot(e);
+            if (OnlineManager.State == ConnectionState.LoggedIn) {
+                string id = OnlineManager.SendScreenshot(e);
+
+                ScreenshotManager.SaveScreenshot(e, true, id);
+            } else {
+                ScreenshotManager.SaveScreenshot(e, false);
+            }
         }
         );
         NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Saving screenshot!");

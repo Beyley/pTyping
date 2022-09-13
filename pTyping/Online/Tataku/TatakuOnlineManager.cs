@@ -20,6 +20,7 @@ using pTyping.Graphics.Player;
 using pTyping.Online.Tataku.Packets;
 using pTyping.Scores;
 using pTyping.Songs;
+using SixLabors.ImageSharp;
 using Websocket.Client;
 using Websocket.Client.Models;
 
@@ -925,6 +926,28 @@ public class TatakuOnlineManager : OnlineManager {
         return true;
     }
 
+    public override string SendScreenshot(Image image) {
+        using MemoryStream ms = new();
+        image.SaveAsPng(ms);
+        Uri                       uri      = new($"{this._httpUri}screenshots/?username={pTypingConfig.Instance.Username}&password={pTypingConfig.Instance.Password}");
+        Task<HttpResponseMessage> response = this._httpClient.PostAsync(uri, new ByteArrayContent(ms.ToArray()));
+        response.Wait();
+
+        Task<string> str = response.Result.Content.ReadAsStringAsync();
+        str.Wait();
+
+        return str.Result;
+    }
+
+    public override Image RetrieveScreenshot(string id) {
+        Task<Stream> stream = this._httpClient.GetStreamAsync(new Uri($"{this._httpUri}screenshots/{id}"));
+        stream.Wait();
+
+        Image image = Image.Load(stream.Result);
+
+        return image;
+    }
+    
     public override void Update(double time) {
         while (this._chatQueue.TryDequeue(out ChatMessage message))
             lock (this.ChatLog) {

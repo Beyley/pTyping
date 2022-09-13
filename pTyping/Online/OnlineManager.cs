@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
 using pTyping.Scores;
+using SixLabors.ImageSharp;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
 namespace pTyping.Online;
@@ -72,7 +73,7 @@ public abstract class OnlineManager {
     public abstract void SpectatorBuffer(double      time);
     public abstract void SpectatorScoreSync(double   time, PlayerScore score);
     public abstract void SpectatorReplayFrame(double time, ReplayFrame frame);
-    
+
     public abstract void SpectatePlayer(OnlinePlayer player);
 
     protected abstract Task ClientSubmitScore(PlayerScore score);
@@ -96,7 +97,7 @@ public abstract class OnlineManager {
     public event EventHandler OnDisconnect;
 
     public OnlineLobby OnlineLobby = null;
-    
+
     public void Login() {
         lock (this.OnlinePlayers) {
             this.OnlinePlayers.Clear();
@@ -116,6 +117,10 @@ public abstract class OnlineManager {
         FurballGame.Time + 15000
         );
     }
+
+    public abstract string SendScreenshot(Image image);
+
+    public abstract Image RetrieveScreenshot(string id);
 
     public void Logout() {
         lock (this.OnlinePlayers) {
