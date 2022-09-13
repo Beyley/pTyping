@@ -172,7 +172,7 @@ public class pTypingGame : FurballGame {
 
     public static void PlayMusic() {
         MusicTrack.Play();
-        
+
         MusicTrack.Volume = ConVars.Volume.Value.Value;
     }
 
@@ -188,8 +188,10 @@ public class pTypingGame : FurballGame {
             MusicTrack.Stop();
             AudioEngine.DisposeStream(MusicTrack);
         }
-        
-        MusicTrack                   = AudioEngine.CreateStream(data);
+
+        MusicTrack        = AudioEngine.CreateStream(data);
+        MusicTrack.Volume = ConVars.Volume.Value.Value;
+
         MusicTrackTimeSourceNoOffset = new AudioStreamTimeSource(MusicTrack);
         MusicTrackTimeSource         = new OffsetTimeSource(MusicTrackTimeSourceNoOffset, 0);
 
@@ -203,7 +205,7 @@ public class pTypingGame : FurballGame {
     private static void SetBackgroundTexture(Texture tex) {
         CurrentSongBackground.Texture = tex;
 
-        CurrentSongBackground.Scale = new Vector2(1f / ((float) CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
+        CurrentSongBackground.Scale = new Vector2(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
     }
 
     public static void LoadBackgroundFromSong(Song song) {
@@ -230,8 +232,7 @@ public class pTypingGame : FurballGame {
             backgroundTex ??= DefaultBackground;
         } else {
             backgroundTex = System.IO.File.Exists(song.QualifiedBackgroundPath)
-                                ? ContentManager.LoadTextureFromFileCached(song.QualifiedBackgroundPath, ContentSource.External)
-                                : DefaultBackground;
+                                ? ContentManager.LoadTextureFromFileCached(song.QualifiedBackgroundPath, ContentSource.External) : DefaultBackground;
         }
 
         SetBackgroundTexture(backgroundTex);
@@ -245,7 +246,7 @@ public class pTypingGame : FurballGame {
 
         ConVars.Volume.OnChange += delegate(object _, Value.Number volume) {
             MenuClickSound.Volume = volume.Value;
-            MusicTrack.Volume = ConVars.Volume.Value.Value;
+            MusicTrack.Volume     = ConVars.Volume.Value.Value;
 
             if (VolumeSelector is not null)
                 VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100d:00.##}";
@@ -328,7 +329,7 @@ public class pTypingGame : FurballGame {
             PlayMusic();
         }
     }
-    
+
     protected override void Update(double deltaTime) {
         base.Update(deltaTime);
         DiscordManager.Update(deltaTime);
@@ -338,7 +339,7 @@ public class pTypingGame : FurballGame {
         this._musicTrackSchedulerDelta += deltaTime * 1000;
         if (this._musicTrackSchedulerDelta > 10) {
             if (MusicTrack != null)
-                MusicTrackScheduler.Update((int) MusicTrack.CurrentPosition);
+                MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
             this._musicTrackSchedulerDelta = 0;
         }
 
@@ -388,7 +389,7 @@ public class pTypingGame : FurballGame {
 
     protected override void Initialize() {
         DiscordManager.Initialize();
-        
+
         this.BeforeScreenChange += this.BeforeOnScreenChange;
         this.AfterScreenChange  += this.AfterOnScreenChange;
 
@@ -434,13 +435,15 @@ public class pTypingGame : FurballGame {
         OnlineManager.Initialize();
 
         OnlineManager.OnLogout     += this.OnLogout;
-        OnlineManager.OnDisconnect += this.OnDisconnect; 
+        OnlineManager.OnDisconnect += this.OnDisconnect;
 
         if (pTypingConfig.Instance.Username != string.Empty)
             OnlineManager.Login();
 
         VolumeSelector = new TextDrawable(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DefaultFont, $"Volume {ConVars.Volume.Value.Value}", 50) {
-            OriginType = OriginType.BottomRight, Clickable = false, CoverClicks = false
+            OriginType  = OriginType.BottomRight,
+            Clickable   = false,
+            CoverClicks = false
         };
 
         //Set the opacity to 0
@@ -453,7 +456,7 @@ public class pTypingGame : FurballGame {
 
         DebugOverlayDrawableManager.Add(VolumeSelector);
 
-        HiraganaConversion.LoadConversion(); //todo: support IMEs for more languages, and make it customizable by the user
+        HiraganaConversion.LoadConversion();//todo: support IMEs for more languages, and make it customizable by the user
 
         try {
             SongManager.LoadDatabase();
@@ -461,10 +464,10 @@ public class pTypingGame : FurballGame {
         catch {
             //If we somehow fail to load the database, just load from disk and save a new one
             SongManager.UpdateSongs();
-            
+
             //todo: notify user loading of database failed
         }
-        
+
         MusicTrackScheduler = new Scheduler();
 
         OnlineManager.OnlinePlayers.CollectionChanged += this.UpdateUserPanel;
@@ -474,7 +477,9 @@ public class pTypingGame : FurballGame {
         this._userPanelManager = new DrawableManager();
         this._userPanelManager.Add(
         new TexturedDrawable(WhitePixel, new Vector2(0)) {
-            Scale = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), Depth = 1.5f, ColorOverride = new Color(0, 0, 0, 100)
+            Scale         = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT),
+            Depth         = 1.5f,
+            ColorOverride = new Color(0, 0, 0, 100)
         }
         );
         this._userPanelManager.Add(
@@ -613,7 +618,7 @@ public class pTypingGame : FurballGame {
     }
     private void OnSongChange(object sender, Song song) {
         LoadMusic(ContentManager.LoadRawAsset(song.QualifiedAudioPath, ContentSource.External));
-        
+
         LoadBackgroundFromSong(song);
 
         UpdateCurrentOnlineStatus(this._currentRealScreen);
@@ -718,7 +723,7 @@ public class pTypingGame : FurballGame {
 
         this.UpdateLetterboxing();
     }
-    
+
     private static void SetSongLoopState(MusicLoopState loopState) {
         _CurrentLoopState = loopState;
         switch (loopState) {
