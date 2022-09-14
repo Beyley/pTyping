@@ -1,21 +1,25 @@
+using System.ComponentModel;
 using Realms;
 
 namespace pTyping.Shared.Events;
 
 public class Event : RealmObject {
-    public double End   { get; set; }
+    [Description("The end of the event")]
+    public double End { get; set; }
+    [Description("The start of the event")]
     public double Start { get; set; }
 
+    [Description("The text of the lyric event")]
     public string Text { get; set; }
 
     public int BackingType { get; set; }
-    [Ignored]
+    [Ignored, Description("The type of event")]
     public EventType Type {
         get => (EventType)this.BackingType;
         set => this.BackingType = (int)value;
     }
 
-    [Ignored]
+    [Ignored, Description("The length of the event")]
     public double Length => this.End - this.Start;
 
     public Event Copy() => (Event)this.MemberwiseClone();

@@ -1,11 +1,14 @@
 #nullable enable
+using System.ComponentModel;
 using Realms;
 
 namespace pTyping.Shared;
 
 public class AsciiUnicodeTuple : RealmObject, IEquatable<AsciiUnicodeTuple> {
-    public string? Ascii   { get; set; }
-    public string  Unicode { get; set; }
+    [Description("The raw Ascii version of the text.")]
+    public string? Ascii { get; set; }
+    [Description("The Unicode version of the text.")]
+    public string Unicode { get; set; }
 
     public AsciiUnicodeTuple(string? ascii, string unicode) {
         this.Ascii   = ascii;

@@ -7,7 +7,6 @@ public static class Program {
         BeatmapDatabase database     = new();
         FileDatabase    fileDatabase = new();
 
-
         database.Realm.Write(
         () => {
             UTypingBeatmapImporter importer = new();

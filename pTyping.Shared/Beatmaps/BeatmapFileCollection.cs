@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
@@ -5,7 +6,10 @@ namespace pTyping.Shared.Beatmaps;
 #nullable enable
 
 public class BeatmapFileCollection : RealmObject {
-    public PathHashTuple? Audio           { get; set; }
-    public PathHashTuple? Background      { get; set; }
+    [Description("The hash and file path for the audio.")]
+    public PathHashTuple? Audio { get; set; }
+    [Description("The hash and file path for the background image.")]
+    public PathHashTuple? Background { get; set; }
+    [Description("The hash and file path for the background video.")]
     public PathHashTuple? BackgroundVideo { get; set; }
 }

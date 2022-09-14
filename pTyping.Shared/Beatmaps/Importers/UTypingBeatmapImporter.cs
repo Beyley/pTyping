@@ -12,7 +12,7 @@ public class UTypingBeatmapImporter : IBeatmapImporter {
         BeatmapSet set = new();
         foreach (FileInfo file in files) {
             Beatmap? map = UTypingSongParser.ParseUTypingBeatmap(file);
-            
+
             //TODO: handle failed imports better, maybe add an error message of some sort and tell the user?
             if (map == null)
                 continue;

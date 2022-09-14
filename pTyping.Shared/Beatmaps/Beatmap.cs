@@ -9,7 +9,7 @@ namespace pTyping.Shared.Beatmaps;
 public class Beatmap : RealmObject {
     [PrimaryKey]
     public string Id { get; set; }
-    
+
     [Description("All of the breaks that happen during the Beatmap.")]
     public IList<Break> Breaks { get; }
     [Description("All of the objects contained within the Beatmap.")]
@@ -35,11 +35,10 @@ public class Beatmap : RealmObject {
             Source         = "Unknown"
         };
         this.Difficulty = new BeatmapDifficulty();
-        this.Metadata = new BeatmapMetadata {
-            Languages = {
-                SongLanguage.Unknown
-            }
-        };
+
+        this.Metadata = new BeatmapMetadata();
+        this.Metadata.BackingLanguages.Add((int)SongLanguage.Unknown);
+
         this.FileCollection = new BeatmapFileCollection {
             Audio           = null,
             Background      = null,
