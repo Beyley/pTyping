@@ -1,30 +1,25 @@
 ﻿using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.Importers;
-using Realms;
 
 public static class Program {
     public static void Main(string[] args) {
-        BeatmapDatabase database = new();
+        BeatmapDatabase database     = new();
+        FileDatabase    fileDatabase = new();
 
         UTypingBeatmapImporter importer = new();
 
-        Transaction transaction = database.Realm.BeginWrite();
-
-        try {
-            importer.ImportBeatmaps(database, new DirectoryInfo("concyclic"));
-
-            transaction.Commit();
-        }
-        catch {
-            transaction.Rollback();
-        } finally {
-            transaction.Dispose();
-        }
+        importer.ImportBeatmaps(database, fileDatabase, new DirectoryInfo("concyclic"));
 
         IQueryable<Beatmap> queryable = database.Realm.All<Beatmap>();
 
         foreach (Beatmap beatmap in queryable)
-            Console.WriteLine(beatmap.Info.Artist);
+            if (beatmap.FileCollection.Audio != null) {
+                Task<byte[]> task = fileDatabase.GetFile(beatmap.FileCollection.Audio.Hash);
+                task.Wait();
+                byte[] arr = task.Result;
+
+                Console.WriteLine(arr.Length);
+            }
     }
 }
