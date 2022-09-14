@@ -7,9 +7,13 @@ public static class Program {
         BeatmapDatabase database     = new();
         FileDatabase    fileDatabase = new();
 
-        UTypingBeatmapImporter importer = new();
 
-        importer.ImportBeatmaps(database, fileDatabase, new DirectoryInfo("concyclic"));
+        database.Realm.Write(
+        () => {
+            UTypingBeatmapImporter importer = new();
+            importer.ImportBeatmaps(database, fileDatabase, new DirectoryInfo("concyclic"));
+        }
+        );
 
         IQueryable<Beatmap> queryable = database.Realm.All<Beatmap>();
 

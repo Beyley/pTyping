@@ -30,11 +30,6 @@ public class UTypingBeatmapImporter : IBeatmapImporter {
             set.Beatmaps.Add(map);
         }
 
-        database.Realm.WriteAsync(
-        () => {
-            //Add the BeatmapSet into the realm
-            database.Realm.Add(set);
-        }
-        );
+        database.Realm.Add(set);
     }
 }
