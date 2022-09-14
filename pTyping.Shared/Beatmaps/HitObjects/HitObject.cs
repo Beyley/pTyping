@@ -1,10 +1,13 @@
-using Furball.Vixie.Backends.Shared;
+using Realms;
 
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
-public abstract class HitObject {
-    public double Time;
-    public Color  Color;
+public class HitObject : RealmObject {
+    public double Time { get; set; }
 
-    public abstract bool Complete { get; }
+    public HitObjectColor Color { get; set; }
+
+    public string Text { get; set; }
+
+    public bool IsComplete() => throw new NotImplementedException();
 }

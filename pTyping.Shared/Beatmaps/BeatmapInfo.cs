@@ -5,25 +5,25 @@ namespace pTyping.Shared.Beatmaps;
 
 public class BeatmapInfo : RealmObject, IEquatable<BeatmapInfo> {
     [Description("The artist of the song.")]
-    public AsciiUnicodeTuple Artist;
+    public AsciiUnicodeTuple Artist { get; set; }
     [Description("A description of the beatmap given by the creator.")]
-    public string Description;
+    public string Description { get; set; }
 
     [Description("The name given by the creator for this specific difficulty.")]
-    public AsciiUnicodeTuple DifficultyName;
+    public AsciiUnicodeTuple DifficultyName { get; set; }
     [Description("The person who created the map, aka the mapper.")]
-    public string Mapper;
+    public string Mapper { get; set; }
     [Description("The title of the song.")]
-    public AsciiUnicodeTuple Title;
+    public AsciiUnicodeTuple Title { get; set; }
     [Description("The source of the song.")]
-    public string Source;
+    public string Source { get; set; }
 
     [Description("The time set to preview the song.")]
-    public double PreviewTime;
+    public double PreviewTime { get; set; }
 
     public BeatmapInfo Clone() => (BeatmapInfo)this.MemberwiseClone();
 
-    public bool Equals(BeatmapInfo? other) {
+    public bool Equals(BeatmapInfo other) {
         if (ReferenceEquals(null, other))
             return false;
         if (ReferenceEquals(this, other))

@@ -3,8 +3,19 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 public class BeatmapMetadata : RealmObject {
-    public IReadOnlyList<SongLanguage> Languages;
-    public IReadOnlyList<string>       Tags;
+    public IList<int> BackingLanguages { get; }
+    [Ignored]
+    public IList<SongLanguage> Languages {
+        get {
+            List<SongLanguage> list = new();
+
+            foreach (uint u in this.BackingLanguages)
+                list.Add((SongLanguage)u);
+
+            return list;
+        }
+    }
+    public IList<string> Tags { get; }
 
     public BeatmapMetadata Clone() => (BeatmapMetadata)this.MemberwiseClone();
 }

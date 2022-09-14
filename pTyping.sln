@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Mola.Bindings", "Fu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Shared", "pTyping.Shared\pTyping.Shared.csproj", "{60CCBF96-164A-4301-BC26-D2E3A1A8CAAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Realms.Test", "pTyping.Realms.Test\pTyping.Realms.Test.csproj", "{A40328E6-67F4-49C0-8600-8DB5398B98F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -122,6 +124,10 @@ Global
 		{60CCBF96-164A-4301-BC26-D2E3A1A8CAAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60CCBF96-164A-4301-BC26-D2E3A1A8CAAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60CCBF96-164A-4301-BC26-D2E3A1A8CAAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}

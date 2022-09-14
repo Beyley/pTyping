@@ -1,8 +1,11 @@
+#nullable enable
+using Realms;
+
 namespace pTyping.Shared;
 
-public class AsciiUnicodeTuple : IEquatable<AsciiUnicodeTuple> {
-    public readonly string? Ascii;
-    public readonly string  Unicode;
+public class AsciiUnicodeTuple : RealmObject, IEquatable<AsciiUnicodeTuple> {
+    public string? Ascii   { get; set; }
+    public string  Unicode { get; set; }
 
     public AsciiUnicodeTuple(string? ascii, string unicode) {
         this.Ascii   = ascii;
@@ -13,6 +16,8 @@ public class AsciiUnicodeTuple : IEquatable<AsciiUnicodeTuple> {
         this.Ascii   = both;
         this.Unicode = both;
     }
+
+    public AsciiUnicodeTuple() => this.Unicode = "";
 
     public bool Equals(AsciiUnicodeTuple? other) {
         if (ReferenceEquals(null, other))

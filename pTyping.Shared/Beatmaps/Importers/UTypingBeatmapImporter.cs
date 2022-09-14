@@ -1,3 +1,4 @@
+#nullable enable
 using pTyping.Shared.Beatmaps.Importers.UTyping;
 
 namespace pTyping.Shared.Beatmaps.Importers;
@@ -6,7 +7,7 @@ public class UTypingBeatmapImporter : IBeatmapImporter {
     public void ImportBeatmaps(BeatmapDatabase database, DirectoryInfo beatmapPath) {
         IEnumerable<FileInfo> files = beatmapPath.GetFiles("*.txt", SearchOption.AllDirectories).Where(x => !x.Name.EndsWith("_src.txt") && x.Name.StartsWith("info"));
 
-        List<Beatmap> maps = new();
+        BeatmapSet set = new();
         foreach (FileInfo file in files) {
             Beatmap? map = UTypingSongParser.ParseUTypingBeatmap(file);
 
@@ -14,14 +15,18 @@ public class UTypingBeatmapImporter : IBeatmapImporter {
             if (map == null)
                 continue;
 
-            maps.Add(map);
+            //TODO: this should never happen, what the fuck?
+            if (string.IsNullOrEmpty(map.Id))
+                continue;
+
+            set.Beatmaps.Add(map);
         }
 
-        BeatmapSet set = new() {
-            //Put all the collected maps into the beatmap set
-            Beatmaps = maps
-        };
-        //Add the BeatmapSet into the realm
-        database.Realm.Add(set);
+        database.Realm.WriteAsync(
+        () => {
+            //Add the BeatmapSet into the realm
+            database.Realm.Add(set);
+        }
+        );
     }
 }

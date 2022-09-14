@@ -1,3 +1,4 @@
+#nullable enable
 using System.Text;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
@@ -6,11 +7,17 @@ using pTyping.Shared.Events;
 
 namespace pTyping.Shared.Beatmaps.Importers.UTyping;
 
-public class UTypingSongParser {
+public static class UTypingSongParser {
     public static Beatmap? ParseUTypingBeatmap(FileInfo fileInfo) {
         Beatmap beatmap = new();
 
-        string infoData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(fileInfo.FullName));
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        byte[] fullFile = File.ReadAllBytes(fileInfo.FullName);
+
+        beatmap.Id = CryptoHelper.GetMd5(fullFile);
+
+        string infoData = Encoding.GetEncoding(932).GetString(fullFile);
 
         infoData = infoData.Replace("\r", "");
         string[] info = infoData.Split("\n");
@@ -34,9 +41,6 @@ public class UTypingSongParser {
         //If the first char of the map is not the song filename, panic out
         //TODO: do all UTyping songs have the song filename first?
         if (mapData[0] != '@') return null;
-
-        List<HitObject> hitObjects = new();
-        List<Event>     events     = new();
 
         double?     firstBeatlineBar = null;
         TimingPoint timingPoint      = new(0, 0);
@@ -65,9 +69,9 @@ public class UTypingSongParser {
                     string fullAudioPath = Path.Combine(fileInfo.DirectoryName!, line);
 
                     if (!File.Exists(fullAudioPath))
-                        throw new Exception();
+                        return null;
 
-                    beatmap.FileCollection.AudioHash = new PathHashTuple(line, CryptoHelper.GetMd5(File.ReadAllBytes(fullAudioPath)));
+                    beatmap.FileCollection.Audio = new PathHashTuple(line, CryptoHelper.GetMd5(File.ReadAllBytes(fullAudioPath)));
                     break;
                 }
                 //Contains a note in the format of
@@ -79,8 +83,8 @@ public class UTypingSongParser {
                     double time = double.Parse(splitLine[0]) * 1000;
                     string text = splitLine[1];
 
-                    hitObjects.Add(
-                    new LyricHitObject {
+                    beatmap.HitObjects.Add(
+                    new HitObject {
                         Text  = text,
                         Time  = time,
                         Color = Color.Red
@@ -98,18 +102,20 @@ public class UTypingSongParser {
                     double time = double.Parse(splitLine[0]) * 1000d;
                     string text = string.Join(' ', splitLine[1..]);
 
-                    if (events.Any(x => x is LyricEvent)) {
-                        LyricEvent ev = (LyricEvent)events.Last(x => x is LyricEvent);
+                    if (beatmap.Events.Any(x => x.Type == EventType.Lyric)) {
+                        Event ev = beatmap.Events.Last(x => x.Type == EventType.Lyric);
 
                         // ReSharper disable once CompareOfFloatsByEqualityOperator
                         if (ev.End == double.PositiveInfinity)
                             ev.End = time;
                     }
 
-                    events.Add(
-                    new LyricEvent(text.Trim()) {
+                    beatmap.Events.Add(
+                    new Event {
                         Start = time,
-                        End   = double.PositiveInfinity
+                        End   = double.PositiveInfinity,
+                        Text  = text.Trim(),
+                        Type  = EventType.Lyric
                     }
                     );
 
@@ -121,15 +127,16 @@ public class UTypingSongParser {
                 case "/": {
                     double time = double.Parse(line) * 1000d;
 
-                    events.Add(
-                    new TypingCutoffEvent {
+                    beatmap.Events.Add(
+                    new Event {
                         Start = time,
-                        End   = time
+                        End   = time,
+                        Type  = EventType.TypingCutoff
                     }
                     );
 
-                    if (events.Any(x => x is LyricEvent)) {
-                        LyricEvent ev = (LyricEvent)events.Last(x => x is LyricEvent);
+                    if (beatmap.Events.Any(x => x.Type == EventType.Lyric)) {
+                        Event ev = beatmap.Events.Last(x => x.Type == EventType.Lyric);
 
                         // ReSharper disable once CompareOfFloatsByEqualityOperator
                         if (ev.End == double.PositiveInfinity)
@@ -172,12 +179,7 @@ public class UTypingSongParser {
             }
         } while (line != null);
 
-        beatmap.HitObjects = hitObjects;
-        beatmap.Events     = events;
-
-        beatmap.TimingPoints = new[] {
-            timingPoint
-        };
+        beatmap.TimingPoints.Add(timingPoint);
 
         return beatmap;
     }
