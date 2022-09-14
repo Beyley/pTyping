@@ -1,0 +1,86 @@
+#nullable enable
+
+using Furball.Engine.Engine.Helpers;
+using Newtonsoft.Json;
+using pTyping.Shared.Beatmaps.HitObjects;
+using pTyping.Shared.Beatmaps.Importers.Legacy.Events;
+using pTyping.Shared.Events;
+
+namespace pTyping.Shared.Beatmaps.Importers.Legacy;
+
+public static class LegacySongParser {
+    public static Beatmap? ParseLegacySong(FileInfo fileInfo) {
+        string fileContents = File.ReadAllText(fileInfo.FullName);
+
+        LegacySong? legacySong = JsonConvert.DeserializeObject<LegacySong>(
+        fileContents,
+        new JsonSerializerSettings {
+            TypeNameHandling = TypeNameHandling.Auto
+        }
+        );
+        if (legacySong == null)
+            return null;
+
+        if (fileInfo.DirectoryName == null)
+            return null;
+
+        string audioPath = Path.Combine(fileInfo.DirectoryName, legacySong.AudioPath);
+
+        Beatmap map = new() {
+            Difficulty = {
+                Strictness = legacySong.Settings.Strictness
+            },
+            Id = CryptoHelper.GetMd5(File.ReadAllBytes(fileInfo.FullName)),
+            Info = {
+                Artist         = new AsciiUnicodeTuple(null, legacySong.Artist),
+                Description    = legacySong.Description,
+                Mapper         = legacySong.Creator,
+                Source         = "Unknown",
+                Title          = new AsciiUnicodeTuple(null, legacySong.Name),
+                DifficultyName = new AsciiUnicodeTuple(legacySong.Difficulty),
+                PreviewTime    = legacySong.PreviewPoint
+            },
+            FileCollection = {
+                Audio = new PathHashTuple(legacySong.AudioPath, CryptoHelper.GetMd5(File.ReadAllBytes(audioPath))),
+                Background = legacySong.BackgroundPath == null ? null : new PathHashTuple(
+                             legacySong.BackgroundPath,
+                             CryptoHelper.GetMd5(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName, legacySong.BackgroundPath)))
+                             ),
+                BackgroundVideo = legacySong.VideoPath == null ? null : new PathHashTuple(
+                                  legacySong.VideoPath,
+                                  CryptoHelper.GetMd5(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName, legacySong.VideoPath)))
+                                  )
+            }
+        };
+        foreach (LegacyNote legacyNote in legacySong.Notes)
+            map.HitObjects.Add(
+            new HitObject {
+                Color = legacyNote.Color,
+                Text  = legacyNote.Text,
+                Time  = legacyNote.Time
+            }
+            );
+        foreach (LegacyEvent legacyEvent in legacySong.Events) {
+            if (legacyEvent.Type is LegacyEventType.BeatLineBar or LegacyEventType.BeatLineBeat)
+                continue;
+
+            double  end  = legacyEvent is LyricEvent lyric ? lyric.EndTime : legacyEvent.Time;
+            string? text = legacyEvent is LyricEvent lyric2 ? lyric2.Lyric : null;
+
+            map.Events.Add(
+            new Event {
+                Type = legacyEvent.Type switch {
+                    LegacyEventType.Lyric        => EventType.Lyric,
+                    LegacyEventType.TypingCutoff => EventType.TypingCutoff,
+                    _                            => throw new ArgumentOutOfRangeException()
+                },
+                Start = legacyEvent.Time,
+                End   = end,
+                Text  = text
+            }
+            );
+        }
+
+        return map;
+    }
+}
