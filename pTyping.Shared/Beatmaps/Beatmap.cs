@@ -43,9 +43,10 @@ public class Beatmap : RealmObject {
             BackgroundHash = new PathHashTuple("", "")
         };
 
-        this.HitObjects = ArraySegment<HitObject>.Empty;
-        this.Breaks     = ArraySegment<Break>.Empty;
-        this.Events     = ArraySegment<Event>.Empty;
+        this.HitObjects   = ArraySegment<HitObject>.Empty;
+        this.Breaks       = ArraySegment<Break>.Empty;
+        this.Events       = ArraySegment<Event>.Empty;
+        this.TimingPoints = ArraySegment<TimingPoint>.Empty;
     }
 
     [Description("The total duration of all the breaks in this Beatmap."), JsonIgnore]
