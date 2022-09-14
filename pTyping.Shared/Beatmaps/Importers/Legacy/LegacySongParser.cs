@@ -12,6 +12,9 @@ public static class LegacySongParser {
     public static Beatmap? ParseLegacySong(FileInfo fileInfo) {
         string fileContents = File.ReadAllText(fileInfo.FullName);
 
+        fileContents = fileContents.Replace("pTyping.Songs.Events.", "pTyping.Shared.Beatmaps.Importers.Legacy.Events.");
+        fileContents = fileContents.Replace("Event, pTyping",        "Event, pTyping.Shared");
+
         LegacySong? legacySong = JsonConvert.DeserializeObject<LegacySong>(
         fileContents,
         new JsonSerializerSettings {
@@ -80,6 +83,8 @@ public static class LegacySongParser {
             }
             );
         }
+        foreach (LegacyTimingPoint legacyTimingPoint in legacySong.TimingPoints)
+            map.TimingPoints.Add(new TimingPoint(legacyTimingPoint.Time, legacyTimingPoint.Tempo));
 
         return map;
     }

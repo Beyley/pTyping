@@ -9,8 +9,10 @@ public static class Program {
 
         database.Realm.Write(
         () => {
-            UTypingBeatmapImporter importer = new();
-            importer.ImportBeatmaps(database, fileDatabase, new DirectoryInfo("concyclic"));
+            // UTypingBeatmapImporter importer = new();
+            // importer.ImportBeatmaps(database, fileDatabase, new DirectoryInfo("concyclic"));
+            LegacyBeatmapImporter importer = new();
+            importer.ImportBeatmaps(database, fileDatabase, new DirectoryInfo("legacymap"));
         }
         );
 
