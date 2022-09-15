@@ -21,7 +21,19 @@ public class BeatmapInfo : RealmObject, IEquatable<BeatmapInfo> {
     [Description("The time set to preview the song.")]
     public double PreviewTime { get; set; }
 
-    public BeatmapInfo Clone() => (BeatmapInfo)this.MemberwiseClone();
+    public BeatmapInfo Clone() {
+        BeatmapInfo info = new() {
+            Artist         = this.Artist.Clone(),
+            Description    = this.Description,
+            Mapper         = this.Mapper,
+            Source         = this.Source,
+            Title          = this.Title.Clone(),
+            DifficultyName = this.DifficultyName.Clone(),
+            PreviewTime    = this.PreviewTime
+        };
+
+        return info;
+    }
 
     public bool Equals(BeatmapInfo other) {
         if (ReferenceEquals(null, other))

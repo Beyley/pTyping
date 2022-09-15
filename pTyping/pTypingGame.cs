@@ -27,12 +27,12 @@ using pTyping.Graphics;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus;
 using pTyping.Graphics.Online;
-using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
 using pTyping.Online.Tataku;
 using pTyping.Scores;
-using pTyping.Songs;
+using pTyping.Shared;
+using pTyping.Shared.Beatmaps;
 using Silk.NET.Input;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -61,7 +61,7 @@ public class pTypingGame : FurballGame {
     public static SoundEffectPlayer     MenuClickSound               = null;
     public static Scheduler             MusicTrackScheduler;
 
-    public static readonly Bindable<Song> CurrentSong = new(null);
+    public static readonly Bindable<Beatmap> CurrentSong = new(null);
 
     public static TextDrawable     VolumeSelector;
     public static TexturedDrawable CurrentSongBackground;
@@ -69,6 +69,9 @@ public class pTypingGame : FurballGame {
     public static readonly ScoreManager ScoreManager = new();
 
     public static OnlineManager OnlineManager;
+
+    public static BeatmapDatabase BeatmapDatabase;
+    public static FileDatabase    FileDatabase;
 
     public static byte[] JapaneseFontData;
     public static FontSystem JapaneseFont = new(
@@ -171,6 +174,10 @@ public class pTypingGame : FurballGame {
     }
 
     public static void PlayMusic() {
+        //If theres no music track registered, this will crash, so lets just NOP the function
+        if (MusicTrack == null)
+            return;
+        
         MusicTrack.Play();
 
         MusicTrack.Volume = ConVars.Volume.Value.Value;
@@ -208,12 +215,12 @@ public class pTypingGame : FurballGame {
         CurrentSongBackground.Scale = new Vector2(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
     }
 
-    public static void LoadBackgroundFromSong(Song song) {
+    public static void LoadBackgroundFromSong(Beatmap song) {
         Texture backgroundTex = null;
 
-        if (song.BackgroundPath == null) {
+        if (song.FileCollection.Background == null) {
             try {
-                File tags = File.Create(song.QualifiedAudioPath);
+                File tags = File.Create(new BeatmapSongFileAbstraction(FileDatabase, song));
 
                 if (tags.Tag.Pictures.Length != 0) {
                     IPicture cover = tags.Tag.Pictures.FirstOrDefault(x => x.Type == PictureType.FrontCover, null);
@@ -231,8 +238,8 @@ public class pTypingGame : FurballGame {
 
             backgroundTex ??= DefaultBackground;
         } else {
-            backgroundTex = System.IO.File.Exists(song.QualifiedBackgroundPath)
-                                ? ContentManager.LoadTextureFromFileCached(song.QualifiedBackgroundPath, ContentSource.External) : DefaultBackground;
+            backgroundTex = song.FileCollection.Background != null ? Texture.CreateTextureFromByteArray(FileDatabase.GetFile(song.FileCollection.Background.Hash))
+                                : DefaultBackground;
         }
 
         SetBackgroundTexture(backgroundTex);
@@ -309,7 +316,19 @@ public class pTypingGame : FurballGame {
     }
 
     public static void SelectNewSong() {
-        CurrentSong.Value = SongManager.Songs[Random.Next(SongManager.Songs.Count)];
+        BeatmapSet[] sets = BeatmapDatabase.Realm.All<BeatmapSet>().ToArray();
+
+        //If there are no maps in the set, return
+        if (!sets.Any())
+            return;
+
+        BeatmapSet picked = sets[Random.Next(sets.Length)];
+
+        //Something probably went wrong here...
+        if (picked.Beatmaps.Count == 0)
+            return;
+
+        CurrentSong.Value = picked.Beatmaps[0];
     }
 
     private static void CheckMusicState() {
@@ -321,7 +340,7 @@ public class pTypingGame : FurballGame {
 
         if (_CurrentLoopState == MusicLoopState.LoopFromPreviewPoint && MusicTrack.PlaybackState == PlaybackState.Stopped) {
             PlayMusic();
-            MusicTrack.CurrentPosition = CurrentSong.Value?.PreviewPoint ?? 0;
+            MusicTrack.CurrentPosition = CurrentSong.Value?.Info.PreviewTime ?? 0;
         }
 
         if (_CurrentLoopState == MusicLoopState.NewSong && MusicTrack.CurrentPosition > MusicTrack.Length - 0.1d) {
@@ -366,7 +385,7 @@ public class pTypingGame : FurballGame {
         NotificationManager.Draw(gameTime, DrawableBatch);
     }
 
-    public static void SubmitScore(Song song, PlayerScore score) {
+    public static void SubmitScore(Beatmap song, PlayerScore score) {
         ScoreManager.AddScore(score);
 
         if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0 && score.Username == OnlineManager.Username())
@@ -458,15 +477,18 @@ public class pTypingGame : FurballGame {
 
         HiraganaConversion.LoadConversion();//todo: support IMEs for more languages, and make it customizable by the user
 
-        try {
-            SongManager.LoadDatabase();
-        }
-        catch {
-            //If we somehow fail to load the database, just load from disk and save a new one
-            SongManager.UpdateSongs();
+        BeatmapDatabase = new BeatmapDatabase();
+        FileDatabase    = new FileDatabase();
 
-            //todo: notify user loading of database failed
-        }
+        // BeatmapDatabase.Realm.Write(
+        // () => {
+        //     UTypingBeatmapImporter importer = new();
+        //
+        //     string[] strings = Directory.GetDirectories(Path.Combine(AssemblyPath, "utyping"));
+        //     foreach (string s in strings) {
+        //         importer.ImportBeatmaps(BeatmapDatabase, FileDatabase, new DirectoryInfo(s));
+        //     }
+        // });
 
         MusicTrackScheduler = new Scheduler();
 
@@ -616,8 +638,11 @@ public class pTypingGame : FurballGame {
         if (e is pScreen s)
             this._currentRealScreen = s;
     }
-    private void OnSongChange(object sender, Song song) {
-        LoadMusic(ContentManager.LoadRawAsset(song.QualifiedAudioPath, ContentSource.External));
+    private void OnSongChange(object sender, Beatmap song) {
+        if (song.FileCollection.Audio != null)
+            LoadMusic(FileDatabase.GetFile(song.FileCollection.Audio.Hash));
+        else
+            MusicTrack.Stop();//if the song has no music, just stop playing the current one for now...
 
         LoadBackgroundFromSong(song);
 
@@ -633,12 +658,12 @@ public class pTypingGame : FurballGame {
         switch (screen.OnlineUserActionType) {
             case ScreenUserActionType.Listening:
                 actionType = UserActionType.Idle;
-                final      = $"Listening to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name}";
+                final      = $"Listening to {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title}";
                 break;
             case ScreenUserActionType.Editing:
-                final = pTypingConfig.Instance.Username == CurrentSong.Value.Creator
-                            ? $"Editing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}"
-                            : $"Modding {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Creator}";
+                final = pTypingConfig.Instance.Username == CurrentSong.Value.Info.Mapper
+                            ? $"Editing {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Info.Mapper}"
+                            : $"Modding {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Info.Mapper}";
                 actionType = UserActionType.Editing;
                 break;
             case ScreenUserActionType.ChoosingSong:
@@ -646,15 +671,15 @@ public class pTypingGame : FurballGame {
                 actionType = UserActionType.Idle;
                 break;
             case ScreenUserActionType.Playing:
-                final      = $"Playing {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
+                final      = $"Playing {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}]";
                 actionType = UserActionType.Ingame;
                 break;
             case ScreenUserActionType.Lobbying:
-                final      = $"Partying to {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
+                final      = $"Partying to {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}]";
                 actionType = UserActionType.Idle;
                 break;
             case ScreenUserActionType.Multiplaying:
-                final      = $"Multiplaying {CurrentSong.Value.Artist} - {CurrentSong.Value.Name} [{CurrentSong.Value.Difficulty}]";
+                final      = $"Multiplaying {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}]";
                 actionType = UserActionType.Ingame;
                 break;
         }
@@ -703,7 +728,7 @@ public class pTypingGame : FurballGame {
         this.SetBackgroundFadeFromScreen();
 
         if (actualScreen.ForceSpeedReset)
-            MusicTrack.SetSpeed(1f);
+            MusicTrack?.SetSpeed(1f);
 
         SetSongLoopState(actualScreen.LoopState);
 
@@ -725,6 +750,9 @@ public class pTypingGame : FurballGame {
     }
 
     private static void SetSongLoopState(MusicLoopState loopState) {
+        if (MusicTrack == null)
+            return;
+        
         _CurrentLoopState = loopState;
         switch (loopState) {
             case MusicLoopState.Loop:

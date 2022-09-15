@@ -12,5 +12,12 @@ public class Break : RealmObject {
     [Ignored, Description("The length of the break")]
     public double Length => this.End - this.Start;
 
-    public Break Clone() => (Break)this.MemberwiseClone();
+    public Break Clone() {
+        Break @break = new() {
+            Start = this.Start,
+            End   = this.End
+        };
+
+        return @break;
+    }
 }

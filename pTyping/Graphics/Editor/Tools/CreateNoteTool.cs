@@ -4,7 +4,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Vixie.Backends.Shared;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
@@ -72,10 +72,10 @@ public class CreateNoteTool : EditorTool {
         if (!this.EditorInstance.InPlayfield(args.position)) return;
         if (args.mouseButton != MouseButton.Left) return;
 
-        Note noteToAdd = new() {
+        HitObject noteToAdd = new() {
             Time  = this.EditorInstance.EditorState.MouseTime,
             Text  = this._defaultNoteText.AsTextBox().Text.Trim(),
-            Color = this._defaultNoteColor.AsColorPicker().Color
+            Color = this._defaultNoteColor.AsColorPicker().Color.Value
         };
 
         this.EditorInstance.CreateNote(noteToAdd, true);

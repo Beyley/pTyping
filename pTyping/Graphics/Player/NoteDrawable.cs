@@ -10,7 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps.HitObjects;
 
 namespace pTyping.Graphics.Player;
 
@@ -31,8 +31,8 @@ public class NoteDrawable : CompositeDrawable {
     public TextDrawable     ToTypeTextDrawable;
     public TexturedDrawable NoteTexture;
 
-    public Note Note;
-    public bool Added = false;
+    public HitObject Note;
+    public bool      Added = false;
 
     public Texture Texture;
 
@@ -82,7 +82,7 @@ public class NoteDrawable : CompositeDrawable {
         this.Tweens.Add(
         new VectorTween(
         TweenType.Movement,
-        new Vector2(noteStartPos.X, noteStartPos.Y + this.Note.YOffset),
+        new Vector2(noteStartPos.X, noteStartPos.Y),
         recepticlePos,
         (int)(this.Note.Time - tweenArgs.ApproachTime),
         (int)this.Note.Time
@@ -124,7 +124,7 @@ public class NoteDrawable : CompositeDrawable {
     /// <returns>Whether the note has been fully completed</returns>
     public bool TypeCharacter(string hiragana, string romaji, double timeDifference, double rawTimeDifference, Player player) {
         //If this is the first time a character is being typed on this note, 
-        if (this.Note.TypedRomaji.Length == 0 && this.Note.Typed.Length == 0) {
+        if (this.Note.TypedRomaji.Length == 0 && this.Note.TypedText.Length == 0) {
             //Find the correct hit result for the users time
             if (timeDifference < player.TIMING_EXCELLENT)
                 this.Note.HitResult = HitResult.Excellent;
@@ -154,14 +154,14 @@ public class NoteDrawable : CompositeDrawable {
         //Have we finished checking th romaji sequence? if so,
         if (string.Equals(this.Note.TypedRomaji, romaji)) {
             //Add the hiragana to the typed section
-            this.Note.Typed += hiragana;
+            this.Note.TypedText += hiragana;
             //Give the play the appropriate 
             player.Score.AddScore(Player.SCORE_PER_CHARACTER);
             //Clear the typed romaji
             this.Note.TypedRomaji = string.Empty;
 
             //Are we finished with the whole note?
-            if (string.Equals(this.Note.Typed, this.Note.Text)) {
+            if (string.Equals(this.Note.TypedText, this.Note.Text)) {
                 this.Hit();
                 return true;
             }
@@ -205,7 +205,7 @@ public class NoteDrawable : CompositeDrawable {
         )
         );
         // this.NoteTexture.Tweens.Add(new VectorTween(TweenType.Scale, this.NoteTexture.Scale, this.NoteTexture.Scale + new Vector2((float)(FurballGame.Random.NextDouble() / 4d + 1d)), (int)(FurballGame.Time + timeToDie / 2d), FurballGame.Time + timeToDie));
-        this.Note.Typed = this.Note.Text;
+        this.Note.TypedText = this.Note.Text;
 
         FurballGame.GameTimeScheduler.ScheduleMethod(
         delegate {
@@ -223,7 +223,7 @@ public class NoteDrawable : CompositeDrawable {
         },
         pTypingGame.MusicTrackTimeSource.GetCurrentTime() + 1000
         );
-        this.Note.Typed     = this.Note.Text;
+        this.Note.TypedText = this.Note.Text;
         this.Note.HitResult = HitResult.Poor;
     }
 

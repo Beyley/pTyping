@@ -22,11 +22,20 @@ public class AsciiUnicodeTuple : RealmObject, IEquatable<AsciiUnicodeTuple> {
 
     public AsciiUnicodeTuple() => this.Unicode = "";
 
+    public static bool ChooseUnicode = true;
+
+    public override string ToString() => ChooseUnicode ? this.Unicode : this.Ascii ?? string.Empty; 
+
     public bool Equals(AsciiUnicodeTuple? other) {
         if (ReferenceEquals(null, other))
             return false;
         if (ReferenceEquals(this, other))
             return true;
         return this.Ascii == other.Ascii && this.Unicode == other.Unicode;
+    }
+    public AsciiUnicodeTuple Clone() {
+        AsciiUnicodeTuple tuple = new(this.Ascii, this.Unicode);
+
+        return tuple;
     }
 }

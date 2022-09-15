@@ -11,6 +11,7 @@ using pTyping.Graphics.Player.Mods;
 
 namespace pTyping.Scores;
 
+//TODO: convert this to proper database
 public class ScoreManager {
     private List<PlayerScore> _scores = new();
 
@@ -18,7 +19,7 @@ public class ScoreManager {
     public readonly string ScoreDatabaseFilePath = Path.Combine(SCORES_FOLDER, "database.json");
 
     public bool WantCreateFreshDatabase = false;
-
+    
     [Pure, NotNull]
     public List<PlayerScore> GetScores(string mapHash) => this._scores.Where(x => x.MapHash == mapHash).ToList();
 

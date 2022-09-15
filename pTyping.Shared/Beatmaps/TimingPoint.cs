@@ -19,4 +19,13 @@ public class TimingPoint : RealmObject {
         this.Tempo         = tempo;
         this.TimeSignature = 4;
     }
+    public TimingPoint Clone() {
+        TimingPoint point = new() {
+            Tempo         = this.Tempo,
+            Time          = this.Time,
+            TimeSignature = this.TimeSignature
+        };
+
+        return point;
+    }
 }

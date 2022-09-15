@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using Eto.Forms;
@@ -25,8 +24,9 @@ using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
-using pTyping.Songs;
-using pTyping.Songs.Events;
+using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Beatmaps.HitObjects;
+using pTyping.Shared.Events;
 using Silk.NET.Input;
 using sowelipisona;
 using Drawable=Furball.Engine.Engine.Graphics.Drawables.Drawable;
@@ -59,7 +59,9 @@ public class EditorScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        this.EditorState = new EditorState(SongManager.LoadFullSong(pTypingGame.CurrentSong.Value));
+        // throw new NotImplementedException();
+
+        this.EditorState = new EditorState(null);
 
         pTypingGame.MusicTrack.Stop();
 
@@ -71,12 +73,14 @@ public class EditorScreen : pScreen {
             Position   = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
         }
         );
-        
-        FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.QualifiedFolderPath).GetFiles("note.png");
 
-        this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
-                               : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,                             ContentSource.External);
+        // FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.QualifiedFolderPath).GetFiles("note.png");
 
+        // this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
+        // : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,                             ContentSource.External);
+
+        this.NoteTexture = ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User); 
+                               
         this._recepticle = new TexturedDrawable(this.NoteTexture, Player.Player.RECEPTICLE_POS) {
             Scale       = new Vector2(0.55f),
             OriginType  = OriginType.Center,
@@ -88,7 +92,7 @@ public class EditorScreen : pScreen {
 
         this.EditorDrawable.Drawables.Add(this._recepticle);
 
-        foreach (Note note in this.EditorState.Song.Notes)
+        foreach (HitObject note in this.EditorState.Song.HitObjects)
             this.CreateNote(note);
         foreach (Event @event in this.EditorState.Song.Events)
             this.CreateEvent(@event);
@@ -113,10 +117,10 @@ public class EditorScreen : pScreen {
 
         #region Video background
 
-        if (pTypingConfig.Instance.VideoBackgrounds && this.EditorState.Song.VideoPath != null)
+        if (pTypingConfig.Instance.VideoBackgrounds && this.EditorState.Song.FileCollection.BackgroundVideo != null)
             try {
                 this._video = new VideoDrawable(
-                this.EditorState.Song.QualifiedVideoPath,
+                pTypingGame.FileDatabase.GetFile(this.EditorState.Song.FileCollection.BackgroundVideo.Hash),
                 1f,
                 pTypingGame.MusicTrackTimeSource,
                 new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
@@ -244,18 +248,18 @@ public class EditorScreen : pScreen {
         };
 
         this._leftButton.OnClick += delegate {
-            if (this.EditorState.Song.Notes.Count > 0) {
-                pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.First().Time;
-                this._video?.Seek(this.EditorState.Song.Notes.First().Time);
+            if (this.EditorState.Song.HitObjects.Count > 0) {
+                pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.HitObjects.First().Time;
+                this._video?.Seek(this.EditorState.Song.HitObjects.First().Time);
                 foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
                     note.EditorHitSoundQueued = true;
             }
         };
 
         this._rightButton.OnClick += delegate {
-            if (this.EditorState.Song.Notes.Count > 0) {
-                pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.Notes.Last().Time;
-                this._video?.Seek(this.EditorState.Song.Notes.Last().Time);
+            if (this.EditorState.Song.HitObjects.Count > 0) {
+                pTypingGame.MusicTrack.CurrentPosition = this.EditorState.Song.HitObjects.Last().Time;
+                this._video?.Seek(this.EditorState.Song.HitObjects.Last().Time);
 
                 foreach (NoteDrawable note in this.EditorState.Notes.Where(note => note.Note.Time > this.EditorState.CurrentTime))
                     note.EditorHitSoundQueued = true;
@@ -422,7 +426,8 @@ public class EditorScreen : pScreen {
     }
 
     public void CreateEvent(Event @event, bool isNew = false) {
-        Drawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time), true, true));
+        // Drawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time), true, true));
+        Drawable eventDrawable = null;
 
         if (eventDrawable == null) return;
 
@@ -436,9 +441,9 @@ public class EditorScreen : pScreen {
         this.CurrentTool?.OnEventCreate(eventDrawable, isNew);
     }
 
-    public void CreateNote(Note note, bool isNew = false) {
+    public void CreateNote(HitObject note, bool isNew = false) {
         NoteDrawable noteDrawable = new(
-        new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y + note.YOffset),
+        new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y),
         this.NoteTexture,
         pTypingGame.JapaneseFont,
         50
@@ -461,7 +466,7 @@ public class EditorScreen : pScreen {
         this.EditorDrawable.Drawables.Add(noteDrawable);
         this.EditorState.Notes.Add(noteDrawable);
         if (isNew) {
-            this.EditorState.Song.Notes.Add(note);
+            this.EditorState.Song.HitObjects.Add(note);
             this.SaveNeeded = true;
         }
 
@@ -494,15 +499,16 @@ public class EditorScreen : pScreen {
 
         double timeAtCursor = relativeMousePosition / speed + currentTime;
 
-        TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(timeAtCursor);
+        //TODO
+        // TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(timeAtCursor);
 
-        double noteLength = this.EditorState.Song.DividedNoteLength(timeAtCursor);
+        // double noteLength = this.EditorState.Song.DividedNoteLength(timeAtCursor);
 
-        timeAtCursor += noteLength / 2d;
+        // timeAtCursor += noteLength / 2d;
 
-        double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
+        // double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
 
-        this.EditorState.MouseTime = roundedTime;
+        // this.EditorState.MouseTime = roundedTime;
 
         this.CurrentTool?.OnMouseMove(e.Position);
     }
@@ -539,17 +545,19 @@ public class EditorScreen : pScreen {
     public void TimelineMove(bool right) {
         double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
-        double noteLength   = this.EditorState.Song.DividedNoteLength(currentTime);
-        double timeToSeekTo = Math.Round((currentTime - this.EditorState.Song.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
+        //TODO
 
-        timeToSeekTo += this.EditorState.Song.CurrentTimingPoint(currentTime).Time;
+        // double noteLength   = this.EditorState.Song.DividedNoteLength(currentTime);
+        // double timeToSeekTo = Math.Round((currentTime - this.EditorState.Song.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
 
-        if (right)
-            timeToSeekTo += noteLength;
-        else
-            timeToSeekTo -= noteLength;
+        // timeToSeekTo += this.EditorState.Song.CurrentTimingPoint(currentTime).Time;
 
-        pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
+        // if (right)
+        // timeToSeekTo += noteLength;
+        // else
+        // timeToSeekTo -= noteLength;
+
+        // pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
         this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
 
         if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
@@ -561,7 +569,7 @@ public class EditorScreen : pScreen {
         foreach (Drawable @object in this.EditorState.SelectedObjects)
             if (@object is NoteDrawable note) {
                 this.EditorDrawable.Drawables.Remove(note);
-                this.EditorState.Song.Notes.Remove(note.Note);
+                this.EditorState.Song.HitObjects.Remove(note.Note);
                 this.EditorState.Notes.Remove(note);
 
                 this.CurrentTool?.OnNoteDelete(note);
@@ -642,15 +650,16 @@ public class EditorScreen : pScreen {
                                     ScreenManager.ChangeScreen(new SongSelectionScreen(true));
                                     break;
                                 case DialogResult.Yes:
-                                    SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-                                    pTypingGame.CurrentSong.Value = this.EditorState.Song;
-                                    SongManager.UpdateSongs();
+                                    throw new NotImplementedException();
+                                // SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                                // pTypingGame.CurrentSong.Value = this.EditorState.Song;
+                                // SongManager.UpdateSongs();
 
-                                    pTypingGame.MenuClickSound.PlayNew();
-
-                                    // Exit the editor
-                                    ScreenManager.ChangeScreen(new SongSelectionScreen(true));
-                                    break;
+                                // pTypingGame.MenuClickSound.PlayNew();
+                                //
+                                // // Exit the editor
+                                // ScreenManager.ChangeScreen(new SongSelectionScreen(true));
+                                // break;
                             }
                         }
                         );
@@ -666,22 +675,24 @@ public class EditorScreen : pScreen {
                 break;
             }
             case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
-                List<LyricEvent> lyrics = this.EditorState.Song.Events.Where(x => x is LyricEvent).Cast<LyricEvent>().ToList();
-                lyrics.Sort((x, y) => (int)(x.Time - y.Time));
-                for (int i = 1; i < lyrics.Count; i++) {
-                    LyricEvent editorStateEvent     = lyrics[i];
-                    LyricEvent lastEditorStateEvent = lyrics[i - 1];
+                throw new NotImplementedException();
 
-                    lastEditorStateEvent.EndTime = editorStateEvent.Time;
-                }
-
-                // Save the song if ctrl+s is pressed
-                SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-                // pTypingGame.CurrentSong.Value = this.EditorState.Song;
-                SongManager.UpdateSongs();
-
-                this.SaveNeeded = false;
-                break;
+                // List<Event> lyrics = this.EditorState.Song.Events.Where(x => x is Event).Cast<Event>().ToList();
+                // lyrics.Sort((x, y) => (int)(x.Time - y.Time));
+                // for (int i = 1; i < lyrics.Count; i++) {
+                //     Event editorStateEvent     = lyrics[i];
+                //     Event lastEditorStateEvent = lyrics[i - 1];
+                //
+                //     lastEditorStateEvent.EndTime = editorStateEvent.Time;
+                // }
+                //
+                // // Save the song if ctrl+s is pressed
+                // // SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
+                // // pTypingGame.CurrentSong.Value = this.EditorState.Song;
+                // // SongManager.UpdateSongs();
+                //
+                // this.SaveNeeded = false;
+                // break;
             }
             case Key.C when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
                 if (this.EditorState.SelectedObjects.Count == 0) return;
@@ -696,10 +707,10 @@ public class EditorScreen : pScreen {
 
                 double startTime = sortedNotes.First().Note.Time;
 
-                List<Note> notes = new();
+                List<HitObject> notes = new();
 
                 foreach (NoteDrawable drawable in sortedNotes) {
-                    Note note = drawable.Note.Copy();
+                    HitObject note = drawable.Note.Copy();
                     note.Time = drawable.Note.Time - startTime;
 
                     notes.Add(note);
@@ -711,9 +722,9 @@ public class EditorScreen : pScreen {
             }
             case Key.V when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
                 try {
-                    List<Note> notes = JsonConvert.DeserializeObject<List<Note>>(FurballGame.InputManager.Clipboard);
+                    List<HitObject> notes = JsonConvert.DeserializeObject<List<HitObject>>(FurballGame.InputManager.Clipboard);
 
-                    foreach (Note note in notes) {
+                    foreach (HitObject note in notes) {
                         note.Time += this.EditorState.CurrentTime;
 
                         this.CreateNote(note, true);
@@ -744,8 +755,7 @@ public class EditorScreen : pScreen {
                 Scale         = new Vector2(3, this._progressBar.BarSize.Y + 10),
                 OriginType    = OriginType.BottomCenter,
                 ColorOverride = new Color(50, 200, 50, 100),
-                ToolTip = $@"BPM:{60000d / timingPoint.Tempo:#.##}
-ApproachMult:{timingPoint.ApproachMultiplier}"
+                ToolTip       = $@"BPM:{60000d / timingPoint.Tempo:#.##}"
             };
 
             this._timingPoints.Add(drawable);
@@ -753,7 +763,8 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
         }
     }
 
-    public double CurrentApproachTime(double time) => ConVars.BASE_APPROACH_TIME / this.EditorState.Song.CurrentTimingPoint(time).ApproachMultiplier;
+    // public double CurrentApproachTime(double time) => ConVars.BASE_APPROACH_TIME / this.EditorState.Song.CurrentTimingPoint(time).ApproachMultiplier;
+    public double CurrentApproachTime(double time) => ConVars.BASE_APPROACH_TIME;//TODO: support per note approach times
 
     private double           _lastTime = 0;
     private DrawableDropdown _speedDropdown;
@@ -781,10 +792,10 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
             }
             foreach (Drawable managedDrawable in this.EditorState.Events) {
                 double time = managedDrawable switch {
-                    TypingCutoffEventDrawable cutoff       => cutoff.Event.Time,
-                    BeatLineBarEventDrawable beatLineBar   => beatLineBar.Event.Time,
-                    BeatLineBeatEventDrawable beatLineBeat => beatLineBeat.Event.Time,
-                    LyricEventDrawable lyric               => lyric.Event.Time,
+                    TypingCutoffEventDrawable cutoff       => cutoff.Event.Start,
+                    BeatLineBarEventDrawable beatLineBar   => beatLineBar.Event.Start,
+                    BeatLineBeatEventDrawable beatLineBeat => beatLineBeat.Event.Start,
+                    LyricEventDrawable lyric               => lyric.Event.Start,
                     _                                      => 0
                 };
 
@@ -826,9 +837,9 @@ ApproachMult:{timingPoint.ApproachMultiplier}"
 
     public override string Name  => "Editor";
     public override string State => "Editing a map!";
-    public override string Details => pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Creator
-                                          ? $"Editing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}"
-                                          : $"Modding {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Creator}";
+    public override string Details => pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Info.Mapper
+                                          ? $"Editing {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}"
+                                          : $"Modding {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}";
 
     public override bool           ForceSpeedReset      => true;
     public override float          BackgroundFadeAmount => 0.3f;

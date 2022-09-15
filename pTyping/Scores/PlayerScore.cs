@@ -6,13 +6,12 @@ using Newtonsoft.Json;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
 using pTyping.Online.Tataku;
-using pTyping.Songs;
 
 namespace pTyping.Scores;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class PlayerScore {
-    public Song Song;
+    public string SongId;
 
     private const ushort TATAKU_SCORE_VERSION = 5;
     [JsonProperty]
@@ -91,7 +90,7 @@ public class PlayerScore {
         MemoryStream stream = new(arr);
         BinaryReader reader = new(stream);
 
-        PlayerScore replay = new(pTypingGame.CurrentSong.Value?.MapHash ?? "", "UTyping");
+        PlayerScore replay = new(pTypingGame.CurrentSong.Value?.Id ?? "", "UTyping");
 
         List<ReplayFrame> frames = new();
 

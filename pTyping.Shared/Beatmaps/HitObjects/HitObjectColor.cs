@@ -20,4 +20,14 @@ public class HitObjectColor : RealmObject {
 
     public static implicit operator Color(HitObjectColor color) => new(color.R, color.G, color.B, color.A);
     public static implicit operator HitObjectColor(Color color) => new(color.Rf, color.Gf, color.Bf, color.Af);
+    public HitObjectColor Clone() {
+        HitObjectColor color = new() {
+            R = this.R,
+            G = this.G,
+            B = this.B,
+            A = this.A
+        };
+
+        return color;
+    }
 }

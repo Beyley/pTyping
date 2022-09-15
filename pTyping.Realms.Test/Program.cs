@@ -20,9 +20,7 @@ public static class Program {
 
         foreach (Beatmap beatmap in queryable)
             if (beatmap.FileCollection.Audio != null) {
-                Task<byte[]> task = fileDatabase.GetFile(beatmap.FileCollection.Audio.Hash);
-                task.Wait();
-                byte[] arr = task.Result;
+                byte[] arr = fileDatabase.GetFile(beatmap.FileCollection.Audio.Hash);
 
                 Console.WriteLine(arr.Length);
             }

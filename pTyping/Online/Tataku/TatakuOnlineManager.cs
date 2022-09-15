@@ -19,7 +19,7 @@ using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Online.Tataku.Packets;
 using pTyping.Scores;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 using SixLabors.ImageSharp;
 using Websocket.Client;
 using Websocket.Client.Models;
@@ -140,7 +140,7 @@ public class TatakuOnlineManager : OnlineManager {
             case PlayerScreen: {
                 SpectatorFramePlay frame = new() {
                     Mode        = PlayMode.pTyping,
-                    BeatmapHash = pTypingGame.CurrentSong.Value.MapHash,
+                    BeatmapHash = pTypingGame.CurrentSong.Value.Id,
                     Modinfo = new SpectatorModInfo {
                         Autoplay = false,
                         Speed    = 1f
@@ -276,7 +276,7 @@ public class TatakuOnlineManager : OnlineManager {
                     using MemoryStream s = new();
                     using TatakuWriter w = new(s);
 
-                    packet.WriteDataToStream(w);
+                    packet!.WriteDataToStream(w);
                     this._client.Send(s.ToArray());
                 }
 
@@ -570,16 +570,23 @@ public class TatakuOnlineManager : OnlineManager {
                         if (FurballGame.Instance.RunningScreen is not SongSelectionScreen)
                             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 
-                        pTypingGame.CurrentSong.Value = SongManager.Songs.FirstOrDefault(x => x.MapHash == pFrame.BeatmapHash);
-                        // pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong);
+                        List<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>().ToList();
 
-                        if (pTypingGame.CurrentSong.Value == default) {
+                        IEnumerable<Beatmap> selectMany = sets.SelectMany(beatmapSet => beatmapSet.Beatmaps);
+
+                        Beatmap map = selectMany.FirstOrDefault(x => x.Id == pFrame.BeatmapHash);
+
+                        if (map == null) {
                             pTypingGame.NotificationManager.CreateNotification(
                             NotificationManager.NotificationImportance.Warning,
                             $"You do not have that map!\nHash: {pFrame.BeatmapHash}"
                             );
                             return;
                         }
+
+
+                        pTypingGame.CurrentSong.Value = map;
+                        // pTypingGame.LoadBackgroundFromSong(pTypingGame.CurrentSong);
 
                         ScreenManager.ChangeScreen(new PlayerScreen(this.Host));
 
@@ -600,7 +607,7 @@ public class TatakuOnlineManager : OnlineManager {
                 case SpectatorFrameDataType.Pause: {
                     if (this.Host == this.Player) break;
 
-                    lock (this.GameScene.SpectatorQueue) {
+                    lock (this.GameScene!.SpectatorQueue) {
                         this.GameScene.SpectatorQueue.Add(frame);
                     }
 
@@ -1024,7 +1031,7 @@ public class TatakuReader : BinaryReader {
 
     public DateTimeOffset ReadUnixEpoch() => DateTimeOffset.FromUnixTimeSeconds((long)this.ReadUInt64());
 
-    public string ReadOptionString() => this.ReadByte() != 0 ? this.ReadString() : null;
+    public string ReadOptionString() => (this.ReadByte() != 0 ? this.ReadString() : null)!;
 }
 
 public class TatakuWriter : BinaryWriter {

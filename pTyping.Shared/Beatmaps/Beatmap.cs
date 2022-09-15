@@ -49,5 +49,32 @@ public class Beatmap : RealmObject {
     [Description("The total duration of all the breaks in this Beatmap."), JsonIgnore]
     public double TotalBreakDuration => this.Breaks.Sum(b => b.Length);
 
-    public Beatmap Clone() => (Beatmap)this.MemberwiseClone();
+    [Ignored, Description("The BPM of the first timing point of the song")]
+    public double BeatsPerMinute => 60000 / this.TimingPoints[0].Tempo;
+
+    public Beatmap Clone() {
+        Beatmap map = new();
+
+        foreach (Break @break in this.Breaks)
+            map.Breaks.Add(@break.Clone());
+        map.Difficulty.Strictness = this.Difficulty.Strictness;
+        foreach (Event @event in this.Events)
+            map.Events.Add(@event.Clone());
+        map.Id             = this.Id;
+        map.Info           = this.Info.Clone();
+        map.Metadata       = this.Metadata.Clone();
+        map.FileCollection = this.FileCollection.Clone();
+        foreach (HitObject hitObject in this.HitObjects)
+            map.HitObjects.Add(hitObject.Clone());
+        foreach (TimingPoint timingPoint in this.TimingPoints)
+            map.TimingPoints.Add(timingPoint.Clone());
+
+        return map;
+    }
+    public bool AllNotesHit() {
+        return this.HitObjects.All(x => x.HitResult != HitResult.NotHit);
+    }
+    public TimingPoint CurrentTimingPoint(double time) {
+        return this.TimingPoints.First(x => x.Time <= time);
+    }
 }

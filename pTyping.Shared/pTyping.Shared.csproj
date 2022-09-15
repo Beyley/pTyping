@@ -15,4 +15,10 @@
         <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="TagLibSharp">
+            <HintPath>..\..\..\..\..\.nuget\packages\taglibsharp\2.3.0\lib\netstandard2.0\TagLibSharp.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>

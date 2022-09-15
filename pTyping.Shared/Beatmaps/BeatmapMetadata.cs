@@ -25,5 +25,14 @@ public class BeatmapMetadata : RealmObject {
     [Description("The tags given for the song by the beatmap creator.")]
     public IList<string> Tags { get; }
 
-    public BeatmapMetadata Clone() => (BeatmapMetadata)this.MemberwiseClone();
+    public BeatmapMetadata Clone() {
+        BeatmapMetadata metadata = new() {
+            Languages = this.Languages
+        };
+
+        foreach (string tag in this.Tags)
+            metadata.Tags.Add(tag);
+
+        return metadata;
+    }
 }

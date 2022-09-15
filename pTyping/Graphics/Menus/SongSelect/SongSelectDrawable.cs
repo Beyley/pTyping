@@ -4,8 +4,7 @@ using System.Numerics;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Vixie;
-using Furball.Vixie.Backends.Shared;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -16,21 +15,23 @@ public class SongSelectDrawable : CompositeDrawable {
 
     public IReadOnlyList<SongButtonDrawable> ButtonDrawables => this._buttonDrawables.AsReadOnly();
 
-    public SongSelectDrawable(Vector2 pos, IEnumerable<Song> songList) {
+    public SongSelectDrawable(Vector2 pos, List<BeatmapSet> songList) {
         this.Position = pos;
 
         Texture backgroundTexture = ContentManager.LoadTextureFromFileCached("song-button-background.png", ContentSource.User);
 
         float y = 0;
-        foreach (Song song in songList) {
-            SongButtonDrawable drawable = new(new Vector2(0, y), song, backgroundTexture);
+        foreach (BeatmapSet set in songList) {
+            foreach (Beatmap map in set.Beatmaps) {
+                SongButtonDrawable drawable = new(new Vector2(0, y), map, backgroundTexture);
 
-            drawable.Tags.Add(y.ToString(CultureInfo.CurrentCulture));
+                drawable.Tags.Add(y.ToString(CultureInfo.CurrentCulture));
 
-            this.Drawables.Add(drawable);
-            this._buttonDrawables.Add(drawable);
+                this.Drawables.Add(drawable);
+                this._buttonDrawables.Add(drawable);
 
-            y += drawable.Size.Y + 7.5f;
+                y += drawable.Size.Y + 7.5f;
+            }
         }
     }
 
@@ -45,14 +46,14 @@ public class SongSelectDrawable : CompositeDrawable {
     }
 
     public class SongButtonDrawable : CompositeDrawable {
-        public Song Song;
+        public Beatmap Song;
 
         private readonly TexturedDrawable _backgroundDrawable;
         private readonly TextDrawable     _titleDrawable;
 
         public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
-        public SongButtonDrawable(Vector2 pos, Song song, Texture backgroundTexture) {
+        public SongButtonDrawable(Vector2 pos, Beatmap song, Texture backgroundTexture) {
             this.Song     = song;
             this.Position = pos;
 
@@ -63,7 +64,12 @@ public class SongSelectDrawable : CompositeDrawable {
                 // ColorOverride = song.Type == SongType.pTyping ? Color.Blue : Color.Green
             };
 
-            this._titleDrawable = new TextDrawable(new Vector2(5), pTypingGame.JapaneseFontStroked, $"{song.Artist} - {song.Name} [{song.Difficulty}]", 30);
+            this._titleDrawable = new TextDrawable(
+            new Vector2(5),
+            pTypingGame.JapaneseFontStroked,
+            $"{song.Info.Artist} - {song.Info.Title} [{song.Info.DifficultyName}]",
+            30
+            );
 
             this.Drawables.Add(this._titleDrawable);
             this.Drawables.Add(this._backgroundDrawable);

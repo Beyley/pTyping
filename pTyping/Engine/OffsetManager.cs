@@ -1,7 +1,7 @@
 using System;
 using Furball.Engine.Engine.Config;
 using Furball.Volpe.Evaluation;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 
 namespace pTyping.Engine;
 
@@ -20,16 +20,16 @@ public static class OffsetManager {
         OffsetConfig.Instance.Save();
     }
 
-    public static double GetOffset(Song song) {
-        if (OffsetConfig.Instance.Values.TryGetValue($"__{song.MapHash}", out Value offset))
+    public static double GetOffset(Beatmap song) {
+        if (OffsetConfig.Instance.Values.TryGetValue($"__{song.Id}", out Value offset))
             return offset.ToNumber().Value;
 
         return 0;
     }
 
-    public static void SetOffset(Song song, double offset) {
+    public static void SetOffset(Beatmap song, double offset) {
         offset = Math.Clamp(offset, -200, 200);
 
-        OffsetConfig.Instance.Values[$"__{song.MapHash}"] = new Value.Number(offset);
+        OffsetConfig.Instance.Values[$"__{song.Id}"] = new Value.Number(offset);//TODO: move offsets to a database
     }
 }

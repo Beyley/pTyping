@@ -5,7 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Player;
-using pTyping.Songs;
+using pTyping.Shared.Events;
 
 namespace pTyping.Graphics.Drawables.Events;
 
@@ -37,15 +37,21 @@ public class TypingCutoffEventDrawable : TexturedDrawable {
         TweenType.Movement,
         new Vector2(noteStartPos.X, noteStartPos.Y),
         recepticlePos,
-        (int)(this.Event.Time - tweenArgs.ApproachTime),
-        (int)this.Event.Time
+        (int)(this.Event.Start - tweenArgs.ApproachTime),
+        (int)this.Event.Start
         ) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );
 
         this.Tweens.Add(
-        new VectorTween(TweenType.Movement, recepticlePos, new Vector2(noteEndPos.X, recepticlePos.Y), (int)this.Event.Time, (int)(this.Event.Time + afterTravelTime)) {
+        new VectorTween(
+        TweenType.Movement,
+        recepticlePos,
+        new Vector2(noteEndPos.X, recepticlePos.Y),
+        (int)this.Event.Start,
+        (int)(this.Event.Start + afterTravelTime)
+        ) {
             KeepAlive = tweenArgs.TweenKeepAlive
         }
         );

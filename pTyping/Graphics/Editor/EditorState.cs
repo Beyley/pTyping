@@ -4,7 +4,7 @@ using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using JetBrains.Annotations;
 using pTyping.Graphics.Player;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 using pTyping.UiGenerator;
 
 namespace pTyping.Graphics.Editor;
@@ -19,9 +19,9 @@ public class EditorState {
     public double MouseTime;
 
     [NotNull]
-    public readonly Song Song;
+    public readonly Beatmap Song;
 
-    public EditorState(Song song) => this.Song = song;
+    public EditorState(Beatmap song) => this.Song = song;
 
     public readonly UiContainer EditorToolUiContainer = new(OriginType.TopRight) {
         Position         = new Vector2(10, 10),

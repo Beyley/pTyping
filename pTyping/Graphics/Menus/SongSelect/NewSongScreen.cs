@@ -7,8 +7,6 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
-using pTyping.Engine;
-using pTyping.Songs;
 using File=TagLib.File;
 
 namespace pTyping.Graphics.Menus.SongSelect;
@@ -107,59 +105,61 @@ public class NewSongScreen : pScreen {
         if (title != null)
             this._songNameTextBox.Text = title;
 
-        Song song = new() {
-            Name       = this._songNameTextBox.Text,
-            Artist     = this._songArtistTextBox.Text,
-            Creator    = this._songCreatorTextBox.Text,
-            Difficulty = this._songDifficultyTextBox.Text,
-            AudioPath  = musicFileInfo.Name
-        };
+        throw new Exception();
+
+        // Beatmap song = new() {
+        //     Name       = this._songNameTextBox.Text,
+        //     Artist     = this._songArtistTextBox.Text,
+        //     Creator    = this._songCreatorTextBox.Text,
+        //     Difficulty = this._songDifficultyTextBox.Text,
+        //     AudioPath  = musicFileInfo.Name
+        // };
 
         //Add a default timing point so we dont crash
-        song.TimingPoints.Add(
-        new TimingPoint {
-            Tempo = 100,
-            Time  = 0
-        }
-        );
+        // song.TimingPoints.Add(
+        // new TimingPoint {
+        //     Tempo = 100,
+        //     Time  = 0
+        // }
+        // );
 
         // Get the new directory for the song
-        string newSongFolder = Path.Combine(
-        musicFileInfo.DirectoryName,
-        $"{song.Artist.Replace(" ", "")}-{song.Name.Replace(" ", "")}-by-{song.Creator.Replace(" ", "")}/"
-        );
-
-        if (Directory.Exists(newSongFolder)) {
-            pTypingGame.NotificationManager.CreateNotification(
-            NotificationManager.NotificationImportance.Error,
-            @"Creation of song failed!
-(song too similar to existing one)"
-            );
-
-            return;
-        }
-
-        // Create the directory
-        Directory.CreateDirectory(newSongFolder);
-
-        musicFileInfo.MoveTo(Path.Combine(newSongFolder, Path.GetFileName(musicFileInfo.FullName)));
-
-        // Open the filestream to the file
-        FileStream stream = System.IO.File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
-
-        song.FilePath   = Path.GetFileName(stream.Name);
-        song.FolderPath = newSongFolder;
-
-        // Close the filestream
-        stream.Close();
-        // Save the song to the file
-        SongManager.PTYPING_SONG_HANDLER.SaveSong(song);
-
-        //Play the menu click sound (since we clicked a button)
-        pTypingGame.MenuClickSound.PlayNew();
-        SongManager.UpdateSongs();
-        //Change the screen to the song select screen
-        ScreenManager.ChangeScreen(new SongSelectionScreen(true));
+        //         string newSongFolder = Path.Combine(
+        //         musicFileInfo.DirectoryName,
+        //         $"{song.Artist.Replace(" ", "")}-{song.Name.Replace(" ", "")}-by-{song.Creator.Replace(" ", "")}/"
+        //         );
+        //
+        //         if (Directory.Exists(newSongFolder)) {
+        //             pTypingGame.NotificationManager.CreateNotification(
+        //             NotificationManager.NotificationImportance.Error,
+        //             @"Creation of song failed!
+        // (song too similar to existing one)"
+        //             );
+        //
+        //             return;
+        //         }
+        //
+        //         // Create the directory
+        //         Directory.CreateDirectory(newSongFolder);
+        //
+        //         musicFileInfo.MoveTo(Path.Combine(newSongFolder, Path.GetFileName(musicFileInfo.FullName)));
+        //
+        //         // Open the filestream to the file
+        //         FileStream stream = System.IO.File.Create(Path.Combine(newSongFolder, $"{song.Difficulty} - {song.Creator}.pts"));
+        //
+        //         song.FilePath   = Path.GetFileName(stream.Name);
+        //         song.FolderPath = newSongFolder;
+        //
+        //         // Close the filestream
+        //         stream.Close();
+        //         // Save the song to the file
+        //         SongManager.PTYPING_SONG_HANDLER.SaveSong(song);
+        //
+        //         //Play the menu click sound (since we clicked a button)
+        //         pTypingGame.MenuClickSound.PlayNew();
+        //         SongManager.UpdateSongs();
+        //         //Change the screen to the song select screen
+        //         ScreenManager.ChangeScreen(new SongSelectionScreen(true));
     }
     public override string         Name                 => "New Song";
     public override string         State                => "Getting ready to map!";

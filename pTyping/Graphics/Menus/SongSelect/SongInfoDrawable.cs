@@ -1,7 +1,7 @@
 using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -30,8 +30,8 @@ public class SongInfoDrawable : CompositeDrawable {
         this._descriptionDrawable.Layout.Width = (int?)this.Size.X;
     }
 
-    public void SetSong(Song song) {
-        this._descriptionDrawable.Layout.Text = song.Description ?? "";
+    public void SetSong(Beatmap song) {
+        this._descriptionDrawable.Layout.Text = song.Info.Description ?? "";
 
         this._scrollableContainer.RecalculateMax();
     }

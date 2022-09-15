@@ -21,7 +21,7 @@ using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Menus.SongSelect;
@@ -45,7 +45,7 @@ public class SongSelectionScreen : pScreen {
     public override string Name  => "Song Select";
     public override string State => "Selecting a song!";
     public override string Details
-        => $"Deciding on playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
+        => $"Deciding on playing {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}]";
     public override bool           ForceSpeedReset      => false;
     public override float          BackgroundFadeAmount => 0.7f;
     public override MusicLoopState LoopState            => MusicLoopState.LoopFromPreviewPoint;
@@ -54,7 +54,9 @@ public class SongSelectionScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        if (!this._editor && SongManager.Songs.Count == 0) {
+        List<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>().ToList();
+
+        if (!this._editor && sets.Count == 0) {
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Warning, "You have no songs downloaded!");
             ScreenManager.ChangeScreen(new MenuScreen());
             return;
@@ -108,9 +110,7 @@ public class SongSelectionScreen : pScreen {
 
         #region Create new buttons for each song
 
-        IEnumerable<Song> songList = this._editor ? SongManager.Songs.Where(x => x.Type == SongType.pTyping) : SongManager.Songs;
-
-        this._songSelectDrawable = new SongSelectDrawable(new Vector2(10, 10), songList) {
+        this._songSelectDrawable = new SongSelectDrawable(new Vector2(10, 10), sets) {
             OriginType       = OriginType.TopRight,
             ScreenOriginType = OriginType.TopRight,
             Depth            = 0.8f
@@ -227,9 +227,9 @@ public class SongSelectionScreen : pScreen {
         });
         
         #endregion
-        
-        if (pTypingGame.CurrentSong.Value == null && SongManager.Songs.Count > 0)
-            pTypingGame.CurrentSong.Value = SongManager.Songs[0];
+
+        if (pTypingGame.CurrentSong.Value == null && sets.Count > 0)
+            pTypingGame.CurrentSong.Value = sets[0].Beatmaps.First();
         else if (pTypingGame.CurrentSong?.Value != null)
             this.UpdateSelectedSong(true);
 
@@ -300,9 +300,10 @@ public class SongSelectionScreen : pScreen {
         };
 
         if (keyEventArgs.Key == Key.F5) {
-            SongManager.UpdateSongs();
-            pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
-            ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor)); //TODO: implement dynamic song select
+            throw new NotImplementedException();
+            // SongManager.UpdateSongs();
+            // pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
+            // ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor)); //TODO: implement dynamic song select
         }
     }
 
@@ -313,7 +314,7 @@ public class SongSelectionScreen : pScreen {
         };
     }
 
-    private void OnSongChange(object sender, Song e) {
+    private void OnSongChange(object sender, Beatmap beatmap) {
         this.UpdateSelectedSong();
     }
 
@@ -323,8 +324,8 @@ public class SongSelectionScreen : pScreen {
     }
 
     public void UpdateSelectedSong(bool fromPrevScreen = false) {
-        this._songInfo.Text = $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
-Created by {pTypingGame.CurrentSong.Value.Creator}
+        this._songInfo.Text = $@"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}]
+Created by {pTypingGame.CurrentSong.Value.Info.Mapper}
 BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
 
         this._songInfoDrawable.SetSong(pTypingGame.CurrentSong);
@@ -352,7 +353,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
                 break;
             }
             case SongSelect.LeaderboardType.Global: {
-                Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.MapHash);
+                Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.Id);
 
                 task.Wait();
 
@@ -362,7 +363,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
                 break;
             }
             case SongSelect.LeaderboardType.Local: {
-                origScores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.MapHash);
+                origScores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.Id);
                 break;
             }
         }

@@ -15,4 +15,9 @@ public class PathHashTuple : RealmObject {
         this.Path = path;
         this.Hash = hash;
     }
+    public PathHashTuple Clone() {
+        PathHashTuple tuple = new(this.Path, this.Hash);
+
+        return tuple;
+    }
 }

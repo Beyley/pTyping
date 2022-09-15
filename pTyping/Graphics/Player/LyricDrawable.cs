@@ -2,21 +2,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using pTyping.Songs;
-using pTyping.Songs.Events;
+using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Events;
 
 namespace pTyping.Graphics.Player;
 
 public class LyricDrawable : CompositeDrawable {
-    private readonly List<LyricEvent> _lyrics = new();
+    private readonly List<Event> _lyrics = new();
 
     private readonly TextDrawable _currentLyricText;
     // private readonly TextDrawable _nextLyricText;
 
-    public LyricDrawable(Vector2 pos, Song song) {
+    public LyricDrawable(Vector2 pos, Beatmap song) {
         foreach (Event e in song.Events)
-            if (e is LyricEvent le)
-                this._lyrics.Add(le);
+            if (e.Type == EventType.Lyric)
+                this._lyrics.Add(e);
 
         this._lyrics.Reverse();
 
@@ -31,17 +31,17 @@ public class LyricDrawable : CompositeDrawable {
         // this.Drawables.Add(this._nextLyricText);
     }
 
-    private void SetLyric(LyricEvent lyric) {
-        this._currentLyricText.Text = $"{lyric.Lyric}";
+    private void SetLyric(Event lyric) {
+        this._currentLyricText.Text = $"{lyric.Text}";
     }
 
-    private static readonly LyricEvent _default = new() {
-        Lyric   = "",
-        Time    = 0,
-        EndTime = double.PositiveInfinity
+    private static readonly Event _default = new() {
+        Text  = "",
+        Start = 0,
+        End   = double.PositiveInfinity
     };
-    
+
     public void UpdateLyric(double time) {
-        this.SetLyric(this._lyrics.FirstOrDefault(lyric => lyric.Time < time && lyric.EndTime > time, _default));
+        this.SetLyric(this._lyrics.FirstOrDefault(lyric => lyric.Start < time && lyric.End > time, _default));
     }
 }

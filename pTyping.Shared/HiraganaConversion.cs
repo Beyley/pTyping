@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using System.IO;
+namespace pTyping.Shared;
 
-namespace pTyping.Graphics.Player;
-
-public class HiraganaConversion {
+public static class HiraganaConversion {
     public static readonly Dictionary<string, List<string>> CONVERSIONS = new();
 
     public static void LoadConversion() {

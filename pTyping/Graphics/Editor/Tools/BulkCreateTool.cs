@@ -6,7 +6,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
@@ -88,8 +88,8 @@ public class BulkCreateTool : EditorTool {
         this._previewNotes.ForEach(x => this.DrawableManager.Drawables.Remove(x));
         this._previewNotes.Clear();
 
-        List<Note> notes = this.GenerateNotes();
-        foreach (Note note in notes) {
+        List<HitObject> notes = this.GenerateNotes();
+        foreach (HitObject note in notes) {
             NoteDrawable drawable = new(Vector2.Zero, this.EditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
                 TimeSource = pTypingGame.MusicTrackTimeSource,
                 RawTextDrawable = {
@@ -118,7 +118,7 @@ public class BulkCreateTool : EditorTool {
         }
     }
 
-    private List<Note> GenerateNotes() {
+    private List<HitObject> GenerateNotes() {
         string[] splitText = this.LyricsToAdd.AsTextBox().Text.Split(this.Delimiter.AsTextBox().Text);
 
         double time = this.EditorInstance.EditorState.CurrentTime;
@@ -126,7 +126,7 @@ public class BulkCreateTool : EditorTool {
         try {
             double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
 
-            List<Note> notes = new();
+            List<HitObject> notes = new();
 
             foreach (string text in splitText) {
                 if (string.IsNullOrEmpty(text.Trim())) {
@@ -135,10 +135,10 @@ public class BulkCreateTool : EditorTool {
                     continue;
                 }
 
-                Note note = new() {
+                HitObject note = new() {
                     Text  = text.Trim(),
                     Time  = time,
-                    Color = this.Color.AsColorPicker().Color
+                    Color = this.Color.AsColorPicker().Color.Value
                 };
 
                 notes.Add(note);
@@ -149,14 +149,14 @@ public class BulkCreateTool : EditorTool {
             return notes;
         }
         catch {
-            return new List<Note>();
+            return new List<HitObject>();
         }
     }
 
     public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
         if (!this.EditorInstance.InPlayfield(args.position)) return;
 
-        List<Note> notes = this.GenerateNotes();
+        List<HitObject> notes = this.GenerateNotes();
         notes.ForEach(x => this.EditorInstance.CreateNote(x, true));
     }
 }

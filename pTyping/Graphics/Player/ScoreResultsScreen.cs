@@ -26,10 +26,15 @@ public class ScoreResultsScreen : pScreen {
         TextDrawable songTitleText = new(
         new Vector2(10, 10),
         pTypingGame.JapaneseFont,
-        $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]",
+        $"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]",
         40
         );
-        TextDrawable songCreatorText = new(new Vector2(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Creator}", 30);
+        TextDrawable songCreatorText = new(
+        new Vector2(10, songTitleText.Size.Y + 20),
+        pTypingGame.JapaneseFont,
+        $"Created by {pTypingGame.CurrentSong.Value.Info.Mapper}",
+        30
+        );
 
         this.Manager.Add(songTitleText);
         this.Manager.Add(songCreatorText);
@@ -110,7 +115,8 @@ public class ScoreResultsScreen : pScreen {
     public override string Name  => "Score Results";
     public override string State => "Looking at scores!";
 
-    public override string Details => $@"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]
+    public override string Details
+        => $@"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
 Played by {this.Score.Username}
 Score: {this.Score.Score:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
     public override bool           ForceSpeedReset      => false;

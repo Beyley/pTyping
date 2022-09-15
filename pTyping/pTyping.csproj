@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
+        <ProjectReference Include="..\pTyping.Shared\pTyping.Shared.csproj"/>
     </ItemGroup>
 
     <!--    <ItemGroup>-->

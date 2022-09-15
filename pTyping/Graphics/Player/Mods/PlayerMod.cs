@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Kettu;
 using pTyping.Engine;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps.HitObjects;
 using sowelipisona;
 
 // using Furball.Engine.Engine.Audio;
@@ -20,8 +20,7 @@ public abstract class PlayerMod {
         new EaseOutMod(),
         new HardRockMod(),
         new EasyMod(),
-        new RotateMod(),
-        new RandomHeightMod()
+        new RotateMod()
     };
 
     public static double ScoreMultiplier(List<PlayerMod> mods) => mods.Aggregate<PlayerMod, double>(1f, (current, mod) => current * mod.ScoreMultiplier());
@@ -46,9 +45,9 @@ public abstract class PlayerMod {
         Logger.Log($"Mod {this.Name()} ({this.ShorthandName()}) uninitialized!", LoggerLevelModInfo.Instance);
     }
 
-    public virtual void OnCharacterTyped(Note note, string character, bool correct) {}
+    public virtual void OnCharacterTyped(HitObject note, string character, bool correct) {}
 
-    public virtual void OnNoteHit(Note note) {}
+    public virtual void OnNoteHit(HitObject note) {}
 
     public virtual void Update(double time) {}
 

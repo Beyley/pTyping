@@ -23,4 +23,14 @@ public class Event : RealmObject {
     public double Length => this.End - this.Start;
 
     public Event Copy() => (Event)this.MemberwiseClone();
+    public Event Clone() {
+        Event @event = new() {
+            Start = this.Start,
+            End   = this.End,
+            Text  = this.Text,
+            Type  = this.Type
+        };
+
+        return @event;
+    }
 }

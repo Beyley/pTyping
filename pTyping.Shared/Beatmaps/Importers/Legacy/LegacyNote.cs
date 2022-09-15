@@ -3,16 +3,16 @@ using Newtonsoft.Json;
 
 namespace pTyping.Shared.Beatmaps.Importers.Legacy;
 
-public enum NoteType {
+internal enum LegacyNoteType {
     UTyping
 }
 
-public class LegacyNote {
+internal class LegacyNote {
     [JsonProperty]
     public Color Color = Color.Red;
 
     [JsonProperty]
-    public NoteType Type = NoteType.UTyping;
+    public LegacyNoteType Type = LegacyNoteType.UTyping;
 
     [JsonProperty]
     public string Text;

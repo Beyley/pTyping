@@ -20,7 +20,7 @@ using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
 using pTyping.Online.Tataku;
 using pTyping.Scores;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Player;
@@ -41,7 +41,7 @@ public class PlayerScreen : pScreen {
 
     private AccuracyBarDrawable _accuracyBar;
 
-    public Song Song;
+    public Beatmap Song;
 
     public Player Player;
 
@@ -72,30 +72,30 @@ public class PlayerScreen : pScreen {
     public override void Initialize() {
         base.Initialize();
 
-        this.Song = SongManager.LoadFullSong(pTypingGame.CurrentSong.Value);
+        this.Song = pTypingGame.CurrentSong.Value.Clone();
 
         #region song validation
 
-        if (this.Song.Notes.Count == 0) {
+        if (this.Song.HitObjects.Count == 0) {
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "That map has 0 notes!");
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             return;
         }
 
-        if (this.Song.Settings.Strictness <= 0) {
+        if (this.Song.Difficulty.Strictness <= 0) {
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "That map has an invalid Strictness!");
             ScreenManager.ChangeScreen(new SongSelectionScreen(false));
             return;
         }
 
-        if (this.Song.Settings.GlobalApproachMultiplier <= 0) {
-            pTypingGame.NotificationManager.CreateNotification(
-            NotificationManager.NotificationImportance.Error,
-            "That map has an invalid global approach multiplier!"
-            );
-            ScreenManager.ChangeScreen(new SongSelectionScreen(false));
-            return;
-        }
+        // if (this.Song.Settings.GlobalApproachMultiplier <= 0) {
+        //     pTypingGame.NotificationManager.CreateNotification(
+        //     NotificationManager.NotificationImportance.Error,
+        //     "That map has an invalid global approach multiplier!"
+        //     );
+        //     ScreenManager.ChangeScreen(new SongSelectionScreen(false));
+        //     return;
+        // }
 
         #endregion
 
@@ -240,10 +240,10 @@ public class PlayerScreen : pScreen {
 
         #region Background video
 
-        if (pTypingConfig.Instance.VideoBackgrounds && this.Song.VideoPath != null)
+        if (pTypingConfig.Instance.VideoBackgrounds && this.Song.FileCollection.BackgroundVideo != null)
             try {
                 this._video = new VideoDrawable(
-                this.Song.QualifiedVideoPath,
+                pTypingGame.FileDatabase.GetFile(this.Song.FileCollection.BackgroundVideo.Hash),
                 this.Player.Score.Speed,
                 pTypingGame.MusicTrackTimeSource,
                 new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
@@ -350,8 +350,8 @@ public class PlayerScreen : pScreen {
 
     private void SkipButtonClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
         pTypingGame.MenuClickSound.PlayNew();
-        pTypingGame.MusicTrack.CurrentPosition = this.Song.Notes.First().Time - 2999;
-        this._video?.Seek(this.Song.Notes.First().Time - 2999);
+        pTypingGame.MusicTrack.CurrentPosition = this.Song.HitObjects.First().Time - 2999;
+        this._video?.Seek(this.Song.HitObjects.First().Time - 2999);
     }
 
     public override void Dispose() {
@@ -530,7 +530,7 @@ public class PlayerScreen : pScreen {
 
         #region skip button visibility
 
-        if (this.Song.Notes.First().Time - currentTime > 3000)
+        if (this.Song.HitObjects.First().Time - currentTime > 3000)
             this._skipButton.Visible = true;
         else
             this._skipButton.Visible = false;
@@ -581,7 +581,7 @@ public class PlayerScreen : pScreen {
     public override string Name  => "Gameplay";
     public override string State => "Typing away!";
     public override string Details
-        => $@"Playing {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name} [{pTypingGame.CurrentSong.Value.Difficulty}]";
+        => $@"Playing {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}]";
     public override bool           ForceSpeedReset      => false;
     public override float          BackgroundFadeAmount => -1f;
     public override MusicLoopState LoopState            => MusicLoopState.None;

@@ -4,8 +4,7 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
-using pTyping.Songs;
-using pTyping.Songs.Events;
+using pTyping.Shared.Events;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
@@ -90,31 +89,31 @@ public class CreateEventTool : EditorTool {
         Event @event = null;
 
         switch (this.SelectedEvent.AsDropdown().SelectedItem.Value.Key) {
-            case BEAT_LINE_BAR: {
-                @event = new BeatLineBarEvent {
-                    Time = this.EditorInstance.EditorState.MouseTime
-                };
-
-                break;
-            }
-            case BEAT_LINE_BEAT: {
-                @event = new BeatLineBeatEvent {
-                    Time = this.EditorInstance.EditorState.MouseTime
-                };
-
-                break;
-            }
+            // case BEAT_LINE_BAR: {
+            //     @event = new BeatLineBarEvent {
+            //         Time = this.EditorInstance.EditorState.MouseTime
+            //     };
+            //
+            //     break;
+            // }
+            // case BEAT_LINE_BEAT: {
+            //     @event = new BeatLineBeatEvent {
+            //         Time = this.EditorInstance.EditorState.MouseTime
+            //     };
+            //
+            //     break;
+            // }
             case LYRIC: {
-                @event = new LyricEvent {
-                    Time  = this.EditorInstance.EditorState.MouseTime,
-                    Lyric = this.LyricInput.AsTextBox().Text
+                @event = new Event {
+                    Start = this.EditorInstance.EditorState.MouseTime,
+                    Text  = this.LyricInput.AsTextBox().Text
                 };
 
                 break;
             }
             case TYPING_CUTOFF: {
-                @event = new TypingCutoffEvent {
-                    Time = this.EditorInstance.EditorState.MouseTime
+                @event = new Event {
+                    Start = this.EditorInstance.EditorState.MouseTime
                 };
 
                 break;

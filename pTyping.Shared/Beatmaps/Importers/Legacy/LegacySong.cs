@@ -10,7 +10,7 @@ public enum SongType {
 }
 
 [JsonObject(MemberSerialization.OptIn)]
-public class LegacySong {
+internal class LegacySong {
     [JsonProperty]
     public int TimeSignature = 4;
 

@@ -13,7 +13,7 @@ using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.UiMaker;
-using pTyping.Songs;
+using pTyping.Shared.Beatmaps;
 using static Furball.Engine.Engine.Localization.LocalizationManager;
 
 namespace pTyping.Graphics.Menus;
@@ -24,6 +24,8 @@ public class MenuScreen : pScreen {
     private Drawable            _userCard = null;
     private DrawableProgressBar _songProgressBar;
 
+    //TODO: add tip of the day: ex. 'Mario teaches typing 2'
+    
     public override void Initialize() {
         base.Initialize();
 
@@ -265,7 +267,7 @@ public class MenuScreen : pScreen {
 
         pTypingGame.MusicTrack.CurrentPosition = targetProgress * pTypingGame.MusicTrack.Length;
     }
-    private void OnCurrentSongOnOnChange(object sender, Song e) {
+    private void OnCurrentSongOnOnChange(object sender, Beatmap beatmap) {
         this.UpdateStats();
     }
 
@@ -308,18 +310,23 @@ public class MenuScreen : pScreen {
         if (pTypingGame.CurrentSong.Value == null)
             this._musicTitle.Text = "None";
         else
-            this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+            this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title}";
     }
 
     public override void Update(double gameTime) {
         base.Update(gameTime);
 
+        if (pTypingGame.MusicTrack == null) {
+            this._songProgressBar.Progress = 0;
+            return;
+        }
+
         this._songProgressBar.Progress = (float) (pTypingGame.MusicTrack.CurrentPosition / pTypingGame.MusicTrack.Length);
     }
 
-    public override string         Name                 => "Main Menu";
-    public override string         State                => "Vibing on the menu!";
-    public override string         Details              => @$"Listening to {pTypingGame.CurrentSong.Value.Artist} - {pTypingGame.CurrentSong.Value.Name}";
+    public override string Name    => "Main Menu";
+    public override string State   => "Vibing on the menu!";
+    public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title}";
     public override bool           ForceSpeedReset      => true;
     public override float          BackgroundFadeAmount => 0.7f;
     public override MusicLoopState LoopState            => MusicLoopState.NewSong;

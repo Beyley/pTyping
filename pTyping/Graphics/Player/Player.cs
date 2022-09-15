@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using FontStashSharp;
@@ -18,10 +17,10 @@ using JetBrains.Annotations;
 using pTyping.Engine;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Scores;
-using pTyping.Songs;
-using pTyping.Songs.Events;
+using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Beatmaps.HitObjects;
+using pTyping.Shared.Events;
 using sowelipisona;
-using Path=Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween.Path;
 
 
 // using Furball.Engine.Engine.Audio;
@@ -40,10 +39,10 @@ public class Player : CompositeDrawable {
     public const uint SCORE_COMBO         = 10;
     public const uint SCORE_COMBO_MAX     = 1000;
 
-    public float TIMING_EXCELLENT => 20  / (this.Song.Settings.Strictness / 5f);
-    public float TIMING_GOOD      => 50  / (this.Song.Settings.Strictness / 5f);
-    public float TIMING_FAIR      => 100 / (this.Song.Settings.Strictness / 5f);
-    public float TIMING_POOR      => 200 / (this.Song.Settings.Strictness / 5f);
+    public float TIMING_EXCELLENT => 20  / (this.Song.Difficulty.Strictness / 5f);
+    public float TIMING_GOOD      => 50  / (this.Song.Difficulty.Strictness / 5f);
+    public float TIMING_FAIR      => 100 / (this.Song.Difficulty.Strictness / 5f);
+    public float TIMING_POOR      => 200 / (this.Song.Difficulty.Strictness / 5f);
 
     public static readonly Color COLOR_EXCELLENT = new(255, 255, 0);
     public static readonly Color COLOR_GOOD      = new(0, 255, 0);
@@ -56,7 +55,8 @@ public class Player : CompositeDrawable {
     public static readonly Vector2 NOTE_END_POS   = new(-100, NOTE_HEIGHT);
 
     public double BaseApproachTime = ConVars.BASE_APPROACH_TIME;
-    public double CurrentApproachTime(double time) => this.BaseApproachTime / this.Song.CurrentTimingPoint(time).ApproachMultiplier;
+    // public double CurrentApproachTime(double time) => this.BaseApproachTime / this.Song.CurrentTimingPoint(time).ApproachMultiplier;
+    public double CurrentApproachTime(double time) => this.BaseApproachTime;//TODO: support per note approach times
 
     private readonly TexturedDrawable _recepticle;
 
@@ -78,7 +78,7 @@ public class Player : CompositeDrawable {
 
     private readonly Texture _noteTexture;
 
-    public Song Song;
+    public Beatmap Song;
 
     public PlayerScore Score;
 
@@ -98,13 +98,14 @@ public class Player : CompositeDrawable {
     public event EventHandler<Color> OnComboUpdate;
     public event EventHandler        OnAllNotesComplete;
 
-    public Player(Song song) {
+    public Player(Beatmap song) {
         this.Song = song;
 
-        this.BaseApproachTime /= song.Settings.GlobalApproachMultiplier;
+        // this.BaseApproachTime /= song.Difficulty.GlobalApproachMultiplier;
 
-        this.Score            = new PlayerScore(this.Song.MapHash, pTypingConfig.Instance.Username);
-        this.Score.Mods       = pTypingGame.SelectedMods;
+        this.Score = new PlayerScore(this.Song.Id, pTypingConfig.Instance.Username) {
+            Mods = pTypingGame.SelectedMods
+        };
         this.Score.ModsString = string.Join(',', this.Score.Mods);
 
         this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User), new Vector2(0)) {
@@ -113,11 +114,12 @@ public class Player : CompositeDrawable {
 
         this.Drawables.Add(this._playfieldBackground);
 
-        FileInfo[] noteFiles = new DirectoryInfo(this.Song.QualifiedFolderPath).GetFiles("note.png");
+        // FileInfo[] noteFiles = new DirectoryInfo(this.Song.QualifiedFolderPath).GetFiles("note.png");
 
-        this._noteTexture = noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
-                                : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,        ContentSource.External);
+        // this._noteTexture = noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
+        // : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,        ContentSource.External);
 
+        this._noteTexture = ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User); 
 
         this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
             Scale      = new Vector2(0.55f),
@@ -158,19 +160,21 @@ public class Player : CompositeDrawable {
         for (int i = 0; i < this.Song.Events.Count; i++) {
             Event @event = this.Song.Events[i];
 
-            Drawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time)));
+            //TODO
 
-            if (drawable != null) {
-                drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
-                drawable.Depth      = 0f;
+            // Drawable drawable = Event.CreateEventDrawable(@event, this._noteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time)));
 
-                this._events.Add(new Tuple<Drawable, bool>(drawable, false));
-            }
+            // if (drawable != null) {
+            // drawable.TimeSource = pTypingGame.MusicTrackTimeSource;
+            // drawable.Depth      = 0f;
+
+            // this._events.Add(new Tuple<Drawable, bool>(drawable, false));
+            // }
         }
     }
 
     private void CreateNotes() {
-        foreach (Note note in this.Song.Notes) {
+        foreach (HitObject note in this.Song.HitObjects) {
             NoteDrawable noteDrawable = this.CreateNote(note);
 
             this._notes.Add(noteDrawable);
@@ -178,8 +182,8 @@ public class Player : CompositeDrawable {
     }
 
     [Pure]
-    private NoteDrawable CreateNote(Note note) {
-        NoteDrawable noteDrawable = new(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y + note.YOffset), this._noteTexture, pTypingGame.JapaneseFont, 50) {
+    private NoteDrawable CreateNote(HitObject note) {
+        NoteDrawable noteDrawable = new(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50) {
             TimeSource = pTypingGame.MusicTrackTimeSource,
             NoteTexture = {
                 ColorOverride = note.Color
@@ -232,7 +236,7 @@ public class Player : CompositeDrawable {
         NoteDrawable noteDrawable = this._notes[checkingNext ? this._noteToType + 1 : this._noteToType];
 
         //The extracted `Note` object 
-        Note note = noteDrawable.Note;
+        HitObject note = noteDrawable.Note;
 
         // Makes sure we dont hit an already hit note, which would cause a crash currently
         // this case *shouldnt* happen but it could so its good to check anyway
@@ -289,7 +293,7 @@ public class Player : CompositeDrawable {
                 }
 
                 //If we are not on the last note of the song, we are not checking the next note, and we are after the current note,
-                if (this._noteToType != this.Song.Notes.Count - 1 && !checkingNext && currentTime > note.Time) {
+                if (this._noteToType != this.Song.HitObjects.Count - 1 && !checkingNext && currentTime > note.Time) {
                     //Then check the next note instead
                     this.TypeCharacter(e, true);
                     return;
@@ -355,7 +359,7 @@ public class Player : CompositeDrawable {
         noteDrawable.ToTypeTextDrawable.Text = $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
         
         for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++) {
-            if(i < noteDrawable.Note.Typed.Length)
+            if (i < noteDrawable.Note.TypedText.Length)
                 noteDrawable.RawTextDrawable.Colors[i] = FSColor.Gray;
             else
                 noteDrawable.RawTextDrawable.Colors[i] = FSColor.White;
@@ -365,7 +369,7 @@ public class Player : CompositeDrawable {
         // }
     }
 
-    private void NoteUpdate(bool wasHit, Note note) {
+    private void NoteUpdate(bool wasHit, HitObject note) {
         foreach (PlayerMod mod in pTypingGame.SelectedMods)
             mod.OnNoteHit(note);
 
@@ -506,9 +510,9 @@ public class Player : CompositeDrawable {
             }
 
             foreach (Event cutOffEvent in this.Song.Events) {
-                if (cutOffEvent is not TypingCutoffEvent) continue;
+                if (cutOffEvent.Type != EventType.TypingCutoff) continue;
 
-                if (currentTime > cutOffEvent.Time && cutOffEvent.Time > noteToType.Note.Time && !noteToType.Note.IsHit) {
+                if (currentTime > cutOffEvent.Start && cutOffEvent.Start > noteToType.Note.Time && !noteToType.Note.IsHit) {
                     //Miss the note
                     noteToType.Miss();
                     //Tell the game to update all the info

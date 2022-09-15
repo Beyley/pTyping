@@ -43,7 +43,32 @@ public class FileDatabase {
         _Cache[hash] = new WeakReference<byte[]>(file);
     }
 
-    public async Task<byte[]> GetFile(string hash) {
+    public byte[] GetFile(string hash) {
+        string path = PathForHash(hash);
+
+        if (!File.Exists(path))
+            throw new FileNotFoundException(hash);
+
+        using FileStream stream = File.OpenRead(path);
+
+        byte[] arr = new byte[stream.Length];
+
+        int readBytes = stream.Read(arr);
+
+        Debug.Assert(readBytes == stream.Length, "readBytes == stream.Length");
+
+        if (_Cache.TryGetValue(hash, out WeakReference<byte[]> dataRef))
+            if (dataRef.TryGetTarget(out arr))
+                return arr;
+            else
+                _Cache.Remove(hash, out _);
+
+        _Cache[hash] = new WeakReference<byte[]>(arr);
+
+        return arr;
+    }
+
+    public async Task<byte[]> GetFileAsync(string hash) {
         string path = PathForHash(hash);
 
         if (!File.Exists(path))
