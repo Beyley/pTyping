@@ -23,7 +23,8 @@ public class BeatmapDatabase {
             typeof(HitObject),
             typeof(Event),
             typeof(AsciiUnicodeTuple),
-            typeof(HitObjectColor)
+            typeof(HitObjectColor),
+            typeof(HitObjectSettings)
         };
 
         RealmConfiguration config = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "songs.db")) {

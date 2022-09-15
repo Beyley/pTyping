@@ -13,5 +13,8 @@ public class HitObject : RealmObject {
     [Description("The text in the hit object")]
     public string Text { get; set; }
 
+    [Description("Misc note specific settings")]
+    public HitObjectSettings Settings { get; set; }
+    
     public bool IsComplete() => throw new NotImplementedException();
 }
