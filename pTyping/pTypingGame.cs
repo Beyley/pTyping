@@ -431,13 +431,9 @@ public class pTypingGame : FurballGame {
 
         NotificationManager = new NotificationManager();
 
-        ScreenManager.SetBlankTransition();
-
         base.Initialize();
 
         TooltipDrawable.TextDrawable.SetFont(JapaneseFont, 20);
-
-        ScreenManager.SetBlankTransition();
 
         //TODO: move these to the config (please)
         DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
