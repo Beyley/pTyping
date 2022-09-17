@@ -1,5 +1,8 @@
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Furball.Engine;
+using pTyping.Shared;
 using pTyping.Shared.Beatmaps.Importers;
 
 namespace pTyping;
@@ -10,36 +13,52 @@ public static class LegacyImportChecker {
     private static string LegacySongFolderImportedFailed => Path.Combine(LegacySongFolderImported, "failed/");
 
     public static void CheckAndImportLegacyMaps() {
-        if (!Directory.Exists(LegacySongFolder))
-            return;
-
-        Directory.CreateDirectory(LegacySongFolderImported);
-        Directory.CreateDirectory(LegacySongFolderImportedFailed);
-
-        pTypingGame.BeatmapDatabase.Realm.Write(
+        Task.Factory.StartNew(
         () => {
-            DirectoryInfo info = new(LegacySongFolder);
+            if (!Directory.Exists(LegacySongFolder))
+                return;
 
-            DirectoryInfo[] legacySongDirs = info.GetDirectories();
+            Directory.CreateDirectory(LegacySongFolderImported);
+            Directory.CreateDirectory(LegacySongFolderImportedFailed);
 
-            LegacyBeatmapImporter importer = new();
+            BeatmapDatabase database = new();
 
-            foreach (DirectoryInfo legacySongDir in legacySongDirs)
-                try {
-                    //Attempt to import the beatmap
-                    importer.ImportBeatmaps(pTypingGame.BeatmapDatabase, pTypingGame.FileDatabase, legacySongDir);
+            database.Realm.Write(
+            () => {
+                DirectoryInfo info = new(LegacySongFolder);
 
-                    legacySongDir.MoveTo(Path.Combine(LegacySongFolderImported, legacySongDir.Name));
-                }
-                catch {
-                    // TODO: notify the user of the failed maps
+                DirectoryInfo[] legacySongDirs = info.GetDirectories();
 
-                    legacySongDir.MoveTo(Path.Combine(LegacySongFolderImportedFailed, legacySongDir.Name));
-                }
+                LegacyBeatmapImporter  legacyImporter  = new();
+                UTypingBeatmapImporter uTypingImporter = new();
+
+                foreach (DirectoryInfo legacySongDir in legacySongDirs)
+                    try {
+                        if (legacySongDir.GetFiles().Any(x => x.Name.Contains("info.txt")))
+                            uTypingImporter.ImportBeatmaps(database, pTypingGame.FileDatabase, legacySongDir);
+                        else
+                            //Attempt to import the beatmap
+                            legacyImporter.ImportBeatmaps(database, pTypingGame.FileDatabase, legacySongDir);
+
+                        legacySongDir.MoveTo(Path.Combine(LegacySongFolderImported, legacySongDir.Name));
+                    }
+                    catch {
+                        // TODO: notify the user of the failed maps
+
+                        legacySongDir.MoveTo(Path.Combine(LegacySongFolderImportedFailed, legacySongDir.Name));
+                    }
+            }
+            );
+
+            //Refresh at the end to make sure it notifies the other threads
+            database.Realm.Refresh();
+
+            FurballGame.GameTimeScheduler.ScheduleMethod(
+            _ => {
+                pTypingGame.BeatmapDatabase.Realm.Refresh();
+            }
+            );
         }
         );
-
-        //After we are done importing, just refresh it to disk
-        pTypingGame.BeatmapDatabase.Realm.RefreshAsync();
     }
 }
