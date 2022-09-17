@@ -482,6 +482,8 @@ public class pTypingGame : FurballGame {
         BeatmapDatabase = new BeatmapDatabase();
         FileDatabase    = new FileDatabase();
 
+        LegacyImportChecker.CheckAndImportLegacyMaps();
+
         // BeatmapDatabase.Realm.Write(
         // () => {
         //     UTypingBeatmapImporter importer = new();
