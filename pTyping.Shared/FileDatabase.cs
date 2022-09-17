@@ -58,8 +58,8 @@ public class FileDatabase {
         Debug.Assert(readBytes == stream.Length, "readBytes == stream.Length");
 
         if (_Cache.TryGetValue(hash, out WeakReference<byte[]> dataRef))
-            if (dataRef.TryGetTarget(out arr))
-                return arr;
+            if (dataRef.TryGetTarget(out byte[] refArr))
+                return refArr;
             else
                 _Cache.Remove(hash, out _);
 
