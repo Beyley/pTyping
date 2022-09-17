@@ -335,7 +335,7 @@ public class EditorScreen : pScreen {
         this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
         ConVars.Volume.OnChange    += this.OnVolumeChange;
-        this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
+        // this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
     }
     private void ProgressBarOnInteract(object sender, MouseButtonEventArgs e) {
         this.ProgressBarOnInteract(sender, new MouseDragEventArgs(Vector2.Zero, Vector2.Zero, Vector2.Zero, e.Button, e.Mouse));
@@ -377,7 +377,7 @@ public class EditorScreen : pScreen {
     }
 
     private void OnVolumeChange(object sender, Value.Number f) {
-        this.HitSoundNormal.Volume = f.Value;
+        // this.HitSoundNormal.Volume = f.Value;
     }
 
     private void ProgressBarOnInteract(object sender, MouseDragEventArgs e) {

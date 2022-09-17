@@ -137,7 +137,7 @@ public class Player : CompositeDrawable {
         this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
 
         ConVars.Volume.OnChange    += this.OnVolumeChange;
-        this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
+        // this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
         
         this.Play();
 
@@ -153,7 +153,7 @@ public class Player : CompositeDrawable {
     }
 
     private void OnVolumeChange(object sender, Value.Number f) {
-        this.HitSoundNormal.Volume = f.Value;
+        // this.HitSoundNormal.Volume = f.Value;
     }
 
     private void CreateEvents() {
