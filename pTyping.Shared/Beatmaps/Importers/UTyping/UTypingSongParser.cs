@@ -27,6 +27,8 @@ public static class UTypingSongParser {
         beatmap.Info.Mapper         = info[2];
         beatmap.Info.DifficultyName = new AsciiUnicodeTuple(null, info[3]);
 
+        beatmap.Info.Source = "UTyping";
+        
         string fumenFilename = info[4];
 
         //info[5] is just the score filename, which we dont parse
