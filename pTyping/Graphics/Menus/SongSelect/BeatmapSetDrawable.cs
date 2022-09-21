@@ -1,10 +1,9 @@
-using System;
 using System.Numerics;
-using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using Furball.Vixie.Backends.Shared.Renderers;
 using pTyping.Shared.Beatmaps;
@@ -23,40 +22,36 @@ public class BeatmapSetDrawable : CompositeDrawable {
 
         this.Drawables.Add(this.setTitle = new SetTitleDrawable(Vector2.Zero, $"{set.Beatmaps[0].Info.Artist} - {set.Beatmaps[0].Info.Title}"));
 
-        float y = this.setTitle.Size.Y + 5;
+        bool  first = true;
+        float y     = this.setTitle.Size.Y;
         foreach (Beatmap map in set.Beatmaps) {
-            // SongSelectDrawable.BeatmapButtonDrawable drawable = new(
-            // new Vector2(0, y),
-            // map,
-            // ContentManager.LoadTextureFromFileCached("song-button-background.png", ContentSource.User)
-            // );
-
-            // Drawable drawable = new TextDrawable(new Vector2(20, y), pTypingGame.JapaneseFont, map.Info.DifficultyName.ToString(), 24);
-
-            DifficultyDrawable drawable = new(map) {
-                Position   = new Vector2(0, y),
+            DifficultyDrawable drawable = new(map, first) {
                 OriginType = OriginType.TopLeft
             };
+            drawable.Position = new Vector2(this.setTitle.Size.X - drawable.Size.X, y);
 
             this.Drawables.Add(drawable);
 
-            y += drawable.Size.Y;
+            y     += drawable.Size.Y;
+            first =  false;
         }
+
+        this.InvisibleToInput = true;
     }
 
     private sealed class DifficultyDrawable : CompositeDrawable {
-        private const float FONT_SIZE = 35;
+        private const float FONT_SIZE = 30;
         private const int   MARGIN    = 2;
 
         private readonly TextDrawable _difficultyName;
+        private readonly bool         _first;
 
         public readonly Beatmap Beatmap;
-        public override Vector2 Size {
-            get => new(700, FONT_SIZE + MARGIN * 2);
-        }
+        public override Vector2 Size => new(700, FONT_SIZE + MARGIN * 2);
 
-        public DifficultyDrawable(Beatmap map) {
+        public DifficultyDrawable(Beatmap map, bool first) {
             this.Beatmap = map;
+            this._first  = first;
 
             this._difficultyName = new TextDrawable(new Vector2(MARGIN), pTypingGame.JapaneseFont, map.Info.DifficultyName.ToString(), FONT_SIZE) {
                 Clickable   = false,
@@ -66,8 +61,19 @@ public class BeatmapSetDrawable : CompositeDrawable {
             };
             
             this.Drawables.Add(this._difficultyName);
+
+            this.OnClick += this.OnMapClick;
         }
-        
+        private void OnMapClick(object sender, MouseButtonEventArgs e) {
+            pTypingGame.CurrentSong.Value = this.Beatmap;
+        }
+
+        public override void Dispose() {
+            base.Dispose();
+
+            this.OnClick -= this.OnMapClick;
+        }
+
         public override unsafe void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
             MappedData mappedData = batch.Reserve(4, 6);
 
@@ -76,7 +82,9 @@ public class BeatmapSetDrawable : CompositeDrawable {
             const int bottomLeft  = 2;
             const int bottomRight = 3;
 
-            mappedData.VertexPtr[topLeft].Position = new Vector2(args.Position.X, args.Position.Y);
+            mappedData.VertexPtr[topLeft].Position = args.Position with {
+                X = this._first ? args.Position.X - 50 : args.Position.X
+            };
             mappedData.VertexPtr[topRight].Position = args.Position with {
                 X = args.Position.X + this.RealSize.X
             };
@@ -90,10 +98,11 @@ public class BeatmapSetDrawable : CompositeDrawable {
                 mappedData.VertexPtr[i].TexId = texId;
             }
 
-            mappedData.VertexPtr[topLeft].Color     = new Color(100, 100, 200, 200);
-            mappedData.VertexPtr[bottomLeft].Color  = new Color(100, 100, 200, 200);
-            mappedData.VertexPtr[topRight].Color    = new Color(100, 100, 200, 100);
-            mappedData.VertexPtr[bottomRight].Color = new Color(100, 100, 200, 100);
+            Color c = Equals(this.Beatmap, pTypingGame.CurrentSong.Value) ? new Color(200, 100, 100) : new Color(100, 100, 200);
+            mappedData.VertexPtr[topLeft].Color     = new Color(c.R, c.G, c.B, (byte)200);
+            mappedData.VertexPtr[bottomLeft].Color  = new Color(c.R, c.G, c.B, (byte)200);
+            mappedData.VertexPtr[topRight].Color    = new Color(c.R, c.G, c.B, (byte)100);
+            mappedData.VertexPtr[bottomRight].Color = new Color(c.R, c.G, c.B, (byte)100);
 
             mappedData.IndexPtr[0] = (ushort)(topLeft     + mappedData.IndexOffset);
             mappedData.IndexPtr[1] = (ushort)(bottomLeft  + mappedData.IndexOffset);

@@ -37,9 +37,10 @@ public class SongSelectionScreen : pScreen {
 
     private float _movingDirection;
 
-    private TextDrawable       _songInfo;
-    private SongSelectDrawable _songSelectDrawable;
-    private SongInfoDrawable   _songInfoDrawable;
+    private TextDrawable        _songInfo;
+    private SongSelectDrawable  _songSelectDrawable;
+    private ScrollableContainer _songSelectScrollable;
+    private SongInfoDrawable    _songInfoDrawable;
 
     public SongSelectionScreen(bool editor) => this._editor = editor;
     public override string Name  => "Song Select";
@@ -110,13 +111,18 @@ public class SongSelectionScreen : pScreen {
 
         #region Create new buttons for each song
 
-        this._songSelectDrawable = new SongSelectDrawable(new Vector2(10, 10)) {
+        this._songSelectDrawable = new SongSelectDrawable(Vector2.Zero);
+
+        this._songSelectScrollable = new ScrollableContainer(this._songSelectDrawable.Size) {
+            Position         = new Vector2(10, 10),
             OriginType       = OriginType.TopRight,
             ScreenOriginType = OriginType.TopRight,
-            Depth            = 0.8f
+            Depth            = 0.8f,
+            InvisibleToInput = true
         };
+        this._songSelectScrollable.Add(this._songSelectDrawable);
 
-        this.Manager.Add(this._songSelectDrawable);
+        this.Manager.Add(this._songSelectScrollable);
 
         #endregion
 
@@ -238,9 +244,6 @@ public class SongSelectionScreen : pScreen {
         FurballGame.InputManager.OnKeyDown += this.OnKeyDown;
         FurballGame.InputManager.OnKeyUp   += this.OnKeyUp;
 
-        // FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
-        FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
-
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
 
         if (!this._editor)
@@ -273,11 +276,6 @@ public class SongSelectionScreen : pScreen {
 
     private void OnLeaderboardTypeChange(object sender, LeaderboardType e) {
         this.UpdateScores();
-    }
-
-    private bool _selectHovered = false;
-    private void OnMouseMove(object sender, MouseMoveEventArgs mouseMoveEventArgs) {
-        this._selectHovered = this._songSelectDrawable.RealContains(mouseMoveEventArgs.Position);
     }
 
     private void OnKeyDown(object sender, KeyEventArgs keyEventArgs) {

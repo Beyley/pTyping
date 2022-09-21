@@ -9,7 +9,6 @@ using Furball.Vixie;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.Filters;
 using pTyping.Shared.Beatmaps.Sorting;
-using Realms;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -24,6 +23,8 @@ public class SongSelectDrawable : CompositeDrawable {
         this.FilterOperations.CollectionChanged += this.OnFilterOperationChange;
         
         this.UpdateDrawables();
+
+        this.InvisibleToInput = true;
     }
     
     private void OnFilterOperationChange(object sender, NotifyCollectionChangedEventArgs e) {
