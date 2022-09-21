@@ -16,13 +16,14 @@ public static class Program {
         }
         );
 
-        IQueryable<Beatmap> queryable = database.Realm.All<Beatmap>();
+        IQueryable<BeatmapSet> queryable = database.Realm.All<BeatmapSet>();
 
-        foreach (Beatmap beatmap in queryable)
-            if (beatmap.FileCollection.Audio != null) {
-                byte[] arr = fileDatabase.GetFile(beatmap.FileCollection.Audio.Hash);
+        foreach (BeatmapSet set in queryable)
+            foreach (Beatmap beatmap in set.Beatmaps)
+                if (beatmap.FileCollection.Audio != null) {
+                    byte[] arr = fileDatabase.GetFile(beatmap.FileCollection.Audio.Hash);
 
-                Console.WriteLine(arr.Length);
-            }
+                    Console.WriteLine(arr.Length);
+                }
     }
 }

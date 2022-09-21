@@ -9,7 +9,7 @@ using pTyping.Shared.Events;
 namespace pTyping.Shared.Beatmaps.Importers.Legacy;
 
 public static class LegacySongParser {
-    public static Beatmap? ParseLegacySong(FileInfo fileInfo) {
+    public static Beatmap? ParseLegacySong(FileInfo fileInfo, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title) {
         string fileContents = File.ReadAllText(fileInfo.FullName);
 
         fileContents = fileContents.Replace("pTyping.Songs.Events.", "pTyping.Shared.Beatmaps.Importers.Legacy.Events.");
@@ -21,13 +21,23 @@ public static class LegacySongParser {
             TypeNameHandling = TypeNameHandling.Auto
         }
         );
-        if (legacySong == null)
+        if (legacySong == null) {
+            artist = null;
+            source = string.Empty;
+            title  = null;
             return null;
-
-        if (fileInfo.DirectoryName == null)
+        }
+        if (fileInfo.DirectoryName == null) {
+            artist = null;
+            source = string.Empty;
+            title  = null;
             return null;
-
+        }
         string audioPath = Path.Combine(fileInfo.DirectoryName, legacySong.AudioPath);
+
+        artist = new AsciiUnicodeTuple(null, legacySong.Artist);
+        source = "Unknown";
+        title  = new AsciiUnicodeTuple(null, legacySong.Name);
 
         Beatmap map = new() {
             Difficulty = {
@@ -35,11 +45,8 @@ public static class LegacySongParser {
             },
             Id = CryptoHelper.GetMd5(File.ReadAllBytes(fileInfo.FullName)),
             Info = {
-                Artist         = new AsciiUnicodeTuple(null, legacySong.Artist),
                 Description    = legacySong.Description,
                 Mapper         = legacySong.Creator,
-                Source         = "Unknown",
-                Title          = new AsciiUnicodeTuple(null, legacySong.Name),
                 DifficultyName = new AsciiUnicodeTuple(legacySong.Difficulty),
                 PreviewTime    = legacySong.PreviewPoint
             },

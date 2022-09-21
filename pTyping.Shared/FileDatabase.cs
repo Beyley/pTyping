@@ -49,13 +49,12 @@ public class FileDatabase {
         if (!File.Exists(path))
             throw new FileNotFoundException(hash);
 
-        using FileStream stream = File.OpenRead(path);
+        using FileStream   stream = File.OpenRead(path);
+        using BinaryReader reader = new(stream);
 
-        byte[] arr = new byte[stream.Length];
+        byte[] arr = reader.ReadBytes((int)stream.Length);
 
-        int readBytes = stream.Read(arr);
-
-        Debug.Assert(readBytes == stream.Length, "readBytes == stream.Length");
+        Debug.Assert(arr.Length == stream.Length, "arr.Length == stream.Length");
 
         if (_Cache.TryGetValue(hash, out WeakReference<byte[]> dataRef))
             if (dataRef.TryGetTarget(out byte[] refArr))

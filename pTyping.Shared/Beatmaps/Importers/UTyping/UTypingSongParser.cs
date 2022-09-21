@@ -8,7 +8,7 @@ using pTyping.Shared.Events;
 namespace pTyping.Shared.Beatmaps.Importers.UTyping;
 
 public static class UTypingSongParser {
-    public static Beatmap? ParseUTypingBeatmap(FileInfo fileInfo) {
+    public static Beatmap? ParseUTypingBeatmap(FileInfo fileInfo, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title) {
         Beatmap beatmap = new();
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -22,12 +22,12 @@ public static class UTypingSongParser {
         infoData = infoData.Replace("\r", "");
         string[] info = infoData.Split("\n");
 
-        beatmap.Info.Title          = new AsciiUnicodeTuple(null, info[0]);
-        beatmap.Info.Artist         = new AsciiUnicodeTuple(null, info[1]);
+        title                       = new AsciiUnicodeTuple(null, info[0]);
+        artist                      = new AsciiUnicodeTuple(null, info[1]);
         beatmap.Info.Mapper         = info[2];
         beatmap.Info.DifficultyName = new AsciiUnicodeTuple(null, info[3]);
 
-        beatmap.Info.Source = "UTyping";
+        source = "UTyping";
         
         string fumenFilename = info[4];
 

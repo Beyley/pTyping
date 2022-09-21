@@ -5,8 +5,8 @@ public class BeatmapDifficultyNameComparer : IComparer<Beatmap> {
         if (x is null || y is null) throw new InvalidOperationException();
         
         return string.Compare(
-        x.Info.Artist.ToString(), 
-        y.Info.Artist.ToString(), 
+        x.Info.DifficultyName.ToString(),
+        y.Info.DifficultyName.ToString(), 
         StringComparison.CurrentCultureIgnoreCase
         );
     }

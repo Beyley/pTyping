@@ -253,13 +253,17 @@ public class pTypingGame : FurballGame {
         MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
         // MenuClickSound.Volume = ConVars.Volume.Value.Value;
-        AudioEngine.MasterVolume = ConVars.Volume.Value.Value;
+        AudioEngine.MusicVolume  = ConVars.Volume.Value.Value;
+        AudioEngine.SampleVolume = ConVars.Volume.Value.Value;
 
-        ConVars.Volume.OnChange += delegate(object _, Value.Number volume) {
+        ConVars.Volume.OnChange += delegate {
             // MenuClickSound.Volume = volume.Value;
             // MusicTrack.Volume     = ConVars.Volume.Value.Value;
-            
-            MenuClickSound.Volume = volume.Value;
+
+            AudioEngine.MusicVolume  = ConVars.Volume.Value.Value;
+            AudioEngine.SampleVolume = ConVars.Volume.Value.Value;
+
+            // MenuClickSound.Volume    = ConVars.Volume.Value.Value;
 
             if (VolumeSelector is not null)
                 VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100d:00.##}";
@@ -480,7 +484,9 @@ public class pTypingGame : FurballGame {
         HiraganaConversion.LoadConversion();//todo: support IMEs for more languages, and make it customizable by the user
 
         BeatmapDatabase = new BeatmapDatabase();
-        FileDatabase    = new FileDatabase();
+        BeatmapDatabase.Realm.Refresh();
+
+        FileDatabase = new FileDatabase();
 
         LegacyImportChecker.CheckAndImportLegacyMaps();
 
@@ -660,16 +666,18 @@ public class pTypingGame : FurballGame {
         string         final      = "Unknown";
 
         //TODO: display a custom status for no songs
-        if (CurrentSong.Value != null)
+        if (CurrentSong.Value != null) {
+            BeatmapSet set = CurrentSong.Value.Parent;
+            
             switch (screen.OnlineUserActionType) {
                 case ScreenUserActionType.Listening:
                     actionType = UserActionType.Idle;
-                    final      = $"Listening to {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title}";
+                    final      = $"Listening to {set.Artist} - {set.Title}";
                     break;
                 case ScreenUserActionType.Editing:
                     final = pTypingConfig.Instance.Username == CurrentSong.Value.Info.Mapper
-                                ? $"Editing {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Info.Mapper}"
-                                : $"Modding {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}] by {CurrentSong.Value.Info.Mapper}";
+                                ? $"Editing {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}] by {CurrentSong.Value.Info.Mapper}"
+                                : $"Modding {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}] by {CurrentSong.Value.Info.Mapper}";
                     actionType = UserActionType.Editing;
                     break;
                 case ScreenUserActionType.ChoosingSong:
@@ -677,18 +685,19 @@ public class pTypingGame : FurballGame {
                     actionType = UserActionType.Idle;
                     break;
                 case ScreenUserActionType.Playing:
-                    final      = $"Playing {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}]";
+                    final      = $"Playing {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}]";
                     actionType = UserActionType.Ingame;
                     break;
                 case ScreenUserActionType.Lobbying:
-                    final      = $"Partying to {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}]";
+                    final      = $"Partying to {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}]";
                     actionType = UserActionType.Idle;
                     break;
                 case ScreenUserActionType.Multiplaying:
-                    final      = $"Multiplaying {CurrentSong.Value.Info.Artist} - {CurrentSong.Value.Info.Title} [{CurrentSong.Value.Difficulty}]";
+                    final      = $"Multiplaying {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}]";
                     actionType = UserActionType.Ingame;
                     break;
             }
+        }
 
         OnlineManager.ChangeUserAction(new UserAction(actionType, final));
     }

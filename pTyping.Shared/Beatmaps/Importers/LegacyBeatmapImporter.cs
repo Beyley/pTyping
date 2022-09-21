@@ -11,10 +11,15 @@ public class LegacyBeatmapImporter : IBeatmapImporter {
 
         BeatmapSet set = new();
         foreach (FileInfo file in files) {
-            Beatmap? map = LegacySongParser.ParseLegacySong(file);
+            Beatmap? map = LegacySongParser.ParseLegacySong(file, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title);
+            set.Artist = artist;
+            set.Source = source;
+            set.Title  = title;
 
             if (map == null)
                 continue;
+
+            map.Parent = set;
 
             if (map.FileCollection.Audio == null)
                 continue;

@@ -837,9 +837,14 @@ public class EditorScreen : pScreen {
 
     public override string Name  => "Editor";
     public override string State => "Editing a map!";
-    public override string Details => pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Info.Mapper
-                                          ? $"Editing {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}"
-                                          : $"Modding {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}";
+    public override string Details {
+        get {
+            BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+            return pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Info.Mapper
+                       ? $"Editing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}"
+                       : $"Modding {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}";
+        }
+    }
 
     public override bool           ForceSpeedReset      => true;
     public override float          BackgroundFadeAmount => 0.3f;

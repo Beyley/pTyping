@@ -45,8 +45,12 @@ public class SongSelectionScreen : pScreen {
     public SongSelectionScreen(bool editor) => this._editor = editor;
     public override string Name  => "Song Select";
     public override string State => "Selecting a song!";
-    public override string Details
-        => $"Deciding on playing {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}]";
+    public override string Details {
+        get {
+            BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+            return $"Deciding on playing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]";
+        }
+    }
     public override bool           ForceSpeedReset      => false;
     public override float          BackgroundFadeAmount => 0.7f;
     public override MusicLoopState LoopState            => MusicLoopState.LoopFromPreviewPoint;
@@ -111,8 +115,13 @@ public class SongSelectionScreen : pScreen {
 
         #region Create new buttons for each song
 
-        this._songSelectDrawable = new SongSelectDrawable(Vector2.Zero);
-
+        this._songSelectDrawable = new SongSelectDrawable(
+        Vector2.Zero,
+        delegate(float f) {
+            this._songSelectScrollable?.SetTargetScroll(f);
+        }
+        );
+        
         this._songSelectScrollable = new ScrollableContainer(this._songSelectDrawable.Size) {
             Position         = new Vector2(10, 10),
             OriginType       = OriginType.TopRight,
@@ -121,6 +130,8 @@ public class SongSelectionScreen : pScreen {
             InvisibleToInput = true
         };
         this._songSelectScrollable.Add(this._songSelectDrawable);
+
+        this._songSelectDrawable.UpdateDrawables();
 
         this.Manager.Add(this._songSelectScrollable);
 
@@ -310,7 +321,9 @@ public class SongSelectionScreen : pScreen {
     }
 
     public void UpdateSelectedSong(bool fromPrevScreen = false) {
-        this._songInfo.Text = $@"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}]
+        BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+
+        this._songInfo.Text = $@"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
 Created by {pTypingGame.CurrentSong.Value.Info.Mapper}
 BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
 

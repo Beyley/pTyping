@@ -20,7 +20,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
     public BeatmapSetDrawable(BeatmapSet set) {
         this.BeatmapSet = set;
 
-        this.Drawables.Add(this.setTitle = new SetTitleDrawable(Vector2.Zero, $"{set.Beatmaps[0].Info.Artist} - {set.Beatmaps[0].Info.Title}"));
+        this.Drawables.Add(this.setTitle = new SetTitleDrawable(Vector2.Zero, $"{set.Artist} - {set.Title}"));
 
         bool  first = true;
         float y     = this.setTitle.Size.Y;

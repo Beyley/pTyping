@@ -10,6 +10,7 @@ using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Scores;
+using pTyping.Shared.Beatmaps;
 
 namespace pTyping.Graphics.Player;
 
@@ -23,10 +24,12 @@ public class ScoreResultsScreen : pScreen {
 
         #region Title
 
+        BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+
         TextDrawable songTitleText = new(
         new Vector2(10, 10),
         pTypingGame.JapaneseFont,
-        $"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]",
+        $"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]",
         40
         );
         TextDrawable songCreatorText = new(
@@ -115,10 +118,14 @@ public class ScoreResultsScreen : pScreen {
     public override string Name  => "Score Results";
     public override string State => "Looking at scores!";
 
-    public override string Details
-        => $@"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
+    public override string Details {
+        get {
+            BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+            return $@"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
 Played by {this.Score.Username}
 Score: {this.Score.Score:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
+        }
+    }
     public override bool           ForceSpeedReset      => false;
     public override float          BackgroundFadeAmount => 0.5f;
     public override MusicLoopState LoopState            => MusicLoopState.None;

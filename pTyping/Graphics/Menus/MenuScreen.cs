@@ -309,8 +309,11 @@ public class MenuScreen : pScreen {
     public void UpdateStats() {
         if (pTypingGame.CurrentSong.Value == null)
             this._musicTitle.Text = "None";
-        else
-            this._musicTitle.Text = $"{pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title}";
+        else {
+            BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+
+            this._musicTitle.Text = $"{set.Artist} - {set.Title}";
+        }
     }
 
     public override void Update(double gameTime) {
@@ -326,7 +329,13 @@ public class MenuScreen : pScreen {
 
     public override string Name    => "Main Menu";
     public override string State   => "Vibing on the menu!";
-    public override string Details => @$"Listening to {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title}";
+    public override string Details {
+        get {
+            BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+
+            return @$"Listening to {set.Artist} - {set.Title}";
+        }
+    }
     public override bool           ForceSpeedReset      => true;
     public override float          BackgroundFadeAmount => 0.7f;
     public override MusicLoopState LoopState            => MusicLoopState.NewSong;

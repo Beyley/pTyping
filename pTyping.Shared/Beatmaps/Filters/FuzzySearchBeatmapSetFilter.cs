@@ -11,10 +11,9 @@ public class FuzzySearchBeatmapSetFilter : IBeatmapSetFilter {
 
     public IQueryable<BeatmapSet> Filter(IQueryable<BeatmapSet> sets) {
         return sets.Where(
-        set => set.Beatmaps[0].Info.Artist.Unicode.Contains(this.SearchQuery, COMPARISON) ||
-               (set.Beatmaps[0].Info.Artist.Ascii != null && set.Beatmaps[0].Info.Artist.Ascii.Contains(this.SearchQuery, COMPARISON)) ||
-               set.Beatmaps[0].Info.Mapper.Contains(this.SearchQuery, COMPARISON) || set.Beatmaps[0].Info.Source.Contains(this.SearchQuery, COMPARISON) ||
-               (set.Beatmaps[0].Info.Title.Ascii          != null && set.Beatmaps[0].Info.Title.Ascii.Contains(this.SearchQuery, COMPARISON)) ||
+        set => set.Artist.Unicode.Contains(this.SearchQuery, COMPARISON) || set.Artist.Ascii != null && set.Artist.Ascii.Contains(this.SearchQuery, COMPARISON) ||
+               set.Beatmaps[0].Info.Mapper.Contains(this.SearchQuery, COMPARISON) || set.Source.Contains(this.SearchQuery, COMPARISON) ||
+               set.Title.Ascii != null && set.Title.Ascii.Contains(this.SearchQuery, COMPARISON) ||
                (set.Beatmaps[0].Info.DifficultyName.Ascii != null && set.Beatmaps[0].Info.DifficultyName.Ascii.Contains(this.SearchQuery, COMPARISON)) ||
                set.Beatmaps[0].Metadata.Tags.Any(x => x.Contains(this.SearchQuery, COMPARISON))
         );

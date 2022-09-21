@@ -580,8 +580,12 @@ public class PlayerScreen : pScreen {
 
     public override string Name  => "Gameplay";
     public override string State => "Typing away!";
-    public override string Details
-        => $@"Playing {pTypingGame.CurrentSong.Value.Info.Artist} - {pTypingGame.CurrentSong.Value.Info.Title} [{pTypingGame.CurrentSong.Value.Difficulty}]";
+    public override string Details {
+        get {
+            BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+            return $@"Playing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]";
+        }
+    }
     public override bool           ForceSpeedReset      => false;
     public override float          BackgroundFadeAmount => -1f;
     public override MusicLoopState LoopState            => MusicLoopState.None;

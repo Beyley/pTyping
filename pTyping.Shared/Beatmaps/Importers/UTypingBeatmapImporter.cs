@@ -11,11 +11,16 @@ public class UTypingBeatmapImporter : IBeatmapImporter {
 
         BeatmapSet set = new();
         foreach (FileInfo file in files) {
-            Beatmap? map = UTypingSongParser.ParseUTypingBeatmap(file);
+            Beatmap? map = UTypingSongParser.ParseUTypingBeatmap(file, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title);
+            set.Artist = artist;
+            set.Source = source;
+            set.Title  = title;
 
             //TODO: handle failed imports better, maybe add an error message of some sort and tell the user?
             if (map == null)
                 continue;
+
+            map.Parent = set;
 
             //TODO: this should never happen, what the fuck?
             if (string.IsNullOrEmpty(map.Id))

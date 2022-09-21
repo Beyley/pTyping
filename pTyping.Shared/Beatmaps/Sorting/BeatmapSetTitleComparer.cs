@@ -8,8 +8,8 @@ public class BeatmapSetTitleComparer : IComparer<BeatmapSet> {
         if (y.Beatmaps.Count == 0) throw new InvalidOperationException();
 
         return string.Compare(
-        x.Beatmaps.First().Info.Title.ToString(), 
-        y.Beatmaps.First().Info.Title.ToString(), 
+        x.Title.ToString(),
+        y.Title.ToString(), 
         StringComparison.CurrentCultureIgnoreCase
         );
     }

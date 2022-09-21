@@ -10,6 +10,8 @@ public class Beatmap : RealmObject {
     [PrimaryKey]
     public string Id { get; set; }
 
+    public BeatmapSet Parent { get; set; }
+
     [Description("All of the breaks that happen during the Beatmap.")]
     public IList<Break> Breaks { get; }
     [Description("All of the objects contained within the Beatmap.")]
@@ -26,13 +28,10 @@ public class Beatmap : RealmObject {
 
     public Beatmap() {
         this.Info = new BeatmapInfo {
-            Artist         = new AsciiUnicodeTuple("Unknown"),
             Description    = "",
             Mapper         = "Unknown Creator",
-            Title          = new AsciiUnicodeTuple("Unknown"),
             DifficultyName = new AsciiUnicodeTuple(""),
             PreviewTime    = 0,
-            Source         = "Unknown"
         };
         this.Difficulty = new BeatmapDifficulty();
 
