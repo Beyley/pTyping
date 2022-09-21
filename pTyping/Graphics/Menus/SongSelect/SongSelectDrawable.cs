@@ -1,51 +1,67 @@
 using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Numerics;
-using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Vixie;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Beatmaps.Filters;
+using pTyping.Shared.Beatmaps.Sorting;
+using Realms;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class SongSelectDrawable : CompositeDrawable {
-    public float TargetScroll = 0;
+    private readonly List<BeatmapSetDrawable> _registeredSetButtons = new();
+    
+    public readonly  ObservableCollection<IBeatmapSetFilter> FilterOperations = new();
 
-    private readonly List<SongButtonDrawable> _buttonDrawables = new();
-
-    public IReadOnlyList<SongButtonDrawable> ButtonDrawables => this._buttonDrawables.AsReadOnly();
-
-    public SongSelectDrawable(Vector2 pos, List<BeatmapSet> songList) {
+    public SongSelectDrawable(Vector2 pos) {
         this.Position = pos;
+        
+        this.FilterOperations.CollectionChanged += this.OnFilterOperationChange;
+        
+        this.UpdateDrawables();
+    }
+    
+    private void OnFilterOperationChange(object sender, NotifyCollectionChangedEventArgs e) {
+        this.UpdateDrawables();
+    }
 
-        Texture backgroundTexture = ContentManager.LoadTextureFromFileCached("song-button-background.png", ContentSource.User);
+    private void UpdateDrawables() {
+        IQueryable<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>();
+
+        foreach (IBeatmapSetFilter filter in this.FilterOperations) {
+            sets = filter.Filter(sets);
+        }
+
+        ImmutableSortedSet<BeatmapSet> sortedSets = sets.ToList().Where(x => x.Beatmaps.Count != 0).ToImmutableSortedSet(new BeatmapSetArtistComparer());
+
+        this.Drawables.Clear();
+        this._registeredSetButtons.Clear();
+
+        foreach (BeatmapSet set in sortedSets) {
+            BeatmapSetDrawable drawable = new(set);
+            
+            this._registeredSetButtons.Add(drawable);
+        }
 
         float y = 0;
-        foreach (BeatmapSet set in songList) {
-            foreach (Beatmap map in set.Beatmaps) {
-                SongButtonDrawable drawable = new(new Vector2(0, y), map, backgroundTexture);
+        foreach (BeatmapSetDrawable button in this._registeredSetButtons) {
+            button.Position   = new Vector2(0, y);
+            // button.OriginType = OriginType.TopRight;
 
-                drawable.Tags.Add(y.ToString(CultureInfo.CurrentCulture));
+            button.YPositionInDrawable = y;
+            
+            this.Drawables.Add(button);
 
-                this.Drawables.Add(drawable);
-                this._buttonDrawables.Add(drawable);
-
-                y += drawable.Size.Y + 7.5f;
-            }
+            y += button.Size.Y + 5;
         }
     }
 
-    public override void Update(double time) {
-        for (int i = 0; i < this._buttonDrawables.Count; i++) {
-            SongButtonDrawable drawable = this._buttonDrawables[i];
-
-            float distanceToTravel = this.TargetScroll - drawable.Position.Y + float.Parse(drawable.Tags[0]);
-
-            drawable.Position += new Vector2(0f, (float)(distanceToTravel * time * 4));
-        }
-    }
-
-    public class SongButtonDrawable : CompositeDrawable {
+    public class BeatmapButtonDrawable : CompositeDrawable {
         public Beatmap Song;
 
         private readonly TexturedDrawable _backgroundDrawable;
@@ -53,7 +69,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
         public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
-        public SongButtonDrawable(Vector2 pos, Beatmap song, Texture backgroundTexture) {
+        public BeatmapButtonDrawable(Vector2 pos, Beatmap song, Texture backgroundTexture) {
             this.Song     = song;
             this.Position = pos;
 
@@ -65,11 +81,11 @@ public class SongSelectDrawable : CompositeDrawable {
             };
 
             this._titleDrawable = new TextDrawable(
-            new Vector2(5),
+            new Vector2(this._backgroundDrawable.Size.X - 5, 5),
             pTypingGame.JapaneseFontStroked,
             $"{song.Info.Artist} - {song.Info.Title} [{song.Info.DifficultyName}]",
             30
-            );
+            ) {OriginType = OriginType.TopRight};
 
             this.Drawables.Add(this._titleDrawable);
             this.Drawables.Add(this._backgroundDrawable);

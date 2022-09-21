@@ -110,7 +110,7 @@ public class SongSelectionScreen : pScreen {
 
         #region Create new buttons for each song
 
-        this._songSelectDrawable = new SongSelectDrawable(new Vector2(10, 10), sets) {
+        this._songSelectDrawable = new SongSelectDrawable(new Vector2(10, 10)) {
             OriginType       = OriginType.TopRight,
             ScreenOriginType = OriginType.TopRight,
             Depth            = 0.8f
@@ -238,7 +238,7 @@ public class SongSelectionScreen : pScreen {
         FurballGame.InputManager.OnKeyDown += this.OnKeyDown;
         FurballGame.InputManager.OnKeyUp   += this.OnKeyUp;
 
-        FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
+        // FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
         FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
 
         LeaderboardType.OnChange += this.OnLeaderboardTypeChange;
@@ -278,18 +278,6 @@ public class SongSelectionScreen : pScreen {
     private bool _selectHovered = false;
     private void OnMouseMove(object sender, MouseMoveEventArgs mouseMoveEventArgs) {
         this._selectHovered = this._songSelectDrawable.RealContains(mouseMoveEventArgs.Position);
-    }
-
-    private void OnMouseScroll(object sender, MouseScrollEventArgs mouseScrollEventArgs) {
-        if (this._selectHovered)
-            this._songSelectDrawable.TargetScroll += mouseScrollEventArgs.ScrollAmount.Y * 10;
-    }
-
-    public override void Update(double gameTime) {
-        if (this._movingDirection != 0f)
-            this._songSelectDrawable.TargetScroll += (float)(this._movingDirection * gameTime);
-
-        base.Update(gameTime);
     }
 
     private void OnKeyDown(object sender, KeyEventArgs keyEventArgs) {
@@ -386,7 +374,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
         FurballGame.InputManager.OnKeyDown -= this.OnKeyDown;
         FurballGame.InputManager.OnKeyUp   -= this.OnKeyUp;
 
-        FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
+        // FurballGame.InputManager.OnMouseScroll -= this.OnMouseScroll;
 
         LeaderboardType.OnChange -= this.OnLeaderboardTypeChange;
 

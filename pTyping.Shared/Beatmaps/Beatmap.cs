@@ -77,4 +77,8 @@ public class Beatmap : RealmObject {
     public TimingPoint CurrentTimingPoint(double time) {
         return this.TimingPoints.First(x => x.Time <= time);
     }
+
+    public override bool Equals(object obj) => obj is Beatmap other && this.Id == other.Id;
+    protected bool Equals(Beatmap other) => base.Equals(other)      && this.Id == other.Id;
+    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), this.Id);
 }

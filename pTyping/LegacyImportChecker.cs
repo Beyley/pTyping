@@ -1,7 +1,9 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Furball.Engine;
+using pTyping.Engine;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps.Importers;
 
@@ -31,6 +33,17 @@ public static class LegacyImportChecker {
 
             DirectoryInfo[] legacySongDirs = info.GetDirectories();
 
+            if (legacySongDirs.Length != 0) {
+                FurballGame.GameTimeScheduler.ScheduleMethod(
+                _ => {
+                    pTypingGame.NotificationManager.CreateNotification(
+                    NotificationManager.NotificationImportance.Info,
+                    $"Importing {legacySongDirs.Length} beatmaps..."
+                    );
+                }
+                );
+            }
+
             LegacyBeatmapImporter  legacyImporter  = new();
             UTypingBeatmapImporter uTypingImporter = new();
 
@@ -44,10 +57,17 @@ public static class LegacyImportChecker {
 
                     legacySongDir.MoveTo(Path.Combine(LegacySongFolderImported, legacySongDir.Name));
                 }
-                catch {
-                    // TODO: notify the user of the failed maps
-
+                catch (Exception ex) {
                     legacySongDir.MoveTo(Path.Combine(LegacySongFolderImportedFailed, legacySongDir.Name));
+                    
+                    FurballGame.GameTimeScheduler.ScheduleMethod(
+                    _ => {
+                        pTypingGame.NotificationManager.CreateNotification(
+                        NotificationManager.NotificationImportance.Error,
+                        $"Failed to import {legacySongDir.Name}! Reason: {ex.GetType()}"
+                        );
+                    }
+                    );
                 }
         }
         );
