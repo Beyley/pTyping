@@ -18,7 +18,8 @@ public class ChangeLogDrawable : CompositeDrawable {
 
         float y = 0;
 
-        foreach (GitLogEntry entry in Program.GitLog) {
+        List<GitLogEntry> gitLog = Program.GetGitLog();
+        foreach (GitLogEntry entry in gitLog) {
             ChangeLogEntryDrawable drawable = new(entry) {
                 Position = new Vector2(0, y)
             };

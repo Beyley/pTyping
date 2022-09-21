@@ -11,8 +11,6 @@ using Newtonsoft.Json;
 namespace pTyping;
 
 internal class Program {
-    public static List<GitLogEntry> GitLog;
-
     public static string GitVersion    = "unknown";
     public static string ReleaseStream = "other";
     public static string BuildVersion => $"{GitVersion}-{ReleaseStream}";
@@ -40,7 +38,7 @@ internal class Program {
         return reader.ReadToEnd().Trim();
     }
 
-    private static List<GitLogEntry> GetGitLog() {
+    public static List<GitLogEntry> GetGitLog() {
         string gitlog = ReadManifestResource("pTyping.gitlog.json");
 
         //evil hack to get around evil commit messages
@@ -56,9 +54,6 @@ internal class Program {
 
         SetReleaseStream();
         GitVersion = ReadManifestResource("pTyping.gitversion.txt");
-        GitLog     = GetGitLog();
-
-        GetGitLog();
 
         using pTypingGame game = new();
 

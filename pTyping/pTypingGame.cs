@@ -254,14 +254,14 @@ public class pTypingGame : FurballGame {
 
         // MenuClickSound.Volume = ConVars.Volume.Value.Value;
         AudioEngine.MusicVolume  = ConVars.Volume.Value.Value;
-        AudioEngine.SampleVolume = ConVars.Volume.Value.Value;
+        AudioEngine.SampleVolume = ConVars.Volume.Value.Value * 0.5;
 
         ConVars.Volume.OnChange += delegate {
             // MenuClickSound.Volume = volume.Value;
             // MusicTrack.Volume     = ConVars.Volume.Value.Value;
 
             AudioEngine.MusicVolume  = ConVars.Volume.Value.Value;
-            AudioEngine.SampleVolume = ConVars.Volume.Value.Value;
+            AudioEngine.SampleVolume = ConVars.Volume.Value.Value * 0.5;
 
             // MenuClickSound.Volume    = ConVars.Volume.Value.Value;
 
