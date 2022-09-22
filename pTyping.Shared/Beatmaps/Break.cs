@@ -1,9 +1,10 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class Break : RealmObject {
+public class Break : EmbeddedObject, IClonable<Break> {
     [Description("The end of the break")]
     public double End { get; set; }
     [Description("The start of the break")]

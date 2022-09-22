@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using pTyping.Scores;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Online.Tataku;
 
@@ -63,7 +64,7 @@ public class SpectatorFrameReplayFrame : SpectatorFrame {
 public class SpectatorFrameScoreSync : SpectatorFrame {
     public override SpectatorFrameDataType Type => SpectatorFrameDataType.ScoreSync;
 
-    public PlayerScore Score;
+    public Score Score;
 }
 
 public class SpectatorFrameChangingMap : SpectatorFrame {
@@ -179,9 +180,9 @@ public abstract class SpectatorFrame {
                 break;
             }
             case SpectatorFrameDataType.ScoreSync: {
-                SpectatorFrameScoreSync tframe = new();
-
-                tframe.Score = PlayerScore.TatakuDeserialize(reader);
+                SpectatorFrameScoreSync tframe = new() {
+                    Score = ScoreExtensions.TatakuDeserialize(reader)
+                };
 
                 frame = tframe;
                 break;

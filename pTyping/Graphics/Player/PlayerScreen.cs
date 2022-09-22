@@ -9,7 +9,6 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using JetBrains.Annotations;
@@ -19,8 +18,8 @@ using pTyping.Engine;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Online;
 using pTyping.Online.Tataku;
-using pTyping.Scores;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Scores;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Player;
@@ -47,8 +46,8 @@ public class PlayerScreen : pScreen {
 
     public PlayerScreen() {}
 
-    private          bool        _playingReplay = false;
-    private readonly PlayerScore _playingScoreReplay;
+    private          bool  _playingReplay = false;
+    private readonly Score _playingScoreReplay;
 
     public bool                 IsSpectating   = false;
     public List<SpectatorFrame> SpectatorQueue = new();
@@ -60,9 +59,9 @@ public class PlayerScreen : pScreen {
     ///     Used to play a replay
     /// </summary>
     /// <param name="replay">The score to get the replay from</param>
-    public PlayerScreen(PlayerScore replay) {
+    public PlayerScreen(Score replay) {
         this._playingReplay      = true;
-        this._playingScoreReplay = replay.Copy();
+        this._playingScoreReplay = replay.Clone();
     }
 
     public PlayerScreen(OnlinePlayer host) =>
@@ -112,7 +111,7 @@ public class PlayerScreen : pScreen {
 
         #region UI
 
-        this._scoreDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DefaultFont, $"{this.Player.Score.Score:00000000}", 60);
+        this._scoreDrawable = new TextDrawable(new Vector2(5, 5), FurballGame.DefaultFont, $"{this.Player.Score.AchievedScore:00000000}", 60);
         this._accuracyDrawable = new TextDrawable(
         new Vector2(5, 5 + this._scoreDrawable.Size.Y),
         FurballGame.DefaultFont,
@@ -122,7 +121,7 @@ public class PlayerScreen : pScreen {
         this._comboDrawable = new TextDrawable(
         new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f - 70),
         FurballGame.DefaultFont,
-        $"{this.Player.Score.Combo}x",
+        $"{this.Player.Score.CurrentCombo}x",
         70
         ) {
             OriginType = OriginType.BottomCenter
@@ -244,7 +243,7 @@ public class PlayerScreen : pScreen {
             try {
                 this._video = new VideoDrawable(
                 pTypingGame.FileDatabase.GetFile(this.Song.FileCollection.BackgroundVideo.Hash),
-                this.Player.Score.Speed,
+                pTypingGame.MusicTrack.GetSpeed(),
                 pTypingGame.MusicTrackTimeSource,
                 new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
                 ) {
@@ -477,11 +476,12 @@ public class PlayerScreen : pScreen {
             //Send a buffer every second
             if (this.timeSinceLastBuffer > 1000) {
                 if (pTypingGame.OnlineManager.Spectators.Count != 0) {
-                    pTypingGame.OnlineManager.SpectatorBuffer(currentTime);
-                    if (this.Player.ReplayFrames.Count != 0) {
-                        this.Player.ReplayFrames.ForEach(x => pTypingGame.OnlineManager.SpectatorReplayFrame(x.Time, x));
-                        this.Player.ReplayFrames.Clear();
-                    }
+                    //TODO: reimplement spectating
+                    // pTypingGame.OnlineManager.SpectatorBuffer(currentTime);
+                    // if (this.Player.Score.ReplayFrames.Count != 0) {
+                    // this.Player.Score.ReplayFrames.ForEach(x => pTypingGame.OnlineManager.SpectatorReplayFrame(x.Time, x));
+                    // this.Player.Score.ReplayFrames.Clear();
+                    // }
                 } else if (this.IsSpectating) {
                     // if(this.SpectatorQueue.Count != 0)
                     //     if (this.SpectatorQueue[^1].Time < currentTime + 5000) {
@@ -509,9 +509,9 @@ public class PlayerScreen : pScreen {
         #region update UI
 
         lock (this.Player.Score) {
-            this._scoreDrawable.Text    = $"{this.Player.Score.Score:00000000}";
+            this._scoreDrawable.Text    = $"{this.Player.Score.AchievedScore:00000000}";
             this._accuracyDrawable.Text = $"{this.Player.Score.Accuracy * 100:0.00}%";
-            this._comboDrawable.Text    = $"{this.Player.Score.Combo}x";
+            this._comboDrawable.Text    = $"{this.Player.Score.CurrentCombo}x";
         }
 
         bool isPaused = pTypingGame.MusicTrack.PlaybackState == PlaybackState.Paused;
@@ -537,12 +537,12 @@ public class PlayerScreen : pScreen {
 
         #endregion
 
-        if (this._playingReplay && Array.TrueForAll(this._playingScoreReplay.ReplayFrames, x => x.Used))
+        if (this._playingReplay && this._playingScoreReplay.ReplayFrames.All(x => x.Used))
             this._playingReplay = false;
 
         if (this._playingReplay)
-            for (int i = 0; i < this._playingScoreReplay.ReplayFrames.Length; i++) {
-                ref ReplayFrame currentFrame = ref this._playingScoreReplay.ReplayFrames[i];
+            for (int i = 0; i < this._playingScoreReplay.ReplayFrames.Count; i++) {
+                ReplayFrame currentFrame = this._playingScoreReplay.ReplayFrames[i];
 
                 if (currentTime > currentFrame.Time && !currentFrame.Used) {
                     this.Player.TypeCharacter(this, currentFrame.Character);
@@ -550,6 +550,8 @@ public class PlayerScreen : pScreen {
                     currentFrame.Used = true;
                     break;
                 }
+
+                this._playingScoreReplay.ReplayFrames[i] = currentFrame;
             }
 
         base.Update(gameTime);
@@ -563,10 +565,9 @@ public class PlayerScreen : pScreen {
 
                 this.Player.Score.Time = DateTime.Now;
                 if (this._playingScoreReplay == null) {
-                    this.Player.Score.ReplayFrames = this.Player.ReplayFrames.ToArray();
                     pTypingGame.SubmitScore(this.Song, this.Player.Score);
                 } else {
-                    this.Player.Score.Username = this._playingScoreReplay.Username;
+                    this.Player.Score.User = this._playingScoreReplay.User;
                 }
 
                 ScreenManager.ChangeScreen(new ScoreResultsScreen(this.Player.Score));

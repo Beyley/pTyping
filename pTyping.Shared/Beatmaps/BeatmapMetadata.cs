@@ -1,9 +1,10 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class BeatmapMetadata : RealmObject {
+public class BeatmapMetadata : EmbeddedObject, IClonable<BeatmapMetadata> {
     public IList<int> BackingLanguages { get; }
     [Ignored, Description("The languages contained within the song")]
     public IList<SongLanguage> Languages {

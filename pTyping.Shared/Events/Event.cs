@@ -1,9 +1,10 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Events;
 
-public class Event : RealmObject {
+public class Event : EmbeddedObject, IClonable<Event> {
     [Description("The end of the event")]
     public double End { get; set; }
     [Description("The start of the event")]
@@ -22,7 +23,6 @@ public class Event : RealmObject {
     [Ignored, Description("The length of the event")]
     public double Length => this.End - this.Start;
 
-    public Event Copy() => (Event)this.MemberwiseClone();
     public Event Clone() {
         Event @event = new() {
             Start = this.Start,

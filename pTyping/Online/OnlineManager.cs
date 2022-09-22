@@ -7,7 +7,7 @@ using Hellosam.Net.Collections;
 using JetBrains.Annotations;
 using pTyping.Engine;
 using pTyping.Graphics.Player;
-using pTyping.Scores;
+using pTyping.Shared.Scores;
 using SixLabors.ImageSharp;
 using Console=Furball.Engine.Engine.DevConsole.DevConsole;
 
@@ -46,17 +46,17 @@ public abstract class OnlineManager {
         protected set;
     } = ConnectionState.Disconnected;
 
-    public async Task SubmitScore(PlayerScore score) {
+    public async Task SubmitScore(Score score) {
         if (this.State == ConnectionState.LoggedIn)
             await this.ClientSubmitScore(score);
     }
 
     [Pure]
-    public async Task<List<PlayerScore>> GetMapScores(string hash) {
+    public async Task<List<Score>> GetMapScores(string hash) {
         if (this.State == ConnectionState.LoggedIn)
             return await this.ClientGetScores(hash);
 
-        return new List<PlayerScore>();
+        return new List<Score>();
     }
 
     public abstract string Username();
@@ -71,14 +71,14 @@ public abstract class OnlineManager {
     public abstract void SpectatorPause(double       time);
     public abstract void SpectatorResume(double      time);
     public abstract void SpectatorBuffer(double      time);
-    public abstract void SpectatorScoreSync(double   time, PlayerScore score);
+    public abstract void SpectatorScoreSync(double   time, Score       score);
     public abstract void SpectatorReplayFrame(double time, ReplayFrame frame);
 
     public abstract void SpectatePlayer(OnlinePlayer player);
 
-    protected abstract Task ClientSubmitScore(PlayerScore score);
+    protected abstract Task ClientSubmitScore(Score score);
     [Pure]
-    protected abstract Task<List<PlayerScore>> ClientGetScores(string hash);
+    protected abstract Task<List<Score>> ClientGetScores(string hash);
 
     public abstract void ChangeUserAction(UserAction action);
 

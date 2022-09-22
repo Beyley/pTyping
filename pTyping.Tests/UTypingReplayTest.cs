@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using pTyping.Scores;
+using pTyping.Shared.Scores;
 using Xunit;
 
 namespace pTyping.Tests {
@@ -1109,19 +1110,22 @@ namespace pTyping.Tests {
 
         [Fact]
         public void LoadUTypingReplayTest() {
-            PlayerScore loadedScore = PlayerScore.LoadUTypingReplay(Arr);
+            Score loadedScore = ScoreExtensions.LoadUTypingReplay(Arr);
 
             Assert.Equal(Frames, loadedScore.ReplayFrames);
         }
 
         [Fact]
         public void SaveUTypingReplayTest() {
-            PlayerScore score = new("hash", "UTyping") {
-                ReplayFrames = Frames
+            Score score = new() {
+                BeatmapId = "hash"
             };
+            score.User.Username = "UTyping";
+            foreach (ReplayFrame frame in Frames)
+                score.ReplayFrames.Add(frame);
 
-            Assert.Equal("UTyping", score.Username);
-            Assert.Equal("hash",    score.MapHash);
+            Assert.Equal("UTyping", score.User.Username);
+            Assert.Equal("hash",    score.BeatmapId);
 
             const string filePath = "utyping-save-test";
 

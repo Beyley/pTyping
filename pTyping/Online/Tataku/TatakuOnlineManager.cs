@@ -20,6 +20,7 @@ using pTyping.Graphics.Player;
 using pTyping.Online.Tataku.Packets;
 using pTyping.Scores;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Scores;
 using SixLabors.ImageSharp;
 using Websocket.Client;
 using Websocket.Client.Models;
@@ -206,7 +207,7 @@ public class TatakuOnlineManager : OnlineManager {
         }
         );
     }
-    public override void SpectatorScoreSync(double time, PlayerScore score) {
+    public override void SpectatorScoreSync(double time, Score score) {
         lock (this.Spectators) {
             if (this.Spectators.Count == 0) return;
         }
@@ -314,7 +315,7 @@ public class TatakuOnlineManager : OnlineManager {
         this.PacketQueue.Enqueue(new ClientNotifyScoreUpdatePacket());
     }
 
-    protected override async Task ClientSubmitScore(PlayerScore score) {
+    protected override async Task ClientSubmitScore(Score score) {
         try {
             string finalUri = $"{this._httpUri}{SCORE_SUBMIT_URL}";
 
@@ -329,12 +330,12 @@ public class TatakuOnlineManager : OnlineManager {
             writer.Write((byte)1);                          //this marks the data as being there
             score.TatakuSerialize(writer);                  //score
             writer.Write(new Dictionary<string, string>(0));//game info
-            writer.Write(score.ReplayFrames);               //replay frames
+            writer.Write(score.ReplayFrames.ToArray());     //replay frames
             // writer.Write(Array.Empty<ReplayFrame>());
             //END REPLAY
             //SCORE MAP INFO
             writer.Write("pTyping");
-            writer.Write(score.MapHash);
+            writer.Write(score.BeatmapId);
             writer.Write(PlayMode.pTyping);
             //END SCORE MAP INFO
 
@@ -361,8 +362,8 @@ public class TatakuOnlineManager : OnlineManager {
 
         this.SendUpdateScoreRequest();
     }
-    protected override async Task<List<PlayerScore>> ClientGetScores(string hash) {
-        List<PlayerScore> scores = new();
+    protected override async Task<List<Score>> ClientGetScores(string hash) {
+        List<Score> scores = new();
 
         try {
             string finalUri = this._httpUri + this._getScoresUrl;
@@ -384,7 +385,7 @@ public class TatakuOnlineManager : OnlineManager {
             ulong length = reader.ReadUInt64();
 
             for (ulong i = 0; i < length; i++)
-                scores.Add(PlayerScore.TatakuDeserialize(reader));
+                scores.Add(ScoreExtensions.TatakuDeserialize(reader));
         }
         catch {
             pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "Loading leaderboards failed!");

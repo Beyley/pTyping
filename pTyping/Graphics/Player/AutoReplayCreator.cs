@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using pTyping.Scores;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Graphics.Player;
 
@@ -11,10 +11,14 @@ namespace pTyping.Graphics.Player;
 //This will let us have a single interface for auto replays and replay conversions and such
 public static class AutoReplayCreator {
     [Pure]
-    public static PlayerScore CreateReplay(Beatmap song) {
-        PlayerScore score = new(song.Id, "p!auto") {
+    public static Score CreateReplay(Beatmap song) {
+        Score score = new() {
+            BeatmapId = song.Id,
+            User = {
+                Username = "p!auto"
+            },
             ExcellentHits = (ushort)song.HitObjects.Count,
-            Combo         = (ushort)song.HitObjects.Count
+            MaxCombo      = (ushort)song.HitObjects.Count
         };
 
         score.AddScore(69420);
@@ -34,8 +38,7 @@ public static class AutoReplayCreator {
                     frames.Add(
                     new ReplayFrame {
                         Character = s,
-                        Time      = time,
-                        Used      = false
+                        Time      = time
                     }
                     );
 
@@ -44,7 +47,8 @@ public static class AutoReplayCreator {
             }
         }
 
-        score.ReplayFrames = frames.ToArray();
+        foreach (ReplayFrame frame in frames)
+            score.ReplayFrames.Add(frame);
 
         return score;
     }

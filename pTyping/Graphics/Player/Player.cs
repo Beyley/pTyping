@@ -16,10 +16,10 @@ using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using pTyping.Engine;
 using pTyping.Graphics.Player.Mods;
-using pTyping.Scores;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
+using pTyping.Shared.Scores;
 using sowelipisona;
 
 
@@ -80,7 +80,7 @@ public class Player : CompositeDrawable {
 
     public Beatmap Song;
 
-    public PlayerScore Score;
+    public Score Score;
 
     private int _noteToType;
 
@@ -91,8 +91,7 @@ public class Player : CompositeDrawable {
     public bool IsSpectating = false;
 
     // private          bool              _playingReplay;
-    // private readonly PlayerScore       _playingScoreReplay = new();
-    public readonly List<ReplayFrame> ReplayFrames = new();
+    // private readonly Score       _playingScoreReplay = new();
     public event EventHandler<double> OnCorrectCharTyped;
 
     public event EventHandler<Color> OnComboUpdate;
@@ -103,10 +102,14 @@ public class Player : CompositeDrawable {
 
         // this.BaseApproachTime /= song.Difficulty.GlobalApproachMultiplier;
 
-        this.Score = new PlayerScore(this.Song.Id, pTypingConfig.Instance.Username) {
-            Mods = pTypingGame.SelectedMods
+        this.Score = new Score {
+            BeatmapId = this.Song.Id,
+            User = {
+                Username = pTypingConfig.Instance.Username
+            },
+            Mods = ""//TODO: mods
         };
-        this.Score.ModsString = string.Join(',', this.Score.Mods);
+        // this.Score.ModsString = string.Join(',', this.Score.Mods);
 
         this._playfieldBackground = new TexturedDrawable(ContentManager.LoadTextureFromFileCached("playfield-background.png", ContentSource.User), new Vector2(0)) {
             Depth = -0.95f
@@ -128,8 +131,8 @@ public class Player : CompositeDrawable {
 
         this.Drawables.Add(this._recepticle);
 
-        //Called before creating the notes
-        this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
+        //TODO: Called before creating the notes
+        // this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
 
         this.CreateEvents();
         this.CreateNotes();
@@ -148,7 +151,7 @@ public class Player : CompositeDrawable {
             mod.OnMapStart(pTypingGame.MusicTrack, this._notes, this);
             speedMod *= mod.SpeedMultiplier();
         }
-        this.Score.Speed = speedMod;
+        // this.Score.Speed = speedMod;
         pTypingGame.MusicTrack.SetSpeed(speedMod);
     }
 
@@ -226,12 +229,15 @@ public class Player : CompositeDrawable {
                 Character = e.Char,
                 Time      = pTypingGame.MusicTrackTimeSource.GetCurrentTime()
             };
-            this.ReplayFrames.Add(f);
+            this.Score.ReplayFrames.Add(f);
         }
 
         //If we already hit all the notes in the song, wtf are we doing here? stop hitting your keyboard you monkey
         if (this.Song.AllNotesHit()) return;
 
+        //TODO: figure out why the fuck this happened
+        if (this._noteToType >= this._notes.Count) return;
+        
         //The drawable for the note we are going to check
         NoteDrawable noteDrawable = this._notes[checkingNext ? this._noteToType + 1 : this._noteToType];
 
@@ -408,21 +414,21 @@ public class Player : CompositeDrawable {
                 _                   => 0
             };
 
-            uint scoreCombo = Math.Min(SCORE_COMBO * this.Score.Combo, SCORE_COMBO_MAX);
+            long scoreCombo = Math.Min(SCORE_COMBO * this.Score.CurrentCombo, SCORE_COMBO_MAX);
             this.Score.AddScore(scoreToAdd + scoreCombo);
 
             if (note.HitResult == HitResult.Poor)
-                this.Score.Combo = 0;
+                this.Score.CurrentCombo = 0;
 
-            this.Score.Combo++;
+            this.Score.CurrentCombo++;
 
-            if (this.Score.Combo > this.Score.MaxCombo)
-                this.Score.MaxCombo = this.Score.Combo;
+            if (this.Score.CurrentCombo > this.Score.MaxCombo)
+                this.Score.MaxCombo = this.Score.CurrentCombo;
         } else {
-            if (this.Score.Combo > this.Score.MaxCombo)
-                this.Score.MaxCombo = this.Score.Combo;
+            if (this.Score.CurrentCombo > this.Score.MaxCombo)
+                this.Score.MaxCombo = this.Score.CurrentCombo;
 
-            this.Score.Combo = 0;
+            this.Score.CurrentCombo = 0;
         }
 
         Color hitColor;
@@ -447,7 +453,7 @@ public class Player : CompositeDrawable {
                 this.Score.PoorHits++;
                 hitColor = COLOR_POOR;
 
-                this.Score.Combo = 0;
+                this.Score.CurrentCombo = 0;
                 break;
             }
         }
@@ -525,8 +531,9 @@ public class Player : CompositeDrawable {
             }
         }
 
-        foreach (PlayerMod mod in this.Score.Mods)
-            mod.Update(time);
+        //TODO
+        // foreach (PlayerMod mod in this.Score.Mods)
+        // mod.Update(time);
 
         base.Update(time);
 

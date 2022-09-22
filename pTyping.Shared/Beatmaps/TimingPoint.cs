@@ -1,9 +1,10 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class TimingPoint : RealmObject {
+public class TimingPoint : EmbeddedObject, IClonable<TimingPoint> {
     [Description("The exact time where the timing segment starts.")]
     public double Time { get; set; }
     [Description("The time between full beats.")]

@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Input.Events;
 using pTyping.Graphics.Player.Mods;
-using pTyping.Scores;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Graphics.Drawables;
 
@@ -23,15 +24,23 @@ public class ScoreResultsDrawable : CompositeDrawable {
 
         return drawable;
     }
-    
-    public ScoreResultsDrawable(PlayerScore playerScore) {
-        this.Drawables.Add(SetRotOrigin(this._username  = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Username: {playerScore.Username}",                 30)));
-        this.Drawables.Add(SetRotOrigin(this._score     = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Score: {playerScore.Score}",                       30)));
-        this.Drawables.Add(SetRotOrigin(this._accuracy  = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Accuracy: {playerScore.Accuracy * 100:00.00}%",    30)));
-        this.Drawables.Add(SetRotOrigin(this._combo     = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Combo: {playerScore.MaxCombo}",                    30)));
-        this.Drawables.Add(SetRotOrigin(this._mods      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Mods: {PlayerMod.GetModString(playerScore.Mods)}", 30)));
-        this.Drawables.Add(SetRotOrigin(this._excellent = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Excellent: {playerScore.ExcellentHits}",           30)));
-        this.Drawables.Add(SetRotOrigin(this._good      = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Good: {playerScore.GoodHits}",                30)));
+
+    public ScoreResultsDrawable(Score playerScore) {
+        this.Drawables.Add(
+        SetRotOrigin(this._username = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Username: {playerScore.User.Username}", 30))
+        );
+        this.Drawables.Add(SetRotOrigin(this._score = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Score: {playerScore.AchievedScore}", 30)));
+        this.Drawables.Add(
+        SetRotOrigin(this._accuracy = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Accuracy: {playerScore.Accuracy * 100:00.00}%", 30))
+        );
+        this.Drawables.Add(SetRotOrigin(this._combo = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Combo: {playerScore.MaxCombo}", 30)));
+        this.Drawables.Add(
+        SetRotOrigin(this._mods = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Mods: {PlayerMod.GetModString(new List<PlayerMod>())}", 30))
+        );//TODO
+        this.Drawables.Add(
+        SetRotOrigin(this._excellent = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Excellent: {playerScore.ExcellentHits}", 30))
+        );
+        this.Drawables.Add(SetRotOrigin(this._good = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Good: {playerScore.GoodHits}", 30)));
         this.Drawables.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Fair: {playerScore.FairHits}", 30)));
         this.Drawables.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Poor: {playerScore.PoorHits}", 30)));
 

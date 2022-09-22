@@ -1,12 +1,13 @@
 using System.ComponentModel;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class HitObject : RealmObject {
+public class HitObject : EmbeddedObject, IClonable<HitObject> {
     [Description("The time the hit object occurs at"), JsonProperty]
     public double Time { get; set; }
 

@@ -7,7 +7,7 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Vixie;
 using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;
-using pTyping.Scores;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Graphics.Drawables;
 
@@ -15,9 +15,9 @@ public class LeaderboardDrawable : CompositeDrawable {
 
     private readonly List<LeaderboardElementDrawable> _leaderboardElementDrawables = new();
 
-    private readonly List<PlayerScore> _scores;
+    private readonly List<Score> _scores;
 
-    public LeaderboardDrawable(List<PlayerScore> scores) {
+    public LeaderboardDrawable(List<Score> scores) {
         Texture tex = ContentManager.LoadTextureFromFileCached("song-button-background.png", ContentSource.User);
         
         this.Clickable   = false;
@@ -29,7 +29,7 @@ public class LeaderboardDrawable : CompositeDrawable {
 
         float y = 0;
         for (int i = 0; i < this._scores.GetRange(0, Math.Min(8, scores.Count)).Count; i++) {
-            PlayerScore score = this._scores.GetRange(0, Math.Min(8, scores.Count))[i];
+            Score score = this._scores.GetRange(0, Math.Min(8, scores.Count))[i];
             LeaderboardElementDrawable drawable = new(score, tex) {
                 Position = new Vector2(0, y)
             };
@@ -50,9 +50,9 @@ public class LeaderboardDrawable : CompositeDrawable {
         private readonly TextDrawable     _infoTextDrawable;
         private readonly TextDrawable     _usernameInfoDrawable;
 
-        public readonly PlayerScore Score;
+        public readonly Score Score;
 
-        public LeaderboardElementDrawable(PlayerScore score, Texture tex) {
+        public LeaderboardElementDrawable(Score score, Texture tex) {
             this.Score = score;
 
             this.Drawables.Add(
@@ -69,9 +69,9 @@ public class LeaderboardDrawable : CompositeDrawable {
         public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;
 
         public void UpdateText() {
-            this._usernameInfoDrawable.Text = this.Score.Username;
+            this._usernameInfoDrawable.Text = this.Score.User.Username;
             this._infoTextDrawable.Text =
-                $"Score: {this.Score.Score} | Accuracy: {this.Score.Accuracy * 100:00.##} | {this.Score.MaxCombo}x | {PlayerMod.GetModString(this.Score.Mods)}";
+                $"Score: {this.Score.AchievedScore} | Accuracy: {this.Score.Accuracy * 100:00.##} | {this.Score.MaxCombo}x | {PlayerMod.GetModString(new List<PlayerMod>())}";//TODO: mods
         }
     }
 }

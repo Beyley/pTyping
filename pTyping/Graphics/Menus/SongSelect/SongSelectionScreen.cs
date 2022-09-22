@@ -20,8 +20,8 @@ using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Editor;
 using pTyping.Graphics.Player;
 using pTyping.Graphics.Player.Mods;
-using pTyping.Scores;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Scores;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Menus.SongSelect;
@@ -343,7 +343,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
         
         this.Manager.Remove(this._leaderboardDrawable);
 
-        List<PlayerScore> origScores = new();
+        List<Score> origScores = new();
 
         switch (LeaderboardType.Value) {
             case SongSelect.LeaderboardType.Friend: {
@@ -352,22 +352,22 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
                 break;
             }
             case SongSelect.LeaderboardType.Global: {
-                Task<List<PlayerScore>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.Id);
+                Task<List<Score>> task = pTypingGame.OnlineManager.GetMapScores(pTypingGame.CurrentSong.Value.Id);
 
                 task.Wait();
 
                 origScores = task.Result;
-                foreach (PlayerScore playerScore in origScores)
-                    playerScore.IsOnline = true;
+                foreach (Score playerScore in origScores)
+                    playerScore.OnlineScore = true;
                 break;
             }
             case SongSelect.LeaderboardType.Local: {
-                origScores = pTypingGame.ScoreManager.GetScores(pTypingGame.CurrentSong.Value.Id);
+                origScores = pTypingGame.ScoreDatabase.Realm.All<Score>().Where(x => x.BeatmapId == pTypingGame.CurrentSong.Value.Id).ToList();
                 break;
             }
         }
 
-        List<PlayerScore> scores = origScores.OrderByDescending(x => x.Score).ToList();
+        List<Score> scores = origScores.OrderByDescending(x => x.AchievedScore).ToList();
 
         float y = this._songInfo.Size.Y + 25;
 

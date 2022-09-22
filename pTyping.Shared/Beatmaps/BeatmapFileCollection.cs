@@ -1,11 +1,12 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
 #nullable enable
 
-public class BeatmapFileCollection : RealmObject {
+public class BeatmapFileCollection : EmbeddedObject, IClonable<BeatmapFileCollection> {
     [Description("The hash and file path for the audio.")]
     public PathHashTuple? Audio { get; set; }
     [Description("The hash and file path for the background image.")]

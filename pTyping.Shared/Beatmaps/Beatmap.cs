@@ -2,11 +2,12 @@ using System.ComponentModel;
 using Newtonsoft.Json;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class Beatmap : RealmObject {
+public class Beatmap : RealmObject, IClonable<Beatmap> {
     [PrimaryKey]
     public string Id { get; set; }
 

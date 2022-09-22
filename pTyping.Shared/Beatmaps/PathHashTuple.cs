@@ -1,9 +1,10 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class PathHashTuple : RealmObject {
+public class PathHashTuple : EmbeddedObject, IClonable<PathHashTuple> {
     [Description("The path to the file")]
     public string Path { get; set; }
     [Description("The hash of the file")]

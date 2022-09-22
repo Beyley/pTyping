@@ -30,9 +30,9 @@ using pTyping.Graphics.Online;
 using pTyping.Graphics.Player.Mods;
 using pTyping.Online;
 using pTyping.Online.Tataku;
-using pTyping.Scores;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Scores;
 using Silk.NET.Input;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -66,12 +66,12 @@ public class pTypingGame : FurballGame {
     public static TextDrawable     VolumeSelector;
     public static TexturedDrawable CurrentSongBackground;
 
-    public static readonly ScoreManager ScoreManager = new();
-
     public static OnlineManager OnlineManager;
 
     public static BeatmapDatabase BeatmapDatabase;
     public static FileDatabase    FileDatabase;
+
+    public static ScoreDatabase ScoreDatabase;
 
     public static byte[] JapaneseFontData;
     public static FontSystem JapaneseFont = new(
@@ -395,10 +395,16 @@ public class pTypingGame : FurballGame {
         NotificationManager.Draw(gameTime, DrawableBatch);
     }
 
-    public static void SubmitScore(Beatmap song, PlayerScore score) {
-        ScoreManager.AddScore(score);
+    public static void SubmitScore(Beatmap song, Score score) {
+        ScoreDatabase.Realm.Write(
+        () => {
+            score.BeatmapId = song.Id;
+            ScoreDatabase.Realm.Add(score);
+        }
+        );
 
-        if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0 && score.Username == OnlineManager.Username())
+        //TODO: submit with mods
+        if (OnlineManager.State == ConnectionState.LoggedIn && SelectedMods.Count == 0 && score.User.Username == OnlineManager.Username())
             OnlineManager.SubmitScore(score).Wait();
     }
 
@@ -436,8 +442,6 @@ public class pTypingGame : FurballGame {
         };
 
         this.OnRelayout += this.RelayoutBackgroundDrawable;
-
-        ScoreManager.Load();
 
         NotificationManager = new NotificationManager();
 
@@ -488,6 +492,9 @@ public class pTypingGame : FurballGame {
 
         FileDatabase = new FileDatabase();
 
+        ScoreDatabase = new ScoreDatabase();
+        ScoreDatabase.Realm.Refresh();
+        
         LegacyImportChecker.CheckAndImportLegacyMaps();
 
         // BeatmapDatabase.Realm.Write(

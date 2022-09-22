@@ -9,15 +9,15 @@ using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
-using pTyping.Scores;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Graphics.Player;
 
 public class ScoreResultsScreen : pScreen {
-    public PlayerScore Score;
+    public Score Score;
 
-    public ScoreResultsScreen(PlayerScore score) => this.Score = score;
+    public ScoreResultsScreen(Score score) => this.Score = score;
 
     public override void Initialize() {
         base.Initialize();
@@ -80,7 +80,7 @@ public class ScoreResultsScreen : pScreen {
 
         EventHandler<MouseButtonEventArgs> watchReplayOnClick = delegate {
             pTypingGame.MenuClickSound.PlayNew();
-            if (!this.Score.ReplayCheck()) {
+            if (this.Score.ReplayFrames.Count == 0) {
                 pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, "This score has no replay data!");
                 return;
             }
@@ -122,8 +122,8 @@ public class ScoreResultsScreen : pScreen {
         get {
             BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
             return $@"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
-Played by {this.Score.Username}
-Score: {this.Score.Score:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
+Played by {this.Score.User.Username}
+Score: {this.Score.AchievedScore:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";
         }
     }
     public override bool           ForceSpeedReset      => false;

@@ -5,6 +5,7 @@ using Furball.Volpe.Evaluation;
 using Kettu;
 using pTyping.Graphics.Player;
 using pTyping.Scores;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Engine;
 
@@ -32,7 +33,7 @@ public class ConVars {
         if (parameters[0] is not Value.String filename) return Value.DefaultVoid;
         
         Logger.Log($"Loading UTyping replay {parameters[0].Representation}", LoggerLevelPlayerInfo.Instance);
-        ScreenManager.ChangeScreen(new PlayerScreen(PlayerScore.LoadUTypingReplay(filename.Value)));
+        ScreenManager.ChangeScreen(new PlayerScreen(ScoreExtensions.LoadUTypingReplay(filename.Value)));
 
         return Value.DefaultVoid;
     }
@@ -43,7 +44,7 @@ public class ConVars {
     (context, parameters) => {
         Logger.Log("Loading Auto replay", LoggerLevelPlayerInfo.Instance);
 
-        PlayerScore playerScore = AutoReplayCreator.CreateReplay(pTypingGame.CurrentSong.Value);
+        Score playerScore = AutoReplayCreator.CreateReplay(pTypingGame.CurrentSong.Value);
 
         ScreenManager.ChangeScreen(new PlayerScreen(playerScore));
 
@@ -91,7 +92,7 @@ public class ConVars {
 //     public LoadUTypingReplay() : base("cl_load_utyping_replay") {}
 //
 //     public override ConsoleResult Run(string[] consoleInput) {
-//         ScreenManager.ChangeScreen(new PlayerScreen(PlayerScore.LoadUTypingReplay(consoleInput[0])));
+//         ScreenManager.ChangeScreen(new PlayerScreen(Score.LoadUTypingReplay(consoleInput[0])));
 //
 //         return new ConsoleResult(ExecutionResult.Success, "Loaded UTyping replay!");
 //     }

@@ -1,9 +1,10 @@
 using System.ComponentModel;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class BeatmapInfo : RealmObject, IEquatable<BeatmapInfo> {
+public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, IClonable<BeatmapInfo> {
     [Description("A description of the beatmap given by the creator.")]
     public string Description { get; set; }
 

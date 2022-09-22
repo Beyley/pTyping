@@ -1,9 +1,10 @@
 using Furball.Vixie.Backends.Shared;
+using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
-public class HitObjectColor : RealmObject {
+public class HitObjectColor : EmbeddedObject, IClonable<HitObjectColor> {
     private HitObjectColor(float colorRf, float colorGf, float colorBf, float colorAf) {
         this.R = colorRf;
         this.G = colorGf;
