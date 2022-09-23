@@ -4,7 +4,12 @@ using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class BeatmapSet : RealmObject, IClonable<BeatmapSet> {
+public class BeatmapSet : RealmObject, IClonable<BeatmapSet>, IEquatable<BeatmapSet> {
+    public BeatmapSet() => this.Id = Guid.NewGuid();
+
+    [Description("The unique ID for the beatmap set"), PrimaryKey]
+    public Guid Id { get; set; }
+
     [Description("A list of all beatmaps in the set")]
     public IList<Beatmap> Beatmaps { get; }
 
@@ -21,16 +26,20 @@ public class BeatmapSet : RealmObject, IClonable<BeatmapSet> {
         BeatmapSet set = new() {
             Title  = this.Title.Clone(),
             Artist = this.Artist.Clone(),
-            Source = this.Source
+            Source = this.Source,
+            Id     = this.Id
         };
         foreach (Beatmap beatmap in this.Beatmaps)
             set.Beatmaps.Add(beatmap.Clone());
         return set;
     }
-    
-    public override bool Equals(object obj) {
-        return obj is BeatmapSet other && this.Beatmaps.SequenceEqual(other.Beatmaps);
+
+    public bool Equals(BeatmapSet obj) {
+        if (ReferenceEquals(null, obj))
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        return this.Id == obj.Id;
     }
-    
-    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), this.Beatmaps);
 }
