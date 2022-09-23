@@ -4,7 +4,7 @@ using Realms;
 
 namespace pTyping.Shared.Events;
 
-public class Event : EmbeddedObject, IClonable<Event> {
+public class Event : EmbeddedObject, IClonable<Event>, IComparable<Event> {
     [Description("The end of the event")]
     public double End { get; set; }
     [Description("The start of the event")]
@@ -32,5 +32,22 @@ public class Event : EmbeddedObject, IClonable<Event> {
         };
 
         return @event;
+    }
+
+    public int CompareTo(Event other) {
+        if (ReferenceEquals(this, other))
+            return 0;
+        if (ReferenceEquals(null, other))
+            return 1;
+        int endComparison = this.End.CompareTo(other.End);
+        if (endComparison != 0)
+            return endComparison;
+        int startComparison = this.Start.CompareTo(other.Start);
+        if (startComparison != 0)
+            return startComparison;
+        int textComparison = string.Compare(this.Text, other.Text, StringComparison.Ordinal);
+        if (textComparison != 0)
+            return textComparison;
+        return this.BackingType.CompareTo(other.BackingType);
     }
 }

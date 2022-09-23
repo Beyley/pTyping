@@ -5,7 +5,13 @@ using Realms;
 namespace pTyping.Shared.Scores;
 
 public class Score : RealmObject, IClonable<Score> {
-    public Score() => this.User = new DatabaseUser();
+    public Score() {
+        this.User = new DatabaseUser();
+        this.ID   = Guid.NewGuid();
+    }
+
+    [Description("A unique ID for the score"), PrimaryKey]
+    public Guid ID { get; set; }
 
     [Description("The user that made the score")]
     public DatabaseUser User { get; set; }
@@ -63,7 +69,8 @@ public class Score : RealmObject, IClonable<Score> {
             GoodHits      = this.GoodHits,
             MaxCombo      = this.MaxCombo,
             OnlineScore   = this.OnlineScore,
-            PoorHits      = this.PoorHits
+            PoorHits      = this.PoorHits,
+            ID            = this.ID
         };
 
         foreach (ReplayFrame frame in this.ReplayFrames)
