@@ -35,6 +35,10 @@ public class UTypingBeatmapImporter : IBeatmapImporter {
             set.Beatmaps.Add(map);
         }
 
+        //Do nothing if we found no beatmaps
+        if (set.Beatmaps.Count == 0)
+            return;
+        
         database.Realm.Add(set);
     }
 }

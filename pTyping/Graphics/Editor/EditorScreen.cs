@@ -61,7 +61,7 @@ public class EditorScreen : pScreen {
 
         // throw new NotImplementedException();
 
-        this.EditorState = new EditorState(null);
+        this.EditorState = new EditorState(pTypingGame.CurrentSong.Value.Clone());
 
         pTypingGame.MusicTrack.Stop();
 

@@ -40,6 +40,10 @@ public class LegacyBeatmapImporter : IBeatmapImporter {
             set.Beatmaps.Add(map);
         }
 
+        //Do nothing if we found no beatmaps in the set
+        if (set.Beatmaps.Count == 0)
+            return;
+
         database.Realm.Add(set);
     }
 }
