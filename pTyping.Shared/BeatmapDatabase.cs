@@ -7,30 +7,30 @@ using Realms.Schema;
 namespace pTyping.Shared;
 
 public class BeatmapDatabase {
-    public readonly Realm Realm;
+	public readonly Realm Realm;
 
-    public BeatmapDatabase() {
-        RealmSchema.Builder builder = new() {
-            typeof(BeatmapSet),
-            typeof(Beatmap),
-            typeof(Break),
-            typeof(BeatmapDifficulty),
-            typeof(BeatmapFileCollection),
-            typeof(BeatmapInfo),
-            typeof(BeatmapMetadata),
-            typeof(PathHashTuple),
-            typeof(TimingPoint),
-            typeof(HitObject),
-            typeof(Event),
-            typeof(AsciiUnicodeTuple),
-            typeof(HitObjectColor),
-            typeof(HitObjectSettings)
-        };
+	public BeatmapDatabase() {
+		RealmSchema.Builder builder = new() {
+			typeof(BeatmapSet),
+			typeof(Beatmap),
+			typeof(Break),
+			typeof(BeatmapDifficulty),
+			typeof(BeatmapFileCollection),
+			typeof(BeatmapInfo),
+			typeof(BeatmapMetadata),
+			typeof(PathHashTuple),
+			typeof(TimingPoint),
+			typeof(HitObject),
+			typeof(Event),
+			typeof(AsciiUnicodeTuple),
+			typeof(HitObjectColor),
+			typeof(HitObjectSettings)
+		};
 
-        RealmConfiguration config = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "songs.db")) {
-            Schema = builder.Build()
-        };
+		RealmConfiguration config = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "songs.db")) {
+			Schema = builder.Build()
+		};
 
-        this.Realm = Realm.GetInstance(config);
-    }
+		this.Realm = Realm.GetInstance(config);
+	}
 }

@@ -8,87 +8,87 @@ using pTyping.Graphics;
 namespace pTyping;
 
 public static class DiscordManager {
-    public static DiscordRpcClient Client;
+	public static DiscordRpcClient Client;
 
-    public const long CLIENT_ID = 908631391934222366;
+	public const long CLIENT_ID = 908631391934222366;
 
-    public static User User { get; private set; }
+	public static User User { get; private set; }
 
-    public static bool Initialized { get; private set; }
-    
-    public static void Initialize() {
-        try {
-            Initialized = true;
+	public static bool Initialized { get; private set; }
 
-            int id = -1;
-            if (Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID") != null)
-                id = Convert.ToInt32(Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID"));
+	public static void Initialize() {
+		try {
+			Initialized = true;
 
-            Client = new DiscordRpcClient(CLIENT_ID.ToString(), id, new NullLogger(), false);
+			int id = -1;
+			if (Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID") != null)
+				id = Convert.ToInt32(Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID"));
 
-            Client.OnReady += OnReady;
+			Client = new DiscordRpcClient(CLIENT_ID.ToString(), id, new NullLogger(), false);
 
-            Client.Initialize();
-        }
-        catch {
-            Initialized = false;
-        }
-    }
+			Client.OnReady += OnReady;
 
-    private static void OnReady(object sender, ReadyMessage args) {
-        User = Client.CurrentUser;
-    }
+			Client.Initialize();
+		}
+		catch {
+			Initialized = false;
+		}
+	}
 
-    public static void Dispose() {
-        if (!Initialized)
-            return;
-        
-        Client.Dispose();
-        Initialized = false;
-    }
+	private static void OnReady(object sender, ReadyMessage args) {
+		User = Client.CurrentUser;
+	}
 
-    private static double _Timer = 0;
-    public static void Update(double deltaTime) {
-        if (!Initialized)
-            return;
-        
-        try {
-            Client.Invoke();
+	public static void Dispose() {
+		if (!Initialized)
+			return;
 
-            _Timer += deltaTime;
+		Client.Dispose();
+		Initialized = false;
+	}
 
-            if (_Timer > 0.150) {// every 150ms
-                UpdatePresence();
-                _Timer = 0;
-            }
+	private static double _Timer;
+	public static void Update(double deltaTime) {
+		if (!Initialized)
+			return;
 
-            // LobbyManager.FlushNetwork();
-        }
-        catch {
-            Initialized = false;
-        }
-    }
+		try {
+			Client.Invoke();
 
-    private static void UpdatePresence() {
-        if (!Initialized)
-            return;
+			_Timer += deltaTime;
 
-        try {
-            if (FurballGame.Instance.RunningScreen is pScreen screen) {
-                RichPresence presence = new() {
-                    State   = screen.State,
-                    Details = screen.Details,
-                    Assets = new Assets {
-                        LargeImageKey  = "ptyping-mode-icon",
-                        LargeImageText = "pTyping"
-                    }
-                };
+			if (_Timer > 0.150) { // every 150ms
+				UpdatePresence();
+				_Timer = 0;
+			}
 
-                Client.SetPresence(presence);
-            }
-        }
-        catch {
-            Initialized = false;
-        }
-    }
+			// LobbyManager.FlushNetwork();
+		}
+		catch {
+			Initialized = false;
+		}
+	}
+
+	private static void UpdatePresence() {
+		if (!Initialized)
+			return;
+
+		try {
+			if (FurballGame.Instance.RunningScreen is pScreen screen) {
+				RichPresence presence = new() {
+					State   = screen.State,
+					Details = screen.Details,
+					Assets = new Assets {
+						LargeImageKey  = "ptyping-mode-icon",
+						LargeImageText = "pTyping"
+					}
+				};
+
+				Client.SetPresence(presence);
+			}
+		}
+		catch {
+			Initialized = false;
+		}
+	}
 }

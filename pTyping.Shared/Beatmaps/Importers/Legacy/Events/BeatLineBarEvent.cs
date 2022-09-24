@@ -4,5 +4,5 @@ namespace pTyping.Shared.Beatmaps.Importers.Legacy.Events;
 ///     Happens every full beat
 /// </summary>
 internal abstract class LegacyBeatLineBarEvent : LegacyEvent {
-    public override LegacyEventType Type => LegacyEventType.BeatLineBar;
+	public override LegacyEventType Type => LegacyEventType.BeatLineBar;
 }

@@ -1,5 +1,5 @@
-namespace pTyping.Shared.Beatmaps.Filters; 
+namespace pTyping.Shared.Beatmaps.Filters;
 
 public interface IBeatmapSetFilter {
-    public IQueryable<BeatmapSet> Filter(IQueryable<BeatmapSet> sets);
+	public IQueryable<BeatmapSet> Filter(IQueryable<BeatmapSet> sets);
 }

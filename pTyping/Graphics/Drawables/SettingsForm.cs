@@ -4,13 +4,13 @@ using Furball.Engine.Engine.Graphics.Drawables;
 namespace pTyping.Graphics.Drawables;
 
 public class SettingsForm : DrawableForm {
-    private class DrawableSettingsMenu : ScrollableContainer {
-        public DrawableSettingsMenu() : base(new Vector2(300, 400)) {
-            this.Add(new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, "Options (WIP)", 24));
-        }
-    }
+	private class DrawableSettingsMenu : ScrollableContainer {
+		public DrawableSettingsMenu() : base(new Vector2(300, 400)) {
+			this.Add(new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, "Options (WIP)", 24));
+		}
+	}
 
-    public bool StateChanging;
+	public bool StateChanging;
 
-    public SettingsForm(OriginType startPosition = OriginType.Center) : base("Settings", new DrawableSettingsMenu(), startPosition) {}
+	public SettingsForm(OriginType startPosition = OriginType.Center) : base("Settings", new DrawableSettingsMenu(), startPosition) {}
 }

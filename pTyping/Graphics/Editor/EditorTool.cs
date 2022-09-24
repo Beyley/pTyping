@@ -15,73 +15,75 @@ namespace pTyping.Graphics.Editor;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public abstract class EditorTool : IComparable<EditorTool> {
-    public const           int     ITEMTEXTSIZE       = 30;
-    public const           int     LABELTEXTSIZE      = 35;
-    public const           float   TEXTBOXWIDTH       = 300;
-    public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
-    public const           float   LABELAFTERDISTANCE = 5f;
+	public const           int     ITEMTEXTSIZE       = 30;
+	public const           int     LABELTEXTSIZE      = 35;
+	public const           float   TEXTBOXWIDTH       = 300;
+	public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
+	public const           float   LABELAFTERDISTANCE = 5f;
 
-    public DrawableTickbox TickBoxDrawable;
-    [NotNull]
-    public abstract string Name { get; }
-    [NotNull]
-    public abstract string Tooltip { get; }
+	public DrawableTickbox TickBoxDrawable;
+	[NotNull]
+	public abstract string Name { get; }
+	[NotNull]
+	public abstract string Tooltip { get; }
 
-    protected EditorDrawable DrawableManager;
-    protected EditorScreen   EditorInstance;
+	protected EditorDrawable DrawableManager;
+	protected EditorScreen   EditorInstance;
 
-    public int CompareTo(EditorTool other) {
-        if (ReferenceEquals(this, other))
-            return 0;
-        if (ReferenceEquals(null, other))
-            return 1;
-        int nameComparison = string.Compare(this.Name, other.Name, StringComparison.Ordinal);
-        if (nameComparison != 0)
-            return nameComparison;
-        return string.Compare(this.Tooltip, other.Tooltip, StringComparison.Ordinal);
-    }
+	public int CompareTo(EditorTool other) {
+		if (ReferenceEquals(this, other))
+			return 0;
+		if (ReferenceEquals(null, other))
+			return 1;
+		int nameComparison = string.Compare(this.Name, other.Name, StringComparison.Ordinal);
+		if (nameComparison != 0)
+			return nameComparison;
+		return string.Compare(this.Tooltip, other.Tooltip, StringComparison.Ordinal);
+	}
 
-    public void SelectTool(EditorScreen editor, ref EditorDrawable drawableManager) {
-        this.DrawableManager = drawableManager;
-        this.EditorInstance  = editor;
+	public void SelectTool(EditorScreen editor, ref EditorDrawable drawableManager) {
+		this.DrawableManager = drawableManager;
+		this.EditorInstance  = editor;
 
-        this.Initialize();
+		this.Initialize();
 
-        Logger.Log($"EditorTool {this.GetType().Name} has been initialized!", LoggerLevelEditorInfo.Instance);
-    }
+		Logger.Log($"EditorTool {this.GetType().Name} has been initialized!", LoggerLevelEditorInfo.Instance);
+	}
 
-    public void DeselectTool(EditorScreen editor) {
-        this.Deinitialize();
+	public void DeselectTool(EditorScreen editor) {
+		this.Deinitialize();
 
-        Logger.Log($"EditorTool {this.GetType().Name} has been deinitialized!", LoggerLevelEditorInfo.Instance);
-    }
+		Logger.Log($"EditorTool {this.GetType().Name} has been deinitialized!", LoggerLevelEditorInfo.Instance);
+	}
 
-    /// <summary>
-    ///     Register handlers and such here
-    /// </summary>
-    public virtual void Initialize() {}
-    /// <summary>
-    ///     Unregister your handlers and such here
-    /// </summary>
-    public virtual void Deinitialize() {}
+	/// <summary>
+	///     Register handlers and such here
+	/// </summary>
+	public virtual void Initialize() {}
+	/// <summary>
+	///     Unregister your handlers and such here
+	/// </summary>
+	public virtual void Deinitialize() {}
 
-    public virtual void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {}
+	public virtual void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {}
 
-    public virtual void OnMouseDrag(Vector2 position) {}
+	public virtual void OnMouseDrag(Vector2 position) {}
 
-    public virtual void OnMouseMove(Vector2 position) {}
+	public virtual void OnMouseMove(Vector2 position) {}
 
-    public virtual void OnKeyPress(Key key) {}
+	public virtual void OnKeyPress(Key key) {}
 
-    public virtual void OnTimeChange(double time) {}
+	public virtual void OnTimeChange(double time) {}
 
-    public virtual void OnNoteCreate(NoteDrawable note, bool isNew) {}
+	public virtual void OnNoteCreate(NoteDrawable note, bool isNew) {}
 
-    public virtual void OnNoteDelete(NoteDrawable note) {}
+	public virtual void OnNoteDelete(NoteDrawable note) {}
 
-    public virtual void OnEventCreate(Drawable @event, bool isNew) {}
+	public virtual void OnEventCreate(Drawable @event, bool isNew) {}
 
-    public virtual void OnEventDelete(Drawable note) {}
+	public virtual void OnEventDelete(Drawable note) {}
 
-    public static List<EditorTool> GetAllTools() => ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
+	public static List<EditorTool> GetAllTools() {
+		return ObjectHelper.GetEnumerableOfType<EditorTool>().ToList();
+	}
 }

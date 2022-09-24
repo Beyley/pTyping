@@ -4,15 +4,15 @@ namespace pTyping.Shared.Beatmaps.Importers.Legacy;
 
 [JsonObject(MemberSerialization.OptIn)]
 internal abstract class LegacyEvent {
-    [JsonProperty]
-    public abstract LegacyEventType Type { get; }
-    [JsonProperty]
-    public double Time { get; set; }
+	[JsonProperty]
+	public abstract LegacyEventType Type { get; }
+	[JsonProperty]
+	public double Time { get; set; }
 }
 
 public enum LegacyEventType {
-    Lyric,
-    TypingCutoff,
-    BeatLineBar,
-    BeatLineBeat
+	Lyric,
+	TypingCutoff,
+	BeatLineBar,
+	BeatLineBeat
 }

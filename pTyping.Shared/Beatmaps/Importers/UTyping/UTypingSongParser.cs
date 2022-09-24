@@ -8,181 +8,181 @@ using pTyping.Shared.Events;
 namespace pTyping.Shared.Beatmaps.Importers.UTyping;
 
 public static class UTypingSongParser {
-    public static Beatmap? ParseUTypingBeatmap(FileInfo fileInfo, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title) {
-        Beatmap beatmap = new();
+	public static Beatmap? ParseUTypingBeatmap(FileInfo fileInfo, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title) {
+		Beatmap beatmap = new();
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        byte[] fullFile = File.ReadAllBytes(fileInfo.FullName);
+		byte[] fullFile = File.ReadAllBytes(fileInfo.FullName);
 
-        beatmap.Id = CryptoHelper.GetMd5(fullFile);
+		beatmap.Id = CryptoHelper.GetMd5(fullFile);
 
-        string infoData = Encoding.GetEncoding(932).GetString(fullFile);
+		string infoData = Encoding.GetEncoding(932).GetString(fullFile);
 
-        infoData = infoData.Replace("\r", "");
-        string[] info = infoData.Split("\n");
+		infoData = infoData.Replace("\r", "");
+		string[] info = infoData.Split("\n");
 
-        title                       = new AsciiUnicodeTuple(null, info[0]);
-        artist                      = new AsciiUnicodeTuple(null, info[1]);
-        beatmap.Info.Mapper         = info[2];
-        beatmap.Info.DifficultyName = new AsciiUnicodeTuple(null, info[3]);
+		title                       = new AsciiUnicodeTuple(null, info[0]);
+		artist                      = new AsciiUnicodeTuple(null, info[1]);
+		beatmap.Info.Mapper         = info[2];
+		beatmap.Info.DifficultyName = new AsciiUnicodeTuple(null, info[3]);
 
-        source = "UTyping";
-        
-        string fumenFilename = info[4];
+		source = "UTyping";
 
-        //info[5] is just the score filename, which we dont parse
-        //all lines after info[5] are description
+		string fumenFilename = info[4];
 
-        string[] descSplit = info[6..];
+		//info[5] is just the score filename, which we dont parse
+		//all lines after info[5] are description
 
-        beatmap.Info.Description = string.Join("\n", descSplit);
+		string[] descSplit = info[6..];
 
-        string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, fumenFilename)));
+		beatmap.Info.Description = string.Join("\n", descSplit);
 
-        //If the first char of the map is not the song filename, panic out
-        //TODO: do all UTyping songs have the song filename first?
-        if (mapData[0] != '@') return null;
+		string mapData = Encoding.GetEncoding(932).GetString(File.ReadAllBytes(Path.Combine(fileInfo.DirectoryName!, fumenFilename)));
 
-        double?     firstBeatlineBar = null;
-        TimingPoint timingPoint      = new(0, 0);
+		//If the first char of the map is not the song filename, panic out
+		//TODO: do all UTyping songs have the song filename first?
+		if (mapData[0] != '@') return null;
 
-        using StringReader reader = new(mapData);
+		double?     firstBeatlineBar = null;
+		TimingPoint timingPoint      = new(0, 0);
 
-        string? line;
-        do {
-            line = reader.ReadLine();
+		using StringReader reader = new(mapData);
 
-            //If we reached the end of the string or are on an empty line, skip to the next line...
-            if (line == null || line.Trim() == string.Empty)
-                continue;
+		string? line;
+		do {
+			line = reader.ReadLine();
 
-            //Get the first char of the line
-            string firstChar = line[0].ToString();
+			//If we reached the end of the string or are on an empty line, skip to the next line...
+			if (line == null || line.Trim() == string.Empty)
+				continue;
 
-            //Get the rest of the line
-            line = line[1..];
+			//Get the first char of the line
+			string firstChar = line[0].ToString();
 
-            switch (firstChar) {
-                //Contains the relative path to the song file in the format of
-                //@path
-                //ex. @animariot.ogg
-                case "@": {
-                    string fullAudioPath = Path.Combine(fileInfo.DirectoryName!, line);
+			//Get the rest of the line
+			line = line[1..];
 
-                    if (!File.Exists(fullAudioPath))
-                        return null;
+			switch (firstChar) {
+				//Contains the relative path to the song file in the format of
+				//@path
+				//ex. @animariot.ogg
+				case "@": {
+					string fullAudioPath = Path.Combine(fileInfo.DirectoryName!, line);
 
-                    beatmap.FileCollection.Audio = new PathHashTuple(line, CryptoHelper.GetMd5(File.ReadAllBytes(fullAudioPath)));
-                    break;
-                }
-                //Contains a note in the format of
-                //TimeInSeconds CharacterToType
-                //ex. +109.041176 だい
-                case "+": {
-                    string[] splitLine = line.Split(" ");
+					if (!File.Exists(fullAudioPath))
+						return null;
 
-                    double time = double.Parse(splitLine[0]) * 1000;
-                    string text = splitLine[1];
+					beatmap.FileCollection.Audio = new PathHashTuple(line, CryptoHelper.GetMd5(File.ReadAllBytes(fullAudioPath)));
+					break;
+				}
+				//Contains a note in the format of
+				//TimeInSeconds CharacterToType
+				//ex. +109.041176 だい
+				case "+": {
+					string[] splitLine = line.Split(" ");
 
-                    beatmap.HitObjects.Add(
-                    new HitObject {
-                        Text  = text,
-                        Time  = time,
-                        Color = Color.Red
-                    }
-                    );
+					double time = double.Parse(splitLine[0]) * 1000;
+					string text = splitLine[1];
 
-                    break;
-                }
-                //Contains the next set of lyrics in the format of
-                //*TimeInSeconds Lyrics
-                //ex. *16.100000 だいてだいてだいてだいて　もっと
-                case "*": {
-                    string[] splitLine = line.Split(" ");
+					beatmap.HitObjects.Add(
+						new HitObject {
+							Text  = text,
+							Time  = time,
+							Color = Color.Red
+						}
+					);
 
-                    double time = double.Parse(splitLine[0]) * 1000d;
-                    string text = string.Join(' ', splitLine[1..]);
+					break;
+				}
+				//Contains the next set of lyrics in the format of
+				//*TimeInSeconds Lyrics
+				//ex. *16.100000 だいてだいてだいてだいて　もっと
+				case "*": {
+					string[] splitLine = line.Split(" ");
 
-                    if (beatmap.Events.Any(x => x.Type == EventType.Lyric)) {
-                        Event ev = beatmap.Events.Last(x => x.Type == EventType.Lyric);
+					double time = double.Parse(splitLine[0]) * 1000d;
+					string text = string.Join(' ', splitLine[1..]);
 
-                        // ReSharper disable once CompareOfFloatsByEqualityOperator
-                        if (ev.End == double.PositiveInfinity)
-                            ev.End = time;
-                    }
+					if (beatmap.Events.Any(x => x.Type == EventType.Lyric)) {
+						Event ev = beatmap.Events.Last(x => x.Type == EventType.Lyric);
 
-                    beatmap.Events.Add(
-                    new Event {
-                        Start = time,
-                        End   = double.PositiveInfinity,
-                        Text  = text.Trim(),
-                        Type  = EventType.Lyric
-                    }
-                    );
+						// ReSharper disable once CompareOfFloatsByEqualityOperator
+						if (ev.End == double.PositiveInfinity)
+							ev.End = time;
+					}
 
-                    break;
-                }
-                //Prevents you from typing the previous note, and stops the currently lyric
-                // /TimeInSeconds
-                //ex. /17.982353
-                case "/": {
-                    double time = double.Parse(line) * 1000d;
+					beatmap.Events.Add(
+						new Event {
+							Start = time,
+							End   = double.PositiveInfinity,
+							Text  = text.Trim(),
+							Type  = EventType.Lyric
+						}
+					);
 
-                    beatmap.Events.Add(
-                    new Event {
-                        Start = time,
-                        End   = time,
-                        Type  = EventType.TypingCutoff
-                    }
-                    );
+					break;
+				}
+				//Prevents you from typing the previous note, and stops the currently lyric
+				// /TimeInSeconds
+				//ex. /17.982353
+				case "/": {
+					double time = double.Parse(line) * 1000d;
 
-                    if (beatmap.Events.Any(x => x.Type == EventType.Lyric)) {
-                        Event ev = beatmap.Events.Last(x => x.Type == EventType.Lyric);
+					beatmap.Events.Add(
+						new Event {
+							Start = time,
+							End   = time,
+							Type  = EventType.TypingCutoff
+						}
+					);
 
-                        // ReSharper disable once CompareOfFloatsByEqualityOperator
-                        if (ev.End == double.PositiveInfinity)
-                            ev.End = time;
-                    }
+					if (beatmap.Events.Any(x => x.Type == EventType.Lyric)) {
+						Event ev = beatmap.Events.Last(x => x.Type == EventType.Lyric);
 
-                    break;
-                }
-                //A beatline beat (happens every 1/4th beat except for full beats)
-                //-TimeInSeconds
-                //ex. -17.747059
-                case "-": {
-                    // song.Events.Add(
-                    // new BeatLineBeatEvent {
-                    //     Time = double.Parse(line) * 1000d
-                    // }
-                    // );
+						// ReSharper disable once CompareOfFloatsByEqualityOperator
+						if (ev.End == double.PositiveInfinity)
+							ev.End = time;
+					}
 
-                    //We ignore these events for now...
-                    break;
-                }
-                //A beatline bar (happens every full beat)
-                //=TimeInSeconds
-                //ex. =4.544444
-                case "=": {
-                    // song.Events.Add(
-                    // new BeatLineBarEvent {
-                    //     Time = double.Parse(line) * 1000d
-                    // }
-                    // );
+					break;
+				}
+				//A beatline beat (happens every 1/4th beat except for full beats)
+				//-TimeInSeconds
+				//ex. -17.747059
+				case "-": {
+					// song.Events.Add(
+					// new BeatLineBeatEvent {
+					//     Time = double.Parse(line) * 1000d
+					// }
+					// );
 
-                    if (firstBeatlineBar == null) {
-                        firstBeatlineBar = double.Parse(line) * 1000d;
-                        break;
-                    }
-                    timingPoint = new TimingPoint(firstBeatlineBar.Value, (double.Parse(line) * 1000d - firstBeatlineBar.Value) / 4d);
+					//We ignore these events for now...
+					break;
+				}
+				//A beatline bar (happens every full beat)
+				//=TimeInSeconds
+				//ex. =4.544444
+				case "=": {
+					// song.Events.Add(
+					// new BeatLineBarEvent {
+					//     Time = double.Parse(line) * 1000d
+					// }
+					// );
 
-                    break;
-                }
-            }
-        } while (line != null);
+					if (firstBeatlineBar == null) {
+						firstBeatlineBar = double.Parse(line) * 1000d;
+						break;
+					}
+					timingPoint = new TimingPoint(firstBeatlineBar.Value, (double.Parse(line) * 1000d - firstBeatlineBar.Value) / 4d);
 
-        beatmap.TimingPoints.Add(timingPoint);
+					break;
+				}
+			}
+		} while (line != null);
 
-        return beatmap;
-    }
+		beatmap.TimingPoints.Add(timingPoint);
+
+		return beatmap;
+	}
 }

@@ -11,65 +11,65 @@ using Newtonsoft.Json;
 namespace pTyping;
 
 internal class Program {
-    public static string GitVersion    = "unknown";
-    public static string ReleaseStream = "other";
-    public static string BuildVersion => $"{GitVersion}-{ReleaseStream}";
+	public static string GitVersion    = "unknown";
+	public static string ReleaseStream = "other";
+	public static string BuildVersion => $"{GitVersion}-{ReleaseStream}";
 
-    private static void SetReleaseStream() {
-        StreamDebug();
-        StreamRelease();
-    }
+	private static void SetReleaseStream() {
+		StreamDebug();
+		StreamRelease();
+	}
 
-    [Conditional("DEBUG")]
-    private static void StreamDebug() {
-        ReleaseStream = "debug";
-    }
+	[Conditional("DEBUG")]
+	private static void StreamDebug() {
+		ReleaseStream = "debug";
+	}
 
-    [Conditional("RELEASE")]
-    private static void StreamRelease() {
-        ReleaseStream = "release";
-    }
+	[Conditional("RELEASE")]
+	private static void StreamRelease() {
+		ReleaseStream = "release";
+	}
 
-    private static string ReadManifestResource(string name) {
-        using Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream(name);
+	private static string ReadManifestResource(string name) {
+		using Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream(name);
 
-        using StreamReader reader = new(stream!);
+		using StreamReader reader = new(stream!);
 
-        return reader.ReadToEnd().Trim();
-    }
+		return reader.ReadToEnd().Trim();
+	}
 
-    public static List<GitLogEntry> GetGitLog() {
-        string gitlog = ReadManifestResource("pTyping.gitlog.json");
+	public static List<GitLogEntry> GetGitLog() {
+		string gitlog = ReadManifestResource("pTyping.gitlog.json");
 
-        //evil hack to get around evil commit messages
-        gitlog = gitlog.Replace("\"",         "\\\"");
-        gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
+		//evil hack to get around evil commit messages
+		gitlog = gitlog.Replace("\"", "\\\"");
+		gitlog = gitlog.Replace("@^^ABBA^^@", "\"");
 
-        return JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
-    }
-    
-    [STAThread]
-    private static void Main() {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		return JsonConvert.DeserializeObject<List<GitLogEntry>>(gitlog);
+	}
 
-        SetReleaseStream();
-        GitVersion = ReadManifestResource("pTyping.gitversion.txt");
+	[STAThread]
+	private static void Main() {
+		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        using pTypingGame game = new();
+		SetReleaseStream();
+		GitVersion = ReadManifestResource("pTyping.gitversion.txt");
 
-        if (RuntimeInfo.IsDebug())
-            game.Run();
-        else
-            try {
-                game.Run();
-            }
-            catch (Exception ex) {
-                using FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
-                using StreamWriter writer = new(stream);
+		using pTypingGame game = new();
 
-                writer.Write(ex.ToString());
+		if (RuntimeInfo.IsDebug())
+			game.Run();
+		else
+			try {
+				game.Run();
+			}
+			catch (Exception ex) {
+				using FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
+				using StreamWriter writer = new(stream);
 
-                game.WindowManager.Close();
-            }
-    }
+				writer.Write(ex.ToString());
+
+				game.WindowManager.Close();
+			}
+	}
 }

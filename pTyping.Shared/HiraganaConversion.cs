@@ -1,12 +1,12 @@
 namespace pTyping.Shared;
 
 public static class HiraganaConversion {
-    public static readonly Dictionary<string, List<string>> CONVERSIONS = new();
+	public static readonly Dictionary<string, List<string>> CONVERSIONS = new();
 
-    public static void LoadConversion() {
-        #region im sorry
+	public static void LoadConversion() {
+		#region im sorry
 
-        string conversion = @"a	あ
+		string conversion = @"a	あ
 i	い
 yi	い
 u	う
@@ -771,33 +771,32 @@ _	＿
 /	／
 ";
 
-        #endregion
+		#endregion
 
-        using StringReader reader = new(conversion);
-        string             line;
-        do {
-            line = reader.ReadLine();
+		using StringReader reader = new(conversion);
+		string             line;
+		do {
+			line = reader.ReadLine();
 
-            if (line == null)
-                continue;
+			if (line == null)
+				continue;
 
-            string[] splitLine = line.Split("\t");
+			string[] splitLine = line.Split("\t");
 
-            string romaji   = splitLine[0];
-            string hiragana = splitLine[1];
+			string romaji   = splitLine[0];
+			string hiragana = splitLine[1];
 
-            if (splitLine.Length > 2) continue;
+			if (splitLine.Length > 2) continue;
 
-            if (CONVERSIONS.TryGetValue(hiragana, out List<string> currentRomaji))
-                currentRomaji.Add(romaji);
-            else
-                CONVERSIONS.Add(
-                hiragana,
-                new List<string> {
-                    romaji
-                }
-                );
-
-        } while (line != null);
-    }
+			if (CONVERSIONS.TryGetValue(hiragana, out List<string> currentRomaji))
+				currentRomaji.Add(romaji);
+			else
+				CONVERSIONS.Add(
+					hiragana,
+					new List<string> {
+						romaji
+					}
+				);
+		} while (line != null);
+	}
 }

@@ -11,108 +11,108 @@ using JetBrains.Annotations;
 namespace pTyping.UiGenerator;
 
 public class UiContainer : CompositeDrawable {
-    public Bindable<OriginType> ElementOriginType;
+	public Bindable<OriginType> ElementOriginType;
 
-    private readonly ObservableCollection<UiElement> _elements = new();
+	private readonly ObservableCollection<UiElement> _elements = new();
 
-    public ReadOnlyCollection<UiElement> Elements => new(this._elements);
+	public ReadOnlyCollection<UiElement> Elements => new(this._elements);
 
-    public int EasingTime = 100;
+	public int EasingTime = 100;
 
-    /// <summary>
-    ///     Creates a UiContainer
-    /// </summary>
-    /// <param name="originType">The origin type for the internal elements</param>
-    public UiContainer(OriginType originType) {
-        this.ElementOriginType = new Bindable<OriginType>(originType);
+	/// <summary>
+	///     Creates a UiContainer
+	/// </summary>
+	/// <param name="originType">The origin type for the internal elements</param>
+	public UiContainer(OriginType originType) {
+		this.ElementOriginType = new Bindable<OriginType>(originType);
 
-        this._elements.CollectionChanged += this.Recalculate;
-        this.ElementOriginType.OnChange  += this.OnOriginTypeChange;
+		this._elements.CollectionChanged += this.Recalculate;
+		this.ElementOriginType.OnChange  += this.OnOriginTypeChange;
 
-        this.InvisibleToInput = true;
-    }
+		this.InvisibleToInput = true;
+	}
 
-    private void OnOriginTypeChange(object sender, OriginType e) {
-        this.Recalculate(null, null);
-    }
+	private void OnOriginTypeChange(object sender, OriginType e) {
+		this.Recalculate(null, null);
+	}
 
-    private readonly Queue<UiElement> _queuedForDeletion = new();
-    private void Recalculate(object sender, [CanBeNull] NotifyCollectionChangedEventArgs e) {
-        float y = 0f;
+	private readonly Queue<UiElement> _queuedForDeletion = new();
+	private void Recalculate(object sender, [CanBeNull] NotifyCollectionChangedEventArgs e) {
+		float y = 0f;
 
-        UiElement removedElement = e?.Action == NotifyCollectionChangedAction.Remove ? e.OldItems?[0] as UiElement : null;
+		UiElement removedElement = e?.Action == NotifyCollectionChangedAction.Remove ? e.OldItems?[0] as UiElement : null;
 
-        if (removedElement != null)
-            this.Drawables.Remove(removedElement.Drawable);
+		if (removedElement != null)
+			this.Drawables.Remove(removedElement.Drawable);
 
-        for (int i = 0; i < this._elements.Count; i++) {
-            UiElement element = this._elements[i];
+		for (int i = 0; i < this._elements.Count; i++) {
+			UiElement element = this._elements[i];
 
-            if (element == null)
-                throw new NoNullAllowedException("UiElement cannot be null!");
+			if (element == null)
+				throw new NoNullAllowedException("UiElement cannot be null!");
 
-            if (!element.Visible.Value) {
-                element.Drawable.Visible = false;
-                element.Drawable.Tweens.Clear();
-                continue;
-            }
+			if (!element.Visible.Value) {
+				element.Drawable.Visible = false;
+				element.Drawable.Tweens.Clear();
+				continue;
+			}
 
-            element.Drawable.Visible = true;
+			element.Drawable.Visible = true;
 
-            //TODO: support when multiple are added
-            bool elementIsAdded = e?.Action == NotifyCollectionChangedAction.Add && e.NewItems?[0] == element;
+			//TODO: support when multiple are added
+			bool elementIsAdded = e?.Action == NotifyCollectionChangedAction.Add && e.NewItems?[0] == element;
 
-            //Update the origin type
-            element.Drawable.OriginType = this.ElementOriginType;
+			//Update the origin type
+			element.Drawable.OriginType = this.ElementOriginType;
 
-            element.Drawable.MoveTo(new Vector2(0, y), elementIsAdded ? 0 : this.EasingTime);
+			element.Drawable.MoveTo(new Vector2(0, y), elementIsAdded ? 0 : this.EasingTime);
 
-            if (elementIsAdded)
-                element.Drawable.FadeInFromZero(this.EasingTime);
+			if (elementIsAdded)
+				element.Drawable.FadeInFromZero(this.EasingTime);
 
-            //Update the global y
-            y += element.Drawable.Size.Y + element.SpaceAfter;
+			//Update the global y
+			y += element.Drawable.Size.Y + element.SpaceAfter;
 
-            //Only add the new element
-            if (elementIsAdded)
-                this.Drawables.Add(element.Drawable);
-        }
-    }
+			//Only add the new element
+			if (elementIsAdded)
+				this.Drawables.Add(element.Drawable);
+		}
+	}
 
-    public void RegisterElement(UiElement element, int index = -1) {
-        if (element.InUse)
-            return;
+	public void RegisterElement(UiElement element, int index = -1) {
+		if (element.InUse)
+			return;
 
-        if (element.Drawable == null)
-            throw new InvalidOperationException();
+		if (element.Drawable == null)
+			throw new InvalidOperationException();
 
-        element.InUse = true;
+		element.InUse = true;
 
-        element.Visible.OnChange += this.OnElementVisibleChange;
+		element.Visible.OnChange += this.OnElementVisibleChange;
 
-        if (index != -1)
-            this._elements.Insert(index, element);
-        else
-            this._elements.Add(element);
-    }
+		if (index != -1)
+			this._elements.Insert(index, element);
+		else
+			this._elements.Add(element);
+	}
 
-    private void OnElementVisibleChange(object sender, bool e) {
-        this.Recalculate(null, null);
-    }
+	private void OnElementVisibleChange(object sender, bool e) {
+		this.Recalculate(null, null);
+	}
 
-    public void UnRegisterElement(UiElement element) {
-        if (this._elements.Remove(element)) {
-            element.InUse = false;
-            element.Drawable.Tweens.Clear();
+	public void UnRegisterElement(UiElement element) {
+		if (this._elements.Remove(element)) {
+			element.InUse = false;
+			element.Drawable.Tweens.Clear();
 
-            element.Visible.OnChange -= this.OnElementVisibleChange;
-        }
-    }
+			element.Visible.OnChange -= this.OnElementVisibleChange;
+		}
+	}
 
-    public override void Dispose() {
-        this._elements.CollectionChanged -= this.Recalculate;
-        this.ElementOriginType.OnChange  -= this.OnOriginTypeChange;
+	public override void Dispose() {
+		this._elements.CollectionChanged -= this.Recalculate;
+		this.ElementOriginType.OnChange  -= this.OnOriginTypeChange;
 
-        base.Dispose();
-    }
+		base.Dispose();
+	}
 }

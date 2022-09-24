@@ -7,108 +7,110 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Vixie.Backends.Shared;
-using pTyping.Graphics.Player.Mods;
+using pTyping.Shared.Mods;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class ModSelectionMenuDrawable : CompositeDrawable {
-    private readonly List<ModButtonDrawable> _mods = new();
+	public readonly List<Mod> SelectedMods = new();
 
-    private readonly TextDrawable _scoreMultiplier;
+	private readonly List<ModButtonDrawable> _mods = new();
 
-    public event EventHandler OnModAdd;
+	private readonly TextDrawable _scoreMultiplier;
 
-    public void OnModClick(object sender, bool added) {
-        ModButtonDrawable modButton = (ModButtonDrawable)sender;
+	public event EventHandler OnModAdd;
 
-        foreach (ModButtonDrawable modButtonDrawable in this._mods)
-            if (modButton != modButtonDrawable)
-                modButtonDrawable.ModStateChange(modButton, added);
+	public void OnModClick(object sender, bool added) {
+		ModButtonDrawable modButton = (ModButtonDrawable)sender;
 
-        this.UpdateScoreMultiplierText();
+		foreach (ModButtonDrawable modButtonDrawable in this._mods)
+			if (modButton != modButtonDrawable)
+				modButtonDrawable.ModStateChange(modButton, added);
 
-        this.OnModAdd?.Invoke(this, EventArgs.Empty);
-    }
+		this.UpdateScoreMultiplierText();
 
-    private void UpdateScoreMultiplierText() {
-        this._scoreMultiplier.Text = $"Score Multiplier: {PlayerMod.ScoreMultiplier(pTypingGame.SelectedMods):#0.##}x";
-    }
+		this.OnModAdd?.Invoke(this, EventArgs.Empty);
+	}
 
-    public bool Shown = true;
+	private void UpdateScoreMultiplierText() {
+		this._scoreMultiplier.Text = $"Score Multiplier: {Mod.AggregateScoreMultiplier(this.SelectedMods):#0.##}x";
+	}
 
-    private readonly List<LinePrimitiveDrawable> Lines = new();
-    private readonly RectanglePrimitiveDrawable  _background;
+	public bool Shown = true;
 
-    public void Hide(bool force = false) {
-        foreach (ModButtonDrawable modButtonDrawable in this._mods)
-            modButtonDrawable.Hide(force);
-        this.Shown = false;
+	private readonly List<LinePrimitiveDrawable> Lines = new();
+	private readonly RectanglePrimitiveDrawable  _background;
 
-        float time = force ? 0 : 500;
+	public void Hide(bool force = false) {
+		foreach (ModButtonDrawable modButtonDrawable in this._mods)
+			modButtonDrawable.Hide(force);
+		this.Shown = false;
 
-        foreach (LinePrimitiveDrawable line in this.Lines)
-            line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
+		float time = force ? 0 : 500;
 
-        this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
-        this._background.Tweens.Add(new FloatTween(TweenType.Fade,      this._background.ColorOverride.Af,      0f, FurballGame.Time, FurballGame.Time + time));
-    }
+		foreach (LinePrimitiveDrawable line in this.Lines)
+			line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
 
-    public void Show() {
-        foreach (ModButtonDrawable modButtonDrawable in this._mods)
-            modButtonDrawable.Show();
-        this.Shown = true;
+		this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
+		this._background.Tweens.Add(new FloatTween(TweenType.Fade, this._background.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time           + time));
+	}
 
-        const float time = 500;
+	public void Show() {
+		foreach (ModButtonDrawable modButtonDrawable in this._mods)
+			modButtonDrawable.Show();
+		this.Shown = true;
 
-        foreach (LinePrimitiveDrawable line in this.Lines)
-            line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
+		const float time = 500;
 
-        this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 1f,    FurballGame.Time, FurballGame.Time + time));
-        this._background.Tweens.Add(new FloatTween(TweenType.Fade,      this._background.ColorOverride.Af,      0.75f, FurballGame.Time, FurballGame.Time + time));
-    }
+		foreach (LinePrimitiveDrawable line in this.Lines)
+			line.Tweens.Add(new FloatTween(TweenType.Fade, line.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
 
-    public ModSelectionMenuDrawable(Vector2 pos) {
-        this.Position = pos;
+		this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
+		this._background.Tweens.Add(new FloatTween(TweenType.Fade, this._background.ColorOverride.Af, 0.75f, FurballGame.Time, FurballGame.Time        + time));
+	}
 
-        int   lineAmounts = (int)Math.Ceiling(PlayerMod.RegisteredMods.Count / 5d);
-        float lineY       = 0;
-        for (int i = 0; i < lineAmounts; i++) {
-            LinePrimitiveDrawable line;
-            this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
-            this.Lines.Add(line);
-            this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray, 2f));
-            this.Lines.Add(line);
-            lineY += 100;
-        }
+	public ModSelectionMenuDrawable(Vector2 pos) {
+		this.Position = pos;
 
-        float x = 75;
-        float y = 0;
-        for (int i = 0; i < PlayerMod.RegisteredMods.Count; i++) {
-            PlayerMod         registeredMod = PlayerMod.RegisteredMods[i];
-            ModButtonDrawable modButton     = new(registeredMod, new(x, y), this.OnModClick);
+		int   lineAmounts = (int)Math.Ceiling(Mod.RegisteredMods.Length / 5d);
+		float lineY       = 0;
+		for (int i = 0; i < lineAmounts; i++) {
+			LinePrimitiveDrawable line;
+			this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
+			this.Lines.Add(line);
+			this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray, 2f));
+			this.Lines.Add(line);
+			lineY += 100;
+		}
 
-            this.Drawables.Add(modButton);
-            this._mods.Add(modButton);
+		float x = 75;
+		float y = 0;
+		for (int i = 0; i < Mod.RegisteredMods.Length; i++) {
+			Mod               registeredMod = Mod.RegisteredMods[i];
+			ModButtonDrawable modButton     = new(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
 
-            x += 15 + modButton.Size.X;
+			this.Drawables.Add(modButton);
+			this._mods.Add(modButton);
 
-            if (i != 0 && i % 4 == 0) {
-                x =  75;
-                y += 100;
-            }
-        }
+			x += 15 + modButton.Size.X;
 
-        this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFontStroked, "", 30));
+			if (i != 0 && i % 4 == 0) {
+				x =  75;
+				y += 100;
+			}
+		}
 
-        this.UpdateScoreMultiplierText();
+		this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFontStroked, "", 30));
 
-        this.Drawables.Add(
-        this._background = new RectanglePrimitiveDrawable(new(-2, -66), new(410, this.Size.Y + 4), 2, true) {
-            ColorOverride = new(50, 50, 50, 175),
-            Depth         = -1f
-        }
-        );
-    }
+		this.UpdateScoreMultiplierText();
 
-    public sealed override Vector2 Size => base.Size;
+		this.Drawables.Add(
+			this._background = new RectanglePrimitiveDrawable(new(-2, -66), new(410, this.Size.Y + 4), 2, true) {
+				ColorOverride = new(50, 50, 50, 175),
+				Depth         = -1f
+			}
+		);
+	}
+
+	public sealed override Vector2 Size => base.Size;
 }

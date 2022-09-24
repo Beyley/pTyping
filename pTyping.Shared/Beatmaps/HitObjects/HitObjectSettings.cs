@@ -7,14 +7,14 @@ namespace pTyping.Shared.Beatmaps.HitObjects;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class HitObjectSettings : EmbeddedObject, IClonable<HitObjectSettings> {
-    [Description("The approach modifier of the note"), JsonProperty]
-    public double ApproachModifier { get; set; } = 1d;
+	[Description("The approach modifier of the note"), JsonProperty]
+	public double ApproachModifier { get; set; } = 1d;
 
-    public HitObjectSettings Clone() {
-        HitObjectSettings settings = new() {
-            ApproachModifier = this.ApproachModifier
-        };
+	public HitObjectSettings Clone() {
+		HitObjectSettings settings = new() {
+			ApproachModifier = this.ApproachModifier
+		};
 
-        return settings;
-    }
+		return settings;
+	}
 }

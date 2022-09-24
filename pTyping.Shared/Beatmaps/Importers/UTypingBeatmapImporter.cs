@@ -6,39 +6,39 @@ namespace pTyping.Shared.Beatmaps.Importers;
 #pragma warning disable CS4014
 
 public class UTypingBeatmapImporter : IBeatmapImporter {
-    public void ImportBeatmaps(BeatmapDatabase database, FileDatabase fileDatabase, DirectoryInfo beatmapPath) {
-        IEnumerable<FileInfo> files = beatmapPath.GetFiles("*.txt", SearchOption.AllDirectories).Where(x => !x.Name.EndsWith("_src.txt") && x.Name.StartsWith("info"));
+	public void ImportBeatmaps(BeatmapDatabase database, FileDatabase fileDatabase, DirectoryInfo beatmapPath) {
+		IEnumerable<FileInfo> files = beatmapPath.GetFiles("*.txt", SearchOption.AllDirectories).Where(x => !x.Name.EndsWith("_src.txt") && x.Name.StartsWith("info"));
 
-        BeatmapSet set = new();
-        foreach (FileInfo file in files) {
-            Beatmap? map = UTypingSongParser.ParseUTypingBeatmap(file, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title);
-            set.Artist = artist;
-            set.Source = source;
-            set.Title  = title;
+		BeatmapSet set = new();
+		foreach (FileInfo file in files) {
+			Beatmap? map = UTypingSongParser.ParseUTypingBeatmap(file, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title);
+			set.Artist = artist;
+			set.Source = source;
+			set.Title  = title;
 
-            //TODO: handle failed imports better, maybe add an error message of some sort and tell the user?
-            if (map == null)
-                continue;
+			//TODO: handle failed imports better, maybe add an error message of some sort and tell the user?
+			if (map == null)
+				continue;
 
-            map.Parent = set;
+			map.Parent = set;
 
-            //TODO: this should never happen, what the fuck?
-            if (string.IsNullOrEmpty(map.Id))
-                continue;
+			//TODO: this should never happen, what the fuck?
+			if (string.IsNullOrEmpty(map.Id))
+				continue;
 
-            if (map.FileCollection.Audio == null)
-                continue;
+			if (map.FileCollection.Audio == null)
+				continue;
 
-            string audioPath = map.FileCollection.Audio.Path;
-            fileDatabase.AddFile(File.ReadAllBytes(Path.Combine(beatmapPath.FullName, audioPath)));
+			string audioPath = map.FileCollection.Audio.Path;
+			fileDatabase.AddFile(File.ReadAllBytes(Path.Combine(beatmapPath.FullName, audioPath)));
 
-            set.Beatmaps.Add(map);
-        }
+			set.Beatmaps.Add(map);
+		}
 
-        //Do nothing if we found no beatmaps
-        if (set.Beatmaps.Count == 0)
-            return;
-        
-        database.Realm.Add(set);
-    }
+		//Do nothing if we found no beatmaps
+		if (set.Beatmaps.Count == 0)
+			return;
+
+		database.Realm.Add(set);
+	}
 }

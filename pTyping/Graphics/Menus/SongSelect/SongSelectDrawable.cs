@@ -15,66 +15,66 @@ using pTyping.Shared.Beatmaps.Sorting;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class SongSelectDrawable : CompositeDrawable {
-    private readonly List<BeatmapSetDrawable> _registeredSetButtons = new();
+	private readonly List<BeatmapSetDrawable> _registeredSetButtons = new();
 
-    public readonly ObservableCollection<IBeatmapSetFilter> FilterOperations = new();
+	public readonly ObservableCollection<IBeatmapSetFilter> FilterOperations = new();
 
-    public Action<float> ChangeScroll;
+	public Action<float> ChangeScroll;
 
-    public SongSelectDrawable(Vector2 pos, Action<float> changeScroll) {
-        this.ChangeScroll = changeScroll;
-        this.Position     = pos;
+	public SongSelectDrawable(Vector2 pos, Action<float> changeScroll) {
+		this.ChangeScroll = changeScroll;
+		this.Position     = pos;
 
-        this.FilterOperations.CollectionChanged        += this.OnFilterOperationChange;
-        pTypingGame.BeatmapDatabase.Realm.RealmChanged += this.OnRealmUpdate;
+		this.FilterOperations.CollectionChanged        += this.OnFilterOperationChange;
+		pTypingGame.BeatmapDatabase.Realm.RealmChanged += this.OnRealmUpdate;
 
-        this.UpdateDrawables();
+		this.UpdateDrawables();
 
-        this.InvisibleToInput = true;
-    }
+		this.InvisibleToInput = true;
+	}
 
-    private void OnRealmUpdate(object sender, EventArgs e) {
-        this.UpdateDrawables();
-    }
+	private void OnRealmUpdate(object sender, EventArgs e) {
+		this.UpdateDrawables();
+	}
 
-    private void OnFilterOperationChange(object? sender, NotifyCollectionChangedEventArgs e) {
-        this.UpdateDrawables();
-    }
+	private void OnFilterOperationChange(object? sender, NotifyCollectionChangedEventArgs e) {
+		this.UpdateDrawables();
+	}
 
-    public void UpdateDrawables() {
-        IQueryable<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>();
+	public void UpdateDrawables() {
+		IQueryable<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>();
 
-        foreach (IBeatmapSetFilter filter in this.FilterOperations)
-            sets = filter.Filter(sets);
+		foreach (IBeatmapSetFilter filter in this.FilterOperations)
+			sets = filter.Filter(sets);
 
-        ImmutableSortedSet<BeatmapSet> sortedSets = sets.ToList().ToImmutableSortedSet(new BeatmapSetArtistComparer());
+		ImmutableSortedSet<BeatmapSet> sortedSets = sets.ToList().ToImmutableSortedSet(new BeatmapSetArtistComparer());
 
-        this.Drawables.Clear();
-        this._registeredSetButtons.Clear();
+		this.Drawables.Clear();
+		this._registeredSetButtons.Clear();
 
-        foreach (BeatmapSet set in sortedSets) {
-            BeatmapSetDrawable drawable = new(set);
+		foreach (BeatmapSet set in sortedSets) {
+			BeatmapSetDrawable drawable = new(set);
 
-            this._registeredSetButtons.Add(drawable);
-        }
+			this._registeredSetButtons.Add(drawable);
+		}
 
-        float y = 0;
-        foreach (BeatmapSetDrawable button in this._registeredSetButtons) {
-            button.Position = new Vector2(0, y);
-            // button.OriginType = OriginType.TopRight;
+		float y = 0;
+		foreach (BeatmapSetDrawable button in this._registeredSetButtons) {
+			button.Position = new Vector2(0, y);
+			// button.OriginType = OriginType.TopRight;
 
-            button.YPositionInDrawable = y;
+			button.YPositionInDrawable = y;
 
-            this.Drawables.Add(button);
+			this.Drawables.Add(button);
 
-            y += button.Size.Y + 5;
-        }
+			y += button.Size.Y + 5;
+		}
 
-        if (pTypingGame.CurrentSong.Value != null) {
-            BeatmapSetDrawable? setSelected = this._registeredSetButtons.FirstOrDefault(x => x.BeatmapSet.Beatmaps.Any(y => y.Id == pTypingGame.CurrentSong.Value.Id));
+		if (pTypingGame.CurrentSong.Value != null) {
+			BeatmapSetDrawable? setSelected = this._registeredSetButtons.FirstOrDefault(x => x.BeatmapSet.Beatmaps.Any(y => y.Id == pTypingGame.CurrentSong.Value.Id));
 
-            if (setSelected != null)
-                this.ChangeScroll?.Invoke(setSelected.YPositionInDrawable - FurballGame.WindowHeight / 2f + setSelected.Size.Y / 2f);
-        }
-    }
+			if (setSelected != null)
+				this.ChangeScroll?.Invoke(setSelected.YPositionInDrawable - FurballGame.WindowHeight / 2f + setSelected.Size.Y / 2f);
+		}
+	}
 }

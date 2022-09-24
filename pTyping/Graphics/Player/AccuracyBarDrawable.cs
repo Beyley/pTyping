@@ -9,76 +9,75 @@ using Furball.Vixie.Backends.Shared;
 namespace pTyping.Graphics.Player;
 
 public class AccuracyBarDrawable : CompositeDrawable {
-    private readonly Player                     _player;
-    private readonly RectanglePrimitiveDrawable _poorRect;
-    private readonly RectanglePrimitiveDrawable _fairRect;
-    private readonly RectanglePrimitiveDrawable _goodRect;
-    private readonly RectanglePrimitiveDrawable _excellentRect;
+	private readonly Player                     _player;
+	private readonly RectanglePrimitiveDrawable _poorRect;
+	private readonly RectanglePrimitiveDrawable _fairRect;
+	private readonly RectanglePrimitiveDrawable _goodRect;
+	private readonly RectanglePrimitiveDrawable _excellentRect;
 
-    public float Width = 300;
-    public float Height;
+	public float Width = 300;
+	public float Height;
 
-    public override Vector2 Size => new Vector2(this.Width, this.Height) * this.Scale;
+	public override Vector2 Size => new Vector2(this.Width, this.Height) * this.Scale;
 
-    public AccuracyBarDrawable(Vector2 position, Player player, float height = 10) {
-        this._player  = player;
-        this.Position = position;
+	public AccuracyBarDrawable(Vector2 position, Player player, float height = 10) {
+		this._player  = player;
+		this.Position = position;
 
-        this.Height = height;
-        
-        this._player.OnCorrectCharTyped += this.OnChar;
+		this.Height = height;
 
-        Vector2 pos = new(Width / 2f, 0);
+		this._player.OnCorrectCharTyped += this.OnChar;
 
-        float fairRatio = this._player.TIMING_FAIR / this._player.TIMING_POOR;
-        float goodRatio = this._player.TIMING_GOOD / this._player.TIMING_POOR;
-        float excellentRatio = this._player.TIMING_EXCELLENT / this._player.TIMING_POOR;
+		Vector2 pos = new(this.Width / 2f, 0);
 
-        this._poorRect = new RectanglePrimitiveDrawable(pos, new Vector2(Width, height), 1f, true) {
-            OriginType = OriginType.TopCenter,
-            ColorOverride = Player.COLOR_POOR
-        };
-        this._fairRect = new RectanglePrimitiveDrawable(pos, new Vector2(Width * fairRatio, height), 1f, true) {
-            OriginType    = OriginType.TopCenter,
-            ColorOverride = Player.COLOR_FAIR
+		float fairRatio      = this._player.TIMING_FAIR      / this._player.TIMING_POOR;
+		float goodRatio      = this._player.TIMING_GOOD      / this._player.TIMING_POOR;
+		float excellentRatio = this._player.TIMING_EXCELLENT / this._player.TIMING_POOR;
 
-        };
-        this._goodRect = new RectanglePrimitiveDrawable(pos, new Vector2(Width * goodRatio, height), 1f, true) {
-            OriginType    = OriginType.TopCenter,
-            ColorOverride = Player.COLOR_GOOD
-        };
-        this._excellentRect = new RectanglePrimitiveDrawable(pos, new Vector2(Width * excellentRatio, height), 1f, true) {
-            OriginType = OriginType.TopCenter,
-            ColorOverride = Player.COLOR_EXCELLENT
-        };
+		this._poorRect = new RectanglePrimitiveDrawable(pos, new Vector2(this.Width, height), 1f, true) {
+			OriginType    = OriginType.TopCenter,
+			ColorOverride = Player.COLOR_POOR
+		};
+		this._fairRect = new RectanglePrimitiveDrawable(pos, new Vector2(this.Width * fairRatio, height), 1f, true) {
+			OriginType    = OriginType.TopCenter,
+			ColorOverride = Player.COLOR_FAIR
+		};
+		this._goodRect = new RectanglePrimitiveDrawable(pos, new Vector2(this.Width * goodRatio, height), 1f, true) {
+			OriginType    = OriginType.TopCenter,
+			ColorOverride = Player.COLOR_GOOD
+		};
+		this._excellentRect = new RectanglePrimitiveDrawable(pos, new Vector2(this.Width * excellentRatio, height), 1f, true) {
+			OriginType    = OriginType.TopCenter,
+			ColorOverride = Player.COLOR_EXCELLENT
+		};
 
-        this.Drawables.Add(this._poorRect);
-        this.Drawables.Add(this._fairRect);
-        this.Drawables.Add(this._goodRect);
-        this.Drawables.Add(this._excellentRect);
-    }
+		this.Drawables.Add(this._poorRect);
+		this.Drawables.Add(this._fairRect);
+		this.Drawables.Add(this._goodRect);
+		this.Drawables.Add(this._excellentRect);
+	}
 
-    private void OnChar(object sender, double e) {
-        const float fadeoutTime = 2000;
-        
-        RectanglePrimitiveDrawable rect = new(new Vector2((float) ((this.Width / 2f) + ((this.Width / 2) * (e / this._player.TIMING_POOR))), this.Height), new Vector2(this.Width / 50f, this.Height * 2f), 1f, true) {
-            ColorOverride = new Color(255, 255, 255, 100),
-            OriginType    = OriginType.BottomCenter
-        };
-        
-        rect.Tweens.Add(new ColorTween(TweenType.Color, rect.ColorOverride, new Color(0, 0, 0, 0), FurballGame.Time, FurballGame.Time + fadeoutTime));
-        
-        this.Drawables.Add(rect);
-        
-        FurballGame.GameTimeScheduler.ScheduleMethod(
-        _ => {
-            this.Drawables.Remove(rect);
-        }, FurballGame.Time + fadeoutTime);
-    }
+	private void OnChar(object sender, double e) {
+		const float fadeoutTime = 2000;
 
-    public override void Dispose() {
-        this._player.OnCorrectCharTyped -= this.OnChar;
+		RectanglePrimitiveDrawable rect = new(new Vector2((float)(this.Width / 2f + this.Width / 2 * (e / this._player.TIMING_POOR)), this.Height), new Vector2(this.Width / 50f, this.Height * 2f), 1f, true) {
+			ColorOverride = new Color(255, 255, 255, 100),
+			OriginType    = OriginType.BottomCenter
+		};
 
-        base.Dispose();
-    }
+		rect.Tweens.Add(new ColorTween(TweenType.Color, rect.ColorOverride, new Color(0, 0, 0, 0), FurballGame.Time, FurballGame.Time + fadeoutTime));
+
+		this.Drawables.Add(rect);
+
+		FurballGame.GameTimeScheduler.ScheduleMethod(
+			_ => {
+				this.Drawables.Remove(rect);
+			}, FurballGame.Time + fadeoutTime);
+	}
+
+	public override void Dispose() {
+		this._player.OnCorrectCharTyped -= this.OnChar;
+
+		base.Dispose();
+	}
 }
