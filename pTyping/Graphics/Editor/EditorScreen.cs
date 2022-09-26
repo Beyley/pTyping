@@ -546,19 +546,19 @@ public class EditorScreen : pScreen {
 	public void TimelineMove(bool right) {
 		double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
-		//TODO
+		TimingPoint currentTimingPoint = this.EditorState.Song.CurrentTimingPoint(currentTime);
 
-		// double noteLength   = this.EditorState.Song.DividedNoteLength(currentTime);
-		// double timeToSeekTo = Math.Round((currentTime - this.EditorState.Song.CurrentTimingPoint(currentTime).Time) / noteLength) * noteLength;
+		double noteLength   = this.EditorState.Song.DividedNoteLength(currentTime);
+		double timeToSeekTo = Math.Round((currentTime - currentTimingPoint.Time) / noteLength) * noteLength;
 
-		// timeToSeekTo += this.EditorState.Song.CurrentTimingPoint(currentTime).Time;
+		timeToSeekTo += currentTimingPoint.Time;
 
-		// if (right)
-		// timeToSeekTo += noteLength;
-		// else
-		// timeToSeekTo -= noteLength;
+		if (right)
+			timeToSeekTo += noteLength;
+		else
+			timeToSeekTo -= noteLength;
 
-		// pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
+		pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
 		this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
 
 		if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
@@ -671,6 +671,8 @@ public class EditorScreen : pScreen {
 						"Do you want to save before quitting?",
 						MessageBoxButtons.YesNoCancel
 					);
+				else //If we dont have anything to save, then just exit back to the song select
+					ScreenManager.ChangeScreen(new SongSelectionScreen(true));
 				break;
 			case Key.Delete: {
 				// Delete the selected objects

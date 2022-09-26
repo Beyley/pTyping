@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
@@ -80,6 +81,13 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap> {
 
 	public TimingPoint CurrentTimingPoint(double time) {
 		return this.TimingPoints.First(x => x.Time <= time);
+	}
+
+	[Pure]
+	public double DividedNoteLength(double currentTime) {
+		TimingPoint timingPoint = this.CurrentTimingPoint(currentTime);
+
+		return timingPoint.Tempo / timingPoint.TimeSignature;
 	}
 
 	public bool Equals(Beatmap other) {
