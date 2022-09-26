@@ -55,7 +55,11 @@ public static class LegacyImportChecker {
 							//Attempt to import the beatmap
 							legacyImporter.ImportBeatmaps(database, scoreDatabase, pTypingGame.FileDatabase, legacySongDir);
 
-						legacySongDir.MoveTo(Path.Combine(LegacySongFolderImported, legacySongDir.Name));
+						try {
+							legacySongDir.MoveTo(Path.Combine(LegacySongFolderImported, legacySongDir.Name));
+						}
+						catch { /* do nothing :^) */
+						}
 					}
 					catch (Exception ex) {
 						legacySongDir.MoveTo(Path.Combine(LegacySongFolderImportedFailed, legacySongDir.Name));

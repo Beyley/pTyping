@@ -325,7 +325,7 @@ public static class UTypingSongParser {
 
 			int version = reader.ReadInt32();
 
-			if ((version & 0xFF) < ' ') { //Hack for old formats(?)
+			if ((version & 0xFF) > ' ') { //Hack for old formats(?)
 				version         = 0;
 				stream.Position = 0;
 			}
@@ -372,5 +372,8 @@ public static class UTypingSongParser {
 		using FileStream stream = File.OpenRead(filePath);
 
 		Ranking ranking = Ranking.Read(stream);
+
+		foreach (UTypingScore uTypingScore in ranking.Score)
+			;
 	}
 }
