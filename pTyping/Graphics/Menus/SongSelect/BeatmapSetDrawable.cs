@@ -25,7 +25,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		bool  first = true;
 		float y     = this.setTitle.Size.Y;
 		foreach (Beatmap map in set.Beatmaps) {
-			DifficultyDrawable drawable = new(map, first) {
+			DifficultyDrawable drawable = new DifficultyDrawable(map, first) {
 				OriginType = OriginType.TopLeft
 			};
 			drawable.Position = new Vector2(this.setTitle.Size.X - drawable.Size.X, y);
@@ -47,7 +47,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		private readonly bool         _first;
 
 		public readonly Beatmap Beatmap;
-		public override Vector2 Size => new(700, FONT_SIZE + MARGIN * 2);
+		public override Vector2 Size => new Vector2(700, FONT_SIZE + MARGIN * 2);
 
 		public DifficultyDrawable(Beatmap map, bool first) {
 			this.Beatmap = map;
@@ -118,7 +118,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		private const int   MARGIN    = 4;
 		private const float FONT_SIZE = 35;
 
-		public override Vector2 Size => new(750, FONT_SIZE + MARGIN * 2);
+		public override Vector2 Size => new Vector2(750, FONT_SIZE + MARGIN * 2);
 
 		private readonly TextDrawable _text;
 		public SetTitleDrawable(Vector2 position, string text) {

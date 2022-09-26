@@ -15,9 +15,9 @@ using pTyping.Shared.Beatmaps.Sorting;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class SongSelectDrawable : CompositeDrawable {
-	private readonly List<BeatmapSetDrawable> _registeredSetButtons = new();
+	private readonly List<BeatmapSetDrawable> _registeredSetButtons = new List<BeatmapSetDrawable>();
 
-	public readonly ObservableCollection<IBeatmapSetFilter> FilterOperations = new();
+	public readonly ObservableCollection<IBeatmapSetFilter> FilterOperations = new ObservableCollection<IBeatmapSetFilter>();
 
 	public Action<float> ChangeScroll;
 
@@ -53,7 +53,7 @@ public class SongSelectDrawable : CompositeDrawable {
 		this._registeredSetButtons.Clear();
 
 		foreach (BeatmapSet set in sortedSets) {
-			BeatmapSetDrawable drawable = new(set);
+			BeatmapSetDrawable drawable = new BeatmapSetDrawable(set);
 
 			this._registeredSetButtons.Add(drawable);
 		}

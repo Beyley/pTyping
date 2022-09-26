@@ -72,7 +72,7 @@ public class CreateNoteTool : EditorTool {
 		if (!this.EditorInstance.InPlayfield(args.position)) return;
 		if (args.mouseButton != MouseButton.Left) return;
 
-		HitObject noteToAdd = new() {
+		HitObject noteToAdd = new HitObject {
 			Time  = this.EditorInstance.EditorState.MouseTime,
 			Text  = this._defaultNoteText.AsTextBox().Text.Trim(),
 			Color = this._defaultNoteColor.AsColorPicker().Color.Value

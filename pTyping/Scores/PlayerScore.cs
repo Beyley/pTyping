@@ -15,17 +15,17 @@ public static class ScoreExtensions {
 	private const ushort TATAKU_SCORE_VERSION = 5;
 
 	public static Score LoadUTypingReplay(byte[] arr) {
-		MemoryStream stream = new(arr);
-		BinaryReader reader = new(stream);
+		MemoryStream stream = new MemoryStream(arr);
+		BinaryReader reader = new BinaryReader(stream);
 
-		Score replay = new() {
+		Score replay = new Score {
 			User = new DatabaseUser {
 				Username = "UTyping",
 				UserId   = uint.MaxValue
 			}
 		};
 
-		List<ReplayFrame> frames = new();
+		List<ReplayFrame> frames = new List<ReplayFrame>();
 
 		while (stream.Position < stream.Length)
 			frames.Add(ReplayFrameExtensions.UTypingDeserialize(reader));
@@ -45,7 +45,7 @@ public static class ScoreExtensions {
 
 	public static void SaveUTypingReplay(this Score score, string path) {
 		FileStream   stream = File.Create(path);
-		BinaryWriter writer = new(stream);
+		BinaryWriter writer = new BinaryWriter(stream);
 
 		foreach (ReplayFrame frame in score.ReplayFrames)
 			frame.UTypingSerialize(writer);
@@ -56,7 +56,7 @@ public static class ScoreExtensions {
 
 	[Pure]
 	public static Score TatakuDeserialize(TatakuReader reader) {
-		Score score = new();
+		Score score = new Score();
 
 		ushort scoreVersion = reader.ReadUInt16();
 
@@ -132,8 +132,8 @@ public static class ScoreExtensions {
 
 	[Pure]
 	public static byte[] TatakuSerialize(this Score score) {
-		using MemoryStream stream = new();
-		using TatakuWriter writer = new(stream);
+		using MemoryStream stream = new MemoryStream();
+		using TatakuWriter writer = new TatakuWriter(stream);
 
 		score.TatakuSerialize(writer);
 
@@ -146,7 +146,7 @@ public static class ScoreExtensions {
 public static class ReplayFrameExtensions {
 	[Pure]
 	public static ReplayFrame UTypingDeserialize(BinaryReader reader) {
-		ReplayFrame frame = new() {
+		ReplayFrame frame = new ReplayFrame {
 			Character = reader.ReadChar(),
 			Time      = reader.ReadDouble() * 1000d
 		};

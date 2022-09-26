@@ -17,7 +17,7 @@ public class PathHashTuple : EmbeddedObject, IClonable<PathHashTuple> {
 		this.Hash = hash;
 	}
 	public PathHashTuple Clone() {
-		PathHashTuple tuple = new(this.Path, this.Hash);
+		PathHashTuple tuple = new PathHashTuple(this.Path, this.Hash);
 
 		return tuple;
 	}

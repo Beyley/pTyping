@@ -96,7 +96,7 @@ public static class UiMakerCodeGen {
 	}
 
 	public static string GenerateClass(UiMakerElementContainer container) {
-		IndentedStringBuilder builder = new();
+		IndentedStringBuilder builder = new IndentedStringBuilder();
 
 		builder.AppendLine("using System.Numerics;");
 		builder.AppendLine("using Furball.Vixie.Backends.Shared;");

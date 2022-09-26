@@ -14,7 +14,7 @@ public class Break : EmbeddedObject, IClonable<Break> {
 	public double Length => this.End - this.Start;
 
 	public Break Clone() {
-		Break @break = new() {
+		Break @break = new Break {
 			Start = this.Start,
 			End   = this.End
 		};

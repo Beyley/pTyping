@@ -15,7 +15,7 @@ public class BeatmapFileCollection : EmbeddedObject, IClonable<BeatmapFileCollec
 	public PathHashTuple? BackgroundVideo { get; set; }
 
 	public BeatmapFileCollection Clone() {
-		BeatmapFileCollection collection = new() {
+		BeatmapFileCollection collection = new BeatmapFileCollection {
 			Audio           = this.Audio?.Clone(),
 			Background      = this.Background?.Clone(),
 			BackgroundVideo = this.BackgroundVideo?.Clone()

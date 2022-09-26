@@ -9,7 +9,7 @@ public static class OffsetManager {
 	private class OffsetConfig : VolpeConfig {
 		public override string Name => "offsets";
 
-		public static readonly OffsetConfig Instance = new();
+		public static readonly OffsetConfig Instance = new OffsetConfig();
 	}
 
 	public static void Initialize() {

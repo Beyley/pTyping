@@ -54,7 +54,7 @@ public class FileDatabase {
 			throw new FileNotFoundException(hash);
 
 		using FileStream   stream = File.OpenRead(path);
-		using BinaryReader reader = new(stream);
+		using BinaryReader reader = new BinaryReader(stream);
 
 		byte[] arr = reader.ReadBytes((int)stream.Length);
 

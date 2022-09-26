@@ -6,7 +6,7 @@ public class LoggerLevelSongInfo : LoggerLevel {
 	private LoggerLevelSongInfo() {}
 	public override string Name => "SongInfo";
 
-	public static LoggerLevelSongInfo Instance = new();
+	public static LoggerLevelSongInfo Instance = new LoggerLevelSongInfo();
 }
 
 public class LoggerLevelSongManagerUpdateInfo : LoggerLevel {
@@ -14,7 +14,7 @@ public class LoggerLevelSongManagerUpdateInfo : LoggerLevel {
 
 	public override string Name => "SongManagerInfo";
 
-	public static LoggerLevelSongManagerUpdateInfo Instance = new();
+	public static LoggerLevelSongManagerUpdateInfo Instance = new LoggerLevelSongManagerUpdateInfo();
 }
 
 public class LoggerLevelOnlineInfo : LoggerLevel {
@@ -22,7 +22,7 @@ public class LoggerLevelOnlineInfo : LoggerLevel {
 
 	public override string Name => "OnlineInfo";
 
-	public static LoggerLevelOnlineInfo Instance = new();
+	public static LoggerLevelOnlineInfo Instance = new LoggerLevelOnlineInfo();
 }
 
 public class LoggerLevelChatMessage : LoggerLevel {
@@ -30,7 +30,7 @@ public class LoggerLevelChatMessage : LoggerLevel {
 
 	public override string Name => "ChatMessage";
 
-	public static LoggerLevelChatMessage Instance = new();
+	public static LoggerLevelChatMessage Instance = new LoggerLevelChatMessage();
 }
 
 public class LoggerLevelModInfo : LoggerLevel {
@@ -38,7 +38,7 @@ public class LoggerLevelModInfo : LoggerLevel {
 
 	public override string Name => "ModInfo";
 
-	public static LoggerLevelModInfo Instance = new();
+	public static LoggerLevelModInfo Instance = new LoggerLevelModInfo();
 }
 
 public class LoggerLevelEditorInfo : LoggerLevel {
@@ -46,7 +46,7 @@ public class LoggerLevelEditorInfo : LoggerLevel {
 
 	public override string Name => "EditorInfo";
 
-	public static LoggerLevelEditorInfo Instance = new();
+	public static LoggerLevelEditorInfo Instance = new LoggerLevelEditorInfo();
 }
 
 public class LoggerLevelPlayerInfo : LoggerLevel {
@@ -54,5 +54,5 @@ public class LoggerLevelPlayerInfo : LoggerLevel {
 
 	public override string Name => "FurballFormInfo";
 
-	public static LoggerLevelPlayerInfo Instance = new();
+	public static LoggerLevelPlayerInfo Instance = new LoggerLevelPlayerInfo();
 }

@@ -25,7 +25,7 @@ public class BeatmapSet : RealmObject, IClonable<BeatmapSet>, IEquatable<Beatmap
 	public string Source { get; set; }
 
 	public BeatmapSet Clone() {
-		BeatmapSet set = new() {
+		BeatmapSet set = new BeatmapSet {
 			Title  = this.Title.Clone(),
 			Artist = this.Artist.Clone(),
 			Source = this.Source,

@@ -19,7 +19,7 @@ public static class ScreenshotManager {
 	}
 
 	public static string SaveScreenshot(Image img, bool online, string id = null) {
-		DirectoryInfo info = new(ResolvedScreenshotPath);
+		DirectoryInfo info = new DirectoryInfo(ResolvedScreenshotPath);
 
 		FileInfo[] files = info.GetFiles();
 

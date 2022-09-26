@@ -10,10 +10,10 @@ using pTyping.UiGenerator;
 namespace pTyping.Graphics.Editor;
 
 public class EditorState {
-	public readonly List<NoteDrawable> Notes  = new();
-	public readonly List<Drawable>     Events = new();
+	public readonly List<NoteDrawable> Notes  = new List<NoteDrawable>();
+	public readonly List<Drawable>     Events = new List<Drawable>();
 
-	public readonly ObservableCollection<Drawable> SelectedObjects = new();
+	public readonly ObservableCollection<Drawable> SelectedObjects = new ObservableCollection<Drawable>();
 
 	public double CurrentTime;
 	public double MouseTime;
@@ -25,7 +25,7 @@ public class EditorState {
 		this.Song = song;
 	}
 
-	public readonly UiContainer EditorToolUiContainer = new(OriginType.TopRight) {
+	public readonly UiContainer EditorToolUiContainer = new UiContainer(OriginType.TopRight) {
 		Position         = new Vector2(10, 10),
 		Depth            = -1f,
 		ScreenOriginType = OriginType.TopRight

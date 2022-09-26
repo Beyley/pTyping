@@ -18,7 +18,7 @@ public abstract class EditorTool : IComparable<EditorTool> {
 	public const           int     ITEMTEXTSIZE       = 30;
 	public const           int     LABELTEXTSIZE      = 35;
 	public const           float   TEXTBOXWIDTH       = 300;
-	public static readonly Vector2 DROPDOWNBUTTONSIZE = new(250, 35);
+	public static readonly Vector2 DROPDOWNBUTTONSIZE = new Vector2(250, 35);
 	public const           float   LABELAFTERDISTANCE = 5f;
 
 	public DrawableTickbox TickBoxDrawable;

@@ -24,7 +24,7 @@ public abstract class Mod {
 	public abstract bool IsIncompatible(Mod mod);
 
 	public static string ModsShorthandString(Mod[] mods) {
-		StringBuilder builder = new();
+		StringBuilder builder = new StringBuilder();
 
 		foreach (Mod mod in mods)
 			builder.Append(mod.ShorthandName);

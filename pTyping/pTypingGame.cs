@@ -49,7 +49,7 @@ public enum Localizations {
 
 // ReSharper disable once InconsistentNaming
 public class pTypingGame : FurballGame {
-	public static readonly Vector2 BackButtonScale = new(0.12f);
+	public static readonly Vector2 BackButtonScale = new Vector2(0.12f);
 
 	public static Texture BackButtonTexture;
 	public static Texture DefaultBackground;
@@ -60,7 +60,7 @@ public class pTypingGame : FurballGame {
 	public static SoundEffectPlayer     MenuClickSound;
 	public static Scheduler             MusicTrackScheduler;
 
-	public static readonly Bindable<Beatmap> CurrentSong = new(null);
+	public static readonly Bindable<Beatmap> CurrentSong = new Bindable<Beatmap>(null);
 
 	public static TextDrawable     VolumeSelector;
 	public static TexturedDrawable CurrentSongBackground;
@@ -73,47 +73,39 @@ public class pTypingGame : FurballGame {
 	public static ScoreDatabase ScoreDatabase;
 
 	public static byte[] JapaneseFontData;
-	public static FontSystem JapaneseFont = new(
-		new FontSystemSettings {
-			FontResolutionFactor = 2f,
-			KernelWidth          = 1,
-			KernelHeight         = 1,
-			Effect               = FontSystemEffect.None,
-			TextureWidth         = 2048,
-			TextureHeight        = 2048
-		}
-	);
-	public static FontSystem JapaneseFontStroked = new(
-		new FontSystemSettings {
-			FontResolutionFactor = 2f,
-			KernelWidth          = 1,
-			KernelHeight         = 1,
-			Effect               = FontSystemEffect.Stroked,
-			EffectAmount         = 2,
-			TextureWidth         = 2048,
-			TextureHeight        = 2048
-		}
-	);
-	public static readonly FontSystem FurballFontRegular = new(
-		new FontSystemSettings {
-			FontResolutionFactor = 2f,
-			KernelWidth          = 1,
-			KernelHeight         = 1,
-			TextureWidth         = 2048,
-			TextureHeight        = 2048
-		}
-	);
-	public static readonly FontSystem FurballFontRegularStroked = new(
-		new FontSystemSettings {
-			FontResolutionFactor = 2f,
-			KernelWidth          = 1,
-			KernelHeight         = 1,
-			Effect               = FontSystemEffect.Stroked,
-			EffectAmount         = 2,
-			TextureWidth         = 2048,
-			TextureHeight        = 2048
-		}
-	);
+	public static FontSystem JapaneseFont = new FontSystem(new FontSystemSettings {
+		FontResolutionFactor = 2f,
+		KernelWidth          = 1,
+		KernelHeight         = 1,
+		Effect               = FontSystemEffect.None,
+		TextureWidth         = 2048,
+		TextureHeight        = 2048
+	});
+	public static FontSystem JapaneseFontStroked = new FontSystem(new FontSystemSettings {
+		FontResolutionFactor = 2f,
+		KernelWidth          = 1,
+		KernelHeight         = 1,
+		Effect               = FontSystemEffect.Stroked,
+		EffectAmount         = 2,
+		TextureWidth         = 2048,
+		TextureHeight        = 2048
+	});
+	public static readonly FontSystem FurballFontRegular = new FontSystem(new FontSystemSettings {
+		FontResolutionFactor = 2f,
+		KernelWidth          = 1,
+		KernelHeight         = 1,
+		TextureWidth         = 2048,
+		TextureHeight        = 2048
+	});
+	public static readonly FontSystem FurballFontRegularStroked = new FontSystem(new FontSystemSettings {
+		FontResolutionFactor = 2f,
+		KernelWidth          = 1,
+		KernelHeight         = 1,
+		Effect               = FontSystemEffect.Stroked,
+		EffectAmount         = 2,
+		TextureWidth         = 2048,
+		TextureHeight        = 2048
+	});
 
 	public static UserCardDrawable MenuPlayerUserCard;
 
@@ -122,7 +114,7 @@ public class pTypingGame : FurballGame {
 	public static Texture GlobalLeaderboardButtonTexture;
 
 	private          double         _musicTrackSchedulerDelta;
-	private readonly List<Drawable> _userPanelDrawables = new();
+	private readonly List<Drawable> _userPanelDrawables = new List<Drawable>();
 
 	private DrawableManager _userPanelManager;
 	private DrawableManager _settingsManager;
@@ -824,7 +816,7 @@ public class pTypingGame : FurballGame {
 				this._userPanelDrawables.ForEach(x => { this._userPanelManager.Remove(x); });
 				this._userPanelDrawables.Clear();
 
-				Vector2 pos = new(10, 10 + _OnlineUsersText.Size.Y + 10);
+				Vector2 pos = new Vector2(10, 10 + _OnlineUsersText.Size.Y + 10);
 				foreach (OnlinePlayer player in OnlineManager.OnlinePlayers) {
 					UserCardDrawable drawable = player.GetUserCard();
 					drawable.MoveTo(pos);

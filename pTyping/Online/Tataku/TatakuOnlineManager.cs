@@ -41,7 +41,7 @@ public class TatakuOnlineManager : OnlineManager {
 
 	public bool IsAlive => this._client.IsRunning;
 
-	private readonly Queue<ChatMessage> _chatQueue = new();
+	private readonly Queue<ChatMessage> _chatQueue = new Queue<ChatMessage>();
 
 	public TatakuOnlineManager(string wsUri, string httpUri) {
 		this._wsUri   = new Uri(wsUri);
@@ -143,7 +143,7 @@ public class TatakuOnlineManager : OnlineManager {
 
 		switch (e) {
 			case PlayerScreen: {
-				SpectatorFramePlay frame = new() {
+				SpectatorFramePlay frame = new SpectatorFramePlay {
 					Mode        = PlayMode.pTyping,
 					BeatmapHash = pTypingGame.CurrentSong.Value.Id,
 					Modinfo = new SpectatorModInfo {
@@ -266,8 +266,8 @@ public class TatakuOnlineManager : OnlineManager {
 		}
 	}
 
-	public ConcurrentQueue<Packet>         PacketQueue         = new();
-	public ConcurrentQueue<SpectatorFrame> SpectatorFrameQueue = new();
+	public ConcurrentQueue<Packet>         PacketQueue         = new ConcurrentQueue<Packet>();
+	public ConcurrentQueue<SpectatorFrame> SpectatorFrameQueue = new ConcurrentQueue<SpectatorFrame>();
 
 	private bool _sendPackets;
 	private bool _spectatorFrameSendThreadRun;
@@ -278,8 +278,8 @@ public class TatakuOnlineManager : OnlineManager {
 		while (this._sendPackets) {
 			if (this._client.NativeClient.State == WebSocketState.Open) {
 				if (this.PacketQueue.TryDequeue(out Packet packet)) {
-					using MemoryStream s = new();
-					using TatakuWriter w = new(s);
+					using MemoryStream s = new MemoryStream();
+					using TatakuWriter w = new TatakuWriter(s);
 
 					packet!.WriteDataToStream(w);
 					this._client.Send(s.ToArray());
@@ -288,10 +288,10 @@ public class TatakuOnlineManager : OnlineManager {
 				if (UnixTime.Now() - this._lastPing > 5) {
 					this._lastPing = UnixTime.Now();
 
-					using MemoryStream s = new();
-					using TatakuWriter w = new(s);
+					using MemoryStream s = new MemoryStream();
+					using TatakuWriter w = new TatakuWriter(s);
 
-					PingPacket pingPacket = new();
+					PingPacket pingPacket = new PingPacket();
 					pingPacket.WriteDataToStream(w);
 				}
 			}
@@ -323,8 +323,8 @@ public class TatakuOnlineManager : OnlineManager {
 		try {
 			string finalUri = $"{this._httpUri}{SCORE_SUBMIT_URL}";
 
-			using MemoryStream       str    = new();
-			await using TatakuWriter writer = new(str);
+			using MemoryStream       str    = new MemoryStream();
+			await using TatakuWriter writer = new TatakuWriter(str);
 
 			writer.Write(pTypingConfig.Instance.Username);
 			writer.Write(pTypingConfig.Instance.Password);
@@ -367,13 +367,13 @@ public class TatakuOnlineManager : OnlineManager {
 		this.SendUpdateScoreRequest();
 	}
 	protected override async Task<List<Score>> ClientGetScores(string hash) {
-		List<Score> scores = new();
+		List<Score> scores = new List<Score>();
 
 		try {
 			string finalUri = this._httpUri + this._getScoresUrl;
 
-			MemoryStream stream = new();
-			TatakuWriter writer = new(stream);
+			MemoryStream stream = new MemoryStream();
+			TatakuWriter writer = new TatakuWriter(stream);
 			writer.Write(hash);
 			writer.Write((byte)PlayMode.pTyping);
 			writer.Flush();
@@ -384,7 +384,7 @@ public class TatakuOnlineManager : OnlineManager {
 
 			await task;
 
-			TatakuReader reader = new(task.Result.Content.ReadAsStream());
+			TatakuReader reader = new TatakuReader(task.Result.Content.ReadAsStream());
 
 			ulong length = reader.ReadUInt64();
 
@@ -399,8 +399,8 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private void HandleMessage(ResponseMessage args) {
-		MemoryStream stream = new(args.Binary);
-		TatakuReader reader = new(stream);
+		MemoryStream stream = new MemoryStream(args.Binary);
+		TatakuReader reader = new TatakuReader(stream);
 
 		PacketId pid = reader.ReadPacketId();
 
@@ -437,7 +437,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerSpectateResult(TatakuReader reader) {
-		ServerSpectateResultPacket p = new();
+		ServerSpectateResultPacket p = new ServerSpectateResultPacket();
 
 		p.ReadDataFromStream(reader);
 
@@ -485,7 +485,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerSpectatorPlayingRequest(TatakuReader reader) {
-		ServerSpectatorPlayingRequestPacket p = new();
+		ServerSpectatorPlayingRequestPacket p = new ServerSpectatorPlayingRequestPacket();
 
 		p.ReadDataFromStream(reader);
 
@@ -495,7 +495,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerErrorPacket(TatakuReader reader) {
-		ServerErrorPacket p = new();
+		ServerErrorPacket p = new ServerErrorPacket();
 		p.ReadDataFromStream(reader);
 
 		pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Error, $"Server Error {p.ErrorCode}");
@@ -504,7 +504,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerDropConnectionPacket(TatakuReader reader) {
-		ServerDropConnectionPacket p = new();
+		ServerDropConnectionPacket p = new ServerDropConnectionPacket();
 		p.ReadDataFromStream(reader);
 
 		string final = "Dropped from server!\nReason: ";
@@ -540,7 +540,7 @@ public class TatakuOnlineManager : OnlineManager {
 
 
 	private bool HandleServerNotificationPacket(TatakuReader reader) {
-		ServerNotificationPacket p = new();
+		ServerNotificationPacket p = new ServerNotificationPacket();
 		p.ReadDataFromStream(reader);
 
 		pTypingGame.NotificationManager.CreateNotification(p.Importance, p.Message);
@@ -685,7 +685,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerSpectatorLeftPacket(TatakuReader reader) {
-		ServerSpectatorLeftPacket p = new();
+		ServerSpectatorLeftPacket p = new ServerSpectatorLeftPacket();
 		p.ReadDataFromStream(reader);
 
 		if (p.UserId == this.Player.UserId) {
@@ -714,7 +714,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerSpectatorJoinedPacket(TatakuReader reader) {
-		ServerSpectatorJoinedPacket p = new();
+		ServerSpectatorJoinedPacket p = new ServerSpectatorJoinedPacket();
 		p.ReadDataFromStream(reader);
 
 		// if (this.Host == null) {
@@ -791,12 +791,12 @@ public class TatakuOnlineManager : OnlineManager {
 	#region Handle packets
 
 	private bool HandleServerSendMessagePacket(TatakuReader reader) {
-		ServerSendMessagePacket packet = new();
+		ServerSendMessagePacket packet = new ServerSendMessagePacket();
 		packet.ReadDataFromStream(reader);
 
 		lock (this.OnlinePlayers) {
 			if (this.OnlinePlayers.TryGetValue(packet.SenderId, out OnlinePlayer player)) {
-				ChatMessage message = new(player, packet.Channel, packet.Message);
+				ChatMessage message = new ChatMessage(player, packet.Channel, packet.Message);
 
 				if (message.Message.Length > 128) message.Message = message.Message[..Math.Min(128, message.Message.Length)];
 
@@ -818,7 +818,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerScoreUpdatePacket(TatakuReader reader) {
-		ServerScoreUpdatePacket packet = new();
+		ServerScoreUpdatePacket packet = new ServerScoreUpdatePacket();
 		packet.ReadDataFromStream(reader);
 
 		lock (this.OnlinePlayers) {
@@ -843,7 +843,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerUserStatusUpdatePacket(TatakuReader reader) {
-		ServerUserStatusUpdatePacket packet = new();
+		ServerUserStatusUpdatePacket packet = new ServerUserStatusUpdatePacket();
 		packet.ReadDataFromStream(reader);
 
 		lock (this.OnlinePlayers) {
@@ -863,7 +863,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerUserLeftPacket(TatakuReader reader) {
-		ServerUserLeftPacket packet = new();
+		ServerUserLeftPacket packet = new ServerUserLeftPacket();
 		packet.ReadDataFromStream(reader);
 
 		lock (this.OnlinePlayers) {
@@ -877,7 +877,7 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerLoginResponsePacket(TatakuReader reader) {
-		ServerLoginResponsePacket packet = new();
+		ServerLoginResponsePacket packet = new ServerLoginResponsePacket();
 		packet.ReadDataFromStream(reader);
 
 		switch (packet.LoginStatus) {
@@ -940,9 +940,9 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	public override string SendScreenshot(Image image) {
-		using MemoryStream ms = new();
+		using MemoryStream ms = new MemoryStream();
 		image.SaveAsPng(ms);
-		Uri                       uri      = new($"{this._httpUri}screenshots/?username={pTypingConfig.Instance.Username}&password={pTypingConfig.Instance.Password}");
+		Uri                       uri      = new Uri($"{this._httpUri}screenshots/?username={pTypingConfig.Instance.Username}&password={pTypingConfig.Instance.Password}");
 		Task<HttpResponseMessage> response = this._httpClient.PostAsync(uri, new ByteArrayContent(ms.ToArray()));
 		response.Wait();
 
@@ -971,10 +971,10 @@ public class TatakuOnlineManager : OnlineManager {
 	}
 
 	private bool HandleServerUserJoinedPacket(TatakuReader reader) {
-		ServerUserJoinedPacket packet = new();
+		ServerUserJoinedPacket packet = new ServerUserJoinedPacket();
 		packet.ReadDataFromStream(reader);
 
-		OnlinePlayer player = new() {
+		OnlinePlayer player = new OnlinePlayer {
 			Username = {
 				Value = packet.Username
 			},
@@ -1013,7 +1013,7 @@ public class TatakuReader : BinaryReader {
 	}
 
 	public Dictionary<string, ushort> ReadStringUshortDictionary() {
-		Dictionary<string, ushort> dic = new();
+		Dictionary<string, ushort> dic = new Dictionary<string, ushort>();
 
 		ulong length = this.ReadUInt64();
 

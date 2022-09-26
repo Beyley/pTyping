@@ -29,28 +29,14 @@ public class MenuScreen : pScreen {
 	public override void Initialize() {
 		base.Initialize();
 
-		TextDrawable gitVersionText = new(
-			new Vector2(10, 10),
-			pTypingGame.JapaneseFont,
-			string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion),
-			30
-		) {
+		TextDrawable gitVersionText = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion), 30) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight
 		};
 
 		this.Manager.Add(gitVersionText);
 
-		DrawableButton changelogButton = new(
-			new Vector2(10, 10),
-			pTypingGame.JapaneseFont,
-			30,
-			GetLocalizedString(Localizations.Changelog),
-			Color.Blue,
-			Color.White,
-			Color.White,
-			new Vector2(0)
-		) {
+		DrawableButton changelogButton = new DrawableButton(new Vector2(10, 10), pTypingGame.JapaneseFont, 30, GetLocalizedString(Localizations.Changelog), Color.Blue, Color.White, Color.White, new Vector2(0)) {
 			OriginType       = OriginType.BottomLeft,
 			ScreenOriginType = OriginType.BottomLeft
 		};
@@ -59,16 +45,7 @@ public class MenuScreen : pScreen {
 
 		this.Manager.Add(changelogButton);
 
-		DrawableButton uiEditorButton = new(
-			new Vector2(changelogButton.Position.X + changelogButton.Size.X + 10, 10),
-			pTypingGame.JapaneseFont,
-			30,
-			"Ui Maker",
-			Color.Blue,
-			Color.White,
-			Color.White,
-			new Vector2(0)
-		) {
+		DrawableButton uiEditorButton = new DrawableButton(new Vector2(changelogButton.Position.X + changelogButton.Size.X + 10, 10), pTypingGame.JapaneseFont, 30, "Ui Maker", Color.Blue, Color.White, Color.White, new Vector2(0)) {
 			OriginType       = OriginType.BottomLeft,
 			ScreenOriginType = OriginType.BottomLeft
 		};
@@ -180,29 +157,17 @@ public class MenuScreen : pScreen {
 
 		Texture editorButtonsTexture2D = ContentManager.LoadTextureFromFileCached("editorbuttons.png", ContentSource.User);
 
-		TexturedDrawable musicPlayButton = new(
-			editorButtonsTexture2D,
-			new Vector2(105, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
-			TexturePositions.EDITOR_PLAY
-		) {
+		TexturedDrawable musicPlayButton = new TexturedDrawable(editorButtonsTexture2D, new Vector2(105, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f), TexturePositions.EDITOR_PLAY) {
 			Scale            = new Vector2(0.5f, 0.5f),
 			OriginType       = OriginType.TopRight,
 			ScreenOriginType = OriginType.TopRight
 		};
-		TexturedDrawable musicPauseButton = new(
-			editorButtonsTexture2D,
-			new Vector2(55, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
-			TexturePositions.EDITOR_PAUSE
-		) {
+		TexturedDrawable musicPauseButton = new TexturedDrawable(editorButtonsTexture2D, new Vector2(55, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f), TexturePositions.EDITOR_PAUSE) {
 			Scale            = new Vector2(0.5f, 0.5f),
 			OriginType       = OriginType.TopRight,
 			ScreenOriginType = OriginType.TopRight
 		};
-		TexturedDrawable musicNextButton = new(
-			editorButtonsTexture2D,
-			new Vector2(5, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f),
-			TexturePositions.EDITOR_RIGHT
-		) {
+		TexturedDrawable musicNextButton = new TexturedDrawable(editorButtonsTexture2D, new Vector2(5, this._songProgressBar.Position.Y + this._songProgressBar.Size.Y + 5f), TexturePositions.EDITOR_RIGHT) {
 			Scale            = new Vector2(0.5f, 0.5f),
 			OriginType       = OriginType.TopRight,
 			ScreenOriginType = OriginType.TopRight

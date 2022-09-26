@@ -28,7 +28,7 @@ public class AccuracyBarDrawable : CompositeDrawable {
 
 		this._player.OnCorrectCharTyped += this.OnChar;
 
-		Vector2 pos = new(this.Width / 2f, 0);
+		Vector2 pos = new Vector2(this.Width / 2f, 0);
 
 		float fairRatio      = this._player.TIMING_FAIR      / this._player.TIMING_POOR;
 		float goodRatio      = this._player.TIMING_GOOD      / this._player.TIMING_POOR;
@@ -60,7 +60,7 @@ public class AccuracyBarDrawable : CompositeDrawable {
 	private void OnChar(object sender, double e) {
 		const float fadeoutTime = 2000;
 
-		RectanglePrimitiveDrawable rect = new(new Vector2((float)(this.Width / 2f + this.Width / 2 * (e / this._player.TIMING_POOR)), this.Height), new Vector2(this.Width / 50f, this.Height * 2f), 1f, true) {
+		RectanglePrimitiveDrawable rect = new RectanglePrimitiveDrawable(new Vector2((float)(this.Width / 2f + this.Width / 2 * (e / this._player.TIMING_POOR)), this.Height), new Vector2(this.Width / 50f, this.Height * 2f), 1f, true) {
 			ColorOverride = new Color(255, 255, 255, 100),
 			OriginType    = OriginType.BottomCenter
 		};

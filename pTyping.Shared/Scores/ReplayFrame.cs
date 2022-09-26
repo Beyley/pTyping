@@ -13,7 +13,7 @@ public class ReplayFrame : EmbeddedObject, IClonable<ReplayFrame> {
 		set;
 	}
 	public ReplayFrame Clone() {
-		ReplayFrame frame = new() {
+		ReplayFrame frame = new ReplayFrame {
 			Used      = this.Used,
 			Time      = this.Time,
 			Character = this.Character

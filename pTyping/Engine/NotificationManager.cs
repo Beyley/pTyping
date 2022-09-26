@@ -23,7 +23,7 @@ public class NotificationManager : DrawableManager {
 	}
 
 	public NotificationDrawable CreateNotification(NotificationImportance importance, string text) {
-		NotificationDrawable drawable = new(importance, NotificationType.BottomRight, text) {
+		NotificationDrawable drawable = new NotificationDrawable(importance, NotificationType.BottomRight, text) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight,
 			Position         = new Vector2(-500, -500)
@@ -38,7 +38,7 @@ public class NotificationManager : DrawableManager {
 	}
 
 	public NotificationDrawable CreatePopup(string text) {
-		NotificationDrawable drawable = new(NotificationImportance.Info, NotificationType.MiddlePopup, text) {
+		NotificationDrawable drawable = new NotificationDrawable(NotificationImportance.Info, NotificationType.MiddlePopup, text) {
 			OriginType = OriginType.Center,
 			Position   = new Vector2(FurballGame.WindowWidth / 2f, FurballGame.WindowHeight / 2f)
 		};

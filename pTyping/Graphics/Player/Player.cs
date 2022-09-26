@@ -44,15 +44,15 @@ public class Player : CompositeDrawable {
 	public float TIMING_FAIR      => 100 / (this.Song.Difficulty.Strictness / 5f);
 	public float TIMING_POOR      => 200 / (this.Song.Difficulty.Strictness / 5f);
 
-	public static readonly Color COLOR_EXCELLENT = new(255, 255, 0);
-	public static readonly Color COLOR_GOOD      = new(0, 255, 0);
-	public static readonly Color COLOR_FAIR      = new(0, 128, 255);
-	public static readonly Color COLOR_POOR      = new(128, 128, 128);
+	public static readonly Color COLOR_EXCELLENT = new Color(255, 255, 0);
+	public static readonly Color COLOR_GOOD      = new Color(0, 255, 0);
+	public static readonly Color COLOR_FAIR      = new Color(0, 128, 255);
+	public static readonly Color COLOR_POOR      = new Color(128, 128, 128);
 
 	public const float NOTE_HEIGHT = 50f;
 
-	public static readonly Vector2 NOTE_START_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH + 200, NOTE_HEIGHT);
-	public static readonly Vector2 NOTE_END_POS   = new(-100, NOTE_HEIGHT);
+	public static readonly Vector2 NOTE_START_POS = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH + 200, NOTE_HEIGHT);
+	public static readonly Vector2 NOTE_END_POS   = new Vector2(-100, NOTE_HEIGHT);
 
 	public double BaseApproachTime = ConVars.BASE_APPROACH_TIME;
 	// public double CurrentApproachTime(double time) => this.BaseApproachTime / this.Song.CurrentTimingPoint(time).ApproachMultiplier;
@@ -74,10 +74,10 @@ public class Player : CompositeDrawable {
 		set => this._typingIndicators[this._currentTypingIndicatorIndex] = value;
 	}
 
-	private readonly List<NoteDrawable>          _notes  = new();
-	private readonly List<Tuple<Drawable, bool>> _events = new();
+	private readonly List<NoteDrawable>          _notes  = new List<NoteDrawable>();
+	private readonly List<Tuple<Drawable, bool>> _events = new List<Tuple<Drawable, bool>>();
 
-	public static readonly Vector2 RECEPTICLE_POS = new(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
+	public static readonly Vector2 RECEPTICLE_POS = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
 
 	private readonly Texture _noteTexture;
 
@@ -189,7 +189,7 @@ public class Player : CompositeDrawable {
 
 	[Pure]
 	private NoteDrawable CreateNote(HitObject note) {
-		NoteDrawable noteDrawable = new(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50) {
+		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {
 				ColorOverride = note.Color
@@ -231,7 +231,7 @@ public class Player : CompositeDrawable {
 
 		//If we are recording a replay or we are spectating someone, record the keypress
 		if (this.RecordReplay || this.IsSpectating) {
-			ReplayFrame f = new() {
+			ReplayFrame f = new ReplayFrame {
 				Character = e.Char,
 				Time      = pTypingGame.MusicTrackTimeSource.GetCurrentTime()
 			};

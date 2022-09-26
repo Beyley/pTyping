@@ -39,7 +39,7 @@ public static class LegacySongParser {
 		source = "Unknown";
 		title  = new AsciiUnicodeTuple(null, legacySong.Name);
 
-		Beatmap map = new() {
+		Beatmap map = new Beatmap {
 			Difficulty = {
 				Strictness = legacySong.Settings.Strictness
 			},

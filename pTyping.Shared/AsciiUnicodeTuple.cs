@@ -38,7 +38,7 @@ public class AsciiUnicodeTuple : RealmObject, IEquatable<AsciiUnicodeTuple> {
 		return this.Ascii == other.Ascii && this.Unicode == other.Unicode;
 	}
 	public AsciiUnicodeTuple Clone() {
-		AsciiUnicodeTuple tuple = new(this.Ascii, this.Unicode);
+		AsciiUnicodeTuple tuple = new AsciiUnicodeTuple(this.Ascii, this.Unicode);
 
 		return tuple;
 	}

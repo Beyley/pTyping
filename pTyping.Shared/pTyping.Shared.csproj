@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Realm" Version="10.15.1" />
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+        <PackageReference Include="Realm" Version="10.15.1"/>
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
+        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

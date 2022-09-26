@@ -12,7 +12,7 @@ namespace pTyping.Graphics.Player;
 public static class AutoReplayCreator {
 	[Pure]
 	public static Score CreateReplay(Beatmap song) {
-		Score score = new() {
+		Score score = new Score {
 			BeatmapId = song.Id,
 			User = {
 				Username = "p!auto"
@@ -23,7 +23,7 @@ public static class AutoReplayCreator {
 
 		score.AddScore(69420);
 
-		List<ReplayFrame> frames = new();
+		List<ReplayFrame> frames = new List<ReplayFrame>();
 
 		for (int i = 0; i < song.HitObjects.Count; i++) {
 			HitObject note = song.HitObjects[i];

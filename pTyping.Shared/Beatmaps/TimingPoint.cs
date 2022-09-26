@@ -24,7 +24,7 @@ public class TimingPoint : EmbeddedObject, IClonable<TimingPoint> {
 		this.TimeSignature = 4;
 	}
 	public TimingPoint Clone() {
-		TimingPoint point = new() {
+		TimingPoint point = new TimingPoint {
 			Tempo         = this.Tempo,
 			Time          = this.Time,
 			TimeSignature = this.TimeSignature

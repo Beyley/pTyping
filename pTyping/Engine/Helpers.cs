@@ -5,7 +5,7 @@ namespace pTyping.Engine;
 
 public static class Helpers {
 	public static Color RotateColor(Color color, float r) {
-		ColorHSL temp = new(new Eto.Drawing.Color(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f));
+		ColorHSL temp = new ColorHSL(new Eto.Drawing.Color(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f));
 
 		temp.H = (temp.H + r) % 360;
 

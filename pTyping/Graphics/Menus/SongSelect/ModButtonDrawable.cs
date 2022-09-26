@@ -96,10 +96,10 @@ public class ModButtonDrawable : TexturedDrawable {
 		);
 	}
 
-	private static readonly Color   CLICKED_COLOR  = new(210, 210, 255);
-	private static readonly Color   DISABLED_COLOR = new(255, 180, 180);
+	private static readonly Color   CLICKED_COLOR  = new Color(210, 210, 255);
+	private static readonly Color   DISABLED_COLOR = new Color(255, 180, 180);
 	private const           float   CLICKED_ROT    = MathF.PI / 10;
-	private static readonly Vector2 CLICKED_MOVE   = new(10, 0);
+	private static readonly Vector2 CLICKED_MOVE   = new Vector2(10, 0);
 
 	private void OnModClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
 		const float tweenTime = 100;

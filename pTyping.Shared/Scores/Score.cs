@@ -99,7 +99,7 @@ public class Score : RealmObject, IClonable<Score> {
 		this.AchievedScore += i; //TODO: mod multipliers
 	}
 	public Score Clone() {
-		Score score = new() {
+		Score score = new Score {
 			Time          = this.Time,
 			Accuracy      = this.Accuracy,
 			Mods          = this.Mods,

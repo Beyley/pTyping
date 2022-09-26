@@ -24,7 +24,7 @@ public class Event : EmbeddedObject, IClonable<Event>, IComparable<Event> {
 	public double Length => this.End - this.Start;
 
 	public Event Clone() {
-		Event @event = new() {
+		Event @event = new Event {
 			Start = this.Start,
 			End   = this.End,
 			Text  = this.Text,

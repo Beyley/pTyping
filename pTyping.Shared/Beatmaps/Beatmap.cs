@@ -56,7 +56,7 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap> {
 	public double BeatsPerMinute => this.TimingPoints[0].BeatsPerMinute;
 
 	public Beatmap Clone() {
-		Beatmap map = new();
+		Beatmap map = new Beatmap();
 
 		foreach (Break @break in this.Breaks)
 			map.Breaks.Add(@break.Clone());

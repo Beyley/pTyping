@@ -48,7 +48,7 @@ public class EditorScreen : pScreen {
 
 	public EditorState EditorState;
 
-	private readonly List<Drawable> _selectionRects = new();
+	private readonly List<Drawable> _selectionRects = new List<Drawable>();
 
 	public bool SaveNeeded;
 
@@ -279,7 +279,7 @@ public class EditorScreen : pScreen {
 
 		float y = 10;
 		foreach (EditorTool tool in this.EditorTools) {
-			DrawableTickbox tickboxDrawable = new(new Vector2(10, y), pTypingGame.JapaneseFontStroked, 35, tool.Name, false, true) {
+			DrawableTickbox tickboxDrawable = new DrawableTickbox(new Vector2(10, y), pTypingGame.JapaneseFontStroked, 35, tool.Name, false, true) {
 				ToolTip = tool.Tooltip
 			};
 
@@ -399,7 +399,7 @@ public class EditorScreen : pScreen {
 		this._selectionRects.Clear();
 
 		foreach (Drawable @object in this.EditorState.SelectedObjects) {
-			RectanglePrimitiveDrawable rect = new() {
+			RectanglePrimitiveDrawable rect = new RectanglePrimitiveDrawable {
 				RectSize      = @object.Size + new Vector2(20f),
 				Filled        = false,
 				Thickness     = 2f,
@@ -441,12 +441,7 @@ public class EditorScreen : pScreen {
 	}
 
 	public void CreateNote(HitObject note, bool isNew = false) {
-		NoteDrawable noteDrawable = new(
-			new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y),
-			this.NoteTexture,
-			pTypingGame.JapaneseFont,
-			50
-		) {
+		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y), this.NoteTexture, pTypingGame.JapaneseFont, 50) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {
 				ColorOverride = note.Color
@@ -553,7 +548,7 @@ public class EditorScreen : pScreen {
 		timeToSeekTo += currentTimingPoint.Time;
 
 		timeToSeekTo += right ? noteLength : -noteLength;
-		
+
 		pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
 		this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
 
@@ -698,7 +693,7 @@ public class EditorScreen : pScreen {
 			case Key.C when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
 				if (this.EditorState.SelectedObjects.Count == 0) return;
 
-				List<NoteDrawable> sortedNotes = new();
+				List<NoteDrawable> sortedNotes = new List<NoteDrawable>();
 				foreach (Drawable @object in this.EditorState.SelectedObjects)
 					if (@object is NoteDrawable note)
 						sortedNotes.Add(note);
@@ -708,7 +703,7 @@ public class EditorScreen : pScreen {
 
 				double startTime = sortedNotes.First().Note.Time;
 
-				List<HitObject> notes = new();
+				List<HitObject> notes = new List<HitObject>();
 
 				foreach (NoteDrawable drawable in sortedNotes) {
 					HitObject note = drawable.Note.Copy();
@@ -740,7 +735,7 @@ public class EditorScreen : pScreen {
 		}
 	}
 
-	private readonly List<Drawable> _timingPoints = new();
+	private readonly List<Drawable> _timingPoints = new List<Drawable>();
 
 	public void UpdateTimingPointDisplay() {
 		this._timingPoints.ForEach(x => this.Manager.Remove(x));
@@ -752,7 +747,7 @@ public class EditorScreen : pScreen {
 		foreach (TimingPoint timingPoint in this.EditorState.Song.TimingPoints) {
 			float x = (float)(timingPoint.Time / pTypingGame.MusicTrack.Length * length + startX);
 
-			TexturedDrawable drawable = new(FurballGame.WhitePixel, new Vector2(x, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+			TexturedDrawable drawable = new TexturedDrawable(FurballGame.WhitePixel, new Vector2(x, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
 				Scale         = new Vector2(3, this._progressBar.BarSize.Y + 10),
 				OriginType    = OriginType.BottomCenter,
 				ColorOverride = new Color(50, 200, 50, 100),

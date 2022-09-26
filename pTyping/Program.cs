@@ -33,7 +33,7 @@ internal class Program {
 	private static string ReadManifestResource(string name) {
 		using Stream stream = Assembly.GetAssembly(typeof(Program))?.GetManifestResourceStream(name);
 
-		using StreamReader reader = new(stream!);
+		using StreamReader reader = new StreamReader(stream!);
 
 		return reader.ReadToEnd().Trim();
 	}
@@ -55,7 +55,7 @@ internal class Program {
 		SetReleaseStream();
 		GitVersion = ReadManifestResource("pTyping.gitversion.txt");
 
-		using pTypingGame game = new();
+		using pTypingGame game = new pTypingGame();
 
 		if (RuntimeInfo.IsDebug())
 			game.Run();
@@ -65,7 +65,7 @@ internal class Program {
 			}
 			catch (Exception ex) {
 				using FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
-				using StreamWriter writer = new(stream);
+				using StreamWriter writer = new StreamWriter(stream);
 
 				writer.Write(ex.ToString());
 

@@ -17,7 +17,7 @@ public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, IClonable<Be
 	public double PreviewTime { get; set; }
 
 	public BeatmapInfo Clone() {
-		BeatmapInfo info = new() {
+		BeatmapInfo info = new BeatmapInfo {
 			Description    = this.Description,
 			Mapper         = this.Mapper,
 			DifficultyName = this.DifficultyName.Clone(),

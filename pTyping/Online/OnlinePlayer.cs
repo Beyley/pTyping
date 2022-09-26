@@ -16,18 +16,18 @@ public enum ServerPermissions : ushort {
 
 public class OnlinePlayer {
 	private UserCardDrawable            _userCard;
-	public  Bindable<double>            Accuracy    = new(1d);
-	public  Bindable<UserAction>        Action      = new(new UserAction(UserActionType.Idle, "Idling.", PlayMode.Unknown));
-	public  Bindable<int>               PlayCount   = new(0);
-	public  Bindable<int>               Rank        = new(0);
-	public  Bindable<ServerPermissions> Permissions = new(ServerPermissions.None);
+	public  Bindable<double>            Accuracy    = new Bindable<double>(1d);
+	public  Bindable<UserAction>        Action      = new Bindable<UserAction>(new UserAction(UserActionType.Idle, "Idling.", PlayMode.Unknown));
+	public  Bindable<int>               PlayCount   = new Bindable<int>(0);
+	public  Bindable<int>               Rank        = new Bindable<int>(0);
+	public  Bindable<ServerPermissions> Permissions = new Bindable<ServerPermissions>(ServerPermissions.None);
 
 	public bool Bot => (this.Permissions.Value & ServerPermissions.Bot) != 0;
 
-	public Bindable<long>   RankedScore = new(0);
-	public Bindable<long>   TotalScore  = new(0);
-	public Bindable<uint>   UserId      = new(uint.MaxValue);
-	public Bindable<string> Username    = new("Unknown user!");
+	public Bindable<long>   RankedScore = new Bindable<long>(0);
+	public Bindable<long>   TotalScore  = new Bindable<long>(0);
+	public Bindable<uint>   UserId      = new Bindable<uint>(uint.MaxValue);
+	public Bindable<string> Username    = new Bindable<string>("Unknown user!");
 
 	[Pure]
 	public UserCardDrawable GetUserCard() {

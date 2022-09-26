@@ -20,7 +20,7 @@ public class ChangeLogDrawable : CompositeDrawable {
 
 		List<GitLogEntry> gitLog = Program.GetGitLog();
 		foreach (GitLogEntry entry in gitLog) {
-			ChangeLogEntryDrawable drawable = new(entry) {
+			ChangeLogEntryDrawable drawable = new ChangeLogEntryDrawable(entry) {
 				Position = new Vector2(0, y)
 			};
 
@@ -53,7 +53,7 @@ public class ChangeLogDrawable : CompositeDrawable {
 				TotalMinutes = Math.Abs(TotalMinutes);
 				sSuffix      = " from now";
 			}
-			SortedList<double, Func<string>> aValue = new();
+			SortedList<double, Func<string>> aValue = new SortedList<double, Func<string>>();
 			aValue.Add(0.75, () => "less than a minute");
 			aValue.Add(1.5, () => "about a minute");
 			aValue.Add(45, () => string.Format("{0} minutes", Math.Round(TotalMinutes)));
@@ -146,7 +146,7 @@ public class ChangelogScreen : pScreen {
 
 		pTypingGame.LoadBackButtonTexture();
 
-		TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+		TexturedDrawable backButton = new TexturedDrawable(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
 			OriginType = OriginType.BottomLeft,
 			Scale      = pTypingGame.BackButtonScale,
 			Depth      = 0

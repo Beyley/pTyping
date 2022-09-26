@@ -5,11 +5,11 @@ namespace pTyping.Shared.Beatmaps.Importers;
 
 #pragma warning disable CS4014
 
-public class LegacyBeatmapImporter : IBeatmapImporter {
-	public void ImportBeatmaps(BeatmapDatabase database, FileDatabase fileDatabase, DirectoryInfo beatmapPath) {
+public class LegacyBeatmapImporter : IBeatmapScoreImporter {
+	public void ImportBeatmaps(BeatmapDatabase database, ScoreDatabase scoreDatabase, FileDatabase fileDatabase, DirectoryInfo beatmapPath) {
 		FileInfo[] files = beatmapPath.GetFiles("*.pts");
 
-		BeatmapSet set = new();
+		BeatmapSet set = new BeatmapSet();
 		foreach (FileInfo file in files) {
 			Beatmap? map = LegacySongParser.ParseLegacySong(file, out AsciiUnicodeTuple artist, out string source, out AsciiUnicodeTuple title);
 			set.Artist = artist;

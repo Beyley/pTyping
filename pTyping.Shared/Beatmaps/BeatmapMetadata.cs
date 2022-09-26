@@ -9,7 +9,7 @@ public class BeatmapMetadata : EmbeddedObject, IClonable<BeatmapMetadata> {
 	[Ignored, Description("The languages contained within the song")]
 	public IList<SongLanguage> Languages {
 		get {
-			List<SongLanguage> list = new();
+			List<SongLanguage> list = new List<SongLanguage>();
 
 			foreach (uint u in this.BackingLanguages)
 				list.Add((SongLanguage)u);
@@ -27,7 +27,7 @@ public class BeatmapMetadata : EmbeddedObject, IClonable<BeatmapMetadata> {
 	public IList<string> Tags { get; }
 
 	public BeatmapMetadata Clone() {
-		BeatmapMetadata metadata = new() {
+		BeatmapMetadata metadata = new BeatmapMetadata {
 			Languages = this.Languages
 		};
 

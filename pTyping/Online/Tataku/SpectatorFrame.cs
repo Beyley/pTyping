@@ -143,7 +143,7 @@ public abstract class SpectatorFrame {
 
 		switch (type) {
 			case SpectatorFrameDataType.Play:
-				SpectatorFramePlay playFrame = new();
+				SpectatorFramePlay playFrame = new SpectatorFramePlay();
 
 				playFrame.BeatmapHash = reader.ReadString();
 				playFrame.Mode        = reader.ReadPlayMode();
@@ -161,7 +161,7 @@ public abstract class SpectatorFrame {
 				frame = new SpectatorFrameBuffer();
 				break;
 			case SpectatorFrameDataType.SpectatingOther: {
-				SpectatorFrameSpectatingOther tframe = new();
+				SpectatorFrameSpectatingOther tframe = new SpectatorFrameSpectatingOther();
 
 				tframe.UserId = reader.ReadUInt32();
 
@@ -169,9 +169,9 @@ public abstract class SpectatorFrame {
 				break;
 			}
 			case SpectatorFrameDataType.ReplayFrame: {
-				SpectatorFrameReplayFrame tframe = new();
+				SpectatorFrameReplayFrame tframe = new SpectatorFrameReplayFrame();
 
-				ReplayFrame rFrame = new();
+				ReplayFrame rFrame = new ReplayFrame();
 				rFrame.TatakuDeserialize(time, reader);
 
 				tframe.Frame = rFrame;
@@ -180,7 +180,7 @@ public abstract class SpectatorFrame {
 				break;
 			}
 			case SpectatorFrameDataType.ScoreSync: {
-				SpectatorFrameScoreSync tframe = new() {
+				SpectatorFrameScoreSync tframe = new SpectatorFrameScoreSync {
 					Score = ScoreExtensions.TatakuDeserialize(reader)
 				};
 
@@ -191,7 +191,7 @@ public abstract class SpectatorFrame {
 				frame = new SpectatorFrameChangingMap();
 				break;
 			case SpectatorFrameDataType.PlayingResponse: {
-				SpectatorFramePlayingResponse tframe = new();
+				SpectatorFramePlayingResponse tframe = new SpectatorFramePlayingResponse();
 
 				tframe.UserId      = reader.ReadUInt32();
 				tframe.BeatmapHash = reader.ReadString();

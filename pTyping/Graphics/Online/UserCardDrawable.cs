@@ -137,7 +137,7 @@ public class UserCardDrawable : CompositeDrawable {
 		};
 	}
 
-	private static readonly Dictionary<string, Texture> _TextureCache = new();
+	private static readonly Dictionary<string, Texture> _TextureCache = new Dictionary<string, Texture>();
 
 	private static Texture GetTextureForMode(string mode) {
 		if (_TextureCache.TryGetValue(mode, out Texture tex))

@@ -79,13 +79,13 @@ public class ChatDrawable : CompositeDrawable {
 	private readonly RectanglePrimitiveDrawable _background;
 	public readonly  DrawableTextBox            MessageInputDrawable;
 
-	public Bindable<string> SelectedChannel = new("#general");
+	public Bindable<string> SelectedChannel = new Bindable<string>("#general");
 
 	public override Vector2 Size {
 		get;
 	} //TODO
 
-	private readonly List<DrawableButton> _channelButtons = new();
+	private readonly List<DrawableButton> _channelButtons = new List<DrawableButton>();
 
 	private readonly float _padding = 5f;
 
@@ -96,7 +96,7 @@ public class ChatDrawable : CompositeDrawable {
 
 			float x = 0f;
 			foreach (string channel in pTypingGame.OnlineManager.KnownChannels) {
-				DrawableButton button = new(new Vector2(x, 0), FurballGame.DefaultFont, 30, channel, Color.Blue, Color.White, Color.Black, new Vector2(100, 32)) {
+				DrawableButton button = new DrawableButton(new Vector2(x, 0), FurballGame.DefaultFont, 30, channel, Color.Blue, Color.White, Color.Black, new Vector2(100, 32)) {
 					OriginType = OriginType.BottomLeft
 				};
 				x += button.Size.X;
@@ -197,7 +197,7 @@ public class ChatDrawable : CompositeDrawable {
 
 			float y = this.Size.Y - this.MessageInputDrawable.Size.Y - 10;
 			foreach (ChatMessage message in chatMessages) {
-				ChatMessageDrawable messageDrawable = new(this, new Vector2(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
+				ChatMessageDrawable messageDrawable = new ChatMessageDrawable(this, new Vector2(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
 					OriginType = OriginType.BottomLeft
 				};
 

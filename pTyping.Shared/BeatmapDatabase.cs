@@ -10,7 +10,7 @@ public class BeatmapDatabase {
 	public readonly Realm Realm;
 
 	public BeatmapDatabase() {
-		RealmSchema.Builder builder = new() {
+		RealmSchema.Builder builder = new RealmSchema.Builder {
 			typeof(BeatmapSet),
 			typeof(Beatmap),
 			typeof(Break),
@@ -27,7 +27,7 @@ public class BeatmapDatabase {
 			typeof(HitObjectSettings)
 		};
 
-		RealmConfiguration config = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "songs.db")) {
+		RealmConfiguration config = new RealmConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "songs.db")) {
 			Schema = builder.Build()
 		};
 

@@ -26,7 +26,7 @@ using Silk.NET.Input;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class SongSelectionScreen : pScreen {
-	public static    Bindable<LeaderboardType> LeaderboardType = new(SongSelect.LeaderboardType.Local);
+	public static    Bindable<LeaderboardType> LeaderboardType = new Bindable<LeaderboardType>(SongSelect.LeaderboardType.Local);
 	private readonly bool                      _editor;
 	private          TexturedDrawable          _leaderboardButton;
 	private          LeaderboardDrawable       _leaderboardDrawable;
@@ -71,7 +71,7 @@ public class SongSelectionScreen : pScreen {
 
 		pTypingGame.LoadBackButtonTexture();
 
-		TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+		TexturedDrawable backButton = new TexturedDrawable(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
 			OriginType = OriginType.BottomLeft,
 			Scale      = pTypingGame.BackButtonScale
 		};
@@ -93,17 +93,7 @@ public class SongSelectionScreen : pScreen {
 				ScreenManager.ChangeScreen(new NewSongScreen());
 			};
 
-			DrawableButton createNewSongButton = new(
-				new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT),
-				FurballGame.DefaultFont,
-				30,
-				"Create Song",
-				Color.Blue,
-				Color.White,
-				Color.White,
-				Vector2.Zero,
-				newSongOnClick
-			) {
+			DrawableButton createNewSongButton = new DrawableButton(new Vector2(backButton.Size.X + 10f, FurballGame.DEFAULT_WINDOW_HEIGHT), FurballGame.DefaultFont, 30, "Create Song", Color.Blue, Color.White, Color.White, Vector2.Zero, newSongOnClick) {
 				OriginType = OriginType.BottomLeft,
 				Depth      = 0.5f
 			};
@@ -139,7 +129,7 @@ public class SongSelectionScreen : pScreen {
 
 		#region Start button
 
-		DrawableButton startButton = new(new Vector2(5), FurballGame.DefaultFont, 60, "Start!", Color.Red, Color.White, Color.White, new Vector2(0)) {
+		DrawableButton startButton = new DrawableButton(new Vector2(5), FurballGame.DefaultFont, 60, "Start!", Color.Red, Color.White, Color.White, new Vector2(0)) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight,
 			Depth            = 0f
@@ -202,16 +192,7 @@ public class SongSelectionScreen : pScreen {
 			this._modMenu.Hide(true);
 			this.Manager.Add(this._modMenu);
 
-			DrawableButton toggleMods = new(
-				new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y),
-				FurballGame.DefaultFontStroked,
-				30,
-				"Mods",
-				Color.Blue,
-				Color.White,
-				Color.White,
-				new Vector2(0)
-			) {
+			DrawableButton toggleMods = new DrawableButton(new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y), FurballGame.DefaultFontStroked, 30, "Mods", Color.Blue, Color.White, Color.White, new Vector2(0)) {
 				OriginType = OriginType.BottomLeft
 			};
 
@@ -343,7 +324,7 @@ BPM:{pTypingGame.CurrentSong.Value.BeatsPerMinute:00.##}".ReplaceLineEndings();
 
 		this.Manager.Remove(this._leaderboardDrawable);
 
-		List<Score> origScores = new();
+		List<Score> origScores = new List<Score>();
 
 		switch (LeaderboardType.Value) {
 			case SongSelect.LeaderboardType.Friend: {

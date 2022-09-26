@@ -28,18 +28,8 @@ public class ScoreResultsScreen : pScreen {
 
 		BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
 
-		TextDrawable songTitleText = new(
-			new Vector2(10, 10),
-			pTypingGame.JapaneseFont,
-			$"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]",
-			40
-		);
-		TextDrawable songCreatorText = new(
-			new Vector2(10, songTitleText.Size.Y + 20),
-			pTypingGame.JapaneseFont,
-			$"Created by {pTypingGame.CurrentSong.Value.Info.Mapper}",
-			30
-		);
+		TextDrawable songTitleText   = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, $"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]", 40);
+		TextDrawable songCreatorText = new TextDrawable(new Vector2(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Info.Mapper}", 30);
 
 		this.Manager.Add(songTitleText);
 		this.Manager.Add(songCreatorText);
@@ -48,7 +38,7 @@ public class ScoreResultsScreen : pScreen {
 
 		#region Score info
 
-		ScoreResultsDrawable playerResults = new(this.Score) {
+		ScoreResultsDrawable playerResults = new ScoreResultsDrawable(this.Score) {
 			Position = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
 		};
 
@@ -63,17 +53,7 @@ public class ScoreResultsScreen : pScreen {
 			ScreenManager.ChangeScreen(new SongSelectionScreen(false));
 		};
 
-		DrawableButton exitButton = new(
-			new Vector2(20f, 20f),
-			FurballGame.DefaultFont,
-			40,
-			"Exit",
-			Color.Red,
-			Color.White,
-			Color.White,
-			Vector2.Zero,
-			exitOnClick
-		) {
+		DrawableButton exitButton = new DrawableButton(new Vector2(20f, 20f), FurballGame.DefaultFont, 40, "Exit", Color.Red, Color.White, Color.White, Vector2.Zero, exitOnClick) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight
 		};
@@ -89,17 +69,7 @@ public class ScoreResultsScreen : pScreen {
 			ScreenManager.ChangeScreen(new PlayerScreen(this.Score));
 		};
 
-		DrawableButton watchReplayButton = new(
-			new Vector2(20f, 80f),
-			FurballGame.DefaultFont,
-			40,
-			"Watch Replay",
-			Color.Blue,
-			Color.White,
-			Color.White,
-			Vector2.Zero,
-			watchReplayOnClick
-		) {
+		DrawableButton watchReplayButton = new DrawableButton(new Vector2(20f, 80f), FurballGame.DefaultFont, 40, "Watch Replay", Color.Blue, Color.White, Color.White, Vector2.Zero, watchReplayOnClick) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight
 		};

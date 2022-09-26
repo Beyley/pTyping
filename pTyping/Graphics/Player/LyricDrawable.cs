@@ -8,7 +8,7 @@ using pTyping.Shared.Events;
 namespace pTyping.Graphics.Player;
 
 public class LyricDrawable : CompositeDrawable {
-	private readonly List<Event> _lyrics = new();
+	private readonly List<Event> _lyrics = new List<Event>();
 
 	private readonly TextDrawable _currentLyricText;
 	// private readonly TextDrawable _nextLyricText;
@@ -35,7 +35,7 @@ public class LyricDrawable : CompositeDrawable {
 		this._currentLyricText.Text = $"{lyric.Text}";
 	}
 
-	private static readonly Event _default = new() {
+	private static readonly Event _default = new Event {
 		Text  = "",
 		Start = 0,
 		End   = double.PositiveInfinity

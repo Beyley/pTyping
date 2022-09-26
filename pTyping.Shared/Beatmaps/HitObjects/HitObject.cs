@@ -28,7 +28,7 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 	public HitResult HitResult = HitResult.NotHit;
 
 	[Description("Misc note specific settings"), JsonProperty]
-	public HitObjectSettings Settings { get; set; } = new();
+	public HitObjectSettings Settings { get; set; } = new HitObjectSettings();
 
 	[Ignored]
 	public (string Hiragana, List<string> Romaji) TypableRomaji => this.GetTypableRomaji(this.TypedText);
@@ -74,7 +74,7 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 		throw new NotImplementedException();
 	}
 	public HitObject Clone() {
-		HitObject hitObject = new() {
+		HitObject hitObject = new HitObject {
 			Color    = this.Color.Clone(),
 			Settings = this.Settings.Clone(),
 			Text     = this.Text,

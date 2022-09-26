@@ -13,9 +13,9 @@ namespace pTyping.UiGenerator;
 public class UiContainer : CompositeDrawable {
 	public Bindable<OriginType> ElementOriginType;
 
-	private readonly ObservableCollection<UiElement> _elements = new();
+	private readonly ObservableCollection<UiElement> _elements = new ObservableCollection<UiElement>();
 
-	public ReadOnlyCollection<UiElement> Elements => new(this._elements);
+	public ReadOnlyCollection<UiElement> Elements => new ReadOnlyCollection<UiElement>(this._elements);
 
 	public int EasingTime = 100;
 
@@ -36,7 +36,7 @@ public class UiContainer : CompositeDrawable {
 		this.Recalculate(null, null);
 	}
 
-	private readonly Queue<UiElement> _queuedForDeletion = new();
+	private readonly Queue<UiElement> _queuedForDeletion = new Queue<UiElement>();
 	private void Recalculate(object sender, [CanBeNull] NotifyCollectionChangedEventArgs e) {
 		float y = 0f;
 

@@ -25,11 +25,12 @@ public static class LegacyImportChecker {
 		Directory.CreateDirectory(LegacySongFolderImported);
 		Directory.CreateDirectory(LegacySongFolderImportedFailed);
 
-		BeatmapDatabase database = new();
+		BeatmapDatabase database      = new BeatmapDatabase();
+		ScoreDatabase   scoreDatabase = new ScoreDatabase();
 
 		database.Realm.Write(
 			() => {
-				DirectoryInfo info = new(LegacySongFolder);
+				DirectoryInfo info = new DirectoryInfo(LegacySongFolder);
 
 				DirectoryInfo[] legacySongDirs = info.GetDirectories();
 
@@ -43,16 +44,16 @@ public static class LegacyImportChecker {
 						}
 					);
 
-				LegacyBeatmapImporter  legacyImporter  = new();
-				UTypingBeatmapImporter uTypingImporter = new();
+				LegacyBeatmapImporter       legacyImporter       = new LegacyBeatmapImporter();
+				UTypingBeatmapScoreImporter uTypingScoreImporter = new UTypingBeatmapScoreImporter();
 
 				foreach (DirectoryInfo legacySongDir in legacySongDirs)
 					try {
 						if (legacySongDir.GetFiles().Any(x => x.Name.Contains("info.txt")))
-							uTypingImporter.ImportBeatmaps(database, pTypingGame.FileDatabase, legacySongDir);
+							uTypingScoreImporter.ImportBeatmaps(database, scoreDatabase, pTypingGame.FileDatabase, legacySongDir);
 						else
 							//Attempt to import the beatmap
-							legacyImporter.ImportBeatmaps(database, pTypingGame.FileDatabase, legacySongDir);
+							legacyImporter.ImportBeatmaps(database, scoreDatabase, pTypingGame.FileDatabase, legacySongDir);
 
 						legacySongDir.MoveTo(Path.Combine(LegacySongFolderImported, legacySongDir.Name));
 					}
@@ -73,10 +74,12 @@ public static class LegacyImportChecker {
 
 		//Refresh at the end to make sure it notifies the other threads
 		database.Realm.Refresh();
+		scoreDatabase.Realm.Refresh();
 
 		FurballGame.GameTimeScheduler.ScheduleMethod(
 			_ => {
 				pTypingGame.BeatmapDatabase.Realm.Refresh();
+				pTypingGame.ScoreDatabase.Realm.Refresh();
 			}
 		);
 	}

@@ -33,7 +33,7 @@ public class BulkCreateTool : EditorTool {
 	public UiElement Color;
 	public UiElement ColorLabel;
 
-	private readonly List<NoteDrawable> _previewNotes = new();
+	private readonly List<NoteDrawable> _previewNotes = new List<NoteDrawable>();
 
 	public override void Initialize() {
 		this.LyricsToAddLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Lyrics", LABELTEXTSIZE);
@@ -89,7 +89,7 @@ public class BulkCreateTool : EditorTool {
 
 		List<HitObject> notes = this.GenerateNotes();
 		foreach (HitObject note in notes) {
-			NoteDrawable drawable = new(Vector2.Zero, this.EditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
+			NoteDrawable drawable = new NoteDrawable(Vector2.Zero, this.EditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
 				TimeSource = pTypingGame.MusicTrackTimeSource,
 				RawTextDrawable = {
 					Text = $"{note.Text}"
@@ -125,7 +125,7 @@ public class BulkCreateTool : EditorTool {
 		try {
 			double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
 
-			List<HitObject> notes = new();
+			List<HitObject> notes = new List<HitObject>();
 
 			foreach (string text in splitText) {
 				if (string.IsNullOrEmpty(text.Trim())) {
@@ -134,7 +134,7 @@ public class BulkCreateTool : EditorTool {
 					continue;
 				}
 
-				HitObject note = new() {
+				HitObject note = new HitObject {
 					Text  = text.Trim(),
 					Time  = time,
 					Color = this.Color.AsColorPicker().Color.Value

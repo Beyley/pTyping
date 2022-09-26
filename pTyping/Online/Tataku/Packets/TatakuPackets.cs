@@ -20,11 +20,11 @@ public enum DataType {
 }
 
 public abstract class Packet {
-	protected Dictionary<string, object> Data = new();
+	protected Dictionary<string, object> Data = new Dictionary<string, object>();
 
 	public virtual PacketId Pid => PacketId.Unknown;
 
-	protected static readonly List<(string name, DataType type)> BLANK_DATA_DEFINITION = new();
+	protected static readonly List<(string name, DataType type)> BLANK_DATA_DEFINITION = new List<(string name, DataType type)>();
 	public virtual            List<(string name, DataType type)> DataDefinition => BLANK_DATA_DEFINITION;
 
 	public void ReadDataFromStream(TatakuReader reader) {
@@ -158,7 +158,7 @@ public class ClientUserLoginPacket : Packet {
 	}
 	public override PacketId Pid => PacketId.ClientUserLogin;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("protocol_version", DataType.UShort),
 		("username", DataType.String),
 		("password", DataType.String),
@@ -195,7 +195,7 @@ public enum LoginStatus : byte {
 public class ServerLoginResponsePacket : Packet {
 	public override PacketId Pid => PacketId.ServerLoginResponse;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("status", DataType.Byte),
 		("user_id", DataType.UInt)
 	};
@@ -215,7 +215,7 @@ public class ServerLoginResponsePacket : Packet {
 public class ServerPermissionsPacket : Packet {
 	public override PacketId Pid => PacketId.ServerPermissions;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt),
 		("permissions", DataType.UShort)
 	};
@@ -235,7 +235,7 @@ public class ServerPermissionsPacket : Packet {
 public class ServerUserJoinedPacket : Packet {
 	public override PacketId Pid => PacketId.ServerPermissions;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt),
 		("username", DataType.String),
 		("game", DataType.String)
@@ -260,7 +260,7 @@ public class ServerUserJoinedPacket : Packet {
 public class ServerUserLeftPacket : Packet {
 	public override PacketId Pid => PacketId.ServerUserLeft;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt)
 	};
 
@@ -278,14 +278,14 @@ public class ClientStatusUpdatePacket : Packet {
 	}
 	public override PacketId Pid => PacketId.ClientStatusUpdate;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("action", DataType.Byte),
 		("action_text", DataType.String),
 		("mode", DataType.String)
 	};
 
 	public UserAction Action {
-		get => new((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), PlayModeMethods.FromString((string)this.Data["mode"]));
+		get => new UserAction((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), PlayModeMethods.FromString((string)this.Data["mode"]));
 		set {
 			this.Data["action"]      = value.Action.Value;
 			this.Data["action_text"] = value.ActionText.Value;
@@ -299,7 +299,7 @@ public class ClientStatusUpdatePacket : Packet {
 public class ServerUserStatusUpdatePacket : Packet {
 	public override PacketId Pid => PacketId.ServerUserStatusUpdate;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt),
 		("action", DataType.Byte),
 		("action_text", DataType.String),
@@ -312,7 +312,7 @@ public class ServerUserStatusUpdatePacket : Packet {
 	}
 
 	public UserAction Action {
-		get => new((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), PlayModeMethods.FromString((string)this.Data["mode"]));
+		get => new UserAction((UserActionType)this.Data["action"], this.Data["action_text"].ToString(), PlayModeMethods.FromString((string)this.Data["mode"]));
 		set {
 			this.Data["action"]      = value.Action.Value;
 			this.Data["action_text"] = value.ActionText.Value;
@@ -330,7 +330,7 @@ public class ClientNotifyScoreUpdatePacket : Packet {
 public class ServerScoreUpdatePacket : Packet {
 	public override PacketId Pid => PacketId.ServerScoreUpdate;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt),
 		("total_score", DataType.Long),
 		("ranked_score", DataType.Long),
@@ -375,7 +375,7 @@ public class ClientSendMessagePacket : Packet {
 	}
 	public override PacketId Pid => PacketId.ClientSendMessage;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("channel", DataType.String),
 		("message", DataType.String)
 	};
@@ -395,7 +395,7 @@ public class ClientSendMessagePacket : Packet {
 public class ServerNotificationPacket : Packet {
 	public override PacketId Pid => PacketId.ServerNotification;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("message", DataType.String),
 		("severity", DataType.Byte)
 	};
@@ -423,7 +423,7 @@ public enum ServerDropReason : byte {
 public class ServerDropConnectionPacket : Packet {
 	public override PacketId Pid => PacketId.ServerDropConnection;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("reason", DataType.Byte),
 		("message", DataType.String)
 	};
@@ -444,7 +444,7 @@ public class ServerDropConnectionPacket : Packet {
 public class ServerErrorPacket : Packet {
 	public override PacketId Pid => PacketId.ServerDropConnection;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("error_code", DataType.Byte)
 	};
 
@@ -459,7 +459,7 @@ public class ServerErrorPacket : Packet {
 public class ServerSpectatorPlayingRequestPacket : Packet {
 	public override PacketId Pid => PacketId.ServerSpectatorPlayingRequest;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt)
 	};
 
@@ -474,7 +474,7 @@ public class ServerSpectatorPlayingRequestPacket : Packet {
 public class ServerSendMessagePacket : Packet {
 	public override PacketId Pid => PacketId.ServerSendMessage;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("sender_id", DataType.UInt),
 		("channel", DataType.String),
 		("message", DataType.String)
@@ -499,7 +499,7 @@ public class ServerSendMessagePacket : Packet {
 public class ClientSpectatePacket : Packet {
 	public override PacketId Pid => PacketId.ClientSpectate;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("host_id", DataType.UInt)
 	};
 
@@ -514,7 +514,7 @@ public class ClientSpectatePacket : Packet {
 public class ServerSpectatorJoinedPacket : Packet {
 	public override PacketId Pid => PacketId.ServerSpectatorJoined;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt),
 		("username", DataType.String)
 	};
@@ -538,7 +538,7 @@ public class ServerSpectatorJoinedPacket : Packet {
 public class ServerSpectatorLeftPacket : Packet {
 	public override PacketId Pid => PacketId.ServerSpectatorLeft;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("user_id", DataType.UInt)
 	};
 
@@ -553,7 +553,7 @@ public class ServerSpectatorLeftPacket : Packet {
 public class ServerSpectateResultPacket : Packet {
 	public override PacketId Pid => PacketId.ServerSpectateResult;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("result", DataType.Byte),
 		("host_id", DataType.UInt)
 	};
@@ -574,7 +574,7 @@ public class ServerSpectateResultPacket : Packet {
 public class ClientSpectatorFramesPacket : Packet {
 	public override PacketId Pid => PacketId.ClientSpectatorFrames;
 
-	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new() {
+	private static readonly List<(string name, DataType type)> DATA_DEFINITION = new List<(string name, DataType type)> {
 		("frames", DataType.VecSpectatorFrameData)
 	};
 

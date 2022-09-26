@@ -215,7 +215,7 @@ public class UiMakerElementContainer {
 	public string Name;
 
 	[JsonProperty]
-	public List<UiMakerElement> Elements = new();
+	public List<UiMakerElement> Elements = new List<UiMakerElement>();
 }
 
 public class UiMakerScreenContent : CompositeDrawable {
@@ -260,9 +260,9 @@ public class UiMakerScreen : pScreen {
 
 	private UiMakerScreenContent _content;
 
-	public readonly ObservableCollection<UiMakerElement> Selected = new();
+	public readonly ObservableCollection<UiMakerElement> Selected = new ObservableCollection<UiMakerElement>();
 
-	public List<Drawable> SelectedDrawables = new();
+	public List<Drawable> SelectedDrawables = new List<Drawable>();
 
 	private UiContainer _createThingsContainer;
 	private UiContainer _editThingsContainer;
@@ -496,7 +496,7 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		Dictionary<object, string> items = new();
+		Dictionary<object, string> items = new Dictionary<object, string>();
 		items.Add(OriginType.TopLeft, "Top Left");
 		items.Add(OriginType.TopRight, "Top Right");
 		items.Add(OriginType.BottomLeft, "Bottom Left");
@@ -569,7 +569,7 @@ public class UiMakerScreen : pScreen {
 		this.SelectedDrawables.Clear();
 
 		foreach (UiMakerElement element in this.Selected) {
-			SelectBoxDrawable drawable = new(element.Drawable) {
+			SelectBoxDrawable drawable = new SelectBoxDrawable(element.Drawable) {
 				OriginType = element.OriginType
 			};
 
@@ -581,7 +581,7 @@ public class UiMakerScreen : pScreen {
 		this.UpdateUi();
 	}
 
-	private readonly Dictionary<string, Texture> _textureCache = new();
+	private readonly Dictionary<string, Texture> _textureCache = new Dictionary<string, Texture>();
 
 	private Drawable CreateDrawableFromElement(UiMakerElement element) {
 		Drawable drawable = element.Type switch {

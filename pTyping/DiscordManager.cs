@@ -75,7 +75,7 @@ public static class DiscordManager {
 
 		try {
 			if (FurballGame.Instance.RunningScreen is pScreen screen) {
-				RichPresence presence = new() {
+				RichPresence presence = new RichPresence {
 					State   = screen.State,
 					Details = screen.Details,
 					Assets = new Assets {

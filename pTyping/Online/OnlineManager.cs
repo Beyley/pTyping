@@ -21,17 +21,17 @@ public enum SpectatorState {
 }
 
 public abstract class OnlineManager {
-	public ObservableCollection<ChatMessage>        ChatLog       = new();
-	public ObservableDictionary<uint, OnlinePlayer> OnlinePlayers = new();
+	public ObservableCollection<ChatMessage>        ChatLog       = new ObservableCollection<ChatMessage>();
+	public ObservableDictionary<uint, OnlinePlayer> OnlinePlayers = new ObservableDictionary<uint, OnlinePlayer>();
 	/// <summary>
 	///     If you are host, this is your spectators, otherwise it is the other spectators
 	/// </summary>
-	public Dictionary<uint, OnlinePlayer> Spectators = new();
+	public Dictionary<uint, OnlinePlayer> Spectators = new Dictionary<uint, OnlinePlayer>();
 	/// <summary>
 	///     The host you are spectating
 	/// </summary>
 	public OnlinePlayer Host;
-	public OnlinePlayer Player = new();
+	public OnlinePlayer Player = new OnlinePlayer();
 
 	public SpectatorState SpectatorState = SpectatorState.Stopped;
 
@@ -39,7 +39,7 @@ public abstract class OnlineManager {
 
 	public PlayerScreen GameScene;
 
-	public ObservableCollection<string> KnownChannels = new();
+	public ObservableCollection<string> KnownChannels = new ObservableCollection<string>();
 
 	public ConnectionState State {
 		get;

@@ -53,7 +53,7 @@ public class PlayerScreen : pScreen {
 	private readonly Score _playingScoreReplay;
 
 	public bool                 IsSpectating;
-	public List<SpectatorFrame> SpectatorQueue = new();
+	public List<SpectatorFrame> SpectatorQueue = new List<SpectatorFrame>();
 
 	[CanBeNull]
 	private VideoDrawable _video;
@@ -160,7 +160,7 @@ public class PlayerScreen : pScreen {
 
 		#region Pause UI
 
-		Vector2 pauseUiButtonSize = new(170, 50);
+		Vector2 pauseUiButtonSize = new Vector2(170, 50);
 
 		this._resumeButton = new DrawableButton(
 			new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.2f),

@@ -24,7 +24,7 @@ public class NewSongScreen : pScreen {
 
 		pTypingGame.LoadBackButtonTexture();
 
-		TexturedDrawable backButton = new(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
+		TexturedDrawable backButton = new TexturedDrawable(pTypingGame.BackButtonTexture, new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT)) {
 			OriginType = OriginType.BottomLeft,
 			Scale      = pTypingGame.BackButtonScale
 		};
@@ -44,23 +44,13 @@ public class NewSongScreen : pScreen {
 
 		float y = 20f;
 		foreach (string songPath in songs) {
-			FileInfo songInfo = new(songPath);
+			FileInfo songInfo = new FileInfo(songPath);
 
 			EventHandler<MouseButtonEventArgs> songOnClick = delegate {
 				this.CreateSong(songInfo);
 			};
 
-			DrawableButton buttonForSong = new(
-				new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y),
-				pTypingGame.JapaneseFontStroked,
-				25,
-				songInfo.Name,
-				Color.Blue,
-				Color.White,
-				Color.White,
-				Vector2.Zero,
-				songOnClick
-			) {
+			DrawableButton buttonForSong = new DrawableButton(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), pTypingGame.JapaneseFontStroked, 25, songInfo.Name, Color.Blue, Color.White, Color.White, Vector2.Zero, songOnClick) {
 				OriginType = OriginType.TopRight
 			};
 

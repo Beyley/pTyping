@@ -11,7 +11,7 @@ public class HitObjectSettings : EmbeddedObject, IClonable<HitObjectSettings> {
 	public double ApproachModifier { get; set; } = 1d;
 
 	public HitObjectSettings Clone() {
-		HitObjectSettings settings = new() {
+		HitObjectSettings settings = new HitObjectSettings {
 			ApproachModifier = this.ApproachModifier
 		};
 

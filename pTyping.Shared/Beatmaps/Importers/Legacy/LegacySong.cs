@@ -21,7 +21,7 @@ internal class LegacySong {
 	[JsonProperty]
 	public SongType Type;
 	[JsonProperty]
-	public List<LegacyNote> Notes { get; set; } = new();
+	public List<LegacyNote> Notes { get; set; } = new List<LegacyNote>();
 
 	[JsonProperty]
 	public string Description { get; set; }
@@ -37,12 +37,12 @@ internal class LegacySong {
 	///     A list of all timing points
 	/// </summary>
 	[JsonProperty]
-	public List<LegacyTimingPoint> TimingPoints { get; set; } = new();
+	public List<LegacyTimingPoint> TimingPoints { get; set; } = new List<LegacyTimingPoint>();
 	/// <summary>
 	///     A list of all events that happen in the song
 	/// </summary>
 	[JsonProperty]
-	public List<LegacyEvent> Events { get; set; } = new();
+	public List<LegacyEvent> Events { get; set; } = new List<LegacyEvent>();
 
 	[JsonProperty]
 	public string AudioPath { get; set; }
@@ -63,5 +63,5 @@ internal class LegacySong {
 	}
 
 	[JsonProperty]
-	public SongSettings Settings { get; set; } = new();
+	public SongSettings Settings { get; set; } = new SongSettings();
 }

@@ -9,13 +9,13 @@ public class ScoreDatabase {
 	public Realm Realm;
 
 	public ScoreDatabase() {
-		RealmSchema.Builder builder = new() {
+		RealmSchema.Builder builder = new RealmSchema.Builder {
 			typeof(Score),
 			typeof(DatabaseUser),
 			typeof(ReplayFrame)
 		};
 
-		RealmConfiguration config = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scores.db")) {
+		RealmConfiguration config = new RealmConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scores.db")) {
 			Schema = builder.Build()
 		};
 

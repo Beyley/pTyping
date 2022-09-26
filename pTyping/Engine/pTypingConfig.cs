@@ -30,7 +30,7 @@ public class pTypingConfig : VolpeConfig {
 	public string Username => this.Values["username"].ToStringValue().Value;
 	public string Password => this.Values["password"].ToStringValue().Value;
 
-	public static pTypingConfig Instance = new();
+	public static pTypingConfig Instance = new pTypingConfig();
 
 	public pTypingConfig() {
 		this.Values["fps_based_on_monitorhz"] = new Value.Boolean(true);

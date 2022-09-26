@@ -1,7 +1,7 @@
 namespace pTyping.Shared;
 
 public static class HiraganaConversion {
-	public static readonly Dictionary<string, List<string>> CONVERSIONS = new();
+	public static readonly Dictionary<string, List<string>> CONVERSIONS = new Dictionary<string, List<string>>();
 
 	public static void LoadConversion() {
 		#region im sorry
@@ -773,7 +773,7 @@ _	＿
 
 		#endregion
 
-		using StringReader reader = new(conversion);
+		using StringReader reader = new StringReader(conversion);
 		string             line;
 		do {
 			line = reader.ReadLine();

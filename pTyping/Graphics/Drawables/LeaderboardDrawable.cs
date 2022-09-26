@@ -12,7 +12,7 @@ using pTyping.Shared.Scores;
 namespace pTyping.Graphics.Drawables;
 
 public class LeaderboardDrawable : CompositeDrawable {
-	private readonly List<LeaderboardElementDrawable> _leaderboardElementDrawables = new();
+	private readonly List<LeaderboardElementDrawable> _leaderboardElementDrawables = new List<LeaderboardElementDrawable>();
 
 	private readonly List<Score> _scores;
 
@@ -29,7 +29,7 @@ public class LeaderboardDrawable : CompositeDrawable {
 		float y = 0;
 		for (int i = 0; i < this._scores.GetRange(0, Math.Min(8, scores.Count)).Count; i++) {
 			Score score = this._scores.GetRange(0, Math.Min(8, scores.Count))[i];
-			LeaderboardElementDrawable drawable = new(score, tex) {
+			LeaderboardElementDrawable drawable = new LeaderboardElementDrawable(score, tex) {
 				Position = new Vector2(0, y)
 			};
 

@@ -26,7 +26,7 @@ public class HitObjectColor : EmbeddedObject, IClonable<HitObjectColor> {
 		return new(color.Rf, color.Gf, color.Bf, color.Af);
 	}
 	public HitObjectColor Clone() {
-		HitObjectColor color = new() {
+		HitObjectColor color = new HitObjectColor {
 			R = this.R,
 			G = this.G,
 			B = this.B,

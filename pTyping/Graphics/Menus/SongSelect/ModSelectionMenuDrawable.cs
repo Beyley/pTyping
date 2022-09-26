@@ -12,9 +12,9 @@ using pTyping.Shared.Mods;
 namespace pTyping.Graphics.Menus.SongSelect;
 
 public class ModSelectionMenuDrawable : CompositeDrawable {
-	public readonly List<Mod> SelectedMods = new();
+	public readonly List<Mod> SelectedMods = new List<Mod>();
 
-	private readonly List<ModButtonDrawable> _mods = new();
+	private readonly List<ModButtonDrawable> _mods = new List<ModButtonDrawable>();
 
 	private readonly TextDrawable _scoreMultiplier;
 
@@ -38,7 +38,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 
 	public bool Shown = true;
 
-	private readonly List<LinePrimitiveDrawable> Lines = new();
+	private readonly List<LinePrimitiveDrawable> Lines = new List<LinePrimitiveDrawable>();
 	private readonly RectanglePrimitiveDrawable  _background;
 
 	public void Hide(bool force = false) {
@@ -87,7 +87,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 		float y = 0;
 		for (int i = 0; i < Mod.RegisteredMods.Length; i++) {
 			Mod               registeredMod = Mod.RegisteredMods[i];
-			ModButtonDrawable modButton     = new(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
+			ModButtonDrawable modButton     = new ModButtonDrawable(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
 
 			this.Drawables.Add(modButton);
 			this._mods.Add(modButton);
