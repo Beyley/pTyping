@@ -53,7 +53,7 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap> {
 	public double TotalBreakDuration => this.Breaks.Sum(b => b.Length);
 
 	[Ignored, Description("The BPM of the first timing point of the song")]
-	public double BeatsPerMinute => 60000 / this.TimingPoints[0].Tempo;
+	public double BeatsPerMinute => this.TimingPoints[0].BeatsPerMinute;
 
 	public Beatmap Clone() {
 		Beatmap map = new();

@@ -498,16 +498,15 @@ public class EditorScreen : pScreen {
 
 		double timeAtCursor = relativeMousePosition / speed + currentTime;
 
-		//TODO
-		// TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(timeAtCursor);
+		TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(timeAtCursor);
 
-		// double noteLength = this.EditorState.Song.DividedNoteLength(timeAtCursor);
+		double noteLength = this.EditorState.Song.DividedNoteLength(timeAtCursor);
 
-		// timeAtCursor += noteLength / 2d;
+		timeAtCursor += noteLength / 2d;
 
-		// double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
+		double roundedTime = timeAtCursor - (timeAtCursor - timingPoint.Time) % noteLength;
 
-		// this.EditorState.MouseTime = roundedTime;
+		this.EditorState.MouseTime = roundedTime;
 
 		this.CurrentTool?.OnMouseMove(e.Position);
 	}
@@ -553,11 +552,8 @@ public class EditorScreen : pScreen {
 
 		timeToSeekTo += currentTimingPoint.Time;
 
-		if (right)
-			timeToSeekTo += noteLength;
-		else
-			timeToSeekTo -= noteLength;
-
+		timeToSeekTo += right ? noteLength : -noteLength;
+		
 		pTypingGame.MusicTrack.CurrentPosition = Math.Max(timeToSeekTo, 0);
 		this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
 

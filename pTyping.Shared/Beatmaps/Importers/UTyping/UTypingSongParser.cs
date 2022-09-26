@@ -44,8 +44,9 @@ public static class UTypingSongParser {
 		//TODO: do all UTyping songs have the song filename first?
 		if (mapData[0] != '@') return null;
 
-		double?     firstBeatlineBar = null;
-		TimingPoint timingPoint      = new(0, 0);
+		double? firstBeatlineBar = null;
+
+		TimingPoint? timingPoint = null;
 
 		using StringReader reader = new(mapData);
 
@@ -164,24 +165,30 @@ public static class UTypingSongParser {
 				//=TimeInSeconds
 				//ex. =4.544444
 				case "=": {
-					// song.Events.Add(
-					// new BeatLineBarEvent {
-					//     Time = double.Parse(line) * 1000d
-					// }
-					// );
+					if (timingPoint != null)
+						break;
 
+					//This is null if we are at the first beatline bar
 					if (firstBeatlineBar == null) {
+						//We found the first beatline bar, so save the time
 						firstBeatlineBar = double.Parse(line) * 1000d;
 						break;
 					}
-					timingPoint = new TimingPoint(firstBeatlineBar.Value, (double.Parse(line) * 1000d - firstBeatlineBar.Value) / 4d);
+
+					double thisBeatLineBarTime = double.Parse(line) * 1000d;
+
+					//The tempo of the song is the 
+					double tempo = thisBeatLineBarTime - firstBeatlineBar.Value;
+
+					timingPoint = new TimingPoint(firstBeatlineBar.Value, tempo / 4d);
 
 					break;
 				}
 			}
 		} while (line != null);
 
-		beatmap.TimingPoints.Add(timingPoint);
+		if (timingPoint != null)
+			beatmap.TimingPoints.Add(timingPoint);
 
 		return beatmap;
 	}

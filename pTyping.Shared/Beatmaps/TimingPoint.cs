@@ -15,6 +15,9 @@ public class TimingPoint : EmbeddedObject, IClonable<TimingPoint> {
 
 	public TimingPoint() {}
 
+	[Ignored]
+	public double BeatsPerMinute => 60000d / this.Tempo;
+
 	public TimingPoint(double time, double tempo) {
 		this.Time          = time;
 		this.Tempo         = tempo;
