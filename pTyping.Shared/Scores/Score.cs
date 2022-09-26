@@ -70,7 +70,9 @@ public class Score : RealmObject, IClonable<Score> {
 			}
 
 			//Deserialize the mod JSON
-			this._mods = JsonConvert.DeserializeObject<Mod[]>(this.ModsJson!);
+			this._mods = JsonConvert.DeserializeObject<Mod[]>(this.ModsJson!, new JsonSerializerSettings {
+				TypeNameHandling = TypeNameHandling.All
+			});
 
 			return this._mods;
 		}
@@ -111,7 +113,8 @@ public class Score : RealmObject, IClonable<Score> {
 			MaxCombo      = this.MaxCombo,
 			OnlineScore   = this.OnlineScore,
 			PoorHits      = this.PoorHits,
-			Id            = this.Id
+			Id            = this.Id,
+			ModsJson      = this.ModsJson
 		};
 
 		foreach (ReplayFrame frame in this.ReplayFrames)
