@@ -47,12 +47,22 @@ public class Score : RealmObject, IClonable<Score> {
 	private Mod[] _mods;
 
 	private void UpdateModsJson() {
-		this.ModsJson = JsonConvert.SerializeObject(
-			this._mods,
-			new JsonSerializerSettings {
-				TypeNameHandling = TypeNameHandling.All
-			}
-		);
+		if (this.Realm != null)
+			this.Realm.Write(() => {
+				this.ModsJson = JsonConvert.SerializeObject(
+					this._mods,
+					new JsonSerializerSettings {
+						TypeNameHandling = TypeNameHandling.All
+					}
+				);
+			});
+		else
+			this.ModsJson = JsonConvert.SerializeObject(
+				this._mods,
+				new JsonSerializerSettings {
+					TypeNameHandling = TypeNameHandling.All
+				}
+			);
 	}
 
 	[Ignored, Description("All the mods the score used, this is a frontend ease property for the backing ModsJson property.")]

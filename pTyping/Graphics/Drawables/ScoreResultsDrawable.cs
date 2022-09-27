@@ -17,6 +17,7 @@ public class ScoreResultsDrawable : CompositeDrawable {
 	private readonly TextDrawable _fair;
 	private readonly TextDrawable _poor;
 	private readonly TextDrawable _mods;
+	private readonly TextDrawable _date;
 
 	private static Drawable SetRotOrigin(Drawable drawable) {
 		drawable.RotationOrigin = new Vector2(-300, drawable.Size.Y / 2f);
@@ -35,13 +36,14 @@ public class ScoreResultsDrawable : CompositeDrawable {
 		this.Drawables.Add(SetRotOrigin(this._combo = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Combo: {score.MaxCombo}", 30)));
 		this.Drawables.Add(
 			SetRotOrigin(this._mods = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Mods: {Mod.ModsShorthandString(score.Mods)}", 30))
-		); //TODO
+		);
 		this.Drawables.Add(
 			SetRotOrigin(this._excellent = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Excellent: {score.ExcellentHits}", 30))
 		);
 		this.Drawables.Add(SetRotOrigin(this._good = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Good: {score.GoodHits}", 30)));
 		this.Drawables.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Fair: {score.FairHits}", 30)));
 		this.Drawables.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Poor: {score.PoorHits}", 30)));
+		this.Drawables.Add(SetRotOrigin(this._date = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, $"Date: {score.Time}", 30)));
 
 		FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 	}
@@ -56,7 +58,7 @@ public class ScoreResultsDrawable : CompositeDrawable {
 		base.Dispose();
 	}
 
-	private const float SEPARATION_AMOUNT = 0.15f;
+	private const float SEPARATION_AMOUNT = 0.20f;
 
 	private float _rotation;
 	private float _targetRotation;
@@ -71,6 +73,7 @@ public class ScoreResultsDrawable : CompositeDrawable {
 		this._accuracy.Rotation = this._rotation + SEPARATION_AMOUNT * 2f;
 		this._combo.Rotation    = this._rotation + SEPARATION_AMOUNT * 3f;
 		this._mods.Rotation     = this._rotation + SEPARATION_AMOUNT * 4f;
+		this._date.Rotation     = this._rotation + SEPARATION_AMOUNT * 5f;
 
 		this._excellent.Rotation = this._rotation - SEPARATION_AMOUNT * 4f;
 		this._good.Rotation      = this._rotation - SEPARATION_AMOUNT * 3f;

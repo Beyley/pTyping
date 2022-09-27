@@ -6,6 +6,7 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
+using pTyping.Shared.Scores;
 
 namespace pTyping.Shared.Beatmaps.Importers.UTyping;
 
@@ -34,7 +35,7 @@ public static class UTypingSongParser {
 		string fumenFilename = info[4];
 
 		//Parse the score file
-		ParseUTypingScores(Path.Combine(fileInfo.DirectoryName!, info[5]), scoreDatabase);
+		ParseUTypingScores(Path.Combine(fileInfo.DirectoryName!, info[5]), scoreDatabase, beatmap);
 
 		string[] descSplit = info[6..];
 
@@ -264,6 +265,16 @@ public static class UTypingSongParser {
 		public int    ComboMax;
 		public int    Date;
 
+		public DateTimeOffset RealDate {
+			get {
+				int day   = this.Date & 0x000000FF;
+				int month = (this.Date & 0x0000FF00) >> 8;
+				int year  = (int)((this.Date & 0xFFFF0000) >> 16);
+
+				return new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
+			}
+		}
+
 		public ScoreChallenge Challenge;
 
 		public ScoreAchievement GetLevel() {
@@ -309,7 +320,7 @@ public static class UTypingSongParser {
 
 	private class Ranking {
 		public          bool             Changed;
-		public readonly UTypingScore[]   Score       = new UTypingScore[RANKING_LEN];
+		public readonly UTypingScore?[]  Score       = new UTypingScore?[RANKING_LEN];
 		public          ScoreAchievement Achievement = ScoreAchievement.NoData;
 		public          int              PlayCount;
 		public          int              PlayTime;
@@ -355,7 +366,7 @@ public static class UTypingSongParser {
 
 			if (version < 4)
 				for (int i = 0; i < rankingSize; i++) {
-					ScoreAchievement l = ranking.Score[0].GetLevel();
+					ScoreAchievement l = ranking.Score[0]!.GetLevel();
 					if (l > ranking.Achievement)
 						ranking.Achievement = (ScoreAchievement)1;
 				}
@@ -364,7 +375,7 @@ public static class UTypingSongParser {
 		}
 	}
 
-	private static void ParseUTypingScores(string filePath, ScoreDatabase scoreDatabase) {
+	private static void ParseUTypingScores(string filePath, ScoreDatabase scoreDatabase, Beatmap beatmap) {
 		//If the score file does not exist, ignore
 		if (!File.Exists(filePath))
 			return;
@@ -373,7 +384,29 @@ public static class UTypingSongParser {
 
 		Ranking ranking = Ranking.Read(stream);
 
-		foreach (UTypingScore uTypingScore in ranking.Score)
-			;
+		scoreDatabase.Realm.Write(() => {
+			foreach (UTypingScore? uTypingScore in ranking.Score) {
+				if (uTypingScore == null)
+					continue;
+
+				Score score = new Score {
+					User = {
+						Username = uTypingScore.Name
+					},
+					AchievedScore = uTypingScore.Score,
+					BeatmapId     = beatmap.Id,
+					MaxCombo      = uTypingScore.ComboMax,
+					ExcellentHits = uTypingScore.CountExcellent,
+					FairHits      = uTypingScore.CountFair,
+					GoodHits      = uTypingScore.CountGood,
+					PoorHits      = uTypingScore.CountPoor,
+					OnlineScore   = false,
+					Accuracy      = -1f,
+					Time          = uTypingScore.RealDate
+				};
+
+				scoreDatabase.Realm.Add(score);
+			}
+		});
 	}
 }
