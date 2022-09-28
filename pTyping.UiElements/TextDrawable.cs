@@ -1,3 +1,4 @@
+using System.Numerics;
 using FontStashSharp;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -13,10 +14,12 @@ public class TextDrawable : Drawable {
 	private string _text;
 
 	public readonly Bindable<object>     LocalizationTag;
-	public readonly Bindable<string>     Format = new Bindable<string>("%s");
+	public readonly Bindable<string>     Format = new Bindable<string>("{0}");
 	public readonly Bindable<FontSystem> FontSystem;
 	public          DynamicSpriteFont    Font { get; private set; }
 	public readonly Bindable<float>      FontSize;
+
+	public override Vector2 Size => this.Font.MeasureString(this._text);
 
 	public TextDrawable(object localizationTag, FontSystem font, float fontSize) {
 		this.LocalizationTag = new Bindable<object>(localizationTag);
@@ -49,7 +52,7 @@ public class TextDrawable : Drawable {
 
 	private void LanguageChanged(object? sender, Language e) {
 		try {
-			this._text = string.Format(this.Format.Value, LocalizationManager.GetLocalizedString(this._text, e));
+			this._text = string.Format(this.Format.Value, LocalizationManager.GetLocalizedString(this.LocalizationTag, e));
 		}
 		catch (NoTranslationException) {
 			this._text = string.Format(this.Format.Value, this.LocalizationTag);

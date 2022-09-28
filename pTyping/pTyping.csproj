@@ -16,9 +16,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
-        <ProjectReference Include="..\pTyping.Shared\pTyping.Shared.csproj"/>
-        <ProjectReference Include="..\pTyping.UiElements\pTyping.UiElements.csproj"/>
+        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
+        <ProjectReference Include="..\pTyping.Shared\pTyping.Shared.csproj" />
+        <ProjectReference Include="..\pTyping.UiElements\pTyping.UiElements.csproj" />
     </ItemGroup>
 
     <!--    <ItemGroup>-->
@@ -28,45 +28,45 @@
     <!--    </ItemGroup>-->
 
     <ItemGroup>
-        <None Update="Content/*.png" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.wav" CopyToOutputDirectory="Always"/>
-        <None Update="Content/*.ttf" CopyToOutputDirectory="Always"/>
-        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always"/>
-        <None Update="runtimes/**" CopyToOutputDirectory="Always"/>
-        <None Remove="Content\note.png~"/>
+        <None Update="Content/*.png" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.wav" CopyToOutputDirectory="Always" />
+        <None Update="Content/*.ttf" CopyToOutputDirectory="Always" />
+        <None Update="Content/Localization/*.lang" CopyToOutputDirectory="Always" />
+        <None Update="runtimes/**" CopyToOutputDirectory="Always" />
+        <None Remove="Content\note.png~" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DiscordRichPresence" Version="1.0.175"/>
-        <PackageReference Include="EeveeTools" Version="1.0.0"/>
-        <PackageReference Include="hellosam.net.collections" Version="1.0.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0"/>
-        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.118"/>
-        <PackageReference Include="Kettu" Version="1.4.0"/>
-        <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageReference Include="ParallelExtensionsCore" Version="2.1.0"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
-        <PackageReference Include="TagLibSharp" Version="2.3.0"/>
-        <PackageReference Include="Websocket.Client" Version="4.4.43"/>
+        <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+        <PackageReference Include="EeveeTools" Version="1.0.0" />
+        <PackageReference Include="hellosam.net.collections" Version="1.0.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
+        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.118" />
+        <PackageReference Include="Kettu" Version="1.4.0" />
+        <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="ParallelExtensionsCore" Version="2.1.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+        <PackageReference Include="TagLibSharp" Version="2.3.0" />
+        <PackageReference Include="Websocket.Client" Version="4.4.43" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="gitversion.txt"/>
+        <None Remove="gitversion.txt" />
         <EmbeddedResource Include="gitversion.txt">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="gitlog.json"/>
+        <None Remove="gitlog.json" />
         <EmbeddedResource Include="gitlog.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Engine\Debug"/>
+        <Folder Include="Engine\Debug" />
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;"/>
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;" />
     </Target>
 </Project>

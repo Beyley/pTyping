@@ -52,8 +52,18 @@ public class MenuScreen : pScreen {
 
 		uiEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new UiMakerScreen("test"));
 
-		if (RuntimeInfo.IsDebug())
+		DrawableButton uiTestButton = new DrawableButton(new Vector2(uiEditorButton.Position.X + uiEditorButton.Size.X + 10, 10), pTypingGame.JapaneseFont, 30, "Ui Test Scene", Color.Blue, Color.White, Color.White, new Vector2(0)) {
+			OriginType       = OriginType.BottomLeft,
+			ScreenOriginType = OriginType.BottomLeft
+		};
+
+		uiTestButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new UiElementsTestScreen());
+
+
+		if (RuntimeInfo.IsDebug()) {
 			this.Manager.Add(uiEditorButton);
+			this.Manager.Add(uiTestButton);
+		}
 
 		#region Title
 

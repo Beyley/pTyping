@@ -79,7 +79,8 @@ public class pTypingGame : FurballGame {
 		KernelHeight         = 1,
 		Effect               = FontSystemEffect.None,
 		TextureWidth         = 2048,
-		TextureHeight        = 2048
+		TextureHeight        = 2048,
+		PremultiplyAlpha     = false
 	});
 	public static FontSystem JapaneseFontStroked = new FontSystem(new FontSystemSettings {
 		FontResolutionFactor = 2f,
@@ -88,14 +89,16 @@ public class pTypingGame : FurballGame {
 		Effect               = FontSystemEffect.Stroked,
 		EffectAmount         = 2,
 		TextureWidth         = 2048,
-		TextureHeight        = 2048
+		TextureHeight        = 2048,
+		PremultiplyAlpha     = false
 	});
 	public static readonly FontSystem FurballFontRegular = new FontSystem(new FontSystemSettings {
 		FontResolutionFactor = 2f,
 		KernelWidth          = 1,
 		KernelHeight         = 1,
 		TextureWidth         = 2048,
-		TextureHeight        = 2048
+		TextureHeight        = 2048,
+		PremultiplyAlpha     = false
 	});
 	public static readonly FontSystem FurballFontRegularStroked = new FontSystem(new FontSystemSettings {
 		FontResolutionFactor = 2f,
@@ -104,7 +107,8 @@ public class pTypingGame : FurballGame {
 		Effect               = FontSystemEffect.Stroked,
 		EffectAmount         = 2,
 		TextureWidth         = 2048,
-		TextureHeight        = 2048
+		TextureHeight        = 2048,
+		PremultiplyAlpha = false
 	});
 
 	public static UserCardDrawable MenuPlayerUserCard;
@@ -180,7 +184,12 @@ public class pTypingGame : FurballGame {
 	public static void LoadMusic(byte[] data) {
 		if (MusicTrack != null) {
 			MusicTrack.Stop();
-			AudioEngine.DisposeStream(MusicTrack);
+			try {
+				AudioEngine.DisposeStream(MusicTrack);
+			}
+			catch {
+				/* */
+			}
 		}
 
 		MusicTrack        = AudioEngine.CreateStream(data);
@@ -266,7 +275,8 @@ public class pTypingGame : FurballGame {
 					FontResolutionFactor = 2f,
 					KernelWidth          = 1,
 					KernelHeight         = 1,
-					Effect               = FontSystemEffect.None
+					Effect               = FontSystemEffect.None,
+					PremultiplyAlpha     = false
 				}
 			);
 			JapaneseFont.AddFont(JapaneseFontData);
@@ -279,7 +289,8 @@ public class pTypingGame : FurballGame {
 					KernelWidth          = 1,
 					KernelHeight         = 1,
 					Effect               = FontSystemEffect.Stroked,
-					EffectAmount         = 2
+					EffectAmount         = 2,
+					PremultiplyAlpha     = false
 				}
 			);
 			JapaneseFontStroked.AddFont(JapaneseFontData);
