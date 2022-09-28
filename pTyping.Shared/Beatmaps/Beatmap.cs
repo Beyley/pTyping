@@ -101,7 +101,10 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 	}
 
 	public TimingPoint CurrentTimingPoint(double time) {
-		return this.TimingPoints.First(x => x.Time <= time);
+		if (this.TimingPoints.Count == 0)
+			return new TimingPoint(0, 100);
+
+		return this.TimingPoints.FirstOrDefault(x => x.Time <= time, this.TimingPoints.First());
 	}
 
 	[Pure]
