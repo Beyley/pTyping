@@ -4,6 +4,8 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared.Renderers;
 using Color = Furball.Vixie.Backends.Shared.Color;
@@ -16,6 +18,9 @@ public class ButtonDrawable : CompositeDrawable {
 	public readonly Bindable<Vector2> ButtonSize;
 
 	public override Vector2 Size => this.ButtonSize.Value * this.Scale;
+
+	private Color  _colorAdd = new Color(1f, 1f, 1f, 1f);
+	private ColorTween? _hoverColorTween;
 
 	public ButtonDrawable(TextDrawable text, Vector2 size) {
 		this._text      = text;
@@ -30,6 +35,16 @@ public class ButtonDrawable : CompositeDrawable {
 		this.ButtonSize.OnChange += (_, _) => this.Relayout();
 
 		this.Relayout();
+
+		const float fadeTime = 250;
+		this.OnHover += (_, _) => {
+			this._hoverColorTween = new ColorTween(TweenType.Color, this._colorAdd, new Color(1.4f, 1.4f, 1.4f), FurballGame.Time, FurballGame.Time + fadeTime);
+		};
+		this.OnHoverLost += (_, _) => {
+			this._hoverColorTween = new ColorTween(TweenType.Color, this._colorAdd, new Color(1.0f, 1.0f, 1.0f), FurballGame.Time, FurballGame.Time + fadeTime);
+		};
+
+		this.ChildrenInvisibleToInput = true;
 	}
 
 	private void Relayout() {
@@ -37,9 +52,16 @@ public class ButtonDrawable : CompositeDrawable {
 		this._text.Position = this.ButtonSize.Value / 2f;
 	}
 
+	public override void Update(double time) {
+		base.Update(time);
+		
+		this._hoverColorTween?.Update(FurballGame.Time);
+		this._colorAdd = this._hoverColorTween?.GetCurrent() ?? new Color(1f, 1f, 1f, 1f);
+	}
+
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
 		batch.ScissorPush(this, new Rectangle(this.RealPosition.ToPoint(), this.RealSize.ToSize()));
-		
+
 		MappedData mappedData = batch.Reserve(4, 6);
 
 		unsafe {
@@ -49,7 +71,7 @@ public class ButtonDrawable : CompositeDrawable {
 			const int bottomRight = 3;
 
 			const float offset = 7.5f;
-			
+
 			mappedData.VertexPtr[topLeft].Position = args.Position with {
 				X = args.Position.X + offset
 			};
@@ -65,10 +87,10 @@ public class ButtonDrawable : CompositeDrawable {
 			for (int i = 0; i < mappedData.VertexCount; i++)
 				mappedData.VertexPtr[i].TexId = texId;
 
-			mappedData.VertexPtr[topLeft].Color     = new Color(200, 200, 200);
-			mappedData.VertexPtr[bottomLeft].Color  = new Color(200, 200, 200);
-			mappedData.VertexPtr[topRight].Color    = new Color(100, 100, 100);
-			mappedData.VertexPtr[bottomRight].Color = new Color(100, 100, 100);
+			mappedData.VertexPtr[topLeft].Color     = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
+			mappedData.VertexPtr[bottomLeft].Color  = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
+			mappedData.VertexPtr[topRight].Color    = new Color((byte)Math.Min(255, 100 * this._colorAdd.Rf), (byte)Math.Min(255, 100 * this._colorAdd.Gf), (byte)Math.Min(255, 100 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
+			mappedData.VertexPtr[bottomRight].Color = new Color((byte)Math.Min(255, 100 * this._colorAdd.Rf), (byte)Math.Min(255, 100 * this._colorAdd.Gf), (byte)Math.Min(255, 100 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
 
 			mappedData.IndexPtr[0] = (ushort)(topLeft     + mappedData.IndexOffset);
 			mappedData.IndexPtr[1] = (ushort)(bottomLeft  + mappedData.IndexOffset);
