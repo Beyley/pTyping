@@ -22,6 +22,9 @@ public class ButtonDrawable : CompositeDrawable {
 	private Color  _colorAdd = new Color(1f, 1f, 1f, 1f);
 	private ColorTween? _hoverColorTween;
 
+	public Color BaseColor = new Color(1f, 1f, 1f);
+	public Color HoverColor = new Color(1.4f, 1.4f, 1.4f);
+
 	public ButtonDrawable(TextDrawable text, Vector2 size) {
 		this._text      = text;
 		this.ButtonSize = new Bindable<Vector2>(size);
@@ -38,10 +41,10 @@ public class ButtonDrawable : CompositeDrawable {
 
 		const float fadeTime = 250;
 		this.OnHover += (_, _) => {
-			this._hoverColorTween = new ColorTween(TweenType.Color, this._colorAdd, new Color(1.4f, 1.4f, 1.4f), FurballGame.Time, FurballGame.Time + fadeTime);
+			this._hoverColorTween = new ColorTween(TweenType.Color, this._colorAdd, this.HoverColor, FurballGame.Time, FurballGame.Time + fadeTime);
 		};
 		this.OnHoverLost += (_, _) => {
-			this._hoverColorTween = new ColorTween(TweenType.Color, this._colorAdd, new Color(1.0f, 1.0f, 1.0f), FurballGame.Time, FurballGame.Time + fadeTime);
+			this._hoverColorTween = new ColorTween(TweenType.Color, this._colorAdd, this.BaseColor, FurballGame.Time, FurballGame.Time + fadeTime);
 		};
 
 		this.ChildrenInvisibleToInput = true;
@@ -56,7 +59,7 @@ public class ButtonDrawable : CompositeDrawable {
 		base.Update(time);
 		
 		this._hoverColorTween?.Update(FurballGame.Time);
-		this._colorAdd = this._hoverColorTween?.GetCurrent() ?? new Color(1f, 1f, 1f, 1f);
+		this._colorAdd = this._hoverColorTween?.GetCurrent() ?? this.BaseColor;
 	}
 
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
@@ -87,10 +90,10 @@ public class ButtonDrawable : CompositeDrawable {
 			for (int i = 0; i < mappedData.VertexCount; i++)
 				mappedData.VertexPtr[i].TexId = texId;
 
-			mappedData.VertexPtr[topLeft].Color     = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
-			mappedData.VertexPtr[bottomLeft].Color  = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
-			mappedData.VertexPtr[topRight].Color    = new Color((byte)Math.Min(255, 100 * this._colorAdd.Rf), (byte)Math.Min(255, 100 * this._colorAdd.Gf), (byte)Math.Min(255, 100 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
-			mappedData.VertexPtr[bottomRight].Color = new Color((byte)Math.Min(255, 100 * this._colorAdd.Rf), (byte)Math.Min(255, 100 * this._colorAdd.Gf), (byte)Math.Min(255, 100 * this._colorAdd.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af));
+			mappedData.VertexPtr[topLeft].Color     = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf * args.Color.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf * args.Color.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf * args.Color.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af * args.Color.Af));
+			mappedData.VertexPtr[bottomLeft].Color  = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf * args.Color.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf * args.Color.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf * args.Color.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af * args.Color.Af));
+			mappedData.VertexPtr[topRight].Color    = new Color((byte)Math.Min(255, 100 * this._colorAdd.Rf * args.Color.Rf), (byte)Math.Min(255, 100 * this._colorAdd.Gf * args.Color.Gf), (byte)Math.Min(255, 100 * this._colorAdd.Bf * args.Color.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af * args.Color.Af));
+			mappedData.VertexPtr[bottomRight].Color = new Color((byte)Math.Min(255, 100 * this._colorAdd.Rf * args.Color.Rf), (byte)Math.Min(255, 100 * this._colorAdd.Gf * args.Color.Gf), (byte)Math.Min(255, 100 * this._colorAdd.Bf * args.Color.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af * args.Color.Af));
 
 			mappedData.IndexPtr[0] = (ushort)(topLeft     + mappedData.IndexOffset);
 			mappedData.IndexPtr[1] = (ushort)(bottomLeft  + mappedData.IndexOffset);
