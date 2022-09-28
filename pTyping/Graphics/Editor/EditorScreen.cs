@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -24,6 +25,7 @@ using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
+using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
@@ -671,8 +673,6 @@ public class EditorScreen : pScreen {
 				break;
 			}
 			case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
-				throw new NotImplementedException();
-
 				// List<Event> lyrics = this.EditorState.Song.Events.Where(x => x is Event).Cast<Event>().ToList();
 				// lyrics.Sort((x, y) => (int)(x.Time - y.Time));
 				// for (int i = 1; i < lyrics.Count; i++) {
@@ -689,6 +689,9 @@ public class EditorScreen : pScreen {
 				//
 				// this.SaveNeeded = false;
 				// break;
+
+				this.Save();
+				break;
 			}
 			case Key.C when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
 				if (this.EditorState.SelectedObjects.Count == 0) return;
@@ -757,6 +760,28 @@ public class EditorScreen : pScreen {
 			this._timingPoints.Add(drawable);
 			this.Manager.Add(drawable);
 		}
+	}
+
+	public void Save() {
+		string  id     = this.EditorState.Song.Id;
+		Beatmap toSave = this.EditorState.Song.Clone();
+
+		new Thread(_ => {
+			BeatmapDatabase database = new BeatmapDatabase();
+
+			Beatmap beatmap = database.Realm.Find<Beatmap>(id);
+
+			database.Realm.Write(() => {
+				toSave.CopyInto(beatmap);
+			});
+
+			database.Realm.Refresh();
+
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+				pTypingGame.BeatmapDatabase.Realm.Refresh();
+				this.SaveNeeded = false;
+			});
+		}).Start();
 	}
 
 	// public double CurrentApproachTime(double time) => ConVars.BASE_APPROACH_TIME / this.EditorState.Song.CurrentTimingPoint(time).ApproachMultiplier;

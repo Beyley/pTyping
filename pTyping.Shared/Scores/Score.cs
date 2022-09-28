@@ -47,7 +47,7 @@ public class Score : RealmObject, IClonable<Score> {
 	private Mod[] _mods;
 
 	private void UpdateModsJson() {
-		if (this.Realm != null)
+		if (this.IsValid)
 			this.Realm.Write(() => {
 				this.ModsJson = JsonConvert.SerializeObject(
 					this._mods,

@@ -10,7 +10,7 @@ using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
-public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap> {
+public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICopyable<Beatmap> {
 	[PrimaryKey]
 	public string Id { get; set; }
 
@@ -67,12 +67,33 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap> {
 		map.Info           = this.Info.Clone();
 		map.Metadata       = this.Metadata.Clone();
 		map.FileCollection = this.FileCollection.Clone();
+		map.Parent         = this.Parent;
 		foreach (HitObject hitObject in this.HitObjects)
 			map.HitObjects.Add(hitObject.Clone());
 		foreach (TimingPoint timingPoint in this.TimingPoints)
 			map.TimingPoints.Add(timingPoint.Clone());
 
 		return map;
+	}
+
+	public void CopyInto(Beatmap beatmap) {
+		beatmap.Breaks.Clear();
+		foreach (Break @break in this.Breaks)
+			beatmap.Breaks.Add(@break.Clone());
+		beatmap.Difficulty = this.Difficulty.Clone();
+		beatmap.Events.Clear();
+		foreach (Event @event in this.Events)
+			beatmap.Events.Add(@event.Clone());
+		beatmap.Id             = this.Id;
+		beatmap.Info           = this.Info.Clone();
+		beatmap.Metadata       = this.Metadata.Clone();
+		beatmap.FileCollection = this.FileCollection.Clone();
+		beatmap.HitObjects.Clear();
+		foreach (HitObject hitObject in this.HitObjects)
+			beatmap.HitObjects.Add(hitObject);
+		beatmap.TimingPoints.Clear();
+		foreach (TimingPoint timingPoint in this.TimingPoints)
+			beatmap.TimingPoints.Add(timingPoint);
 	}
 
 	public bool AllNotesHit() {
