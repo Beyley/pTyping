@@ -42,6 +42,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Shared", "pTyping.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.Realms.Test", "pTyping.Realms.Test\pTyping.Realms.Test.csproj", "{A40328E6-67F4-49C0-8600-8DB5398B98F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.UiElements", "pTyping.UiElements\pTyping.UiElements.csproj", "{BF1F4337-B920-4BF0-A67D-F330DF981D0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A40328E6-67F4-49C0-8600-8DB5398B98F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF1F4337-B920-4BF0-A67D-F330DF981D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF1F4337-B920-4BF0-A67D-F330DF981D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF1F4337-B920-4BF0-A67D-F330DF981D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF1F4337-B920-4BF0-A67D-F330DF981D0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}
