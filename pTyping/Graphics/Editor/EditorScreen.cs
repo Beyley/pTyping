@@ -396,6 +396,10 @@ public class EditorScreen : pScreen {
 	}
 
 	public void UpdateSelectionRects(object _, NotifyCollectionChangedEventArgs __) {
+		//Dont recalc selection rects if we shouldnt be, this is used to stop stuttering when selecting all notes
+		if (this.CancelSelectionEvents)
+			return;
+		
 		this._selectionRects.ForEach(x => this.EditorDrawable.Drawables.Remove(x));
 
 		this._selectionRects.Clear();
@@ -735,6 +739,16 @@ public class EditorScreen : pScreen {
 
 				break;
 			}
+			case Key.A when FurballGame.InputManager.ControlHeld: {
+				this.CancelSelectionEvents = true;
+				this.EditorState.SelectedObjects.Clear();
+				foreach (NoteDrawable note in this.EditorState.Notes)
+					this.EditorState.SelectedObjects.Add(note);
+				this.CancelSelectionEvents = false;
+				this.UpdateSelectionRects(null, null);
+
+				break;
+			}
 		}
 	}
 
@@ -799,6 +813,7 @@ public class EditorScreen : pScreen {
 	private TexturedDrawable _rightButton;
 	private TexturedDrawable _leftButton;
 	private TexturedDrawable _playfieldBackgroundCover;
+	private bool             CancelSelectionEvents;
 	public override void Update(double gameTime) {
 		this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
