@@ -8,11 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
+        <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj" />
+        <ProjectReference Include="..\pTyping.Shared\pTyping.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Silk.NET.Maths" Version="2.16.0"/>
+        <PackageReference Include="Silk.NET.Maths" Version="2.16.0" />
     </ItemGroup>
 
 </Project>
