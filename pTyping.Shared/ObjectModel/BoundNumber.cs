@@ -59,6 +59,8 @@ public class BoundNumber <T> where T : struct, IComparable, IConvertible, IEquat
 			if (this._precision.Equals(value))
 				return;
 
+			this._precision = value;
+			
 			this.UpdateValue(this._value);
 		}
 	}
