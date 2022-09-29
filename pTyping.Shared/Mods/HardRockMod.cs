@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace pTyping.Shared.Mods;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class HardRockMod : Mod {
 	public override double ScoreMultiplier => 1.1;
 	public override string Name            => "Hard Rock";

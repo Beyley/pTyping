@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
@@ -5,6 +6,7 @@ using pTyping.Shared.Beatmaps.HitObjects;
 
 namespace pTyping.Shared.Mods;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global"), SuppressMessage("ReSharper", "UnusedType.Global")]
 public class HiddenMod : Mod {
 	public override double ScoreMultiplier => 1.02;
 	public override string Name            => "Hidden";

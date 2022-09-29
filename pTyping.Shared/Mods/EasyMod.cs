@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace pTyping.Shared.Mods;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class EasyMod : Mod {
 	public override double ScoreMultiplier => 0.9;
 	public override string Name            => "Easy";

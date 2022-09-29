@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace pTyping.Shared.Mods;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class HalfTimeMod : Mod {
 	public override double ScoreMultiplier => 0.95;
 	public override string Name            => "Half Time";

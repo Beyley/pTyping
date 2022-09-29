@@ -11,4 +11,8 @@
         <ProjectReference Include="..\Furball\Furball.Engine\Furball.Engine.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Silk.NET.Maths" Version="2.16.0"/>
+    </ItemGroup>
+
 </Project>
