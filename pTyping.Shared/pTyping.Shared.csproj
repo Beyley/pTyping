@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="Realm" Version="10.15.1"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
+        <PackageReference Include="TagLibSharp" Version="2.3.0"/>
     </ItemGroup>
 
     <ItemGroup>
