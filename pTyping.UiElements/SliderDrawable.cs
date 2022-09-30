@@ -14,7 +14,7 @@ using Color = Furball.Vixie.Backends.Shared.Color;
 
 namespace pTyping.UiElements;
 
-public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T> {
+public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T>, IFormattable {
 	private readonly BoundNumber<T> _value;
 
 	public const float LINE_WIDTH         = 1.5f;
@@ -35,12 +35,35 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 	public SliderDrawable(BoundNumber<T> num, float width = 300) {
 		this._value = num;
-		this.Width = width;
+		this.Width  = width;
 
 		this.OnHover     += this.HoverBegin;
 		this.OnHoverLost += this.HoverLost;
 
+		this.OnDragBegin += DragBegin;
+		this.OnDragEnd   += DragEnd;
+		this.OnDrag      += this.Drag;
+
 		this._previewFont = FurballGame.DefaultFont.GetFont(20);
+	}
+
+	private void DragBegin(object? sender, MouseDragEventArgs e) {
+		
+	}
+	
+	private void Drag(object? sender, MouseDragEventArgs e) {
+		float mouseProgress = (e.Position.X - this.RealPosition.X) / this.RealSize.X;
+
+		float startVal = this._value.MinValue.ToSingle(CultureInfo.InvariantCulture);
+		float endVal   = this._value.MaxValue.ToSingle(CultureInfo.InvariantCulture);
+
+		float range = endVal - startVal;
+		
+		this._value.Value = (T)Convert.ChangeType(mouseProgress * range + startVal, typeof(T));
+	}
+	
+	private void DragEnd(object? sender, MouseDragEventArgs e) {
+		
 	}
 
 	private void HoverLost(object? sender, EventArgs e) {
@@ -113,7 +136,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 		}
 
 		if (this._drawPreview) {
-			string text = $"{this._value.Value}";
+			string text = $"{this._value.Value:N2}";
 
 			const float margin    = 3f;
 			const float posOffset = 10f;

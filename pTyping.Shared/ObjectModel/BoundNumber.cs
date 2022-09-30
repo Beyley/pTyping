@@ -59,6 +59,9 @@ public class BoundNumber <T> where T : struct, IComparable, IConvertible, IEquat
 			if (this._precision.Equals(value))
 				return;
 
+			if (value.ToDouble(CultureInfo.InvariantCulture) <= 0)
+				throw new ArgumentException("Precision must be greater than 0!");
+			
 			this._precision = value;
 			
 			this.UpdateValue(this._value);
@@ -70,7 +73,9 @@ public class BoundNumber <T> where T : struct, IComparable, IConvertible, IEquat
 
 		double valD = value.ToDouble(CultureInfo.InvariantCulture);
 
-		this._value = ((T)Convert.ChangeType(valD / this._precision.ToDouble(CultureInfo.InvariantCulture) * this.Precision.ToDouble(CultureInfo.InvariantCulture), typeof(T), CultureInfo.InvariantCulture)).Clamp(this._minValue, this._maxValue);
+		this._value = ((T)Convert.ChangeType(
+			Math.Round(valD / this.Precision.ToDouble(CultureInfo.InvariantCulture)) * this.Precision.ToDouble(CultureInfo.InvariantCulture), typeof(T), CultureInfo.InvariantCulture))
+		   .Clamp(this._minValue, this._maxValue);
 
 		if (!old.Equals(this._value))
 			this.Changed?.Invoke(this, this._value);

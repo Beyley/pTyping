@@ -27,6 +27,24 @@ public class UiElementsTestScreen : pScreen {
 		}) {
 			Position = new Vector2(10, 150)
 		});
+		
+		this.Manager.Add(new SliderDrawable<float>(new BoundNumber<float> {
+			MaxValue  = 10,
+			MinValue  = 0,
+			Precision = 0.1f,
+			Value     = 5
+		}) {
+			Position = new Vector2(10, 190)
+		});
+		
+		this.Manager.Add(new SliderDrawable<float>(new BoundNumber<float> {
+			MaxValue  = 10,
+			MinValue  = 0,
+			Precision = 0.01f,
+			Value     = 5
+		}) {
+			Position = new Vector2(10, 230)
+		});
 	}
 
 	public override string               Name                 => "UI Elements Test Screen";
