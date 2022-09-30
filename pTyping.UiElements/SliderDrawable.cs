@@ -29,8 +29,9 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 	public float Width;
 
-	private          bool              _drawPreview;
-	private          Vector2           _lastMouse;
+	private bool _drawPreview;
+	private bool _dragging;
+
 	private readonly DynamicSpriteFont _previewFont;
 
 	private float      _currentHandleX;
@@ -40,18 +41,27 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 	public SliderDrawable(BoundNumber<T> num, float width = 300) {
 		this.Value = num;
-		this.Width  = width;
+		this.Width = width;
 
 		this.OnHover     += this.HoverBegin;
 		this.OnHoverLost += this.HoverLost;
 
-		this.OnDrag += this.Drag;
+		this.OnDrag      += this.Drag;
+		this.OnDragBegin += this.DragBegin;
+		this.OnDragEnd   += this.DragEnd;
 
 		this._previewFont = FurballGame.DefaultFont.GetFont(20);
 
 		float handleX = this.GetHandleX();
 		this._handleMovementTween = new FloatTween(TweenType.Fade, handleX, handleX, 0, 0);
 		this._currentHandleX      = this._handleMovementTween.GetCurrent();
+	}
+
+	private void DragEnd(object? sender, MouseDragEventArgs e) {
+		this._dragging = false;
+	}
+	private void DragBegin(object? sender, MouseDragEventArgs e) {
+		this._dragging = true;
 	}
 
 	private void Drag(object? sender, MouseDragEventArgs e) {
@@ -66,18 +76,18 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 		//Set the handle movement tween
 		this._handleMovementTween = new FloatTween(
-			TweenType.Fade, 
-			this._currentHandleX, 
-			this.GetHandleX(), 
-			FurballGame.Time, 
-			FurballGame.Time + 75, 
+			TweenType.Fade,
+			this._currentHandleX,
+			this.GetHandleX(),
+			FurballGame.Time,
+			FurballGame.Time + 75,
 			Easing.In
 		);
 	}
 
 	public override void Update(double time) {
 		base.Update(time);
-		
+
 		//Update the handle movement tween
 		this._handleMovementTween.Update(FurballGame.Time);
 		//Save the current handle X
@@ -94,7 +104,6 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 	private void MouseMove(object? sender, MouseMoveEventArgs e) {
 		this._drawPreview = this.PointInHandle(e.Position);
-		this._lastMouse   = e.Position;
 	}
 
 	private bool PointInHandle(Vector2 p) {
@@ -153,7 +162,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 			mappedData.IndexPtr[5] = (ushort)(left   + mappedData.IndexOffset);
 		}
 
-		if (this._drawPreview) {
+		if (this._drawPreview || this._dragging) {
 			string text = $"{this.Value.Value:N2}";
 
 			const float margin    = 3f;
@@ -161,13 +170,17 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 			Vector2 size = this._previewFont.MeasureString(text);
 
+			Vector2 mousePos = FurballGame.InputManager.Mice[0].Position;
+
 			//Draw the preview background
-			batch.Draw(FurballGame.WhitePixel, this._lastMouse + new Vector2(posOffset), size + new Vector2(margin * 2f), new Color(0.3f, 0.3f, 0.3f));
+			batch.Draw(FurballGame.WhitePixel, mousePos + new Vector2(posOffset), size + new Vector2(margin * 2f), new Color(0.3f, 0.3f, 0.3f));
 			//Draw the preview text
-			batch.DrawString(this._previewFont, text, this._lastMouse + new Vector2(posOffset) + new Vector2(margin), Color.White);
+			batch.DrawString(this._previewFont, text, mousePos + new Vector2(posOffset) + new Vector2(margin), Color.White);
 		}
 	}
-	private float GetHandleX() { //The current value of the slider as a float
+
+	private float GetHandleX() {
+		//The current value of the slider as a float
 		float currVal = this.Value.Value.ToSingle(CultureInfo.InvariantCulture);
 		//The range of values (Max - Min)
 		float range = this.Value.MaxValue.ToSingle(CultureInfo.InvariantCulture) - this.Value.MinValue.ToSingle(CultureInfo.InvariantCulture);
