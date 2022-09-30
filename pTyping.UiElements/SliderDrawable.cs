@@ -15,7 +15,7 @@ using Color = Furball.Vixie.Backends.Shared.Color;
 namespace pTyping.UiElements;
 
 public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T> {
-	private readonly BoundNumber<T> Value;
+	private readonly BoundNumber<T> _value;
 
 	public const float LINE_WIDTH         = 1.5f;
 	public const float STOPPER_LINE_WIDTH = 1;
@@ -34,7 +34,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 	public override Vector2 Size => new Vector2(this.Width, HEIGHT) * this.Scale;
 
 	public SliderDrawable(BoundNumber<T> num, float width = 300) {
-		this.Value = num;
+		this._value = num;
 		this.Width = width;
 
 		this.OnHover     += this.HoverBegin;
@@ -113,7 +113,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 		}
 
 		if (this._drawPreview) {
-			string text = $"{this.Value.Value}";
+			string text = $"{this._value.Value}";
 
 			const float margin    = 3f;
 			const float posOffset = 10f;
@@ -127,11 +127,11 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 		}
 	}
 	private float GetHandleX() { //The current value of the slider as a float
-		float currVal = this.Value.Value.ToSingle(CultureInfo.InvariantCulture);
+		float currVal = this._value.Value.ToSingle(CultureInfo.InvariantCulture);
 		//The range of values (Max - Min)
-		float range = this.Value.MaxValue.ToSingle(CultureInfo.InvariantCulture) - this.Value.MinValue.ToSingle(CultureInfo.InvariantCulture);
+		float range = this._value.MaxValue.ToSingle(CultureInfo.InvariantCulture) - this._value.MinValue.ToSingle(CultureInfo.InvariantCulture);
 		//0-1 progress of how far we are along the slider
-		float progress = (currVal - this.Value.MinValue.ToSingle(CultureInfo.InvariantCulture)) / range;
+		float progress = (currVal - this._value.MinValue.ToSingle(CultureInfo.InvariantCulture)) / range;
 
 		return progress * this.Width;
 	}
