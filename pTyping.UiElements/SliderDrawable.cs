@@ -6,6 +6,8 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens;
+using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared.Renderers;
@@ -15,7 +17,7 @@ using Color = Furball.Vixie.Backends.Shared.Color;
 namespace pTyping.UiElements;
 
 public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConvertible, IEquatable<T>, IComparable<T>, IFormattable {
-	private readonly BoundNumber<T> _value;
+	public readonly BoundNumber<T> Value;
 
 	public const float LINE_WIDTH         = 1.5f;
 	public const float STOPPER_LINE_WIDTH = 1;
@@ -31,39 +33,55 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 	private          Vector2           _lastMouse;
 	private readonly DynamicSpriteFont _previewFont;
 
+	private float      _currentHandleX;
+	private FloatTween _handleMovementTween;
+
 	public override Vector2 Size => new Vector2(this.Width, HEIGHT) * this.Scale;
 
 	public SliderDrawable(BoundNumber<T> num, float width = 300) {
-		this._value = num;
+		this.Value = num;
 		this.Width  = width;
 
 		this.OnHover     += this.HoverBegin;
 		this.OnHoverLost += this.HoverLost;
 
-		this.OnDragBegin += DragBegin;
-		this.OnDragEnd   += DragEnd;
-		this.OnDrag      += this.Drag;
+		this.OnDrag += this.Drag;
 
 		this._previewFont = FurballGame.DefaultFont.GetFont(20);
+
+		float handleX = this.GetHandleX();
+		this._handleMovementTween = new FloatTween(TweenType.Fade, handleX, handleX, 0, 0);
+		this._currentHandleX      = this._handleMovementTween.GetCurrent();
 	}
 
-	private void DragBegin(object? sender, MouseDragEventArgs e) {
-		
-	}
-	
 	private void Drag(object? sender, MouseDragEventArgs e) {
 		float mouseProgress = (e.Position.X - this.RealPosition.X) / this.RealSize.X;
 
-		float startVal = this._value.MinValue.ToSingle(CultureInfo.InvariantCulture);
-		float endVal   = this._value.MaxValue.ToSingle(CultureInfo.InvariantCulture);
+		float startVal = this.Value.MinValue.ToSingle(CultureInfo.InvariantCulture);
+		float endVal   = this.Value.MaxValue.ToSingle(CultureInfo.InvariantCulture);
 
 		float range = endVal - startVal;
-		
-		this._value.Value = (T)Convert.ChangeType(mouseProgress * range + startVal, typeof(T));
+
+		this.Value.Value = (T)Convert.ChangeType(mouseProgress * range + startVal, typeof(T));
+
+		//Set the handle movement tween
+		this._handleMovementTween = new FloatTween(
+			TweenType.Fade, 
+			this._currentHandleX, 
+			this.GetHandleX(), 
+			FurballGame.Time, 
+			FurballGame.Time + 75, 
+			Easing.In
+		);
 	}
-	
-	private void DragEnd(object? sender, MouseDragEventArgs e) {
+
+	public override void Update(double time) {
+		base.Update(time);
 		
+		//Update the handle movement tween
+		this._handleMovementTween.Update(FurballGame.Time);
+		//Save the current handle X
+		this._currentHandleX = this._handleMovementTween.GetCurrent();
 	}
 
 	private void HoverLost(object? sender, EventArgs e) {
@@ -106,7 +124,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 		//Draw the right stopper
 		batch.Draw(FurballGame.WhitePixel, new Vector2(args.Position.X + this.RealSize.X, args.Position.Y + MIDDLE - STOPPER_HEIGHT_FROM_MIDDLE), new Vector2(STOPPER_LINE_WIDTH, STOPPER_HEIGHT_FROM_MIDDLE * 2f));
 
-		float handleX = this.GetHandleX();
+		float handleX = this._currentHandleX;
 
 		MappedData mappedData = batch.Reserve(4, 6);
 
@@ -136,7 +154,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 		}
 
 		if (this._drawPreview) {
-			string text = $"{this._value.Value:N2}";
+			string text = $"{this.Value.Value:N2}";
 
 			const float margin    = 3f;
 			const float posOffset = 10f;
@@ -150,11 +168,11 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 		}
 	}
 	private float GetHandleX() { //The current value of the slider as a float
-		float currVal = this._value.Value.ToSingle(CultureInfo.InvariantCulture);
+		float currVal = this.Value.Value.ToSingle(CultureInfo.InvariantCulture);
 		//The range of values (Max - Min)
-		float range = this._value.MaxValue.ToSingle(CultureInfo.InvariantCulture) - this._value.MinValue.ToSingle(CultureInfo.InvariantCulture);
+		float range = this.Value.MaxValue.ToSingle(CultureInfo.InvariantCulture) - this.Value.MinValue.ToSingle(CultureInfo.InvariantCulture);
 		//0-1 progress of how far we are along the slider
-		float progress = (currVal - this._value.MinValue.ToSingle(CultureInfo.InvariantCulture)) / range;
+		float progress = (currVal - this.Value.MinValue.ToSingle(CultureInfo.InvariantCulture)) / range;
 
 		return progress * this.Width;
 	}
