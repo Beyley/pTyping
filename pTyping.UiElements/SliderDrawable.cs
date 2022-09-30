@@ -1,11 +1,13 @@
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
+using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared.Renderers;
 using pTyping.Shared.ObjectModel;
 using Color = Furball.Vixie.Backends.Shared.Color;
@@ -25,17 +27,41 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 	public float Width;
 
-	public override Vector2 Size => new Vector2(this.Width, HEIGHT);
+	private          bool              _drawPreview;
+	private          Vector2           _lastMouse;
+	private readonly DynamicSpriteFont _previewFont;
+
+	public override Vector2 Size => new Vector2(this.Width, HEIGHT) * this.Scale;
 
 	public SliderDrawable(BoundNumber<T> num, float width = 300) {
 		this.Value = num;
 		this.Width = width;
+
+		this.OnHover     += this.HoverBegin;
+		this.OnHoverLost += this.HoverLost;
+
+		this._previewFont = FurballGame.DefaultFont.GetFont(20);
+	}
+
+	private void HoverLost(object? sender, EventArgs e) {
+		FurballGame.InputManager.OnMouseMove -= this.MouseMove;
+	}
+
+	private void HoverBegin(object? sender, EventArgs e) {
+		FurballGame.InputManager.OnMouseMove += this.MouseMove;
+	}
+
+	private void MouseMove(object? sender, MouseMoveEventArgs e) {
+		this._drawPreview = this.PointInHandle(e.Position);
+		this._lastMouse   = e.Position;
 	}
 
 	private bool PointInHandle(Vector2 p) {
 		float handleX = this.GetHandleX();
 
 		RectangleF handleRect = new RectangleF(handleX - HANDLE_SIZE, MIDDLE - HANDLE_SIZE, HANDLE_SIZE * 2f, HANDLE_SIZE * 2f);
+		handleRect.X += this.RealPosition.X;
+		handleRect.Y += this.RealPosition.Y;
 
 		return handleRect.Contains(p.ToPointF());
 	}
@@ -84,6 +110,20 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 			mappedData.IndexPtr[3] = (ushort)(bottom + mappedData.IndexOffset);
 			mappedData.IndexPtr[4] = (ushort)(right  + mappedData.IndexOffset);
 			mappedData.IndexPtr[5] = (ushort)(left   + mappedData.IndexOffset);
+		}
+
+		if (this._drawPreview) {
+			string text = $"{this.Value.Value}";
+
+			const float margin    = 3f;
+			const float posOffset = 10f;
+
+			Vector2 size = this._previewFont.MeasureString(text);
+
+			//Draw the preview background
+			batch.Draw(FurballGame.WhitePixel, this._lastMouse + new Vector2(posOffset), size + new Vector2(margin * 2f), new Color(0.3f, 0.3f, 0.3f));
+			//Draw the preview text
+			batch.DrawString(this._previewFont, text, this._lastMouse + new Vector2(posOffset) + new Vector2(margin), Color.White);
 		}
 	}
 	private float GetHandleX() { //The current value of the slider as a float
