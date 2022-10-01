@@ -14,7 +14,8 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 	[PrimaryKey]
 	public string Id { get; set; }
 
-	public BeatmapSet Parent { get; set; }
+	[Backlink(nameof (BeatmapSet.Beatmaps))]
+	public IQueryable<BeatmapSet> Parent { get; }
 
 	[Description("All of the breaks that happen during the Beatmap.")]
 	public IList<Break> Breaks { get; }
@@ -67,7 +68,7 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 		map.Info           = this.Info.Clone();
 		map.Metadata       = this.Metadata.Clone();
 		map.FileCollection = this.FileCollection.Clone();
-		map.Parent         = this.Parent;
+		// map.Parent         = this.Parent;
 		foreach (HitObject hitObject in this.HitObjects)
 			map.HitObjects.Add(hitObject.Clone());
 		foreach (TimingPoint timingPoint in this.TimingPoints)

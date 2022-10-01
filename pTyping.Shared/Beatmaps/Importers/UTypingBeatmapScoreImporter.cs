@@ -20,7 +20,7 @@ public class UTypingBeatmapScoreImporter : IBeatmapScoreImporter {
 			if (map == null)
 				continue;
 
-			map.Parent = set;
+			// map.Parent = set;
 
 			//TODO: this should never happen, what the fuck?
 			if (string.IsNullOrEmpty(map.Id))

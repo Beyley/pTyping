@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -26,7 +27,7 @@ public class ScoreResultsScreen : pScreen {
 
 		#region Title
 
-		BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+		BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 
 		TextDrawable songTitleText   = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, $"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]", 40);
 		TextDrawable songCreatorText = new TextDrawable(new Vector2(10, songTitleText.Size.Y + 20), pTypingGame.JapaneseFont, $"Created by {pTypingGame.CurrentSong.Value.Info.Mapper}", 30);
@@ -92,7 +93,7 @@ public class ScoreResultsScreen : pScreen {
 
 	public override string Details {
 		get {
-			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 			return $@"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
 Played by {this.Score.User.Username}
 Score: {this.Score.AchievedScore:0000000} Accuracy: {100d * this.Score.Accuracy:00.##}%";

@@ -590,7 +590,7 @@ public class PlayerScreen : pScreen {
 	public override string State => "Typing away!";
 	public override string Details {
 		get {
-			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 			return $@"Playing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]";
 		}
 	}

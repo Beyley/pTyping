@@ -878,7 +878,7 @@ public class EditorScreen : pScreen {
 	public override string State => "Editing a map!";
 	public override string Details {
 		get {
-			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 			return pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Info.Mapper
 				? $"Editing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}"
 				: $"Modding {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}";

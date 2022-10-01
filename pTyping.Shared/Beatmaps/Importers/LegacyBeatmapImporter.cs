@@ -19,7 +19,7 @@ public class LegacyBeatmapImporter : IBeatmapScoreImporter {
 			if (map == null)
 				continue;
 
-			map.Parent = set;
+			// map.Parent = set;
 
 			if (map.FileCollection.Audio == null)
 				continue;

@@ -47,7 +47,7 @@ public class SongSelectionScreen : pScreen {
 	public override string State => "Selecting a song!";
 	public override string Details {
 		get {
-			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 			return $"Deciding on playing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]";
 		}
 	}
@@ -303,7 +303,7 @@ public class SongSelectionScreen : pScreen {
 	}
 
 	public void UpdateSelectedSong(bool fromPrevScreen = false) {
-		BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+		BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 
 		this._songInfo.Text = $@"{set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Info.DifficultyName}]
 Created by {pTypingGame.CurrentSong.Value.Info.Mapper}

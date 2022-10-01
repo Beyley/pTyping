@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -286,7 +287,7 @@ public class MenuScreen : pScreen {
 			this._musicTitle.Text = "None";
 		}
 		else {
-			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 
 			this._musicTitle.Text = $"{set.Artist} - {set.Title}";
 		}
@@ -307,7 +308,7 @@ public class MenuScreen : pScreen {
 	public override string State => "Vibing on the menu!";
 	public override string Details {
 		get {
-			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent;
+			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
 
 			return @$"Listening to {set.Artist} - {set.Title}";
 		}
