@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -27,6 +28,7 @@ using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.Player;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Beatmaps.Exporters;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
 using Silk.NET.Input;
@@ -674,6 +676,20 @@ public class EditorScreen : pScreen {
 			case Key.Delete: {
 				// Delete the selected objects
 				this.DeleteSelectedObjects();
+				break;
+			}
+			case Key.E when FurballGame.InputManager.ControlHeld: {
+				if (this.SaveNeeded) {
+					pTypingGame.NotificationManager.CreatePopup("You have to save first!");
+					return;
+				}
+
+				pTypingBeatmapExporter exporter = new pTypingBeatmapExporter();
+
+				using FileStream fileStream = File.OpenWrite("TestExport.zip");
+
+				exporter.ExportBeatmapSet(pTypingGame.BeatmapDatabase.Realm.Find<Beatmap>(this.EditorState.Song.Id).Parent.First().Clone(), fileStream, pTypingGame.FileDatabase);
+
 				break;
 			}
 			case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
