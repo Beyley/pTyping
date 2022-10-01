@@ -10,25 +10,30 @@ using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICopyable<Beatmap> {
-	[PrimaryKey]
+	[PrimaryKey, JsonProperty]
 	public string Id { get; set; }
 
 	[Backlink(nameof (BeatmapSet.Beatmaps))]
 	public IQueryable<BeatmapSet> Parent { get; }
 
-	[Description("All of the breaks that happen during the Beatmap.")]
+	[Description("All of the breaks that happen during the Beatmap."), JsonProperty]
 	public IList<Break> Breaks { get; }
-	[Description("All of the objects contained within the Beatmap.")]
+	[Description("All of the objects contained within the Beatmap."), JsonProperty]
 	public IList<HitObject> HitObjects { get; }
-	[Description("All of the events container within the Beatmap.")]
+	[Description("All of the events container within the Beatmap."), JsonProperty]
 	public IList<Event> Events { get; }
-	[Description("All of the timing points within the Beatmap.")]
+	[Description("All of the timing points within the Beatmap."), JsonProperty]
 	public IList<TimingPoint> TimingPoints { get; }
 
-	public BeatmapDifficulty     Difficulty     { get; set; }
-	public BeatmapInfo           Info           { get; set; }
-	public BeatmapMetadata       Metadata       { get; set; }
+	[JsonProperty]
+	public BeatmapDifficulty Difficulty { get; set; }
+	[JsonProperty]
+	public BeatmapInfo Info { get; set; }
+	[JsonProperty]
+	public BeatmapMetadata Metadata { get; set; }
+	[JsonProperty]
 	public BeatmapFileCollection FileCollection { get; set; }
 
 	public Beatmap() {
@@ -53,7 +58,7 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 	[Description("The total duration of all the breaks in this Beatmap."), JsonIgnore]
 	public double TotalBreakDuration => this.Breaks.Sum(b => b.Length);
 
-	[Ignored, Description("The BPM of the first timing point of the song")]
+	[Ignored, Description("The BPM of the first timing point of the song"), JsonIgnore]
 	public double BeatsPerMinute => this.TimingPoints[0].BeatsPerMinute;
 
 	public Beatmap Clone() {

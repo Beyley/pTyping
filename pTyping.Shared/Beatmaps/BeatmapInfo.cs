@@ -1,19 +1,22 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, IClonable<BeatmapInfo> {
-	[Description("A description of the beatmap given by the creator.")]
+	[Description("A description of the beatmap given by the creator."), JsonProperty]
 	public string Description { get; set; }
 
-	[Description("The name given by the creator for this specific difficulty.")]
+	[Description("The name given by the creator for this specific difficulty."), JsonProperty]
 	public AsciiUnicodeTuple DifficultyName { get; set; }
-	[Description("The person who created the map, aka the mapper.")]
+
+	[Description("The person who created the map, aka the mapper."), JsonProperty]
 	public string Mapper { get; set; }
 
-	[Description("The time set to preview the song.")]
+	[Description("The time set to preview the song."), JsonProperty]
 	public double PreviewTime { get; set; }
 
 	public BeatmapInfo Clone() {

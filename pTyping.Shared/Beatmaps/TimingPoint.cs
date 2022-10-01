@@ -1,21 +1,23 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class TimingPoint : EmbeddedObject, IClonable<TimingPoint> {
-	[Description("The exact time where the timing segment starts.")]
+	[Description("The exact time where the timing segment starts."), JsonProperty]
 	public double Time { get; set; }
-	[Description("The time between full beats.")]
+	[Description("The time between full beats."), JsonProperty]
 	public double Tempo { get; set; }
 
-	[Description("The time division of the song, aka N beat divisions per full beat.")]
+	[Description("The time division of the song, aka N beat divisions per full beat."), JsonProperty]
 	public double TimeSignature { get; set; } = 4;
 
 	public TimingPoint() {}
 
-	[Ignored]
+	[Ignored, JsonIgnore]
 	public double BeatsPerMinute => 60000d / this.Tempo;
 
 	public TimingPoint(double time, double tempo) {

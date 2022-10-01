@@ -1,12 +1,15 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class BeatmapMetadata : EmbeddedObject, IClonable<BeatmapMetadata> {
+	[JsonProperty]
 	public IList<int> BackingLanguages { get; }
-	[Ignored, Description("The languages contained within the song")]
+	[Ignored, Description("The languages contained within the song"), JsonIgnore]
 	public IList<SongLanguage> Languages {
 		get {
 			List<SongLanguage> list = new List<SongLanguage>();
@@ -23,7 +26,7 @@ public class BeatmapMetadata : EmbeddedObject, IClonable<BeatmapMetadata> {
 				this.BackingLanguages.Add((int)language);
 		}
 	}
-	[Description("The tags given for the song by the beatmap creator.")]
+	[Description("The tags given for the song by the beatmap creator."), JsonProperty]
 	public IList<string> Tags { get; }
 
 	public BeatmapMetadata Clone() {

@@ -1,9 +1,11 @@
 using Furball.Vixie.Backends.Shared;
+using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class HitObjectColor : EmbeddedObject, IClonable<HitObjectColor> {
 	private HitObjectColor(float colorRf, float colorGf, float colorBf, float colorAf) {
 		this.R = colorRf;
@@ -14,9 +16,13 @@ public class HitObjectColor : EmbeddedObject, IClonable<HitObjectColor> {
 
 	public HitObjectColor() {}
 
+	[JsonProperty]
 	public float R { get; set; }
+	[JsonProperty]
 	public float G { get; set; }
+	[JsonProperty]
 	public float B { get; set; }
+	[JsonProperty]
 	public float A { get; set; }
 
 	public static implicit operator Color(HitObjectColor color) {

@@ -1,26 +1,29 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Events;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class Event : EmbeddedObject, IClonable<Event>, IComparable<Event> {
-	[Description("The end of the event")]
+	[Description("The end of the event"), JsonProperty]
 	public double End { get; set; }
-	[Description("The start of the event")]
+	[Description("The start of the event"), JsonProperty]
 	public double Start { get; set; }
 
-	[Description("The text of the lyric event")]
+	[Description("The text of the lyric event"), JsonProperty]
 	public string Text { get; set; }
 
+	[JsonProperty]
 	public int BackingType { get; set; }
-	[Ignored, Description("The type of event")]
+	[Ignored, Description("The type of event"), JsonIgnore]
 	public EventType Type {
 		get => (EventType)this.BackingType;
 		set => this.BackingType = (int)value;
 	}
 
-	[Ignored, Description("The length of the event")]
+	[Ignored, Description("The length of the event"), JsonIgnore]
 	public double Length => this.End - this.Start;
 
 	public Event Clone() {
