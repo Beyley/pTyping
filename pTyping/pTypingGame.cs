@@ -491,17 +491,7 @@ public class pTypingGame : FurballGame {
 		ScoreDatabase = new ScoreDatabase();
 		ScoreDatabase.Realm.Refresh();
 
-		LegacyImportChecker.CheckAndImportLegacyMaps();
-
-		// BeatmapDatabase.Realm.Write(
-		// () => {
-		//     UTypingBeatmapImporter importer = new();
-		//
-		//     string[] strings = Directory.GetDirectories(Path.Combine(AssemblyPath, "utyping"));
-		//     foreach (string s in strings) {
-		//         importer.ImportBeatmaps(BeatmapDatabase, FileDatabase, new DirectoryInfo(s));
-		//     }
-		// });
+		ImportChecker.ImportMaps();
 
 		MusicTrackScheduler = new Scheduler();
 
