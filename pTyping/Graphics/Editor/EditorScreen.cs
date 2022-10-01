@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
+using System.Threading.Tasks;
 using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine;
@@ -684,12 +685,41 @@ public class EditorScreen : pScreen {
 					return;
 				}
 
-				pTypingBeatmapExporter exporter = new pTypingBeatmapExporter();
+				(double StartTime, string BeatmapId) taskState = (StartTime: FurballGame.Time, BeatmapId: this.EditorState.Song.Id);
 
-				using FileStream fileStream = File.OpenWrite("TestExport.zip");
+				pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Exporting map!");
 
-				exporter.ExportBeatmapSet(pTypingGame.BeatmapDatabase.Realm.Find<Beatmap>(this.EditorState.Song.Id).Parent.First().Clone(), fileStream, pTypingGame.FileDatabase);
+				//Start a new task to export the beatmap
+				Task.Factory.StartNew(stateObj => {
+					(double StartTime, string BeatmapId) state = ((double StartTime, string BeatmapId))stateObj;
 
+					//Create the exporter
+					pTypingBeatmapExporter exporter = new pTypingBeatmapExporter();
+
+					//Create an instance of the realm for this thread
+					BeatmapDatabase beatmapDatabase = new BeatmapDatabase();
+
+					//Get the path of the export dir
+					string exportPath = Path.Combine(FurballGame.AssemblyPath, "exports");
+
+					//Create the export dir if it does not exist
+					if (!Directory.Exists(exportPath))
+						Directory.CreateDirectory(exportPath);
+
+					//Get the beatmap set from the database
+					BeatmapSet set = beatmapDatabase.Realm.Find<Beatmap>(state.BeatmapId).Parent.First().Clone();
+
+					//Open the write stream to the file we will export the zip to
+					using FileStream fileStream = File.OpenWrite(Path.Combine(exportPath, $"{set.Artist} - {set.Title}.ptm"));
+
+					//Export to the zip file
+					exporter.ExportBeatmapSet(set, fileStream, pTypingGame.FileDatabase);
+
+					FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+						pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Finished exporting map! Took {FurballGame.Time - state.StartTime:N2}ms");
+					});
+				}, taskState);
+				
 				break;
 			}
 			case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
