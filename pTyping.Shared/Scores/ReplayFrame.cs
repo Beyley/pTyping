@@ -1,13 +1,17 @@
+using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
 
 namespace pTyping.Shared.Scores;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class ReplayFrame : EmbeddedObject, IClonable<ReplayFrame> {
+	[JsonProperty]
 	public char   Character { get; set; }
+	[JsonProperty]
 	public double Time      { get; set; }
 
-	[Ignored]
+	[Ignored, JsonIgnore]
 	public bool Used {
 		get;
 		set;

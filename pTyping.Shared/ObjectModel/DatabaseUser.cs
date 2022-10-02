@@ -1,13 +1,15 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 using Realms;
 
 namespace pTyping.Shared.ObjectModel;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class DatabaseUser : RealmObject, IClonable<DatabaseUser>, IEquatable<DatabaseUser> {
-	[Description("The online ID of the user")]
+	[JsonProperty, Description("The online ID of the user")]
 	public long UserId { get; set; } //NOTE: the reason it is a long and not a uint is because Realm does not support unsigned integers
 
-	[Description("The username of the user")]
+	[JsonProperty, Description("The username of the user")]
 	public string Username { get; set; }
 
 	public DatabaseUser Clone() {

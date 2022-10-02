@@ -12,6 +12,7 @@ using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Scores;
+using pTyping.Shared.Scores.Exporters;
 
 namespace pTyping.Graphics.Player;
 
@@ -59,7 +60,6 @@ public class ScoreResultsScreen : pScreen {
 			ScreenOriginType = OriginType.BottomRight
 		};
 
-		this.Manager.Add(exitButton);
 
 		EventHandler<MouseButtonEventArgs> watchReplayOnClick = delegate {
 			pTypingGame.MenuClickSound.PlayNew();
@@ -75,7 +75,20 @@ public class ScoreResultsScreen : pScreen {
 			ScreenOriginType = OriginType.BottomRight
 		};
 
+		DrawableButton exportReplayButton = new DrawableButton(new Vector2(20f, 140f), FurballGame.DefaultFont, 40, "Export Replay", Color.Green, Color.White, Color.White, Vector2.Zero) {
+			OriginType       = OriginType.BottomRight,
+			ScreenOriginType = OriginType.BottomRight
+		};
+
+		exportReplayButton.OnClick += (_, _) => {
+			pTypingScoreExporter exporter = new pTypingScoreExporter();
+
+			exporter.ExportScore(this.Score, pTypingGame.BeatmapDatabase, pTypingGame.ScoreDatabase, pTypingGame.FileDatabase);
+		};
+		
+		this.Manager.Add(exitButton);
 		this.Manager.Add(watchReplayButton);
+		this.Manager.Add(exportReplayButton);
 
 		#endregion
 
