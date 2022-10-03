@@ -64,9 +64,9 @@ public class EditorScreen : pScreen {
 	public override void Initialize() {
 		base.Initialize();
 
-		// throw new NotImplementedException();
+		Beatmap map = pTypingGame.CurrentSong.Value;
 
-		this.EditorState = new EditorState(pTypingGame.CurrentSong.Value.Clone());
+		this.EditorState = new EditorState(map.Clone());
 
 		pTypingGame.MusicTrack.Stop();
 
@@ -78,11 +78,6 @@ public class EditorScreen : pScreen {
 				Position   = new(0, FurballGame.DEFAULT_WINDOW_HEIGHT / 2f)
 			}
 		);
-
-		// FileInfo[] noteFiles = new DirectoryInfo(this.EditorState.Song.QualifiedFolderPath).GetFiles("note.png");
-
-		// this.NoteTexture = noteFiles == null || noteFiles.Length == 0 ? ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User)
-		// : ContentManager.LoadTextureFromFileCached(noteFiles[0].FullName,                             ContentSource.External);
 
 		this.NoteTexture = ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User);
 
@@ -326,6 +321,19 @@ public class EditorScreen : pScreen {
 
 		#endregion
 
+		ScrollableContainer scrollable = new ScrollableContainer(new Vector2(310, 500)) {
+			InvisibleToInput = true
+		};
+		this._songForm = new DrawableForm($"Beatmap settings for {map.ParentSet.Artist} - {map.ParentSet.Title} [{map.Info.DifficultyName}]", scrollable);
+
+		scrollable.Add(new EditorSongFormContents(this.EditorState.Song, this) {
+			InvisibleToInput = true
+		});
+
+		this._songForm.OnTryClose += (_, _) => {
+			this.Manager.Remove(this._songForm);
+		};
+
 		#endregion
 
 		this.ChangeTool(typeof(SelectTool));
@@ -364,18 +372,6 @@ public class EditorScreen : pScreen {
 
 	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Editing;
 
-	// private void ProgressBarOnInteract(object sender, Point e) {
-	// this.ProgressBarOnInteract(sender, (MouseButton.Left, e));
-	// }
-
-	// private void ProgressBarOnInteract(object sender, Point e) {
-	//     this.ProgressBarOnInteract(sender, (e, MouseButton.LeftButton));
-	// }
-
-	private const string x025 = "x0.25";
-	private const string x050 = "x0.50";
-	private const string x075 = "x0.75";
-	private const string x100 = "x1.00";
 	private static void ChangeSpeed(object _, KeyValuePair<object, string> keyValuePair) {
 		pTypingGame.MusicTrack.SetSpeed((double)keyValuePair.Key);
 	}
@@ -402,7 +398,7 @@ public class EditorScreen : pScreen {
 		//Dont recalc selection rects if we shouldnt be, this is used to stop stuttering when selecting all notes
 		if (this.CancelSelectionEvents)
 			return;
-		
+
 		this._selectionRects.ForEach(x => this.EditorDrawable.Drawables.Remove(x));
 
 		this._selectionRects.Clear();
@@ -625,6 +621,14 @@ public class EditorScreen : pScreen {
 
 				break;
 			}
+			case Key.F5: {
+				if (this.Manager.Drawables.Contains(this._songForm))
+					break;
+
+				this.Manager.Add(this._songForm);
+
+				break;
+			}
 			case Key.Escape:
 				//If the user has some notes selected, clear them
 				if (this.EditorState.SelectedObjects.Count != 0) {
@@ -719,7 +723,7 @@ public class EditorScreen : pScreen {
 						pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Finished exporting map! Took {FurballGame.Time - state.StartTime:N2}ms");
 					});
 				}, taskState);
-				
+
 				break;
 			}
 			case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
@@ -859,6 +863,7 @@ public class EditorScreen : pScreen {
 	private TexturedDrawable _rightButton;
 	private TexturedDrawable _leftButton;
 	private TexturedDrawable _playfieldBackgroundCover;
+	private DrawableForm     _songForm;
 	private bool             CancelSelectionEvents;
 	public override void Update(double gameTime) {
 		this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
