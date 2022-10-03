@@ -11,6 +11,7 @@ using pTyping.Engine;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.Importers;
+using pTyping.Shared.Scores;
 
 namespace pTyping;
 
@@ -20,13 +21,14 @@ public static class ImportChecker {
 	private static string LegacySongFolderImportedFailed => Path.Combine(LegacySongFolderImported, "failed/");
 
 	public static void ImportMaps() {
-		Task.Factory.StartNew(ImportMapsRun);
+		Task.Factory.StartNew(ImportMapsAndScoresRun);
 		Task.Factory.StartNew(ImportLegacyMapsRun);
 	}
 
-	private static void ImportMapsRun() {
-		BeatmapDatabase database     = new BeatmapDatabase();
-		FileDatabase    fileDatabase = new FileDatabase();
+	private static void ImportMapsAndScoresRun() {
+		BeatmapDatabase database      = new BeatmapDatabase();
+		ScoreDatabase   scoreDatabase = new ScoreDatabase();
+		FileDatabase    fileDatabase  = new FileDatabase();
 
 		DirectoryInfo info = new DirectoryInfo(Path.Combine(FurballGame.AssemblyPath, "songs"));
 
@@ -84,12 +86,39 @@ public static class ImportChecker {
 			return importedMaps;
 		});
 
+		int importedScores = scoreDatabase.Realm.Write(() => {
+			int imported = 0;
+
+			info = new DirectoryInfo(Path.Combine(FurballGame.AssemblyPath, "scores"));
+
+			if (!info.Exists)
+				info.Create();
+
+			FileInfo[] scoreFiles = info.GetFiles("*.pts");
+			foreach (FileInfo scoreFile in scoreFiles) {
+				Score? score = JsonConvert.DeserializeObject<Score>(File.ReadAllText(scoreFile.FullName));
+
+				if (score == null)
+					continue; //TODO: tell the user something went wrong
+
+				scoreDatabase.Realm.Add(score);
+			}
+
+			return imported;
+		});
+
 		database.Realm.Refresh();
+		scoreDatabase.Realm.Refresh();
 
 		if (importedCount != 0)
 			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
 				pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Imported {importedCount} beatmap archive{(importedCount == 1 ? "" : "s")}!");
 				pTypingGame.BeatmapDatabase.Realm.Refresh();
+			});
+		if (importedScores != 0)
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+				pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Imported {importedScores} score{(importedScores == 1 ? "" : "s")}!");
+				pTypingGame.ScoreDatabase.Realm.Refresh();
 			});
 	}
 
