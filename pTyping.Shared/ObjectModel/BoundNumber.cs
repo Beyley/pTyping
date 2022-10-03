@@ -13,11 +13,11 @@ public class BoundNumber <T> where T : struct, IComparable, IConvertible, IEquat
 	[JsonProperty(TypeNameHandling = TypeNameHandling.All)]
 	private T _value;
 	[JsonProperty(TypeNameHandling = TypeNameHandling.All)]
-	private T _maxValue;
+	private T _maxValue = (T)Convert.ChangeType(int.MaxValue, typeof(T));
 	[JsonProperty(TypeNameHandling = TypeNameHandling.All)]
-	private T _minValue;
+	private T _minValue = (T)Convert.ChangeType(0, typeof(T));
 	[JsonProperty(TypeNameHandling = TypeNameHandling.All)]
-	private T _precision;
+	private T _precision = (T)Convert.ChangeType(0.01f, typeof(T));
 
 	public T Value {
 		get => this._value;
