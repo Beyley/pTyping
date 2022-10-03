@@ -18,6 +18,9 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 	[Backlink(nameof (BeatmapSet.Beatmaps))]
 	public IQueryable<BeatmapSet> Parent { get; }
 
+	[Ignored, JsonIgnore]
+	public BeatmapSet ParentSet => this.Parent.First();
+
 	[Description("All of the breaks that happen during the Beatmap."), JsonProperty]
 	public IList<Break> Breaks { get; }
 	[Description("All of the objects contained within the Beatmap."), JsonProperty]
