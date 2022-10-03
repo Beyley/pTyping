@@ -64,9 +64,9 @@ public class EditorScreen : pScreen {
 	public override void Initialize() {
 		base.Initialize();
 
-		Beatmap map = pTypingGame.CurrentSong.Value;
+		this.RealmMap = pTypingGame.CurrentSong.Value;
 
-		this.EditorState = new EditorState(map.Clone());
+		this.EditorState = new EditorState(this.RealmMap.Clone());
 
 		pTypingGame.MusicTrack.Stop();
 
@@ -324,7 +324,7 @@ public class EditorScreen : pScreen {
 		ScrollableContainer scrollable = new ScrollableContainer(new Vector2(310, 500)) {
 			InvisibleToInput = true
 		};
-		this._songForm = new DrawableForm($"Beatmap settings for {map.ParentSet.Artist} - {map.ParentSet.Title} [{map.Info.DifficultyName}]", scrollable);
+		this._songForm = new DrawableForm($"Beatmap settings for {this.RealmMap.ParentSet.Artist} - {this.RealmMap.ParentSet.Title} [{this.RealmMap.Info.DifficultyName}]", scrollable);
 
 		scrollable.Add(new EditorSongFormContents(this.EditorState.Song, this) {
 			InvisibleToInput = true
@@ -865,6 +865,7 @@ public class EditorScreen : pScreen {
 	private TexturedDrawable _playfieldBackgroundCover;
 	private DrawableForm     _songForm;
 	private bool             CancelSelectionEvents;
+	public  Beatmap          RealmMap;
 	public override void Update(double gameTime) {
 		this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
