@@ -15,6 +15,8 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _difficultyInputUnicode;
 	private readonly DrawableTextBox       _titleInputAscii;
 	private readonly DrawableTextBox       _titleInputUnicode;
+	private readonly DrawableTextBox       _artistInputAscii;
+	private readonly DrawableTextBox       _artistInputUnicode;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -35,7 +37,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		};
 		y += this._strictnessSlider.Size.Y;
 
-		this._strictnessSlider.Value.Changed += (sender, f) => {
+		this._strictnessSlider.Value.Changed += (_, f) => {
 			map.Difficulty.Strictness = f;
 
 			editor.SaveNeeded = true;
@@ -59,6 +61,24 @@ public class EditorSongFormContents : CompositeDrawable {
 			editor.SaveNeeded                     = true;
 		};
 
+		TextDrawable artistLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Artist", 24);
+		y += artistLabel.Size.Y;
+
+		this._artistInputAscii   =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Artist.Ascii ?? "");
+		y                        += this._artistInputAscii.Size.Y;
+		this._artistInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Artist.Unicode);
+		y                        += this._artistInputUnicode.Size.Y;
+
+		this._artistInputAscii.OnCommit += delegate(object _, string s) {
+			editor.EditorState.Set.Artist.Ascii = s;
+			editor.SaveNeeded                   = true;
+		};
+
+		this._artistInputUnicode.OnCommit += delegate(object _, string s) {
+			editor.EditorState.Set.Artist.Unicode = s;
+			editor.SaveNeeded                     = true;
+		};
+
 		TextDrawable titleLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Title (Name of song)", 24);
 		y += titleLabel.Size.Y;
 
@@ -67,12 +87,12 @@ public class EditorSongFormContents : CompositeDrawable {
 		this._titleInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Title.Unicode);
 		y                       += this._titleInputUnicode.Size.Y;
 
-		this._titleInputAscii.OnCommit += delegate(object sender, string s) {
+		this._titleInputAscii.OnCommit += delegate(object _, string s) {
 			editor.EditorState.Set.Title.Ascii = s;
 			editor.SaveNeeded                  = true;
 		};
 
-		this._titleInputUnicode.OnCommit += delegate(object sender, string s) {
+		this._titleInputUnicode.OnCommit += delegate(object _, string s) {
 			editor.EditorState.Set.Title.Unicode = s;
 			editor.SaveNeeded                    = true;
 		};
@@ -84,6 +104,10 @@ public class EditorSongFormContents : CompositeDrawable {
 		this.Drawables.Add(this._difficultyInputAscii);
 		this.Drawables.Add(this._difficultyInputUnicode);
 
+		this.Drawables.Add(artistLabel);
+		this.Drawables.Add(this._artistInputAscii);
+		this.Drawables.Add(this._artistInputUnicode);
+		
 		this.Drawables.Add(titleLabel);
 		this.Drawables.Add(this._titleInputAscii);
 		this.Drawables.Add(this._titleInputUnicode);
