@@ -13,6 +13,8 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly SliderDrawable<float> _strictnessSlider;
 	private readonly DrawableTextBox       _difficultyInputAscii;
 	private readonly DrawableTextBox       _difficultyInputUnicode;
+	private readonly DrawableTextBox       _titleInputAscii;
+	private readonly DrawableTextBox       _titleInputUnicode;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -49,10 +51,30 @@ public class EditorSongFormContents : CompositeDrawable {
 
 		this._difficultyInputAscii.OnCommit += (_, s) => {
 			this._map.Info.DifficultyName.Ascii = s;
+			editor.SaveNeeded                   = true;
 		};
 
 		this._difficultyInputUnicode.OnCommit += (_, s) => {
 			this._map.Info.DifficultyName.Unicode = s;
+			editor.SaveNeeded                     = true;
+		};
+
+		TextDrawable titleLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Title (Name of song)", 24);
+		y += titleLabel.Size.Y;
+
+		this._titleInputAscii   =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Title.Ascii ?? "");
+		y                       += this._titleInputAscii.Size.Y;
+		this._titleInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Title.Unicode);
+		y                       += this._titleInputUnicode.Size.Y;
+
+		this._titleInputAscii.OnCommit += delegate(object sender, string s) {
+			editor.EditorState.Set.Title.Ascii = s;
+			editor.SaveNeeded                  = true;
+		};
+
+		this._titleInputUnicode.OnCommit += delegate(object sender, string s) {
+			editor.EditorState.Set.Title.Unicode = s;
+			editor.SaveNeeded                    = true;
 		};
 
 		this.Drawables.Add(strictnessLabel);
@@ -61,5 +83,9 @@ public class EditorSongFormContents : CompositeDrawable {
 		this.Drawables.Add(difficultyNameLabel);
 		this.Drawables.Add(this._difficultyInputAscii);
 		this.Drawables.Add(this._difficultyInputUnicode);
+
+		this.Drawables.Add(titleLabel);
+		this.Drawables.Add(this._titleInputAscii);
+		this.Drawables.Add(this._titleInputUnicode);
 	}
 }

@@ -66,7 +66,9 @@ public class EditorScreen : pScreen {
 
 		this.RealmMap = pTypingGame.CurrentSong.Value;
 
-		this.EditorState = new EditorState(this.RealmMap.Clone());
+		BeatmapSet clonedSet = this.RealmMap.ParentSet.Clone();
+
+		this.EditorState = new EditorState(clonedSet.Beatmaps.First(x => x.Id == this.RealmMap.Id), clonedSet);
 
 		pTypingGame.MusicTrack.Stop();
 
@@ -658,16 +660,11 @@ public class EditorScreen : pScreen {
 											// Exit the editor
 											ScreenManager.ChangeScreen(new SongSelectionScreen(true));
 											break;
-										case DialogResult.Yes:
-											throw new NotImplementedException();
-										// SongManager.PTYPING_SONG_HANDLER.SaveSong(this.EditorState.Song);
-										// pTypingGame.CurrentSong.Value = this.EditorState.Song;
-										// SongManager.UpdateSongs();
-										// pTypingGame.MenuClickSound.PlayNew();
-										//
-										// // Exit the editor
-										// ScreenManager.ChangeScreen(new SongSelectionScreen(true));
-										// break;
+										case DialogResult.Yes: {
+											this.Save();
+											ScreenManager.ChangeScreen(new SongSelectionScreen(true));
+											break;
+										}
 									}
 								}
 							);
@@ -827,13 +824,13 @@ public class EditorScreen : pScreen {
 	}
 
 	public void Save() {
-		string  id     = this.EditorState.Song.Id;
-		Beatmap toSave = this.EditorState.Song.Clone();
+		Guid       id     = this.EditorState.Set.Id;
+		BeatmapSet toSave = this.EditorState.Set.Clone();
 
 		new Thread(_ => {
 			BeatmapDatabase database = new BeatmapDatabase();
 
-			Beatmap beatmap = database.Realm.Find<Beatmap>(id);
+			BeatmapSet beatmap = database.Realm.Find<BeatmapSet>(id);
 
 			database.Realm.Write(() => {
 				toSave.CopyInto(beatmap);

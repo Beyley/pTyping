@@ -20,9 +20,11 @@ public class EditorState {
 
 	[NotNull]
 	public readonly Beatmap Song;
+	public readonly BeatmapSet Set;
 
-	public EditorState(Beatmap song) {
+	public EditorState(Beatmap song, BeatmapSet set) {
 		this.Song = song;
+		this.Set  = set;
 	}
 
 	public readonly UiContainer EditorToolUiContainer = new UiContainer(OriginType.TopRight) {

@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class BeatmapSet : RealmObject, IClonable<BeatmapSet>, IEquatable<BeatmapSet> {
+public class BeatmapSet : RealmObject, IClonable<BeatmapSet>, IEquatable<BeatmapSet>, ICopyable<BeatmapSet> {
 	public BeatmapSet() {
 		this.Id = Guid.NewGuid();
 	}
@@ -45,5 +45,24 @@ public class BeatmapSet : RealmObject, IClonable<BeatmapSet>, IEquatable<Beatmap
 			return true;
 
 		return this.Id == obj.Id;
+	}
+	public void CopyInto(BeatmapSet into) {
+		into.Artist = this.Artist.Clone();
+
+		//If something has been added to one of the lists, just throw an exeption for now, we'll work this out later
+		if (into.Beatmaps.Count != this.Beatmaps.Count)
+			throw new Exception();
+
+		//Iterate the beatmaps and copy all beatmaps from one list into the other
+		for (int i = 0; i < this.Beatmaps.Count; i++) {
+			if (this.Beatmaps[i].Id != into.Beatmaps[i].Id)
+				throw new Exception();
+
+			this.Beatmaps[i].CopyInto(into.Beatmaps[i]);
+		}
+
+		into.Id     = this.Id;
+		into.Source = this.Source;
+		into.Title  = this.Title.Clone();
 	}
 }
