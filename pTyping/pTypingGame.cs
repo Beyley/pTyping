@@ -81,14 +81,6 @@ public class pTypingGame : FurballGame {
 		TextureHeight        = 2048,
 		PremultiplyAlpha     = false
 	});
-	public static readonly FontSystem FurballFontRegular = new FontSystem(new FontSystemSettings {
-		FontResolutionFactor = 2f,
-		KernelWidth          = 1,
-		KernelHeight         = 1,
-		TextureWidth         = 2048,
-		TextureHeight        = 2048,
-		PremultiplyAlpha     = false
-	});
 
 	public static UserCardDrawable MenuPlayerUserCard;
 
@@ -275,8 +267,6 @@ public class pTypingGame : FurballGame {
 			JapaneseFont.AddFont(JapaneseFontData);
 			JapaneseFont.AddFont(JapaneseFontData);
 		}
-
-		FurballFontRegular.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf", ContentSource.User, true));
 
 		LocalLeaderboardButtonTexture  = ContentManager.LoadTextureFromFileCached("local-leaderboard-button.png");
 		FriendLeaderboardButtonTexture = ContentManager.LoadTextureFromFileCached("friend-leaderboard-button.png");

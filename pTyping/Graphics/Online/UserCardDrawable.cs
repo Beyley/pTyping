@@ -36,7 +36,7 @@ public class UserCardDrawable : CompositeDrawable {
 			}
 		);
 		this.Drawables.Add(
-			this._usernameDrawable = new TextDrawable(new Vector2(15f), pTypingGame.FurballFontRegular, "", 55) {
+			this._usernameDrawable = new TextDrawable(new Vector2(15f), pTypingGame.JapaneseFont, "", 55) {
 				Scale       = new Vector2(1.7f),
 				Clickable   = false,
 				CoverClicks = false,
@@ -56,7 +56,7 @@ public class UserCardDrawable : CompositeDrawable {
 		);
 
 		this.Drawables.Add(
-			this._rankDrawable = new TextDrawable(new Vector2(0, 0), pTypingGame.FurballFontRegular, "", 175) {
+			this._rankDrawable = new TextDrawable(new Vector2(0, 0), pTypingGame.JapaneseFont, "", 175) {
 				Scale         = new Vector2(2f),
 				ColorOverride = new Color(255, 255, 255, 100),
 				Clickable     = false,
@@ -69,7 +69,7 @@ public class UserCardDrawable : CompositeDrawable {
 		this._rankDrawable.MoveTo(new Vector2(this._backgroundDrawable.Size.X - 370, 0));
 
 		this.Drawables.Add(
-			this._mainTextDrawable = new TextDrawable(new Vector2(this._usernameDrawable.Position.X, 100), pTypingGame.FurballFontRegular, "", 45) {
+			this._mainTextDrawable = new TextDrawable(new Vector2(this._usernameDrawable.Position.X, 100), pTypingGame.JapaneseFont, "", 45) {
 				Scale       = new Vector2(1.7f),
 				Visible     = true,
 				Clickable   = false,
