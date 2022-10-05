@@ -119,19 +119,18 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
 		base.Draw(time, batch, args);
 
-
 		//Draw the main line that you drag across
 		batch.Draw(FurballGame.WhitePixel, args.Position with {
 			Y = args.Position.Y + MIDDLE - LINE_WIDTH / 2f
-		}, new Vector2(this.Width, LINE_WIDTH));
+		}, new Vector2(this.Width, LINE_WIDTH), args.Color);
 
 		//Draw the left stopper
 		batch.Draw(FurballGame.WhitePixel, args.Position with {
 			Y = args.Position.Y + MIDDLE - STOPPER_HEIGHT_FROM_MIDDLE
-		}, new Vector2(STOPPER_LINE_WIDTH, STOPPER_HEIGHT_FROM_MIDDLE * 2f));
+		}, new Vector2(STOPPER_LINE_WIDTH, STOPPER_HEIGHT_FROM_MIDDLE * 2f), args.Color);
 
 		//Draw the right stopper
-		batch.Draw(FurballGame.WhitePixel, new Vector2(args.Position.X + this.RealSize.X, args.Position.Y + MIDDLE - STOPPER_HEIGHT_FROM_MIDDLE), new Vector2(STOPPER_LINE_WIDTH, STOPPER_HEIGHT_FROM_MIDDLE * 2f));
+		batch.Draw(FurballGame.WhitePixel, new Vector2(args.Position.X + this.RealSize.X, args.Position.Y + MIDDLE - STOPPER_HEIGHT_FROM_MIDDLE), new Vector2(STOPPER_LINE_WIDTH, STOPPER_HEIGHT_FROM_MIDDLE * 2f), args.Color);
 
 		float handleX = this._currentHandleX;
 
@@ -151,7 +150,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 			long texId = batch.GetTextureIdForReserve(FurballGame.WhitePixel);
 			for (int i = 0; i < mappedData.VertexCount; i++) {
 				mappedData.VertexPtr[i].TexId = texId;
-				mappedData.VertexPtr[i].Color = new Color(0.75f, 0.75f, 0.75f);
+				mappedData.VertexPtr[i].Color = new Color(0.75f, 0.75f, 0.75f) * args.Color;
 			}
 
 			mappedData.IndexPtr[0] = (ushort)(top    + mappedData.IndexOffset);

@@ -30,6 +30,9 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 		this.UpdateScoreMultiplierText();
 
 		this.OnModAdd?.Invoke(this, EventArgs.Empty);
+
+		//Recalculate the options UI after mod change
+		this._options.RecalculateUi();
 	}
 
 	private void UpdateScoreMultiplierText() {
@@ -40,6 +43,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 
 	private readonly List<LinePrimitiveDrawable> Lines = new List<LinePrimitiveDrawable>();
 	private readonly RectanglePrimitiveDrawable  _background;
+	private readonly ModOptionsDrawable          _options;
 
 	public void Hide(bool force = false) {
 		foreach (ModButtonDrawable modButtonDrawable in this._mods)
@@ -53,6 +57,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 
 		this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time + time));
 		this._background.Tweens.Add(new FloatTween(TweenType.Fade, this._background.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time           + time));
+		this._options.Tweens.Add(new FloatTween(TweenType.Fade, this._options.ColorOverride.Af, 0f, FurballGame.Time, FurballGame.Time                 + time));
 	}
 
 	public void Show() {
@@ -67,6 +72,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 
 		this._scoreMultiplier.Tweens.Add(new FloatTween(TweenType.Fade, this._scoreMultiplier.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time + time));
 		this._background.Tweens.Add(new FloatTween(TweenType.Fade, this._background.ColorOverride.Af, 0.75f, FurballGame.Time, FurballGame.Time        + time));
+		this._options.Tweens.Add(new FloatTween(TweenType.Fade, this._options.ColorOverride.Af, 1f, FurballGame.Time, FurballGame.Time                 + time));
 	}
 
 	public ModSelectionMenuDrawable(Vector2 pos) {
@@ -86,8 +92,10 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 		float x = 75;
 		float y = 0;
 		for (int i = 0; i < Mod.RegisteredMods.Length; i++) {
-			Mod               registeredMod = Mod.RegisteredMods[i];
-			ModButtonDrawable modButton     = new ModButtonDrawable(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
+			//Create a new instance of the mod
+			Mod registeredMod = (Mod)Activator.CreateInstance(Mod.RegisteredMods[i]);
+
+			ModButtonDrawable modButton = new ModButtonDrawable(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
 
 			this.Drawables.Add(modButton);
 			this._mods.Add(modButton);
@@ -110,6 +118,10 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 				Depth         = -1f
 			}
 		);
+
+		this.Drawables.Add(this._options = new ModOptionsDrawable(this.SelectedMods));
+		this._options.Position.X = this.Size.X + 10;
+		this._options.Position.Y = -100;
 	}
 
 	public sealed override Vector2 Size => base.Size;

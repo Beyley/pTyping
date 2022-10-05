@@ -36,5 +36,5 @@ public abstract class Mod {
 		return mods.Aggregate(1d, (d, mod) => mod.ScoreMultiplier * d);
 	}
 
-	public static Mod[] RegisteredMods = (from assembly in AppDomain.CurrentDomain.GetAssemblies() from type in assembly.GetTypes() where type.IsSubclassOf(typeof(Mod)) select (Mod)Activator.CreateInstance(type)).ToArray();
+	public static readonly Type[] RegisteredMods = (from assembly in AppDomain.CurrentDomain.GetAssemblies() from type in assembly.GetTypes() where type.IsSubclassOf(typeof(Mod)) select type).ToArray();
 }
