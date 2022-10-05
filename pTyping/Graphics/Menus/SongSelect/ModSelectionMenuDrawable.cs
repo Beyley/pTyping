@@ -100,7 +100,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 			}
 		}
 
-		this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFontStroked, "", 30));
+		this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFont, "", 30));
 
 		this.UpdateScoreMultiplierText();
 

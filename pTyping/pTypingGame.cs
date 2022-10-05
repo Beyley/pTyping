@@ -77,17 +77,6 @@ public class pTypingGame : FurballGame {
 		FontResolutionFactor = 2f,
 		KernelWidth          = 1,
 		KernelHeight         = 1,
-		Effect               = FontSystemEffect.None,
-		TextureWidth         = 2048,
-		TextureHeight        = 2048,
-		PremultiplyAlpha     = false
-	});
-	public static FontSystem JapaneseFontStroked = new FontSystem(new FontSystemSettings {
-		FontResolutionFactor = 2f,
-		KernelWidth          = 1,
-		KernelHeight         = 1,
-		Effect               = FontSystemEffect.Stroked,
-		EffectAmount         = 2,
 		TextureWidth         = 2048,
 		TextureHeight        = 2048,
 		PremultiplyAlpha     = false
@@ -99,16 +88,6 @@ public class pTypingGame : FurballGame {
 		TextureWidth         = 2048,
 		TextureHeight        = 2048,
 		PremultiplyAlpha     = false
-	});
-	public static readonly FontSystem FurballFontRegularStroked = new FontSystem(new FontSystemSettings {
-		FontResolutionFactor = 2f,
-		KernelWidth          = 1,
-		KernelHeight         = 1,
-		Effect               = FontSystemEffect.Stroked,
-		EffectAmount         = 2,
-		TextureWidth         = 2048,
-		TextureHeight        = 2048,
-		PremultiplyAlpha = false
 	});
 
 	public static UserCardDrawable MenuPlayerUserCard;
@@ -191,7 +170,7 @@ public class pTypingGame : FurballGame {
 				/* */
 			}
 		}
-
+		
 		MusicTrack        = AudioEngine.CreateStream(data);
 		MusicTrack.Volume = ConVars.Volume.Value.Value;
 
@@ -275,33 +254,29 @@ public class pTypingGame : FurballGame {
 					FontResolutionFactor = 2f,
 					KernelWidth          = 1,
 					KernelHeight         = 1,
-					Effect               = FontSystemEffect.None,
 					PremultiplyAlpha     = false
 				}
 			);
 			JapaneseFont.AddFont(JapaneseFontData);
 
-			JapaneseFontStroked = ContentManager.LoadSystemFont(
+			JapaneseFont = ContentManager.LoadSystemFont(
 				"Aller",
 				FontStyle.Regular,
 				new FontSystemSettings {
 					FontResolutionFactor = 2f,
 					KernelWidth          = 1,
 					KernelHeight         = 1,
-					Effect               = FontSystemEffect.Stroked,
-					EffectAmount         = 2,
 					PremultiplyAlpha     = false
 				}
 			);
-			JapaneseFontStroked.AddFont(JapaneseFontData);
+			JapaneseFont.AddFont(JapaneseFontData);
 		}
 		catch {
 			JapaneseFont.AddFont(JapaneseFontData);
-			JapaneseFontStroked.AddFont(JapaneseFontData);
+			JapaneseFont.AddFont(JapaneseFontData);
 		}
 
 		FurballFontRegular.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf", ContentSource.User, true));
-		FurballFontRegularStroked.AddFont(ContentManager.LoadRawAsset("furball-regular.ttf", ContentSource.User, true));
 
 		LocalLeaderboardButtonTexture  = ContentManager.LoadTextureFromFileCached("local-leaderboard-button.png");
 		FriendLeaderboardButtonTexture = ContentManager.LoadTextureFromFileCached("friend-leaderboard-button.png");
@@ -508,7 +483,7 @@ public class pTypingGame : FurballGame {
 			}
 		);
 		this._userPanelManager.Add(
-			_OnlineUsersText = new TextDrawable(new Vector2(10), JapaneseFontStroked, "Online Users: 0", 50) {
+			_OnlineUsersText = new TextDrawable(new Vector2(10), JapaneseFont, "Online Users: 0", 50) {
 				Depth = 0f
 			}
 		);

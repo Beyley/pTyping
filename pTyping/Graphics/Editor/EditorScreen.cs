@@ -281,7 +281,7 @@ public class EditorScreen : pScreen {
 
 		float y = 10;
 		foreach (EditorTool tool in this.EditorTools) {
-			DrawableTickbox tickboxDrawable = new DrawableTickbox(new Vector2(10, y), pTypingGame.JapaneseFontStroked, 35, tool.Name, false, true) {
+			DrawableTickbox tickboxDrawable = new DrawableTickbox(new Vector2(10, y), pTypingGame.JapaneseFont, 35, tool.Name, false, true) {
 				ToolTip = tool.Tooltip
 			};
 

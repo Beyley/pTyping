@@ -143,7 +143,7 @@ public class NotificationManager : DrawableManager {
 			this._importance = importance;
 			this.Type        = type;
 
-			this._textDrawable = new TextDrawable(new Vector2(5f), pTypingGame.JapaneseFontStroked, text, 20) {
+			this._textDrawable = new TextDrawable(new Vector2(5f), pTypingGame.JapaneseFont, text, 20) {
 				Clickable   = false,
 				CoverClicks = false,
 				Hoverable   = false,

@@ -123,7 +123,7 @@ public class OptionsScreen : pScreen {
 			languages.Add(language, language.ToString());
 		}
 
-		DrawableDropdown languageDropdown = new DrawableDropdown(new Vector2(800, 100), pTypingGame.JapaneseFontStroked, 20, new Vector2(175, 40), languages) {
+		DrawableDropdown languageDropdown = new DrawableDropdown(new Vector2(800, 100), pTypingGame.JapaneseFont, 20, new Vector2(175, 40), languages) {
 			SelectedItem = {
 				Value = languages.First(x => ((Language)x.Key).Iso6392Code() == LocalizationManager.CurrentLanguage.Iso6392Code())
 			}

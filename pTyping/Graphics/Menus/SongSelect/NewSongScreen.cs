@@ -50,7 +50,7 @@ public class NewSongScreen : pScreen {
 				this.CreateSong(songInfo);
 			};
 
-			DrawableButton buttonForSong = new DrawableButton(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), pTypingGame.JapaneseFontStroked, 25, songInfo.Name, Color.Blue, Color.White, Color.White, Vector2.Zero, songOnClick) {
+			DrawableButton buttonForSong = new DrawableButton(new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH - 20, y), pTypingGame.JapaneseFont, 25, songInfo.Name, Color.Blue, Color.White, Color.White, Vector2.Zero, songOnClick) {
 				OriginType = OriginType.TopRight
 			};
 
@@ -65,13 +65,13 @@ public class NewSongScreen : pScreen {
 
 		y = 20f;
 
-		this._songNameTextBox       =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Name of Song");
+		this._songNameTextBox       =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFont, 50, 400f, "Name of Song");
 		y                           += 20 + this._songNameTextBox.Size.Y;
-		this._songArtistTextBox     =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Artist");
+		this._songArtistTextBox     =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFont, 50, 400f, "Artist");
 		y                           += 20 + this._songArtistTextBox.Size.Y;
-		this._songCreatorTextBox    =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Map Creator Name");
+		this._songCreatorTextBox    =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFont, 50, 400f, "Map Creator Name");
 		y                           += 20 + this._songCreatorTextBox.Size.Y;
-		this._songDifficultyTextBox =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFontStroked, 50, 400f, "Difficulty Name");
+		this._songDifficultyTextBox =  new DrawableTextBox(new Vector2(20f, y), pTypingGame.JapaneseFont, 50, 400f, "Difficulty Name");
 
 		this.Manager.Add(this._songNameTextBox);
 		this.Manager.Add(this._songArtistTextBox);

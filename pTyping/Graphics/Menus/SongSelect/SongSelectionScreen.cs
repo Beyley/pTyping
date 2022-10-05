@@ -163,7 +163,7 @@ public class SongSelectionScreen : pScreen {
 
 		#region Song info
 
-		this._songInfo = new TextDrawable(new Vector2(this._leaderboardButton.Size.X + 20, 10), pTypingGame.JapaneseFontStroked, "", 35) {
+		this._songInfo = new TextDrawable(new Vector2(this._leaderboardButton.Size.X + 20, 10), pTypingGame.JapaneseFont, "", 35) {
 			Clickable   = false,
 			CoverClicks = false
 		};
@@ -192,7 +192,7 @@ public class SongSelectionScreen : pScreen {
 			this._modMenu.Hide(true);
 			this.Manager.Add(this._modMenu);
 
-			DrawableButton toggleMods = new DrawableButton(new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y), FurballGame.DefaultFontStroked, 30, "Mods", Color.Blue, Color.White, Color.White, new Vector2(0)) {
+			DrawableButton toggleMods = new DrawableButton(new Vector2(backButton.Position.X + backButton.Size.X + 10, backButton.Position.Y), FurballGame.DefaultFont, 30, "Mods", Color.Blue, Color.White, Color.White, new Vector2(0)) {
 				OriginType = OriginType.BottomLeft
 			};
 

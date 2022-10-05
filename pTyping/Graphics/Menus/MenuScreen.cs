@@ -154,7 +154,7 @@ public class MenuScreen : pScreen {
 
 		this._songProgressBar = new DrawableProgressBar(
 			new Vector2(5, this._musicTitle.Position.Y + this._musicTitle.Size.Y + 5f),
-			pTypingGame.JapaneseFontStroked,
+			pTypingGame.JapaneseFont,
 			(int)(25 * 0.9f),
 			new Vector2(250, 25),
 			Color.White,

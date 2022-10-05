@@ -121,7 +121,7 @@ public class ChatDrawable : CompositeDrawable {
 		);
 
 		this.Drawables.Add(
-			this.MessageInputDrawable = new DrawableTextBox(new Vector2(0, size.Y), pTypingGame.JapaneseFontStroked, 35, size.X) {
+			this.MessageInputDrawable = new DrawableTextBox(new Vector2(0, size.Y), pTypingGame.JapaneseFont, 35, size.X) {
 				OriginType       = OriginType.BottomLeft,
 				DeselectOnCommit = false
 			}
@@ -197,7 +197,7 @@ public class ChatDrawable : CompositeDrawable {
 
 			float y = this.Size.Y - this.MessageInputDrawable.Size.Y - 10;
 			foreach (ChatMessage message in chatMessages) {
-				ChatMessageDrawable messageDrawable = new ChatMessageDrawable(this, new Vector2(0, y), pTypingGame.JapaneseFontStroked, message.ToString(), 35) {
+				ChatMessageDrawable messageDrawable = new ChatMessageDrawable(this, new Vector2(0, y), pTypingGame.JapaneseFont, message.ToString(), 35) {
 					OriginType = OriginType.BottomLeft
 				};
 

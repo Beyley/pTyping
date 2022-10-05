@@ -93,11 +93,11 @@ public class UiMakerElement {
 	public void UpdateFontSize() {
 		switch (this.Drawable) {
 			case TextDrawable text: {
-				text.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+				text.SetFont(pTypingGame.JapaneseFont, this.FontSize);
 				break;
 			}
 			case DrawableButton button: {
-				button.TextDrawable.SetFont(pTypingGame.JapaneseFontStroked, this.FontSize);
+				button.TextDrawable.SetFont(pTypingGame.JapaneseFont, this.FontSize);
 				break;
 			}
 		}
@@ -343,7 +343,7 @@ public class UiMakerScreen : pScreen {
 			}
 		);
 
-		UiElement button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Add Text Object", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+		UiElement button = UiElement.CreateButton(pTypingGame.JapaneseFont, "Add Text Object", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
 
 		button.AsButton().OnClick += delegate {
 			this._currentContainer.Elements.Add(
@@ -363,7 +363,7 @@ public class UiMakerScreen : pScreen {
 
 		this._createThingsContainer.RegisterElement(button);
 
-		button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Add Texture Object", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+		button = UiElement.CreateButton(pTypingGame.JapaneseFont, "Add Texture Object", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
 
 		button.AsButton().OnClick += delegate {
 			this._currentContainer.Elements.Add(
@@ -382,7 +382,7 @@ public class UiMakerScreen : pScreen {
 
 		this._createThingsContainer.RegisterElement(button);
 
-		button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Add Button", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+		button = UiElement.CreateButton(pTypingGame.JapaneseFont, "Add Button", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
 
 		button.AsButton().OnClick += delegate {
 			this._currentContainer.Elements.Add(
@@ -403,7 +403,7 @@ public class UiMakerScreen : pScreen {
 
 		this._createThingsContainer.RegisterElement(button);
 
-		button = UiElement.CreateButton(pTypingGame.JapaneseFontStroked, "Run code generation", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
+		button = UiElement.CreateButton(pTypingGame.JapaneseFont, "Run code generation", 20, Color.Blue, Color.White, Color.Black, Vector2.Zero);
 
 		button.AsButton().OnClick += delegate {
 			File.WriteAllText("Output.cs", UiMakerCodeGen.GenerateClass(this._currentContainer));
@@ -411,8 +411,8 @@ public class UiMakerScreen : pScreen {
 
 		this._createThingsContainer.RegisterElement(button);
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Colour:", 25));
-		this._editThingsContainer.RegisterElement(this._colourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Colour:", 25));
+		this._editThingsContainer.RegisterElement(this._colourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 20, Color.White));
 		this._colourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
 			foreach (UiMakerElement uiMakerElement in this.Selected) {
 				uiMakerElement.Color = e;
@@ -420,8 +420,8 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Button Colour:", 25));
-		this._editThingsContainer.RegisterElement(this._buttonColourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Button Colour:", 25));
+		this._editThingsContainer.RegisterElement(this._buttonColourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 20, Color.White));
 		this._buttonColourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
 			foreach (UiMakerElement uiMakerElement in this.Selected) {
 				uiMakerElement.ButtonColor = e;
@@ -429,8 +429,8 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Button Outline Colour:", 25));
-		this._editThingsContainer.RegisterElement(this._buttonOutlineColourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFontStroked, 20, Color.White));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Button Outline Colour:", 25));
+		this._editThingsContainer.RegisterElement(this._buttonOutlineColourPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 20, Color.White));
 		this._buttonOutlineColourPicker.AsColorPicker().Color.OnChange += delegate(object _, Color e) {
 			foreach (UiMakerElement uiMakerElement in this.Selected) {
 				uiMakerElement.ButtonOutlineColor = e;
@@ -438,8 +438,8 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Depth:", 25));
-		this._editThingsContainer.RegisterElement(this._depthPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "0", 20, 100));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Depth:", 25));
+		this._editThingsContainer.RegisterElement(this._depthPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "0", 20, 100));
 		this._depthPicker.AsTextBox().OnCommit += delegate(object _, string e) {
 			if (!float.TryParse(e, out float res)) {
 				this._depthPicker.AsTextBox().Tweens.Add(
@@ -458,8 +458,8 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Rotation:", 25));
-		this._editThingsContainer.RegisterElement(this._rotationPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "0", 20, 100));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Rotation:", 25));
+		this._editThingsContainer.RegisterElement(this._rotationPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "0", 20, 100));
 		this._rotationPicker.AsTextBox().OnCommit += delegate(object _, string e) {
 			if (!float.TryParse(e, out float res)) {
 				this._rotationPicker.AsTextBox().Tweens.Add(
@@ -478,8 +478,8 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Text:", 25));
-		this._editThingsContainer.RegisterElement(this._textPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "", 20, 300));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Text:", 25));
+		this._editThingsContainer.RegisterElement(this._textPicker = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 20, 300));
 		this._textPicker.AsTextBox().OnCommit += delegate(object _, string e) {
 			foreach (UiMakerElement uiMakerElement in this.Selected) {
 				uiMakerElement.Text = e;
@@ -487,8 +487,8 @@ public class UiMakerScreen : pScreen {
 			}
 		};
 
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Texture:", 25));
-		this._editThingsContainer.RegisterElement(this._texturePicker = UiElement.CreateTextBox(pTypingGame.JapaneseFontStroked, "", 20, 300));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Texture:", 25));
+		this._editThingsContainer.RegisterElement(this._texturePicker = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 20, 300));
 		this._texturePicker.AsTextBox().OnCommit += delegate(object _, string e) {
 			foreach (UiMakerElement uiMakerElement in this.Selected) {
 				uiMakerElement.Texture = e;
@@ -506,8 +506,8 @@ public class UiMakerScreen : pScreen {
 		items.Add(OriginType.BottomCenter, "Bottom Center");
 		items.Add(OriginType.LeftCenter, "Left Center");
 		items.Add(OriginType.RightCenter, "Right Center");
-		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFontStroked, "Origin Type:", 25));
-		this._editThingsContainer.RegisterElement(this._originTypePicker = UiElement.CreateDropdown(items, new(100, 30), pTypingGame.JapaneseFontStroked, 20));
+		this._editThingsContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Origin Type:", 25));
+		this._editThingsContainer.RegisterElement(this._originTypePicker = UiElement.CreateDropdown(items, new(100, 30), pTypingGame.JapaneseFont, 20));
 		this._originTypePicker.AsDropdown().SelectedItem.OnChange += (_, pair) => {
 			foreach (UiMakerElement uiMakerElement in this.Selected) {
 				uiMakerElement.OriginType = (OriginType)pair.Key;
@@ -585,11 +585,11 @@ public class UiMakerScreen : pScreen {
 
 	private Drawable CreateDrawableFromElement(UiMakerElement element) {
 		Drawable drawable = element.Type switch {
-			UiMakerElementType.Text    => new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, element.Text, element.FontSize),
+			UiMakerElementType.Text    => new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, element.Text, element.FontSize),
 			UiMakerElementType.Texture => new TexturedDrawable(null, Vector2.Zero),
 			UiMakerElementType.Button => new DrawableButton(
 				Vector2.Zero,
-				pTypingGame.JapaneseFontStroked,
+				pTypingGame.JapaneseFont,
 				element.FontSize,
 				element.Text,
 				element.ButtonColor,

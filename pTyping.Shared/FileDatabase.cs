@@ -47,6 +47,17 @@ public class FileDatabase {
 		_Cache[hash] = new WeakReference<byte[]>(file);
 	}
 
+	public FileStream GetFileStream(string hash) {
+		string path = PathForHash(hash);
+
+		if (!File.Exists(path))
+			throw new FileNotFoundException(hash);
+
+		FileStream stream = File.OpenRead(path);
+
+		return stream;
+	}
+
 	public byte[] GetFile(string hash) {
 		string path = PathForHash(hash);
 

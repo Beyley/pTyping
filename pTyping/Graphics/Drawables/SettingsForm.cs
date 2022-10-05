@@ -6,7 +6,7 @@ namespace pTyping.Graphics.Drawables;
 public class SettingsForm : DrawableForm {
 	private class DrawableSettingsMenu : ScrollableContainer {
 		public DrawableSettingsMenu() : base(new Vector2(300, 400)) {
-			this.Add(new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFontStroked, "Options (WIP)", 24));
+			this.Add(new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, "Options (WIP)", 24));
 		}
 	}
 
