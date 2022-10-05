@@ -1,9 +1,11 @@
 using System.Text;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Newtonsoft.Json;
 using pTyping.Shared.Beatmaps.HitObjects;
 
 namespace pTyping.Shared.Mods;
 
+[JsonObject(MemberSerialization.OptIn)]
 public abstract class Mod {
 	public abstract double ScoreMultiplier { get; }
 

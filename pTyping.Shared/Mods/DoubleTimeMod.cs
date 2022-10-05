@@ -5,14 +5,14 @@ using pTyping.Shared.ObjectModel;
 
 namespace pTyping.Shared.Mods;
 
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global"), JsonObject]
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global"), JsonObject(MemberSerialization.OptIn)]
 public class DoubleTimeMod : Mod {
 	public override double ScoreMultiplier => 1.05;
 	public override string Name            => "Double Time";
 	public override string ToolTip         => "A whole 3 fasts per second!";
 	public override string ShorthandName   => "DT";
 
-	[ModSetting("Speed", "The speed of the beatmap", 0)]
+	[ModSetting("Speed", "The speed of the beatmap", 0), JsonProperty]
 	public BoundNumber<double> Speed = new BoundNumber<double> {
 		Value     = 1.5,
 		MaxValue  = 2,
