@@ -33,6 +33,7 @@ public class EditorSongFormContents : CompositeDrawable {
 	private          DrawableTextBox       _tagsInput;
 	private          DrawableTextBox       _descriptionInput;
 	private readonly DrawableTextBox       _mapperInput;
+	private readonly DrawableTextBox       _previewTimeInput;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -228,6 +229,20 @@ public class EditorSongFormContents : CompositeDrawable {
 			editor.SaveNeeded = true;
 		};
 		
+		//TODO: replace this with something more integrated into the editor, rather than a text input
+		TextDrawable previewTimeLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Preview Time", 24);
+		y += previewTimeLabel.Size.Y;
+		
+		this._previewTimeInput = new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.PreviewTime.ToString());
+		y                     += this._previewTimeInput.Size.Y;
+		
+		this._previewTimeInput.OnCommit += delegate(object _, string s) {
+			if (double.TryParse(s, out double previewTime)) {
+				map.Info.PreviewTime = previewTime;
+				editor.SaveNeeded    = true;
+			}
+		};
+
 		this.Drawables.Add(strictnessLabel);
 		this.Drawables.Add(this._strictnessSlider);
 
@@ -258,5 +273,8 @@ public class EditorSongFormContents : CompositeDrawable {
 		
 		this.Drawables.Add(mapperLabel);
 		this.Drawables.Add(this._mapperInput);
+		
+		this.Drawables.Add(previewTimeLabel);
+		this.Drawables.Add(this._previewTimeInput);
 	}
 }
