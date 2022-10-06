@@ -4,7 +4,8 @@ public static class TypingConversions {
 	public enum ConversionType {
 		StandardHiragana,
 		StandardEsperanto,
-		StandardLatin
+		StandardLatin,
+		StandardRussian
 	}
 
 	public static readonly Dictionary<ConversionType, Dictionary<string, List<string>>> Conversions = new Dictionary<ConversionType, Dictionary<string, List<string>>>();
@@ -811,9 +812,50 @@ ux	ŭ
 
 		#endregion
 
+		#region Russian
+
+		string rsConversion = @"А	A
+Б	B
+Г	G
+Д	D
+Е	YE
+Ё	YO
+Ж	ZH
+З	Z
+И	I
+Й	J
+К	K
+Л	L
+М	M
+Н	N
+О	O
+П	P
+Р	R
+С	S
+Т	T
+У	U
+Ф	F
+Х	H
+Ц	TS
+Ч	CH
+Ш	SH
+Щ	SCH
+Ы	OO
+Ь	'
+Э	E
+Ю	YU
+";
+
+		rsConversion = $@"{slConversion}
+{rsConversion.ToLower()}
+{rsConversion}";
+
+		#endregion
+		
 		ReadConversionDatabase(slConversion, ConversionType.StandardLatin);
 		ReadConversionDatabase(jpConversion, ConversionType.StandardHiragana);
 		ReadConversionDatabase(eoConversion, ConversionType.StandardEsperanto);
+		ReadConversionDatabase(rsConversion, ConversionType.StandardRussian);
 	}
 
 	public static void ReadConversionDatabase(string database, ConversionType type) {
