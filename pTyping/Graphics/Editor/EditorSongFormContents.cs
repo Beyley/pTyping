@@ -17,6 +17,8 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _titleInputUnicode;
 	private readonly DrawableTextBox       _artistInputAscii;
 	private readonly DrawableTextBox       _artistInputUnicode;
+	private readonly DrawableTextBox       _timingInputTime;
+	private readonly DrawableTextBox       _timingInputTempo;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -97,6 +99,29 @@ public class EditorSongFormContents : CompositeDrawable {
 			editor.SaveNeeded                    = true;
 		};
 
+		TextDrawable timingLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Timing", 24);
+		y += timingLabel.Size.Y;
+
+		this._timingInputTime =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, $"{this._map.TimingPoints[0].Time}");
+		y                     += this._timingInputTime.Size.Y;
+
+		this._timingInputTime.OnCommit += delegate(object _, string s) {
+			if (float.TryParse(s, out float time)) {
+				this._map.TimingPoints[0].Time = time;
+				editor.SaveNeeded              = true;
+			}
+		};
+
+		this._timingInputTempo =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, $"{this._map.TimingPoints[0].Tempo}");
+		y                      += this._timingInputTempo.Size.Y;
+
+		this._timingInputTempo.OnCommit += delegate(object _, string s) {
+			if (float.TryParse(s, out float tempo)) {
+				this._map.TimingPoints[0].Tempo = tempo;
+				editor.SaveNeeded               = true;
+			}
+		};
+
 		this.Drawables.Add(strictnessLabel);
 		this.Drawables.Add(this._strictnessSlider);
 
@@ -107,9 +132,13 @@ public class EditorSongFormContents : CompositeDrawable {
 		this.Drawables.Add(artistLabel);
 		this.Drawables.Add(this._artistInputAscii);
 		this.Drawables.Add(this._artistInputUnicode);
-		
+
 		this.Drawables.Add(titleLabel);
 		this.Drawables.Add(this._titleInputAscii);
 		this.Drawables.Add(this._titleInputUnicode);
+
+		this.Drawables.Add(timingLabel);
+		this.Drawables.Add(this._timingInputTime);
+		this.Drawables.Add(this._timingInputTempo);
 	}
 }
