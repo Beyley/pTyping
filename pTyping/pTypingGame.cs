@@ -446,7 +446,7 @@ public class pTypingGame : FurballGame {
 
 		DebugOverlayDrawableManager.Add(VolumeSelector);
 
-		HiraganaConversion.LoadConversion(); //todo: support IMEs for more languages, and make it customizable by the user
+		TypingConversions.LoadConversion(); //todo: support IMEs for more languages, and make it customizable by the user
 
 		BeatmapDatabase = new BeatmapDatabase();
 		BeatmapDatabase.Realm.Refresh();

@@ -45,19 +45,19 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 
 		if (this.Text.Length - typed.Length >= 3) { //Try to get the next 3 chars
 			textToCheck = this.Text.Substring(typed.Length, 3);
-			HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+			TypingConversions.Conversions[TypingConversions.ConversionType.StandardHiragana].TryGetValue(textToCheck, out possible);
 		}
 
 		//Try to get the next 2 chars instead
 		if (possible is null && this.Text.Length - typed.Length >= 2) {
 			textToCheck = this.Text.Substring(typed.Length, 2);
-			HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+			TypingConversions.Conversions[TypingConversions.ConversionType.StandardHiragana].TryGetValue(textToCheck, out possible);
 		}
 
 		//Try to get the next char instead
 		if (possible is null) {
 			textToCheck = this.Text.Substring(typed.Length, 1);
-			HiraganaConversion.CONVERSIONS.TryGetValue(textToCheck, out possible);
+			TypingConversions.Conversions[TypingConversions.ConversionType.StandardHiragana].TryGetValue(textToCheck, out possible);
 		}
 
 		if (possible is null) throw new Exception("Unknown character! Did you put kanji? smh my head");

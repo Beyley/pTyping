@@ -1,12 +1,19 @@
 namespace pTyping.Shared;
 
-public static class HiraganaConversion {
-	public static readonly Dictionary<string, List<string>> CONVERSIONS = new Dictionary<string, List<string>>();
+public static class TypingConversions {
+	public enum ConversionType {
+		StandardHiragana,
+		StandardKatakana,
+		StandardEsperanto,
+		StandardLatin
+	}
+
+	public static readonly Dictionary<ConversionType, Dictionary<string, List<string>>> Conversions = new Dictionary<ConversionType, Dictionary<string, List<string>>>();
 
 	public static void LoadConversion() {
 		#region im sorry
 
-		string conversion = @"a	あ
+		string jpConversion = @"a	あ
 i	い
 yi	い
 u	う
@@ -773,8 +780,11 @@ _	＿
 
 		#endregion
 
-		using StringReader reader = new StringReader(conversion);
+		using StringReader reader = new StringReader(jpConversion);
 		string             line;
+
+		Dictionary<string, List<string>> jpConversionDict = new Dictionary<string, List<string>>();
+
 		do {
 			line = reader.ReadLine();
 
@@ -788,15 +798,18 @@ _	＿
 
 			if (splitLine.Length > 2) continue;
 
-			if (CONVERSIONS.TryGetValue(hiragana, out List<string> currentRomaji))
+			if (jpConversionDict.TryGetValue(hiragana, out List<string> currentRomaji))
 				currentRomaji.Add(romaji);
 			else
-				CONVERSIONS.Add(
+				jpConversionDict.Add(
 					hiragana,
 					new List<string> {
 						romaji
 					}
 				);
 		} while (line != null);
+
+		//Set the Japanese conversion to the one we just loaded from the default string
+		Conversions[ConversionType.StandardHiragana] = jpConversionDict;
 	}
 }
