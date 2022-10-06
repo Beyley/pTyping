@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using System.Xml.Linq;
 using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -132,6 +135,32 @@ public class EditorSongFormContents : CompositeDrawable {
 		TextDrawable songLanguageLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Song Language", 24);
 		y += songLanguageLabel.Size.Y;
 
+		SongLanguage[] languages = (SongLanguage[])Enum.GetValues(typeof(SongLanguage));
+
+		foreach (SongLanguage language in languages) {
+			DrawableTickbox tickbox = new DrawableTickbox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, language.ToString(), map.Metadata.Languages.Contains(language));
+			y += tickbox.Size.Y;
+
+			tickbox.Selected.OnChange += delegate(object _, bool b) {
+				if (b) {
+					//Dont add the language if the map already has it
+					if (map.Metadata.Languages.Contains(language))
+						return;
+
+					map.Metadata.BackingLanguages.Add((int)language);
+					editor.SaveNeeded = true;
+				}
+				else {
+					//If we were successful in removing the language, mark we need to save
+					if (map.Metadata.BackingLanguages.Remove((int)language))
+						editor.SaveNeeded = true;
+				}
+			};
+
+			this.Drawables.Add(tickbox);
+		}
+
+
 		this._typingConversionDropdown = new DrawableDropdown(new Vector2(x, y), pTypingGame.JapaneseFont, 20, new Vector2(250, 35), new Dictionary<object, string> {
 			{ TypingConversions.ConversionType.StandardLatin, "Standard Latin Only" },
 			{ TypingConversions.ConversionType.StandardHiragana, "Japanese/Hiragana" },
@@ -151,9 +180,9 @@ public class EditorSongFormContents : CompositeDrawable {
 					foreach (HitObject hitObject in this._map.HitObjects)
 						hitObject.TypingConversion = (TypingConversions.ConversionType)selection.Key;
 				});
-			}, "Are you sure you want to do this?", MessageBoxButtons.YesNo);
+			}, $"Are you sure you want to do this? This will set *all* notes to {selection.Value}!", MessageBoxButtons.YesNo);
 		};
-		
+
 		this.Drawables.Add(strictnessLabel);
 		this.Drawables.Add(this._strictnessSlider);
 
