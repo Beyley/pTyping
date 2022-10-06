@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Xml.Linq;
 using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using pTyping.Online;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
@@ -35,6 +33,7 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _mapperInput;
 	private readonly DrawableTextBox       _previewTimeInput;
 	private readonly DrawableTextBox       _sourceInput;
+	private readonly DrawableTextBox       _timingInputTimeSignature;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -135,6 +134,17 @@ public class EditorSongFormContents : CompositeDrawable {
 			if (float.TryParse(s, out float tempo)) {
 				this._map.TimingPoints[0].Tempo = tempo;
 				editor.SaveNeeded               = true;
+			}
+		};
+
+		//text input for the timing point's time signature
+		this._timingInputTimeSignature =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, $"{this._map.TimingPoints[0].TimeSignature}");
+		y                              += this._timingInputTimeSignature.Size.Y;
+
+		this._timingInputTimeSignature.OnCommit += delegate(object _, string s) {
+			if (int.TryParse(s, out int timeSignature)) {
+				this._map.TimingPoints[0].TimeSignature = timeSignature;
+				editor.SaveNeeded                       = true;
 			}
 		};
 
@@ -273,6 +283,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		this.Drawables.Add(timingLabel);
 		this.Drawables.Add(this._timingInputTime);
 		this.Drawables.Add(this._timingInputTempo);
+		this.Drawables.Add(this._timingInputTimeSignature);
 
 		this.Drawables.Add(songLanguageLabel);
 		this.Drawables.Add(this._typingConversionDropdown);
