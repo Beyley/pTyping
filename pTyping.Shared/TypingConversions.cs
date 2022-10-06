@@ -814,36 +814,45 @@ ux	ŭ
 
 		#region Russian
 
-		string rsConversion = @"А	A
-Б	B
-Г	G
-Д	D
-Е	YE
-Ё	YO
-Ж	ZH
-З	Z
-И	I
-Й	J
-К	K
-Л	L
-М	M
-Н	N
-О	O
-П	P
-Р	R
-С	S
-Т	T
-У	U
-Ф	F
-Х	H
-Ц	TS
-Ч	CH
-Ш	SH
-Щ	SCH
-Ы	OO
-Ь	'
-Э	E
-Ю	YU
+		string rsConversion = @"A	А
+B	Б
+V	В
+YA	Я
+G	Г
+D	Д
+YE	Е
+YO	Ё
+ZH	Ж
+Z	З
+I	И
+J	Й
+Y	Й
+K	К
+L	Л
+M	М
+N	Н
+O	О
+P	П
+R	Р
+S	С
+T	Т
+U	У
+F	Ф
+H	Х
+KH	Х
+TS	Ц
+CH	Ч
+SH	Ш
+SCH	Щ
+OO	Ы
+Y	Ы
+'	Ь
+""	Ь
+E	Э
+YU	Ю
+-	—
+-	–
+X	×
 ";
 
 		rsConversion = $@"{slConversion}
