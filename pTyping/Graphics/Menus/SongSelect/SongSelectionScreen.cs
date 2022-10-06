@@ -279,8 +279,8 @@ public class SongSelectionScreen : pScreen {
 			_        => this._movingDirection
 		};
 
-		if (keyEventArgs.Key == Key.F5)
-			throw new NotImplementedException();
+		// if (keyEventArgs.Key == Key.F5)
+			// throw new NotImplementedException();
 		// SongManager.UpdateSongs();
 		// pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
 		// ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor)); //TODO: implement dynamic song select

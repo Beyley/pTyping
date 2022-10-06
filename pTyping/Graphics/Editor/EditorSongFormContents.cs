@@ -29,6 +29,8 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _timingInputTime;
 	private readonly DrawableTextBox       _timingInputTempo;
 	private readonly DrawableDropdown      _typingConversionDropdown;
+	private          DrawableTextBox       _tagsInput;
+	private          DrawableTextBox       _descriptionInput;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -159,8 +161,7 @@ public class EditorSongFormContents : CompositeDrawable {
 
 			this.Drawables.Add(tickbox);
 		}
-
-
+		
 		this._typingConversionDropdown = new DrawableDropdown(new Vector2(x, y), pTypingGame.JapaneseFont, 20, new Vector2(250, 35), new Dictionary<object, string> {
 			{ TypingConversions.ConversionType.StandardLatin, "Standard Latin Only" },
 			{ TypingConversions.ConversionType.StandardHiragana, "Japanese/Hiragana" },
@@ -181,6 +182,37 @@ public class EditorSongFormContents : CompositeDrawable {
 						hitObject.TypingConversion = (TypingConversions.ConversionType)selection.Key;
 				});
 			}, $"Are you sure you want to do this? This will set *all* notes to {selection.Value}!", MessageBoxButtons.YesNo);
+		};
+		
+		TextDrawable tagsLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Tags (comma separated)", 24);
+		y += songLanguageLabel.Size.Y;
+
+		this._tagsInput = new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, string.Join(", ", map.Metadata.Tags));
+		y += this._tagsInput.Size.Y;
+		
+		this._tagsInput.OnCommit += delegate(object _, string s) {
+			//Split the string by commas, and trim each tag
+			string[] tags = s.Split(',').Select(tag => tag.Trim()).ToArray();
+
+			map.Metadata.Tags.Clear();
+			
+			//Set the tags to the new tags
+			foreach (string tag in tags) {
+				map.Metadata.Tags.Add(tag);
+			}
+			editor.SaveNeeded = true;
+		};
+		
+		TextDrawable descriptionLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Description", 24);
+		y += descriptionLabel.Size.Y;
+
+		//Multiline text box with 5 lines
+		this._descriptionInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.Description, 5);
+		y                      += this._descriptionInput.Size.Y;
+		
+		this._descriptionInput.OnCommit += delegate(object _, string s) {
+			map.Info.Description = s;
+			editor.SaveNeeded    = true;
 		};
 
 		this.Drawables.Add(strictnessLabel);
@@ -204,5 +236,11 @@ public class EditorSongFormContents : CompositeDrawable {
 
 		this.Drawables.Add(songLanguageLabel);
 		this.Drawables.Add(this._typingConversionDropdown);
+		
+		this.Drawables.Add(tagsLabel);
+		this.Drawables.Add(this._tagsInput);
+		
+		this.Drawables.Add(descriptionLabel);
+		this.Drawables.Add(this._descriptionInput);
 	}
 }
