@@ -8,6 +8,7 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using pTyping.Online;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
@@ -31,6 +32,7 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableDropdown      _typingConversionDropdown;
 	private          DrawableTextBox       _tagsInput;
 	private          DrawableTextBox       _descriptionInput;
+	private readonly DrawableTextBox       _mapperInput;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -214,7 +216,18 @@ public class EditorSongFormContents : CompositeDrawable {
 			map.Info.Description = s;
 			editor.SaveNeeded    = true;
 		};
+		
+		TextDrawable mapperLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Mapper", 24);
+		y += mapperLabel.Size.Y;
 
+		this._mapperInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.Mapper);
+		y                += this._mapperInput.Size.Y;
+		
+		this._mapperInput.OnCommit += delegate(object _, string s) {
+			map.Info.Mapper = s;
+			editor.SaveNeeded = true;
+		};
+		
 		this.Drawables.Add(strictnessLabel);
 		this.Drawables.Add(this._strictnessSlider);
 
@@ -242,5 +255,8 @@ public class EditorSongFormContents : CompositeDrawable {
 		
 		this.Drawables.Add(descriptionLabel);
 		this.Drawables.Add(this._descriptionInput);
+		
+		this.Drawables.Add(mapperLabel);
+		this.Drawables.Add(this._mapperInput);
 	}
 }
