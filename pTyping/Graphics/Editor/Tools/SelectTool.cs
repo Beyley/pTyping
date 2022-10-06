@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
+using pTyping.Shared;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
@@ -12,10 +15,14 @@ namespace pTyping.Graphics.Editor.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class SelectTool : EditorTool {
-	public UiElement ObjectText;
-	public UiElement ObjectTextLabel;
-	public UiElement ObjectColour;
-	public UiElement ObjectColourLabel;
+	public  UiElement ObjectText;
+	public  UiElement ObjectTextLabel;
+	public  UiElement ObjectColour;
+	public  UiElement ObjectColourLabel;
+	private UiElement ObjectLanguageLabel;
+	private UiElement ObjectLanguage;
+
+	private Dictionary<object, string> _langaugeDictionary;
 
 	public override string Name    => "Select";
 	public override string Tooltip => "Select, move, and change notes in the timeline.";
@@ -48,17 +55,40 @@ public class SelectTool : EditorTool {
 		this.ObjectColourLabel.SpaceAfter = LABELAFTERDISTANCE;
 		this.ObjectColour                 = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Color.White);
 
+		this.ObjectLanguageLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Language", LABELTEXTSIZE);
+		this.ObjectLanguageLabel.SpaceAfter = LABELAFTERDISTANCE;
+		this.ObjectLanguage = UiElement.CreateDropdown(this._langaugeDictionary = new Dictionary<object, string> {
+			{ TypingConversions.ConversionType.StandardLatin, "Standard Latin Only" },
+			{ TypingConversions.ConversionType.StandardHiragana, "Japanese/Hiragana" },
+			{ TypingConversions.ConversionType.StandardRussian, "Russian" },
+			{ TypingConversions.ConversionType.StandardEsperanto, "Esperanto" }
+		}, DROPDOWNBUTTONSIZE, pTypingGame.JapaneseFont, ITEMTEXTSIZE);
+
 		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectTextLabel);
 		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectText);
 		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColourLabel);
 		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColour);
+		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectLanguageLabel);
+		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectLanguage);
 
-		this.ObjectText.AsTextBox().OnFocusChange        += this.OnObjectTextCommit;
-		this.ObjectColour.AsColorPicker().Color.OnChange += this.OnObjectColourChange;
+		this.ObjectText.AsTextBox().OnFocusChange              += this.OnObjectTextCommit;
+		this.ObjectColour.AsColorPicker().Color.OnChange       += this.OnObjectColourChange;
+		this.ObjectLanguage.AsDropdown().SelectedItem.OnChange += this.OnObjectLanguageChange;
 
 		this.EditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChange;
 
 		base.Initialize();
+	}
+	private void OnObjectLanguageChange(object sender, KeyValuePair<object, string> e) {
+		if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
+
+		foreach (Drawable @object in this.EditorInstance.EditorState.SelectedObjects) {
+			if (@object is not NoteDrawable note)
+				continue;
+
+			note.Note.TypingConversion     = (TypingConversions.ConversionType)e.Key;
+			this.EditorInstance.SaveNeeded = true;
+		}
 	}
 
 	private void OnObjectTextCommit(object sender, bool selected) {
@@ -86,11 +116,13 @@ public class SelectTool : EditorTool {
 		base.OnNoteDelete(note);
 	}
 
-	private void ShowUiElements(bool text, bool colour) {
-		this.ObjectTextLabel.Visible.Value   = text;
-		this.ObjectText.Visible.Value        = text;
-		this.ObjectColourLabel.Visible.Value = colour;
-		this.ObjectColour.Visible.Value      = colour;
+	private void ShowUiElements(bool text, bool colour, bool language) {
+		this.ObjectTextLabel.Visible.Value     = text;
+		this.ObjectText.Visible.Value          = text;
+		this.ObjectColourLabel.Visible.Value   = colour;
+		this.ObjectColour.Visible.Value        = colour;
+		this.ObjectLanguageLabel.Visible.Value = language;
+		this.ObjectLanguageLabel.Visible.Value = language;
 	}
 
 	private void OnObjectColourChange(object sender, Color color) {
@@ -134,18 +166,18 @@ public class SelectTool : EditorTool {
 
 		switch (selectedObject) {
 			case NoteDrawable note:
-				this.ObjectText.AsTextBox().Text              = note.Note.Text;
-				this.ObjectColour.AsColorPicker().Color.Value = note.Note.Color;
-
-				this.ShowUiElements(true, true);
+				this.ObjectText.AsTextBox().Text                    = note.Note.Text;
+				this.ObjectColour.AsColorPicker().Color.Value       = note.Note.Color;
+				this.ObjectLanguage.AsDropdown().SelectedItem.Value = this._langaugeDictionary.First(x => (TypingConversions.ConversionType)x.Key == note.Note.TypingConversion);
+				this.ShowUiElements(true, true, true);
 				break;
 			case LyricEventDrawable lyric:
 				this.ObjectText.AsTextBox().Text = lyric.Event.Text;
 
-				this.ShowUiElements(true, false);
+				this.ShowUiElements(true, false, false);
 				break;
 			default:
-				this.ShowUiElements(false, false);
+				this.ShowUiElements(false, false, false);
 				break;
 		}
 	}
@@ -168,9 +200,12 @@ public class SelectTool : EditorTool {
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectText);
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColourLabel);
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColour);
+		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectLanguageLabel);
+		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectLanguage);
 
-		this.ObjectText.AsTextBox().OnCommit             -= this.OnObjectTextCommit;
-		this.ObjectColour.AsColorPicker().Color.OnChange -= this.OnObjectColourChange;
+		this.ObjectText.AsTextBox().OnCommit                   -= this.OnObjectTextCommit;
+		this.ObjectColour.AsColorPicker().Color.OnChange       -= this.OnObjectColourChange;
+		this.ObjectLanguage.AsDropdown().SelectedItem.OnChange -= this.OnObjectLanguageChange;
 
 		this.EditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChange;
 
