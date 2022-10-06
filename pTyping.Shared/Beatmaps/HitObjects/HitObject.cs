@@ -67,7 +67,7 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 			TypingConversions.Conversions[this.TypingConversion].TryGetValue(textToCheck, out possible);
 		}
 
-		if (possible is null) throw new Exception("Unknown character! Did you put kanji? smh my head");
+		if (possible is null) return (textToCheck, new List<string> { textToCheck });
 
 		possible.Sort((x, y) => x.Length - y.Length);
 
