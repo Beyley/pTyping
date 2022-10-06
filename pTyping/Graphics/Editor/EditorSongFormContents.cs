@@ -1,7 +1,13 @@
+using System.Collections.Generic;
 using System.Numerics;
+using Eto.Forms;
+using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
+using Furball.Engine.Engine.Helpers;
+using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.ObjectModel;
 using pTyping.UiElements;
 using TextDrawable = Furball.Engine.Engine.Graphics.Drawables.TextDrawable;
@@ -19,6 +25,7 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _artistInputUnicode;
 	private readonly DrawableTextBox       _timingInputTime;
 	private readonly DrawableTextBox       _timingInputTempo;
+	private readonly DrawableDropdown      _typingConversionDropdown;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -122,6 +129,31 @@ public class EditorSongFormContents : CompositeDrawable {
 			}
 		};
 
+		TextDrawable songLanguageLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Song Language", 24);
+		y += songLanguageLabel.Size.Y;
+
+		this._typingConversionDropdown = new DrawableDropdown(new Vector2(x, y), pTypingGame.JapaneseFont, 20, new Vector2(250, 35), new Dictionary<object, string> {
+			{ TypingConversions.ConversionType.StandardLatin, "Standard Latin Only" },
+			{ TypingConversions.ConversionType.StandardHiragana, "Japanese/Hiragana" },
+			{ TypingConversions.ConversionType.StandardRussian, "Russian" },
+			{ TypingConversions.ConversionType.StandardEsperanto, "Esperanto" }
+		});
+		y += this._typingConversionDropdown.Size.Y;
+
+		this._typingConversionDropdown.SelectedItem.OnChange += delegate(object _, KeyValuePair<object, string> selection) {
+			EtoHelper.MessageDialog((sender, result) => {
+				if (result != DialogResult.Yes)
+					return;
+
+				//Schedule a new method to run ASAP on the main thread
+				FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+					//Set the conversion type of all hit objects to the new type
+					foreach (HitObject hitObject in this._map.HitObjects)
+						hitObject.TypingConversion = (TypingConversions.ConversionType)selection.Key;
+				});
+			}, "Are you sure you want to do this?", MessageBoxButtons.YesNo);
+		};
+		
 		this.Drawables.Add(strictnessLabel);
 		this.Drawables.Add(this._strictnessSlider);
 
@@ -140,5 +172,8 @@ public class EditorSongFormContents : CompositeDrawable {
 		this.Drawables.Add(timingLabel);
 		this.Drawables.Add(this._timingInputTime);
 		this.Drawables.Add(this._timingInputTempo);
+
+		this.Drawables.Add(songLanguageLabel);
+		this.Drawables.Add(this._typingConversionDropdown);
 	}
 }
