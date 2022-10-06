@@ -9,7 +9,7 @@ namespace pTyping.Shared;
 public class BeatmapDatabase {
 	public readonly Realm Realm;
 
-	public const ulong SCHEMA_VERSION = 1;
+	public const ulong SCHEMA_VERSION = 2;
 
 	public BeatmapDatabase() {
 		RealmSchema.Builder builder = new RealmSchema.Builder {
@@ -49,6 +49,13 @@ public class BeatmapDatabase {
 			if (oldSchemaVersion < 1) {
 				//This is blank because nothing needs to be done here, this is just here to keep track of the change
 			}
+
+			//In version 3, we added typing conversion to `HitObject`, so we need to set a default value for all of them
+			if (oldSchemaVersion < 2)
+				foreach (Beatmap newSetBeatmap in newSet.Beatmaps) {
+					foreach (HitObject hitObject in newSetBeatmap.HitObjects)
+						hitObject.TypingConversion = TypingConversions.ConversionType.StandardHiragana;
+				}
 		}
 	}
 }

@@ -3,7 +3,6 @@ namespace pTyping.Shared;
 public static class TypingConversions {
 	public enum ConversionType {
 		StandardHiragana,
-		StandardKatakana,
 		StandardEsperanto,
 		StandardLatin
 	}
@@ -11,9 +10,212 @@ public static class TypingConversions {
 	public static readonly Dictionary<ConversionType, Dictionary<string, List<string>>> Conversions = new Dictionary<ConversionType, Dictionary<string, List<string>>>();
 
 	public static void LoadConversion() {
-		#region im sorry
+		#region Standard Latin
 
-		string jpConversion = @"a	あ
+		string slConversion = @"a	a
+b	b
+c	c
+d	d
+e	e
+f	f
+g	g
+h	h
+i	i
+j	j
+k	k
+l	l
+m	m
+n	n
+o	o
+p	p
+q	q
+r	r
+s	s
+t	t
+u	u
+v	v
+w	w
+x	x
+y	y
+z	z
+A	A
+B	B
+C	C
+D	D
+E	E
+F	F
+G	G
+H	H
+I	I
+J	J
+K	K
+L	L
+M	M
+N	N
+O	O
+P	P
+Q	Q
+R	R
+S	S
+T	T
+U	U
+V	V
+W	W
+X	X
+Y	Y
+Z	Z
+1	1
+2	2
+3	3
+4	4
+5	5
+6	6
+7	7
+8	8
+9	9
+0	0
+-	-
+^	^
+!	!
+""	""
+#	#
+$	$
+%	%
+&	&
+'	'
+(	(
+)	)
+=	=
+~	~
+|	|
+@	@
+[	[
+`	`
+{	{
+;	;
+:	:
+]	]
++	+
+*	*
+}	}
+,	,
+.	.
+/	/
+\	\
+<	<
+>	>
+?	?
+_	_
+A	Ａ
+B	Ｂ
+C	Ｃ
+D	Ｄ
+E	Ｅ
+F	Ｆ
+G	Ｇ
+H	Ｈ
+I	Ｉ
+J	Ｊ
+K	Ｋ
+L	Ｌ
+M	Ｍ
+N	Ｎ
+O	Ｏ
+P	Ｐ
+Q	Ｑ
+R	Ｒ
+S	Ｓ
+T	Ｔ
+U	Ｕ
+V	Ｖ
+W	Ｗ
+X	Ｘ
+Y	Ｙ
+Z	Ｚ
+a	ａ
+b	ｂ
+c	ｃ
+d	ｄ
+e	ｅ
+f	ｆ
+g	ｇ
+h	ｈ
+i	ｉ
+j	ｊ
+k	ｋ
+l	ｌ
+m	ｍ
+n	ｎ
+o	ｏ
+p	ｐ
+q	ｑ
+r	ｒ
+s	ｓ
+t	ｔ
+u	ｕ
+v	ｖ
+w	ｗ
+x	ｘ
+y	ｙ
+z	ｚ
+1	１
+2	２
+3	３
+4	４
+5	５
+6	６
+7	７
+8	８
+9	９
+0	０
+-	ー
+^	＾
+!	！
+""	”
+#	＃
+$	＄
+%	％
+&	＆
+'	’
+(	（
+)	）
+=	＝
+~	～
+~	〜
+|	｜
+@	＠
+[	「
+`	‘
+{	｛
+;	；
+:	：
+]	」
++	＋
+*	＊
+}	｝
+,	、
+.	。
+/	・
+\	￥
+<	＜
+>	＞
+?	？
+_	＿
+///	…
+-	－
+[	［
+]	］
+,	，
+.	．
+/	／
+";
+
+		#endregion
+
+		#region Japanese Hiragana
+
+		string jpConversion = $@"{slConversion}
+a	あ
 i	い
 yi	い
 u	う
@@ -565,13 +767,13 @@ n|	ん	|
 n@	ん	@
 n[	ん	[
 n`	ん	`
-n{	ん	{
+n{{	ん	{{
 n;	ん	;
 n:	ん	:
 n]	ん	]
 n+	ん	+
 n*	ん	*
-n}	ん	}
+n}}	ん	}}
 n,	ん	,
 n.	ん	.
 n/	ん	/
@@ -580,215 +782,51 @@ n<	ん	<
 n>	ん	>
 n?	ん	?
 n_	ん	_
-a	a
-b	b
-c	c
-d	d
-e	e
-f	f
-g	g
-h	h
-i	i
-j	j
-k	k
-l	l
-m	m
-n	n
-o	o
-p	p
-q	q
-r	r
-s	s
-t	t
-u	u
-v	v
-w	w
-x	x
-y	y
-z	z
-A	A
-B	B
-C	C
-D	D
-E	E
-F	F
-G	G
-H	H
-I	I
-J	J
-K	K
-L	L
-M	M
-N	N
-O	O
-P	P
-Q	Q
-R	R
-S	S
-T	T
-U	U
-V	V
-W	W
-X	X
-Y	Y
-Z	Z
-1	1
-2	2
-3	3
-4	4
-5	5
-6	6
-7	7
-8	8
-9	9
-0	0
--	-
-^	^
-!	!
-""	""
-#	#
-$	$
-%	%
-&	&
-'	'
-(	(
-)	)
-=	=
-~	~
-|	|
-@	@
-[	[
-`	`
-{	{
-;	;
-:	:
-]	]
-+	+
-*	*
-}	}
-,	,
-.	.
-/	/
-\	\
-<	<
->	>
-?	?
-_	_
-A	Ａ
-B	Ｂ
-C	Ｃ
-D	Ｄ
-E	Ｅ
-F	Ｆ
-G	Ｇ
-H	Ｈ
-I	Ｉ
-J	Ｊ
-K	Ｋ
-L	Ｌ
-M	Ｍ
-N	Ｎ
-O	Ｏ
-P	Ｐ
-Q	Ｑ
-R	Ｒ
-S	Ｓ
-T	Ｔ
-U	Ｕ
-V	Ｖ
-W	Ｗ
-X	Ｘ
-Y	Ｙ
-Z	Ｚ
-a	ａ
-b	ｂ
-c	ｃ
-d	ｄ
-e	ｅ
-f	ｆ
-g	ｇ
-h	ｈ
-i	ｉ
-j	ｊ
-k	ｋ
-l	ｌ
-m	ｍ
-n	ｎ
-o	ｏ
-p	ｐ
-q	ｑ
-r	ｒ
-s	ｓ
-t	ｔ
-u	ｕ
-v	ｖ
-w	ｗ
-x	ｘ
-y	ｙ
-z	ｚ
-1	１
-2	２
-3	３
-4	４
-5	５
-6	６
-7	７
-8	８
-9	９
-0	０
--	ー
-^	＾
-!	！
-""	”
-#	＃
-$	＄
-%	％
-&	＆
-'	’
-(	（
-)	）
-=	＝
-~	～
-~	〜
-|	｜
-@	＠
-[	「
-`	‘
-{	｛
-;	；
-:	：
-]	」
-+	＋
-*	＊
-}	｝
-,	、
-.	。
-/	・
-\	￥
-<	＜
->	＞
-?	？
-_	＿
-///	…
--	－
-[	［
-]	］
-,	，
-.	．
-/	／
 ";
 
 		#endregion
 
-		using StringReader reader = new StringReader(jpConversion);
+		#region Esperanto
+
+		string eoConversion = $@"{slConversion}
+cx	ĉ
+gx	ĝ
+hx	ĥ
+jx	ĵ
+sx	ŝ
+ux	ŭ
+Ĉ	Cx
+Ĝ	Gx
+Ĥ	Hx
+Ĵ	Jx
+Ŝ	Sx
+Ŭ	Ux
+Ĉ	CX
+Ĝ	GX
+Ĥ	HX
+Ĵ	JX
+Ŝ	SX
+Ŭ	UX
+";
+
+		#endregion
+
+		ReadConversionDatabase(slConversion, ConversionType.StandardLatin);
+		ReadConversionDatabase(jpConversion, ConversionType.StandardHiragana);
+		ReadConversionDatabase(eoConversion, ConversionType.StandardEsperanto);
+	}
+
+	public static void ReadConversionDatabase(string database, ConversionType type) {
+		using StringReader reader = new StringReader(database);
 		string             line;
 
-		Dictionary<string, List<string>> jpConversionDict = new Dictionary<string, List<string>>();
+		Dictionary<string, List<string>> conversionDict = new Dictionary<string, List<string>>();
 
 		do {
 			line = reader.ReadLine();
 
-			if (line == null)
+			//Only parse lines with actual content
+			if (string.IsNullOrWhiteSpace(line))
 				continue;
 
 			string[] splitLine = line.Split("\t");
@@ -798,10 +836,10 @@ _	＿
 
 			if (splitLine.Length > 2) continue;
 
-			if (jpConversionDict.TryGetValue(hiragana, out List<string> currentRomaji))
+			if (conversionDict.TryGetValue(hiragana, out List<string> currentRomaji))
 				currentRomaji.Add(romaji);
 			else
-				jpConversionDict.Add(
+				conversionDict.Add(
 					hiragana,
 					new List<string> {
 						romaji
@@ -810,6 +848,6 @@ _	＿
 		} while (line != null);
 
 		//Set the Japanese conversion to the one we just loaded from the default string
-		Conversions[ConversionType.StandardHiragana] = jpConversionDict;
+		Conversions[type] = conversionDict;
 	}
 }

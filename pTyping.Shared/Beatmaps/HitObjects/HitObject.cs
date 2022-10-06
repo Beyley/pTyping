@@ -23,12 +23,19 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 	[Description("The portion of the whole text the user has typed")]
 	public string TypedText = "";
 
-
 	[Description("The result of the users hit")]
 	public HitResult HitResult = HitResult.NotHit;
 
 	[Description("Misc note specific settings"), JsonProperty]
 	public HitObjectSettings Settings { get; set; } = new HitObjectSettings();
+
+	[Description("The typing conversion to use for this hit object"), JsonProperty, Ignored]
+	public TypingConversions.ConversionType TypingConversion {
+		get => (TypingConversions.ConversionType)this._backingTypingConversion;
+		set => this._backingTypingConversion = (int)value;
+	}
+
+	private int _backingTypingConversion { get; set; } = (int)TypingConversions.ConversionType.StandardHiragana;
 
 	[Ignored]
 	public (string Hiragana, List<string> Romaji) TypableRomaji => this.GetTypableRomaji(this.TypedText);
@@ -45,19 +52,19 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 
 		if (this.Text.Length - typed.Length >= 3) { //Try to get the next 3 chars
 			textToCheck = this.Text.Substring(typed.Length, 3);
-			TypingConversions.Conversions[TypingConversions.ConversionType.StandardHiragana].TryGetValue(textToCheck, out possible);
+			TypingConversions.Conversions[this.TypingConversion].TryGetValue(textToCheck, out possible);
 		}
 
 		//Try to get the next 2 chars instead
 		if (possible is null && this.Text.Length - typed.Length >= 2) {
 			textToCheck = this.Text.Substring(typed.Length, 2);
-			TypingConversions.Conversions[TypingConversions.ConversionType.StandardHiragana].TryGetValue(textToCheck, out possible);
+			TypingConversions.Conversions[this.TypingConversion].TryGetValue(textToCheck, out possible);
 		}
 
 		//Try to get the next char instead
 		if (possible is null) {
 			textToCheck = this.Text.Substring(typed.Length, 1);
-			TypingConversions.Conversions[TypingConversions.ConversionType.StandardHiragana].TryGetValue(textToCheck, out possible);
+			TypingConversions.Conversions[this.TypingConversion].TryGetValue(textToCheck, out possible);
 		}
 
 		if (possible is null) throw new Exception("Unknown character! Did you put kanji? smh my head");
@@ -70,15 +77,13 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 	[Ignored]
 	public bool IsHit => this.TypedText == this.Text;
 
-	public bool IsComplete() {
-		throw new NotImplementedException();
-	}
 	public HitObject Clone() {
 		HitObject hitObject = new HitObject {
-			Color    = this.Color.Clone(),
-			Settings = this.Settings.Clone(),
-			Text     = this.Text,
-			Time     = this.Time
+			Color            = this.Color.Clone(),
+			Settings         = this.Settings.Clone(),
+			Text             = this.Text,
+			Time             = this.Time,
+			TypingConversion = this.TypingConversion
 		};
 
 		return hitObject;
