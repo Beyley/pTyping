@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Shared.ObjectModel;
@@ -27,7 +29,7 @@ public class UiElementsTestScreen : pScreen {
 		}) {
 			Position = new Vector2(10, 150)
 		});
-		
+
 		this.Manager.Add(new SliderDrawable<float>(new BoundNumber<float> {
 			MaxValue  = 10,
 			MinValue  = 0,
@@ -36,7 +38,7 @@ public class UiElementsTestScreen : pScreen {
 		}) {
 			Position = new Vector2(10, 190)
 		});
-		
+
 		this.Manager.Add(new SliderDrawable<float>(new BoundNumber<float> {
 			MaxValue  = 10,
 			MinValue  = 0,
@@ -45,6 +47,18 @@ public class UiElementsTestScreen : pScreen {
 		}) {
 			Position = new Vector2(10, 230)
 		});
+
+		this.Manager.Add(new ContextMenuDrawable(new Vector2(10, 300), new List<(string, Delegate)> {
+			("Option 1", new Action(delegate {
+				pTypingGame.NotificationManager.CreatePopup("Clicked Option 1");
+			})),
+			("Option 2", new Action(delegate {
+				pTypingGame.NotificationManager.CreatePopup("Clicked Option 2");
+			})),
+			("This is option 3!", new Action(delegate {
+				pTypingGame.NotificationManager.CreatePopup("Clicked Option 3");
+			}))
+		}, pTypingGame.JapaneseFont, 24));
 	}
 
 	public override string               Name                 => "UI Elements Test Screen";
