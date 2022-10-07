@@ -213,6 +213,8 @@ public class NoteDrawable : CompositeDrawable {
 			},
 			FurballGame.Time + timeToDie
 		);
+
+		this.Note.Complete = true;
 	}
 
 	public void Miss() {
@@ -225,6 +227,7 @@ public class NoteDrawable : CompositeDrawable {
 		);
 		this.Note.TypedText = this.Note.Text;
 		this.Note.HitResult = HitResult.Poor;
+		this.Note.Complete  = true;
 	}
 
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {

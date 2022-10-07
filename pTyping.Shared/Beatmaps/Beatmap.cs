@@ -106,7 +106,7 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 	}
 
 	public bool AllNotesHit() {
-		return this.HitObjects.All(x => x.HitResult != HitResult.NotHit);
+		return this.HitObjects.All(x => x.Complete);
 	}
 
 	public TimingPoint CurrentTimingPoint(double time) {

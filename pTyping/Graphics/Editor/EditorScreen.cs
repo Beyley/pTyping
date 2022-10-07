@@ -350,7 +350,34 @@ public class EditorScreen : pScreen {
 
 		ConVars.Volume.OnChange += this.OnVolumeChange;
 		// this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
+
+		FurballGame.Instance.FileDrop += this.OnFileDrop;
 	}
+
+	private void OnFileDrop(object sender, string[] paths) {
+		//Make sure the user only dragged in one path
+		if (paths.Length != 1)
+			return;
+
+		//Create an array of video extensions 
+		string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".webm" };
+
+		//Check if the first path is a video
+		if (videoExtensions.Any(x => paths[0].EndsWith(x))) {
+			byte[] videoBytes = File.ReadAllBytes(paths[0]);
+
+			string md5 = CryptoHelper.GetMd5(videoBytes);
+
+			pTypingGame.FileDatabase.AddFile(videoBytes).Wait();
+
+			this.EditorState.Song.FileCollection.BackgroundVideo = new PathHashTuple(Path.GetFileName(paths[0]), md5);
+
+			this.SaveNeeded = true;
+
+			pTypingGame.NotificationManager.CreatePopup("Reload the map to see the video!");
+		}
+	}
+
 	private void ProgressBarOnInteract(object sender, MouseButtonEventArgs e) {
 		this.ProgressBarOnInteract(sender, new MouseDragEventArgs(Vector2.Zero, Vector2.Zero, Vector2.Zero, e.Button, e.Mouse));
 	}
@@ -534,6 +561,8 @@ public class EditorScreen : pScreen {
 		this._progressBar.OnDrag -= this.ProgressBarOnInteract;
 
 		ConVars.Volume.OnChange -= this.OnVolumeChange;
+
+		FurballGame.Instance.FileDrop -= this.OnFileDrop;
 
 		this._video?.Dispose();
 

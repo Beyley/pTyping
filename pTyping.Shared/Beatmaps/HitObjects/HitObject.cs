@@ -26,6 +26,9 @@ public class HitObject : EmbeddedObject, IClonable<HitObject> {
 	[Description("The result of the users hit")]
 	public HitResult HitResult = HitResult.NotHit;
 
+	[Description("Whether the note is completed or not")]
+	public bool Complete;
+	
 	[Description("Misc note specific settings"), JsonProperty]
 	public HitObjectSettings Settings { get; set; } = new HitObjectSettings();
 
