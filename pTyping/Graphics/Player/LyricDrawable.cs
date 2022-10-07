@@ -23,12 +23,12 @@ public class LyricDrawable : CompositeDrawable {
 		this.Position = pos;
 
 		this._currentLyricText = new TextDrawable(new Vector2(0), pTypingGame.JapaneseFont, "", 35);
-		this.Drawables.Add(this._currentLyricText);
+		this.Children.Add(this._currentLyricText);
 
 		// this._nextLyricText = new TextDrawable(new Vector2(0), pTypingGame.JapaneseFont, "", 27) {
 		// ColorOverride = Color.LightGray
 		// };
-		// this.Drawables.Add(this._nextLyricText);
+		// this.Children.Add(this._nextLyricText);
 	}
 
 	private void SetLyric(Event lyric) {

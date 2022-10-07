@@ -49,7 +49,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
 		ImmutableSortedSet<BeatmapSet> sortedSets = sets.ToList().ToImmutableSortedSet(new BeatmapSetArtistComparer());
 
-		this.Drawables.Clear();
+		this.Children.Clear();
 		this._registeredSetButtons.Clear();
 
 		foreach (BeatmapSet set in sortedSets) {
@@ -65,7 +65,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
 			button.YPositionInDrawable = y;
 
-			this.Drawables.Add(button);
+			this.Children.Add(button);
 
 			y += button.Size.Y + 5;
 		}

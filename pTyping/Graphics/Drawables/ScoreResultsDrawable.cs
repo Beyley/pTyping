@@ -26,24 +26,24 @@ public class ScoreResultsDrawable : CompositeDrawable {
 	}
 
 	public ScoreResultsDrawable(Score score) {
-		this.Drawables.Add(
+		this.Children.Add(
 			SetRotOrigin(this._username = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Username: {score.User.Username}", 30))
 		);
-		this.Drawables.Add(SetRotOrigin(this._score = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Score: {score.AchievedScore}", 30)));
-		this.Drawables.Add(
+		this.Children.Add(SetRotOrigin(this._score = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Score: {score.AchievedScore}", 30)));
+		this.Children.Add(
 			SetRotOrigin(this._accuracy = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Accuracy: {score.Accuracy * 100:00.00}%", 30))
 		);
-		this.Drawables.Add(SetRotOrigin(this._combo = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Combo: {score.MaxCombo}", 30)));
-		this.Drawables.Add(
+		this.Children.Add(SetRotOrigin(this._combo = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Combo: {score.MaxCombo}", 30)));
+		this.Children.Add(
 			SetRotOrigin(this._mods = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Mods: {Mod.ModsShorthandString(score.Mods)}", 30))
 		);
-		this.Drawables.Add(
+		this.Children.Add(
 			SetRotOrigin(this._excellent = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Excellent: {score.ExcellentHits}", 30))
 		);
-		this.Drawables.Add(SetRotOrigin(this._good = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Good: {score.GoodHits}", 30)));
-		this.Drawables.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Fair: {score.FairHits}", 30)));
-		this.Drawables.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Poor: {score.PoorHits}", 30)));
-		this.Drawables.Add(SetRotOrigin(this._date = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Date: {score.Time}", 30)));
+		this.Children.Add(SetRotOrigin(this._good = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Good: {score.GoodHits}", 30)));
+		this.Children.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Fair: {score.FairHits}", 30)));
+		this.Children.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Poor: {score.PoorHits}", 30)));
+		this.Children.Add(SetRotOrigin(this._date = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Date: {score.Time}", 30)));
 
 		FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 	}

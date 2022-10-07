@@ -71,7 +71,7 @@ public class BulkCreateTool : EditorTool {
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ColorLabel);
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Color);
 
-		this._previewNotes.ForEach(x => this.DrawableManager.Drawables.Remove(x));
+		this._previewNotes.ForEach(x => this.DrawableManager.Children.Remove(x));
 		this._previewNotes.Clear();
 	}
 
@@ -84,7 +84,7 @@ public class BulkCreateTool : EditorTool {
 	}
 
 	private void Update() {
-		this._previewNotes.ForEach(x => this.DrawableManager.Drawables.Remove(x));
+		this._previewNotes.ForEach(x => this.DrawableManager.Children.Remove(x));
 		this._previewNotes.Clear();
 
 		List<HitObject> notes = this.GenerateNotes();
@@ -113,7 +113,7 @@ public class BulkCreateTool : EditorTool {
 			);
 
 			this._previewNotes.Add(drawable);
-			this.DrawableManager.Drawables.Add(drawable);
+			this.DrawableManager.Children.Add(drawable);
 		}
 	}
 

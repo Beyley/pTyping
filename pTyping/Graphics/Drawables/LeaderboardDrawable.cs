@@ -34,7 +34,7 @@ public class LeaderboardDrawable : CompositeDrawable {
 			};
 
 			this._leaderboardElementDrawables.Add(drawable);
-			this.Drawables.Add(drawable);
+			this.Children.Add(drawable);
 
 			drawable.OnClick += delegate {
 				ScreenManager.ChangeScreen(new ScoreResultsScreen(score));
@@ -54,13 +54,13 @@ public class LeaderboardDrawable : CompositeDrawable {
 		public LeaderboardElementDrawable(Score score, Texture tex) {
 			this.Score = score;
 
-			this.Drawables.Add(
+			this.Children.Add(
 				this._backgroundDrawable = new TexturedDrawable(tex, Vector2.Zero) {
 					Scale = new Vector2(0.2f)
 				}
 			);
-			this.Drawables.Add(this._usernameInfoDrawable = new TextDrawable(new Vector2(3f), pTypingGame.JapaneseFont, "a", 30));
-			this.Drawables.Add(this._infoTextDrawable     = new TextDrawable(new Vector2(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
+			this.Children.Add(this._usernameInfoDrawable = new TextDrawable(new Vector2(3f), pTypingGame.JapaneseFont, "a", 30));
+			this.Children.Add(this._infoTextDrawable     = new TextDrawable(new Vector2(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
 
 			this.UpdateText();
 		}

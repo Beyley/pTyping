@@ -563,7 +563,7 @@ public class UiMakerScreen : pScreen {
 
 	private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
 		foreach (Drawable d in this.SelectedDrawables)
-			this._content.Drawables.Remove(d);
+			this._content.Children.Remove(d);
 
 		this._currentContainer.Elements.ForEach(x => x.SelectDrawable = null);
 		this.SelectedDrawables.Clear();
@@ -575,7 +575,7 @@ public class UiMakerScreen : pScreen {
 
 			element.SelectDrawable = drawable;
 			this.SelectedDrawables.Add(drawable);
-			this._content.Drawables.Add(drawable);
+			this._content.Children.Add(drawable);
 		}
 
 		this.UpdateUi();
@@ -633,12 +633,12 @@ public class UiMakerScreen : pScreen {
 	}
 
 	private void ResetLayout() {
-		this._content.Drawables.Clear();
+		this._content.Children.Clear();
 
 		foreach (UiMakerElement element in this._currentContainer.Elements) {
 			Drawable drawable = this.CreateDrawableFromElement(element);
 
-			this._content.Drawables.Add(drawable);
+			this._content.Children.Add(drawable);
 		}
 	}
 

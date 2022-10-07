@@ -29,7 +29,7 @@ public class CreateNoteTool : EditorTool {
 			Scale      = new Vector2(1, 80)
 		};
 
-		this.DrawableManager.Drawables.Add(this._createLine);
+		this.DrawableManager.Children.Add(this._createLine);
 
 		this._defaultNoteTextLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Text", LABELTEXTSIZE);
 		this._defaultNoteTextLabel.SpaceAfter = LABELAFTERDISTANCE;
@@ -84,7 +84,7 @@ public class CreateNoteTool : EditorTool {
 	}
 
 	public override void Deinitialize() {
-		this.DrawableManager.Drawables.Remove(this._createLine);
+		this.DrawableManager.Children.Remove(this._createLine);
 
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteTextLabel);
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this._defaultNoteText);

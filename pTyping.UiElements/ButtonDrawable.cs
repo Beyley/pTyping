@@ -32,7 +32,7 @@ public class ButtonDrawable : CompositeDrawable {
 		//Make the text origin center
 		this._text.OriginType = OriginType.Center;
 
-		this.Drawables.Add(this._text);
+		this.Children!.Add(this._text);
 
 		//When the user changes the button size, relayout the text
 		this.ButtonSize.OnChange += (_, _) => this.Relayout();

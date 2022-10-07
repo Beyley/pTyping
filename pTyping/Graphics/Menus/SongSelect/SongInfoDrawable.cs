@@ -13,13 +13,13 @@ public class SongInfoDrawable : CompositeDrawable {
 	public sealed override Vector2 Size => new Vector2(300, 475) * this.Scale;
 
 	public SongInfoDrawable() {
-		this.Drawables.Add(
+		this.Children.Add(
 			this._backgroundDrawable = new RectanglePrimitiveDrawable(Vector2.Zero, this.Size, 2, true) {
 				ColorOverride = new(100, 100, 100, 100)
 			}
 		);
 
-		this.Drawables.Add(this._scrollableContainer = new ScrollableContainer(this.Size));
+		this.Children.Add(this._scrollableContainer = new ScrollableContainer(this.Size));
 
 		this._scrollableContainer.Add(
 			this._descriptionDrawable = new RichTextDrawable(Vector2.Zero, "", pTypingGame.JapaneseFont, 20) {

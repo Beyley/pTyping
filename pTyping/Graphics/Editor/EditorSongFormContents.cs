@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Xml.Linq;
 using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
+using pTyping.Online;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
@@ -33,7 +35,6 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _mapperInput;
 	private readonly DrawableTextBox       _previewTimeInput;
 	private readonly DrawableTextBox       _sourceInput;
-	private readonly DrawableTextBox       _timingInputTimeSignature;
 
 	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
 		this._map = map;
@@ -137,17 +138,6 @@ public class EditorSongFormContents : CompositeDrawable {
 			}
 		};
 
-		//text input for the timing point's time signature
-		this._timingInputTimeSignature =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, $"{this._map.TimingPoints[0].TimeSignature}");
-		y                              += this._timingInputTimeSignature.Size.Y;
-
-		this._timingInputTimeSignature.OnCommit += delegate(object _, string s) {
-			if (int.TryParse(s, out int timeSignature)) {
-				this._map.TimingPoints[0].TimeSignature = timeSignature;
-				editor.SaveNeeded                       = true;
-			}
-		};
-
 		TextDrawable songLanguageLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Song Language", 24);
 		y += songLanguageLabel.Size.Y;
 
@@ -173,7 +163,7 @@ public class EditorSongFormContents : CompositeDrawable {
 				}
 			};
 
-			this.Drawables.Add(tickbox);
+			this.Children.Add(tickbox);
 		}
 		
 		this._typingConversionDropdown = new DrawableDropdown(new Vector2(x, y), pTypingGame.JapaneseFont, 20, new Vector2(250, 35), new Dictionary<object, string> {
@@ -265,42 +255,42 @@ public class EditorSongFormContents : CompositeDrawable {
 			editor.SaveNeeded = true;
 		};
 
-		this.Drawables.Add(strictnessLabel);
-		this.Drawables.Add(this._strictnessSlider);
+		this.Children.Add(strictnessLabel);
+		this.Children.Add(this._strictnessSlider);
 
-		this.Drawables.Add(difficultyNameLabel);
-		this.Drawables.Add(this._difficultyInputAscii);
-		this.Drawables.Add(this._difficultyInputUnicode);
+		this.Children.Add(difficultyNameLabel);
+		this.Children.Add(this._difficultyInputAscii);
+		this.Children.Add(this._difficultyInputUnicode);
 
-		this.Drawables.Add(artistLabel);
-		this.Drawables.Add(this._artistInputAscii);
-		this.Drawables.Add(this._artistInputUnicode);
+		this.Children.Add(artistLabel);
+		this.Children.Add(this._artistInputAscii);
+		this.Children.Add(this._artistInputUnicode);
 
-		this.Drawables.Add(titleLabel);
-		this.Drawables.Add(this._titleInputAscii);
-		this.Drawables.Add(this._titleInputUnicode);
+		this.Children.Add(titleLabel);
+		this.Children.Add(this._titleInputAscii);
+		this.Children.Add(this._titleInputUnicode);
 
-		this.Drawables.Add(timingLabel);
-		this.Drawables.Add(this._timingInputTime);
-		this.Drawables.Add(this._timingInputTempo);
-		this.Drawables.Add(this._timingInputTimeSignature);
+		this.Children.Add(timingLabel);
+		this.Children.Add(this._timingInputTime);
+		this.Children.Add(this._timingInputTempo);
 
-		this.Drawables.Add(songLanguageLabel);
-		this.Drawables.Add(this._typingConversionDropdown);
+		this.Children.Add(songLanguageLabel);
+		this.Children.Add(this._typingConversionDropdown);
 		
-		this.Drawables.Add(tagsLabel);
-		this.Drawables.Add(this._tagsInput);
+		this.Children.Add(tagsLabel);
+		this.Children.Add(this._tagsInput);
 		
-		this.Drawables.Add(descriptionLabel);
-		this.Drawables.Add(this._descriptionInput);
+		this.Children.Add(descriptionLabel);
+		this.Children.Add(this._descriptionInput);
 		
-		this.Drawables.Add(mapperLabel);
-		this.Drawables.Add(this._mapperInput);
+		this.Children.Add(mapperLabel);
+		this.Children.Add(this._mapperInput);
 		
-		this.Drawables.Add(previewTimeLabel);
-		this.Drawables.Add(this._previewTimeInput);
+		this.Children.Add(previewTimeLabel);
+		this.Children.Add(this._previewTimeInput);
 		
-		this.Drawables.Add(sourceLabel);
-		this.Drawables.Add(this._sourceInput);
+		this.Children.Add(sourceLabel);
+		this.Children.Add(this._sourceInput);
 	}
 }
+ 

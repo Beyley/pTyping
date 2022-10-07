@@ -24,14 +24,14 @@ public class ChangeLogDrawable : CompositeDrawable {
 				Position = new Vector2(0, y)
 			};
 
-			this.Drawables.Add(drawable);
+			this.Children.Add(drawable);
 			y += drawable.Size.Y + 5;
 		}
 	}
 
 	public override void Update(double time) {
 		// ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
-		foreach (ChangeLogEntryDrawable drawable in this.Drawables)
+		foreach (ChangeLogEntryDrawable drawable in this.Children)
 			drawable.Visible = drawable.RealRectangle.IntersectsWith(FurballGame.DisplayRect);
 
 		base.Update(time);
@@ -92,8 +92,8 @@ public class ChangeLogDrawable : CompositeDrawable {
 			this._summary.OnHoverLost += this.OnHoveredLost;
 			// this._bottomLine.OnHoverLost += this.OnHoveredLost;
 
-			this.Drawables.Add(this._bottomLine);
-			this.Drawables.Add(this._summary);
+			this.Children.Add(this._bottomLine);
+			this.Children.Add(this._summary);
 
 			this._entry = entry;
 		}

@@ -20,7 +20,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 	public BeatmapSetDrawable(BeatmapSet set) {
 		this.BeatmapSet = set;
 
-		this.Drawables.Add(this.setTitle = new SetTitleDrawable(Vector2.Zero, $"{set.Artist} - {set.Title}"));
+		this.Children.Add(this.setTitle = new SetTitleDrawable(Vector2.Zero, $"{set.Artist} - {set.Title}"));
 
 		bool  first = true;
 		float y     = this.setTitle.Size.Y;
@@ -30,7 +30,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 			};
 			drawable.Position = new Vector2(this.setTitle.Size.X - drawable.Size.X, y);
 
-			this.Drawables.Add(drawable);
+			this.Children.Add(drawable);
 
 			y     += drawable.Size.Y;
 			first =  false;
@@ -60,7 +60,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 				CoverHovers = false
 			};
 
-			this.Drawables.Add(this._difficultyName);
+			this.Children.Add(this._difficultyName);
 
 			this.OnClick += this.OnMapClick;
 		}
@@ -127,7 +127,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 			this._text = new TextDrawable(new Vector2(this.Size.X - MARGIN, MARGIN), pTypingGame.JapaneseFont, text, FONT_SIZE) {
 				OriginType = OriginType.TopRight
 			};
-			this.Drawables.Add(this._text);
+			this.Children.Add(this._text);
 		}
 
 		public override unsafe void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {

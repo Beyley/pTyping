@@ -18,7 +18,7 @@ using pTyping.Online;
 namespace pTyping.Graphics.Online;
 
 public class ChatContentsDrawable : CompositeDrawable {
-	public List<Drawable> PublicDrawables => this.Drawables;
+	public List<Drawable> PublicDrawables => this.Children;
 
 	public float TargetScroll;
 
@@ -31,14 +31,14 @@ public class ChatContentsDrawable : CompositeDrawable {
 	}
 
 	public void Clear() {
-		this.Drawables.Clear();
+		this.Children.Clear();
 	}
 
 	public override void Update(double time) {
-		if (this.Drawables.Count != 0) {
+		if (this.Children.Count != 0) {
 			this.TargetScroll = Math.Max(this.TargetScroll, 0);
 
-			foreach (Drawable drawable in this.Drawables) {
+			foreach (Drawable drawable in this.Children) {
 				float startY = float.Parse(drawable.Tags.First());
 
 				float targetY = startY + this.TargetScroll;
@@ -91,7 +91,7 @@ public class ChatDrawable : CompositeDrawable {
 
 	private void UpdateChannelButtons(object _, NotifyCollectionChangedEventArgs __) {
 		lock (pTypingGame.OnlineManager.KnownChannels) {
-			this._channelButtons.ForEach(x => this.Drawables.Remove(x));
+			this._channelButtons.ForEach(x => this.Children.Remove(x));
 			this._channelButtons.Clear();
 
 			float x = 0f;
@@ -105,7 +105,7 @@ public class ChatDrawable : CompositeDrawable {
 					this.SelectedChannel.Value = channel;
 				};
 
-				this.Drawables.Add(button);
+				this.Children.Add(button);
 			}
 		}
 	}
@@ -114,20 +114,20 @@ public class ChatDrawable : CompositeDrawable {
 		this.Position = pos;
 		this.Size     = size;
 
-		this.Drawables.Add(
+		this.Children.Add(
 			this._background = new RectanglePrimitiveDrawable(Vector2.Zero, size, 2, true) {
 				ColorOverride = new Color(100, 100, 100, 100)
 			}
 		);
 
-		this.Drawables.Add(
+		this.Children.Add(
 			this.MessageInputDrawable = new DrawableTextBox(new Vector2(0, size.Y), pTypingGame.JapaneseFont, 35, size.X) {
 				OriginType       = OriginType.BottomLeft,
 				DeselectOnCommit = false
 			}
 		);
 
-		this.Drawables.Add(
+		this.Children.Add(
 			this._channelContents = new ChatContentsDrawable(new Vector2(size.X, size.Y - this.MessageInputDrawable.Size.Y - this._padding)) {
 				OriginType = OriginType.BottomLeft,
 				Position   = new Vector2(0, size.Y - this.MessageInputDrawable.Size.Y - this._padding)

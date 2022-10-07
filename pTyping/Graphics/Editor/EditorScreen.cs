@@ -92,7 +92,7 @@ public class EditorScreen : pScreen {
 			CoverHovers = false
 		};
 
-		this.EditorDrawable.Drawables.Add(this._recepticle);
+		this.EditorDrawable.Children.Add(this._recepticle);
 
 		foreach (HitObject note in this.EditorState.Song.HitObjects)
 			this.CreateNote(note);
@@ -109,7 +109,7 @@ public class EditorScreen : pScreen {
 			CoverClicks = false
 		};
 
-		this.EditorDrawable.Drawables.Add(this._playfieldBackgroundCover);
+		this.EditorDrawable.Children.Add(this._playfieldBackgroundCover);
 
 		#region background image
 
@@ -428,7 +428,7 @@ public class EditorScreen : pScreen {
 		if (this.CancelSelectionEvents)
 			return;
 
-		this._selectionRects.ForEach(x => this.EditorDrawable.Drawables.Remove(x));
+		this._selectionRects.ForEach(x => this.EditorDrawable.Children.Remove(x));
 
 		this._selectionRects.Clear();
 
@@ -450,7 +450,7 @@ public class EditorScreen : pScreen {
 
 			this._selectionRects.Add(rect);
 
-			this.EditorDrawable.Drawables.Add(rect);
+			this.EditorDrawable.Children.Add(rect);
 		}
 	}
 
@@ -477,7 +477,7 @@ public class EditorScreen : pScreen {
 
 		if (eventDrawable == null) return;
 
-		this.EditorDrawable.Drawables.Add(eventDrawable);
+		this.EditorDrawable.Children.Add(eventDrawable);
 		this.EditorState.Events.Add(eventDrawable);
 		if (isNew) {
 			this.EditorState.Song.Events.Add(@event);
@@ -504,7 +504,7 @@ public class EditorScreen : pScreen {
 
 		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), true, true));
 
-		this.EditorDrawable.Drawables.Add(noteDrawable);
+		this.EditorDrawable.Children.Add(noteDrawable);
 		this.EditorState.Notes.Add(noteDrawable);
 		if (isNew) {
 			this.EditorState.Song.HitObjects.Add(note);
@@ -609,35 +609,35 @@ public class EditorScreen : pScreen {
 	public void DeleteSelectedObjects() {
 		foreach (Drawable @object in this.EditorState.SelectedObjects)
 			if (@object is NoteDrawable note) {
-				this.EditorDrawable.Drawables.Remove(note);
+				this.EditorDrawable.Children.Remove(note);
 				this.EditorState.Song.HitObjects.Remove(note.Note);
 				this.EditorState.Notes.Remove(note);
 
 				this.CurrentTool?.OnNoteDelete(note);
 			}
 			else if (@object is BeatLineBarEventDrawable barEvent) {
-				this.EditorDrawable.Drawables.Remove(barEvent);
+				this.EditorDrawable.Children!.Remove(barEvent);
 				this.EditorState.Song.Events.Remove(barEvent.Event);
 				this.EditorState.Events.Remove(barEvent);
 
 				this.CurrentTool?.OnEventDelete(barEvent);
 			}
 			else if (@object is BeatLineBeatEventDrawable beatEvent) {
-				this.EditorDrawable.Drawables.Remove(beatEvent);
+				this.EditorDrawable.Children!.Remove(beatEvent);
 				this.EditorState.Song.Events.Remove(beatEvent.Event);
 				this.EditorState.Events.Remove(beatEvent);
 
 				this.CurrentTool?.OnEventDelete(beatEvent);
 			}
 			else if (@object is TypingCutoffEventDrawable cutoffEvent) {
-				this.EditorDrawable.Drawables.Remove(cutoffEvent);
+				this.EditorDrawable.Children!.Remove(cutoffEvent);
 				this.EditorState.Song.Events.Remove(cutoffEvent.Event);
 				this.EditorState.Events.Remove(cutoffEvent);
 
 				this.CurrentTool?.OnEventDelete(cutoffEvent);
 			}
 			else if (@object is LyricEventDrawable lyricEvent) {
-				this.EditorDrawable.Drawables.Remove(lyricEvent);
+				this.EditorDrawable.Children!.Remove(lyricEvent);
 				this.EditorState.Song.Events.Remove(lyricEvent.Event);
 				this.EditorState.Events.Remove(lyricEvent);
 

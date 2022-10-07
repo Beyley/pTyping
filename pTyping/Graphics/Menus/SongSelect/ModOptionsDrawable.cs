@@ -24,14 +24,14 @@ public sealed class ModOptionsDrawable : CompositeDrawable {
 	public ModOptionsDrawable(List<Mod> mods) {
 		this._mods = mods;
 
-		this.Drawables.Add(new RectanglePrimitiveDrawable(Vector2.Zero, this.Size, 0, true) {
+		this.Children.Add(new RectanglePrimitiveDrawable(Vector2.Zero, this.Size, 0, true) {
 			ColorOverride = new Color(100, 100, 100, 100),
 			Clickable     = false,
 			CoverClicks   = false,
 			Hoverable     = false,
 			CoverHovers   = false
 		});
-		this.Drawables.Add(this._scrollable = new ScrollableContainer(this.Size) {
+		this.Children.Add(this._scrollable = new ScrollableContainer(this.Size) {
 			InvisibleToInput = true
 		});
 
@@ -43,7 +43,7 @@ public sealed class ModOptionsDrawable : CompositeDrawable {
 		float       y = 0;
 
 		//Remove all drawables from the list and update the max scroll
-		this._scrollable.Drawables.Clear();
+		this._scrollable.Children.Clear();
 		this._scrollable.RecalculateMax();
 
 		//Iterate over all mods 

@@ -70,7 +70,7 @@ public static class UiMakerCodeGen {
 				_ => throw new Exception("Unknown element type!")
 			};
 
-			builder.AppendLine($"this.Drawables.Add(this.{element.Identifier} = new({args}));");
+			builder.AppendLine($"this.Children.Add(this.{element.Identifier} = new({args}));");
 			builder.AppendLine($"this.{element.Identifier}.Rotation       = {FormatFloat(element.Rotation)};");
 			builder.AppendLine($"this.{element.Identifier}.Depth          = {FormatFloat(element.Depth)};");
 			builder.AppendLine($"this.{element.Identifier}.OriginType     = OriginType.{element.OriginType};");

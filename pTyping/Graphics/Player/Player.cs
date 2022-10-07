@@ -119,7 +119,7 @@ public class Player : CompositeDrawable {
 			Depth = -0.95f
 		};
 
-		this.Drawables.Add(this._playfieldBackground);
+		this.Children.Add(this._playfieldBackground);
 
 		//TODO: beatmap skins
 		// FileInfo[] noteFiles = new DirectoryInfo(this.Song.QualifiedFolderPath).GetFiles("note.png");
@@ -134,7 +134,7 @@ public class Player : CompositeDrawable {
 			OriginType = OriginType.Center
 		};
 
-		this.Drawables.Add(this._recepticle);
+		this.Children.Add(this._recepticle);
 
 		//TODO: Called before creating the notes
 		// this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));
@@ -324,7 +324,7 @@ public class Player : CompositeDrawable {
 
 	private void ShowTypingIndicator(char character, bool miss = false) {
 		if (this._currentTypingIndicator != null)
-			this.Drawables.Remove(this._currentTypingIndicator);
+			this.Children.Remove(this._currentTypingIndicator);
 
 		if (this._currentTypingIndicator == null) {
 			this._currentTypingIndicator = new TextDrawable(RECEPTICLE_POS, pTypingGame.JapaneseFont, character.ToString(), 60) {
@@ -337,7 +337,7 @@ public class Player : CompositeDrawable {
 			this._currentTypingIndicator.Text     = character.ToString();
 		}
 
-		this.Drawables.Add(this._currentTypingIndicator);
+		this.Children.Add(this._currentTypingIndicator);
 
 		if (miss) {
 			//random bool
@@ -481,7 +481,7 @@ public class Player : CompositeDrawable {
 
 			if (currentTime < note.Note.Time - this.CurrentApproachTime(note.Note.Time)) continue;
 
-			this.Drawables.Add(note);
+			this.Children.Add(note);
 			note.Added = true;
 		}
 
@@ -492,7 +492,7 @@ public class Player : CompositeDrawable {
 
 			if (currentTime < drawable.Tweens[0].StartTime) continue;
 
-			this.Drawables.Add(drawable);
+			this.Children.Add(drawable);
 			this._events[i] = new Tuple<Drawable, bool>(drawable, true);
 		}
 

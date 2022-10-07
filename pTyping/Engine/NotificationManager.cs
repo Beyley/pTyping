@@ -189,9 +189,9 @@ public class NotificationManager : DrawableManager {
 
 			this.Depth = -1;
 
-			this.Drawables.Add(this._backgroundDrawable);
-			this.Drawables.Add(this._outlineDrawable);
-			this.Drawables.Add(this._textDrawable);
+			this.Children!.Add(this._backgroundDrawable);
+			this.Children.Add(this._outlineDrawable);
+			this.Children.Add(this._textDrawable);
 		}
 	}
 }

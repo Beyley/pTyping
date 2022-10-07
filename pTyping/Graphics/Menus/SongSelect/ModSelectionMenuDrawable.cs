@@ -82,9 +82,9 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 		float lineY       = 0;
 		for (int i = 0; i < lineAmounts; i++) {
 			LinePrimitiveDrawable line;
-			this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
+			this.Children.Add(line = new LinePrimitiveDrawable(new(0, lineY + 1), new(406, 0), Color.White, 2f));
 			this.Lines.Add(line);
-			this.Drawables.Add(line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray, 2f));
+			this.Children.Add(line = new LinePrimitiveDrawable(new(0, lineY + 2), new(406, 0), Color.Gray, 2f));
 			this.Lines.Add(line);
 			lineY += 100;
 		}
@@ -97,7 +97,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 
 			ModButtonDrawable modButton = new ModButtonDrawable(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
 
-			this.Drawables.Add(modButton);
+			this.Children.Add(modButton);
 			this._mods.Add(modButton);
 
 			x += 15 + modButton.Size.X;
@@ -108,18 +108,18 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 			}
 		}
 
-		this.Drawables.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFont, "", 30));
+		this.Children.Add(this._scoreMultiplier = new TextDrawable(new(0, y - 100), pTypingGame.JapaneseFont, "", 30));
 
 		this.UpdateScoreMultiplierText();
 
-		this.Drawables.Add(
+		this.Children.Add(
 			this._background = new RectanglePrimitiveDrawable(new(-2, -66), new(410, this.Size.Y + 4), 2, true) {
 				ColorOverride = new(50, 50, 50, 175),
 				Depth         = -1f
 			}
 		);
 
-		this.Drawables.Add(this._options = new ModOptionsDrawable(this.SelectedMods));
+		this.Children.Add(this._options = new ModOptionsDrawable(this.SelectedMods));
 		this._options.Position.X = this.Size.X + 10;
 		this._options.Position.Y = -100;
 	}

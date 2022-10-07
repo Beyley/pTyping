@@ -35,7 +35,7 @@ public class CreateEventTool : EditorTool {
 			Scale      = new Vector2(1, 80)
 		};
 
-		this.DrawableManager.Drawables.Add(this._createLine);
+		this.DrawableManager.Children.Add(this._createLine);
 
 		this.SelectedEventLabel            = UiElement.CreateText(pTypingGame.JapaneseFont, "Event", LABELTEXTSIZE);
 		this.SelectedEventLabel.SpaceAfter = LABELAFTERDISTANCE;
@@ -150,7 +150,7 @@ public class CreateEventTool : EditorTool {
 	}
 
 	public override void Deinitialize() {
-		this.DrawableManager.Drawables.Remove(this._createLine);
+		this.DrawableManager.Children.Remove(this._createLine);
 
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEventLabel);
 		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEvent);

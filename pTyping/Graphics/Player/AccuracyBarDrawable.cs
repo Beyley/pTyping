@@ -51,10 +51,10 @@ public class AccuracyBarDrawable : CompositeDrawable {
 			ColorOverride = Player.COLOR_EXCELLENT
 		};
 
-		this.Drawables.Add(this._poorRect);
-		this.Drawables.Add(this._fairRect);
-		this.Drawables.Add(this._goodRect);
-		this.Drawables.Add(this._excellentRect);
+		this.Children.Add(this._poorRect);
+		this.Children.Add(this._fairRect);
+		this.Children.Add(this._goodRect);
+		this.Children.Add(this._excellentRect);
 	}
 
 	private void OnChar(object sender, double e) {
@@ -67,11 +67,11 @@ public class AccuracyBarDrawable : CompositeDrawable {
 
 		rect.Tweens.Add(new ColorTween(TweenType.Color, rect.ColorOverride, new Color(0, 0, 0, 0), FurballGame.Time, FurballGame.Time + fadeoutTime));
 
-		this.Drawables.Add(rect);
+		this.Children.Add(rect);
 
 		FurballGame.GameTimeScheduler.ScheduleMethod(
 			_ => {
-				this.Drawables.Remove(rect);
+				this.Children.Remove(rect);
 			}, FurballGame.Time + fadeoutTime);
 	}
 
