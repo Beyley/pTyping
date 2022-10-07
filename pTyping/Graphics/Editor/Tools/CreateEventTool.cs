@@ -106,14 +106,16 @@ public class CreateEventTool : EditorTool {
 			case LYRIC: {
 				@event = new Event {
 					Start = this.EditorInstance.EditorState.MouseTime,
-					Text  = this.LyricInput.AsTextBox().Text
+					Text  = this.LyricInput.AsTextBox().Text,
+					Type  = EventType.Lyric
 				};
 
 				break;
 			}
 			case TYPING_CUTOFF: {
 				@event = new Event {
-					Start = this.EditorInstance.EditorState.MouseTime
+					Start = this.EditorInstance.EditorState.MouseTime,
+					Type  = EventType.TypingCutoff
 				};
 
 				break;

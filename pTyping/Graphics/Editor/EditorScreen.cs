@@ -459,8 +459,21 @@ public class EditorScreen : pScreen {
 	}
 
 	public void CreateEvent(Event @event, bool isNew = false) {
-		// Drawable eventDrawable = Event.CreateEventDrawable(@event, this.NoteTexture, new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Time), true, true));
-		Drawable eventDrawable = null;
+		Drawable                  eventDrawable = null;
+		GameplayDrawableTweenArgs args          = new GameplayDrawableTweenArgs(this.CurrentApproachTime(@event.Start), true, true);
+		switch (@event.Type) {
+			case EventType.TypingCutoff:
+				TypingCutoffEventDrawable drawable = new TypingCutoffEventDrawable(this.NoteTexture, @event);
+
+				drawable.CreateTweens(args);
+
+				eventDrawable = drawable;
+				break;
+			case EventType.Lyric:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
+		}
 
 		if (eventDrawable == null) return;
 
