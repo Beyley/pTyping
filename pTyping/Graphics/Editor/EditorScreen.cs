@@ -60,6 +60,8 @@ public class EditorScreen : pScreen {
 	public long LastEscapeTime;
 
 	public SoundEffectPlayer HitSoundNormal;
+	public SoundEffectPlayer HitSoundMetronome1;
+	public SoundEffectPlayer HitSoundMetronome2;
 
 	public override void Initialize() {
 		base.Initialize();
@@ -346,7 +348,9 @@ public class EditorScreen : pScreen {
 		FurballGame.InputManager.OnMouseMove   += this.OnMouseMove;
 		FurballGame.InputManager.OnMouseDrag   += this.OnMouseDrag;
 
-		this.HitSoundNormal = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+		this.HitSoundNormal     = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("hitsound.wav", ContentSource.User));
+		this.HitSoundMetronome1 = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("metronome-1.wav", ContentSource.User));
+		this.HitSoundMetronome2 = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("metronome-2.wav", ContentSource.User));
 
 		ConVars.Volume.OnChange += this.OnVolumeChange;
 		// this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
@@ -665,6 +669,11 @@ public class EditorScreen : pScreen {
 
 				break;
 			}
+			case Key.M: {
+				this.ToggleMetronome();
+
+				break;
+			}
 			case Key.F5: {
 				if (this.Manager.Drawables.Contains(this._songForm))
 					break;
@@ -840,6 +849,9 @@ public class EditorScreen : pScreen {
 			}
 		}
 	}
+	private void ToggleMetronome() {
+		this._metronome = !this._metronome;
+	}
 
 	private readonly List<Drawable> _timingPoints = new List<Drawable>();
 
@@ -893,7 +905,7 @@ public class EditorScreen : pScreen {
 		//TODO: support per note approach times
 	}
 
-	private double           _lastTime;
+	private double           _timeAtLastUpdate;
 	private DrawableDropdown _speedDropdown;
 	[CanBeNull]
 	private VideoDrawable _video;
@@ -905,10 +917,39 @@ public class EditorScreen : pScreen {
 	private DrawableForm     _songForm;
 	private bool             CancelSelectionEvents;
 	public  Beatmap          RealmMap;
-	public override void Update(double gameTime) {
+	private bool             _metronome;
+	private bool             _metronomeFlipFlop;
+	public override void Update(double _) {
 		this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
-		if (!this.EditorState.CurrentTime.Equals(this._lastTime)) {
+		//Get the current timing point
+		TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(this.EditorState.CurrentTime);
+
+		//Get the time since the timing point started
+		double timeSinceTimingPoint = this.EditorState.CurrentTime - timingPoint.Time;
+
+		//Get the time since the timing point started from the point of view of the last frame
+		double timeSinceTimingPointLastFrame = this._timeAtLastUpdate - timingPoint.Time;
+
+		//Check how many beats have passed since the last timing point
+		double beatsSinceLastTimingPoint = Math.Floor(timeSinceTimingPoint / timingPoint.Tempo);
+
+		//Check how many beats have passed since the last timing point from the point of view of the last frame
+		double beatsSinceLastTimingPointLast = Math.Floor(timeSinceTimingPointLastFrame / timingPoint.Tempo);
+
+		//If we have passed a beat since the last frame, play a metronome sound
+		if (this._metronome && beatsSinceLastTimingPoint > beatsSinceLastTimingPointLast) {
+			//Flip between metronome 1 and 2 every beat
+			this._metronomeFlipFlop = !this._metronomeFlipFlop;
+
+			//Play the metronome sound
+			if (this._metronomeFlipFlop)
+				this.HitSoundMetronome1.PlayNew();
+			else
+				this.HitSoundMetronome2.PlayNew();
+		}
+
+		if (!this.EditorState.CurrentTime.Equals(this._timeAtLastUpdate)) {
 			this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
 
 			foreach (NoteDrawable note in this.EditorState.Notes) {
@@ -940,9 +981,9 @@ public class EditorScreen : pScreen {
 		this._currentTimeDrawable.Text = $"Time: {minutes:00}:{seconds:00}:{milliseconds:000}";
 		this._progressBar.Progress     = (float)this.EditorState.CurrentTime / (float)pTypingGame.MusicTrack.Length;
 
-		this._lastTime = this.EditorState.CurrentTime;
+		this._timeAtLastUpdate = this.EditorState.CurrentTime;
 
-		base.Update(gameTime);
+		base.Update(_);
 	}
 
 	public void ToggleMusicPlay() {
