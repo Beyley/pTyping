@@ -113,7 +113,7 @@ public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICo
 		if (this.TimingPoints.Count == 0)
 			return new TimingPoint(0, 100);
 
-		return this.TimingPoints.FirstOrDefault(x => x.Time <= time, this.TimingPoints.First());
+		return this.TimingPoints.FirstOrDefault(x => x.Time <= time, this.TimingPoints[0]);
 	}
 
 	[Pure]
