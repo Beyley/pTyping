@@ -113,6 +113,23 @@ public class EditorScreen : pScreen {
 
 		this.EditorDrawable.Children.Add(this._playfieldBackgroundCover);
 
+		#region Create waveform
+
+		Stream stream = pTypingGame.FileDatabase.GetFileStream(this.EditorState.Song.FileCollection.Audio!.Hash);
+
+		this._audioWaveform = FurballGame.AudioEngine.GetWaveform(stream);
+
+		stream.Close();
+
+		this._waveformDrawable = new WaveformDrawable(new Vector2(Player.Player.NOTE_END_POS.X, this._playfieldBackgroundCover.Position.Y), this._audioWaveform, this._playfieldBackgroundCover.Size.Y);
+
+		this._waveformDrawable.StartCrop = 0;
+		this._waveformDrawable.EndCrop   = 100;
+
+		this.EditorDrawable.Children.Add(this._waveformDrawable);
+
+		#endregion
+
 		#region background image
 
 		this.Manager.Add(pTypingGame.CurrentSongBackground);
@@ -919,21 +936,23 @@ public class EditorScreen : pScreen {
 	public  Beatmap          RealmMap;
 	private bool             _metronome;
 	private bool             _metronomeFlipFlop;
+	private Waveform         _audioWaveform;
+	private WaveformDrawable _waveformDrawable;
 	public override void Update(double _) {
 		this.EditorState.CurrentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
 		//Get the current timing point
 		TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(this.EditorState.CurrentTime);
-
+		
 		//Get the time since the timing point started
 		double timeSinceTimingPoint = this.EditorState.CurrentTime - timingPoint.Time;
-
+		
 		//Get the time since the timing point started from the point of view of the last frame
 		double timeSinceTimingPointLastFrame = this._timeAtLastUpdate - timingPoint.Time;
-
+		
 		//Check how many beats have passed since the last timing point
 		double beatsSinceLastTimingPoint = Math.Floor(timeSinceTimingPoint / timingPoint.Tempo);
-
+		
 		//Check how many beats have passed since the last timing point from the point of view of the last frame
 		double beatsSinceLastTimingPointLast = Math.Floor(timeSinceTimingPointLastFrame / timingPoint.Tempo);
 
@@ -941,13 +960,31 @@ public class EditorScreen : pScreen {
 		if (this._metronome && beatsSinceLastTimingPoint > beatsSinceLastTimingPointLast) {
 			//Flip between metronome 1 and 2 every beat
 			this._metronomeFlipFlop = !this._metronomeFlipFlop;
-
+		
 			//Play the metronome sound
 			if (this._metronomeFlipFlop)
 				this.HitSoundMetronome1.PlayNew();
 			else
 				this.HitSoundMetronome2.PlayNew();
 		}
+
+		#region update waveform
+
+		float travelDistance = Player.Player.NOTE_START_POS.X - Player.Player.RECEPTICLE_POS.X;
+		float travelRatio    = (float)(this.CurrentApproachTime(this.EditorState.CurrentTime) / travelDistance);
+
+		float afterTravelTime = (Player.Player.RECEPTICLE_POS.X - Player.Player.NOTE_END_POS.X) * travelRatio;
+
+		this._waveformDrawable.StartCrop = this.EditorState.CurrentTime - afterTravelTime;
+		this._waveformDrawable.EndCrop   = this.EditorState.CurrentTime + ConVars.BASE_APPROACH_TIME;
+
+		//How far the notes have to travel in gamefield pixels
+		float distanceFromEndToStart = Player.Player.NOTE_START_POS.X - Player.Player.NOTE_END_POS.X;
+
+		//Scale the waveform to fit the distance
+		this._waveformDrawable.Scale = new Vector2((float)(distanceFromEndToStart / (this._waveformDrawable.EndCrop - this._waveformDrawable.StartCrop)), 1);
+
+		#endregion
 
 		if (!this.EditorState.CurrentTime.Equals(this._timeAtLastUpdate)) {
 			this.CurrentTool?.OnTimeChange(this.EditorState.CurrentTime);
