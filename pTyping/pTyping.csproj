@@ -67,6 +67,6 @@
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)/gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;" />
+        <Exec Command="git describe --long --always --dirty --exclude=\* --abbrev=8 &gt; &quot;$(ProjectDir)gitversion.txt&quot;;&#xA;git log --pretty=format:'{%n  @^^ABBA^^@commit@^^ABBA^^@: @^^ABBA^^@%H@^^ABBA^^@,%n  @^^ABBA^^@author@^^ABBA^^@: @^^ABBA^^@%aN;@^^ABBA^^@,%n  @^^ABBA^^@date@^^ABBA^^@: @^^ABBA^^@%ci@^^ABBA^^@,%n  @^^ABBA^^@message@^^ABBA^^@: @^^ABBA^^@%s@^^ABBA^^@%n},' $@ | perl -pe 'BEGIN{print &quot;[&quot;}; END{print &quot;]\n&quot;}' | perl -pe 's/},]/}]/' &gt; &quot;$(ProjectDir)/gitlog.json&quot;" />
     </Target>
 </Project>
