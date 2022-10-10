@@ -43,7 +43,7 @@ public class ScoreResultsDrawable : CompositeDrawable {
 		this.Children.Add(SetRotOrigin(this._good = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Good: {score.GoodHits}", 30)));
 		this.Children.Add(SetRotOrigin(this._fair = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Fair: {score.FairHits}", 30)));
 		this.Children.Add(SetRotOrigin(this._poor = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Poor: {score.PoorHits}", 30)));
-		this.Children.Add(SetRotOrigin(this._date = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Date: {score.Time}", 30)));
+		this.Children.Add(SetRotOrigin(this._date = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, $"Date: {score.Time.ToLocalTime().DateTime}", 30)));
 
 		FurballGame.InputManager.OnMouseScroll += this.OnMouseScroll;
 	}
