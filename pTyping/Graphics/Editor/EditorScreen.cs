@@ -121,7 +121,9 @@ public class EditorScreen : pScreen {
 
 		stream.Close();
 
-		this._waveformDrawable = new WaveformDrawable(new Vector2(Player.Player.NOTE_END_POS.X, this._playfieldBackgroundCover.Position.Y), this._audioWaveform, this._playfieldBackgroundCover.Size.Y);
+		this._waveformDrawable = new WaveformDrawable(new Vector2(Player.Player.NOTE_END_POS.X, this._playfieldBackgroundCover.Position.Y), this._audioWaveform, this._playfieldBackgroundCover.Size.Y) {
+			Depth = -1.1f
+		};
 
 		this._waveformDrawable.StartCrop = 0;
 		this._waveformDrawable.EndCrop   = 100;
