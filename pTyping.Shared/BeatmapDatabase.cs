@@ -11,7 +11,7 @@ public class BeatmapDatabase {
 
 	public const ulong SCHEMA_VERSION = 2;
 
-	public BeatmapDatabase() {
+	public BeatmapDatabase(string dataFolder) {
 		RealmSchema.Builder builder = new RealmSchema.Builder {
 			typeof(BeatmapSet),
 			typeof(Beatmap),
@@ -29,7 +29,7 @@ public class BeatmapDatabase {
 			typeof(HitObjectSettings)
 		};
 
-		RealmConfiguration config = new RealmConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "songs.db")) {
+		RealmConfiguration config = new RealmConfiguration(Path.Combine(dataFolder, "songs.db")) {
 			Schema            = builder.Build(),
 			SchemaVersion     = SCHEMA_VERSION,
 			MigrationCallback = this.Migrate
@@ -37,6 +37,7 @@ public class BeatmapDatabase {
 
 		this.Realm = Realm.GetInstance(config);
 	}
+	
 	private void Migrate(Migration migration, ulong oldSchemaVersion) {
 		List<dynamic>          oldSets = migration.OldRealm.DynamicApi.All("BeatmapSet").ToList();
 		IQueryable<BeatmapSet> newSets = migration.NewRealm.All<BeatmapSet>();

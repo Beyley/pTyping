@@ -6,13 +6,16 @@ using JetBrains.Annotations;
 namespace pTyping.Shared;
 
 public class FileDatabase {
-	public const string DATA_PATH = "data";
+	private readonly string _dataFolder;
+	public const     string DATA_PATH = "data";
 
-	public static readonly string FileFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DATA_PATH, "f");
+	public string FileFolderPath => Path.Combine(this._dataFolder, DATA_PATH, "f");
 
 	private static ConcurrentDictionary<string, WeakReference<byte[]>> _Cache;
 
-	public FileDatabase() {
+	public FileDatabase(string dataFolder) {
+		this._dataFolder = dataFolder;
+		
 		//Ensures the folder exists
 		if (!Directory.Exists(FileFolderPath))
 			Directory.CreateDirectory(FileFolderPath);
@@ -26,7 +29,7 @@ public class FileDatabase {
 	}
 
 	[Pure, NotNull]
-	private static string PathForHash(string hash) {
+	private string PathForHash(string hash) {
 		return Path.Combine(FileFolderPath, FolderForHash(hash), hash);
 	}
 

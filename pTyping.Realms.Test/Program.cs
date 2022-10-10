@@ -4,9 +4,9 @@ using pTyping.Shared.Beatmaps.Importers;
 
 public static class Program {
 	public static void Main(string[] args) {
-		BeatmapDatabase database      = new BeatmapDatabase();
-		ScoreDatabase   scoreDatabase = new ScoreDatabase();
-		FileDatabase    fileDatabase  = new FileDatabase();
+		BeatmapDatabase database      = new BeatmapDatabase(AppContext.BaseDirectory);
+		ScoreDatabase   scoreDatabase = new ScoreDatabase(AppContext.BaseDirectory);
+		FileDatabase    fileDatabase  = new FileDatabase(AppContext.BaseDirectory);
 
 		database.Realm.Write(
 			() => {

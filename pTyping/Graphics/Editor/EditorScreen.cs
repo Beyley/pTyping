@@ -768,10 +768,10 @@ public class EditorScreen : pScreen {
 					pTypingBeatmapExporter exporter = new pTypingBeatmapExporter();
 
 					//Create an instance of the realm for this thread
-					BeatmapDatabase beatmapDatabase = new BeatmapDatabase();
+					BeatmapDatabase beatmapDatabase = new BeatmapDatabase(FurballGame.DataFolder);
 
 					//Get the path of the export dir
-					string exportPath = Path.Combine(FurballGame.AssemblyPath, "exports");
+					string exportPath = Path.Combine(FurballGame.DataFolder, "exports");
 
 					//Create the export dir if it does not exist
 					if (!Directory.Exists(exportPath))
@@ -901,7 +901,7 @@ public class EditorScreen : pScreen {
 		BeatmapSet toSave = this.EditorState.Set.Clone();
 
 		new Thread(_ => {
-			BeatmapDatabase database = new BeatmapDatabase();
+			BeatmapDatabase database = new BeatmapDatabase(FurballGame.DataFolder);
 
 			BeatmapSet beatmap = database.Realm.Find<BeatmapSet>(id);
 

@@ -68,6 +68,9 @@ internal class Program {
 				using StreamWriter writer = new StreamWriter(stream);
 		
 				writer.Write(ex.ToString());
+				writer.Flush();
+
+				writer.Close();
 		
 				game.WindowManager.Close();
 			}

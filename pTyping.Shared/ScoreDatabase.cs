@@ -8,14 +8,14 @@ namespace pTyping.Shared;
 public class ScoreDatabase {
 	public Realm Realm;
 
-	public ScoreDatabase() {
+	public ScoreDatabase(string dataFolder) {
 		RealmSchema.Builder builder = new RealmSchema.Builder {
 			typeof(Score),
 			typeof(DatabaseUser),
 			typeof(ReplayFrame)
 		};
 
-		RealmConfiguration config = new RealmConfiguration(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scores.db")) {
+		RealmConfiguration config = new RealmConfiguration(Path.Combine(dataFolder, "scores.db")) {
 			Schema = builder.Build()
 		};
 

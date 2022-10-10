@@ -16,8 +16,8 @@ using pTyping.Shared.Scores;
 namespace pTyping;
 
 public static class ImportChecker {
-	private static string LegacySongFolder               => Path.Combine(FurballGame.AssemblyPath, "songs/");
-	private static string LegacySongFolderImported       => Path.Combine(FurballGame.AssemblyPath, "songs-imported/");
+	private static string LegacySongFolder               => Path.Combine(FurballGame.DataFolder, "songs/");
+	private static string LegacySongFolderImported       => Path.Combine(FurballGame.DataFolder, "songs-imported/");
 	private static string LegacySongFolderImportedFailed => Path.Combine(LegacySongFolderImported, "failed/");
 
 	public static void ImportMaps() {
@@ -26,11 +26,11 @@ public static class ImportChecker {
 	}
 
 	private static void ImportMapsAndScoresRun() {
-		BeatmapDatabase database      = new BeatmapDatabase();
-		ScoreDatabase   scoreDatabase = new ScoreDatabase();
-		FileDatabase    fileDatabase  = new FileDatabase();
+		BeatmapDatabase database      = new BeatmapDatabase(FurballGame.DataFolder);
+		ScoreDatabase   scoreDatabase = new ScoreDatabase(FurballGame.DataFolder);
+		FileDatabase    fileDatabase  = new FileDatabase(FurballGame.DataFolder);
 
-		DirectoryInfo info = new DirectoryInfo(Path.Combine(FurballGame.AssemblyPath, "songs"));
+		DirectoryInfo info = new DirectoryInfo(Path.Combine(FurballGame.DataFolder, "songs"));
 
 		if (!info.Exists)
 			info.Create();
@@ -89,7 +89,7 @@ public static class ImportChecker {
 		int importedScores = scoreDatabase.Realm.Write(() => {
 			int imported = 0;
 
-			info = new DirectoryInfo(Path.Combine(FurballGame.AssemblyPath, "scores"));
+			info = new DirectoryInfo(Path.Combine(FurballGame.DataFolder, "scores"));
 
 			if (!info.Exists)
 				info.Create();
@@ -129,8 +129,8 @@ public static class ImportChecker {
 		Directory.CreateDirectory(LegacySongFolderImported);
 		Directory.CreateDirectory(LegacySongFolderImportedFailed);
 
-		BeatmapDatabase database      = new BeatmapDatabase();
-		ScoreDatabase   scoreDatabase = new ScoreDatabase();
+		BeatmapDatabase database      = new BeatmapDatabase(FurballGame.DataFolder);
+		ScoreDatabase   scoreDatabase = new ScoreDatabase(FurballGame.DataFolder);
 
 		database.Realm.Write(
 			() => {

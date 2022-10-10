@@ -391,8 +391,6 @@ public class pTypingGame : FurballGame {
 
 		OffsetManager.Initialize();
 
-		ScreenshotManager.Initialize();
-
 		CurrentSongBackground = new TexturedDrawable(Texture.CreateWhitePixelTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
 			Depth       = 1f,
 			OriginType  = OriginType.Center,
@@ -407,6 +405,8 @@ public class pTypingGame : FurballGame {
 		NotificationManager = new NotificationManager();
 
 		base.Initialize();
+
+		ScreenshotManager.Initialize();
 
 		TooltipDrawable.TextDrawable.SetFont(JapaneseFont, 20);
 
@@ -448,12 +448,12 @@ public class pTypingGame : FurballGame {
 
 		TypingConversions.LoadConversion(); //todo: support IMEs for more languages, and make it customizable by the user
 
-		BeatmapDatabase = new BeatmapDatabase();
+		BeatmapDatabase = new BeatmapDatabase(DataFolder);
 		BeatmapDatabase.Realm.Refresh();
 
-		FileDatabase = new FileDatabase();
+		FileDatabase = new FileDatabase(DataFolder);
 
-		ScoreDatabase = new ScoreDatabase();
+		ScoreDatabase = new ScoreDatabase(DataFolder);
 		ScoreDatabase.Realm.Refresh();
 
 		ImportChecker.ImportMaps();
