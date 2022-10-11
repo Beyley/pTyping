@@ -10,11 +10,6 @@ jobs:
         uses: actions/checkout@master
         with:
           submodules: recursive
-    
-        # Setup monogame
-      - name: Install MGCB tool
-        id: mgcb
-        run: dotnet tool update --global dotnet-mgcb-editor --version *-*
 
       - name: Run Tests
         uses: zyborg/dotnet-tests-report@v1
