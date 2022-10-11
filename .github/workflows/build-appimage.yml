@@ -20,10 +20,14 @@ jobs:
     - name: change UseImGui to false
       run: for FILENAME in $(find -name "Directory.Build.props"); do sed -i 's/<UseImGui>true/<UseImGui>false/g' $FILENAME; done
     - name: Restore dependencies
+      working-directory: pTyping
       run: dotnet restore
     - name: Build
+      working-directory: pTyping
       run: dotnet build --no-restore
     - name: Test
+      working-directory: pTyping
       run: dotnet test --no-build --verbosity normal
     - name: Package AppImage
-      run: cd pTyping && ../build-tools/Publish-AppImage/publish-appimage -y
+      working-directory: pTyping
+      run: ../build-tools/publish-appimage/publish-appimage -y
