@@ -1,4 +1,4 @@
-name: .NET
+name: Build AppImage
 
 on:
   push:
@@ -30,9 +30,9 @@ jobs:
     - name: Test
       working-directory: pTyping
       run: dotnet test --no-build --verbosity normal
-    - name: download appimagetool
+    - name: Download appimagetool and configure publish-appimage
       working-directory: .
-      run: wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" && chmod a+x ./appimagetool-x86_64.AppImage
+      run: wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" && chmod a+x ./appimagetool-x86_64.AppImage && sed -i 's/APPIMAGETOOL_COMMAND="appimagetool"/APPIMAGETOOL_COMMAND="$(GITHUB_WORKSPACE)/appimagetool-x86_64.AppImage"
     - name: Package AppImage
       working-directory: pTyping
-      run: APPIMAGETOOL_COMMAND=../appimagetool-x86_64.AppImage ../build-tools/publish-appimage/publish-appimage -y
+      run: ../build-tools/publish-appimage/publish-appimage -y
