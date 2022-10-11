@@ -36,3 +36,8 @@ jobs:
     - name: Package AppImage
       working-directory: pTyping
       run: ../build-tools/publish-appimage/publish-appimage -y
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: pTyping AppImage
+        path: AppImages/pTyping-x86_64.AppImage
