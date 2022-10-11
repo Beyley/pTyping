@@ -1,3 +1,6 @@
 [submodule "Furball"]
 	path = Furball
 	url = https://github.com/Eeveelution/Furball
+[submodule "build-tools/publish-appimage"]
+	path = build-tools/publish-appimage
+	url = https://github.com/kuiperzone/publish-appimage
