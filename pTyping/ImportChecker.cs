@@ -81,6 +81,9 @@ public static class ImportChecker {
 
 				//Indicate that we have imported another map successfully
 				importedMaps++;
+
+				//Delete the archive after it is imported 
+				archive.Delete();
 			}
 
 			return importedMaps;
