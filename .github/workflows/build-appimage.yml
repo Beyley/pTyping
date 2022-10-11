@@ -30,6 +30,9 @@ jobs:
     - name: Test
       working-directory: pTyping
       run: dotnet test --no-build --verbosity normal
+    - name: download appimagetool
+      working-directory: .
+      run: wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" && chmod a+x ./appimagetool-x86-64.AppImage
     - name: Package AppImage
       working-directory: pTyping
-      run: ../build-tools/publish-appimage/publish-appimage -y
+      run: alias appimagetool=../appimagetool-x86-64.AppImage && ../build-tools/publish-appimage/publish-appimage -y
