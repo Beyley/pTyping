@@ -40,4 +40,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: pTyping AppImage
-        path: AppImages/pTyping-x86_64.AppImage
+        path: ${GITHUB_WORKSPACE}/pTyping/AppImages/pTyping-x86_64.AppImage
