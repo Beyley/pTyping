@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class HitObjectColor : EmbeddedObject, IClonable<HitObjectColor> {
+public class HitObjectColor : EmbeddedObject, ICloneable<HitObjectColor> {
 	private HitObjectColor(float colorRf, float colorGf, float colorBf, float colorAf) {
 		this.R = colorRf;
 		this.G = colorGf;

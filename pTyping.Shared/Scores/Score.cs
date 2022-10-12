@@ -8,7 +8,7 @@ using Realms;
 namespace pTyping.Shared.Scores;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Score : RealmObject, IClonable<Score> {
+public class Score : RealmObject, ICloneable<Score> {
 	public Score() {
 		this.User = new DatabaseUser();
 		this.Id   = Guid.NewGuid();

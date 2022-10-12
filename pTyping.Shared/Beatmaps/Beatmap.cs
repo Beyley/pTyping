@@ -11,7 +11,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Beatmap : RealmObject, IClonable<Beatmap>, IEquatable<Beatmap>, ICopyable<Beatmap> {
+public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, ICopyable<Beatmap> {
 	[PrimaryKey, JsonProperty]
 	public string Id { get; set; }
 

@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, IClonable<BeatmapInfo> {
+public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, ICloneable<BeatmapInfo> {
 	[Description("A description of the beatmap given by the creator."), JsonProperty]
 	public string Description { get; set; }
 

@@ -7,7 +7,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class HitObject : EmbeddedObject, IClonable<HitObject> {
+public class HitObject : EmbeddedObject, ICloneable<HitObject> {
 	[Description("The time the hit object occurs at"), JsonProperty]
 	public double Time { get; set; }
 

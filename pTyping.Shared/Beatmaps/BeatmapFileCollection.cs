@@ -8,7 +8,7 @@ namespace pTyping.Shared.Beatmaps;
 #nullable enable
 
 [JsonObject(MemberSerialization.OptIn)]
-public class BeatmapFileCollection : EmbeddedObject, IClonable<BeatmapFileCollection> {
+public class BeatmapFileCollection : EmbeddedObject, ICloneable<BeatmapFileCollection> {
 	[Description("The hash and file path for the audio."), JsonProperty]
 	public PathHashTuple? Audio { get; set; }
 	[Description("The hash and file path for the background image."), JsonProperty]

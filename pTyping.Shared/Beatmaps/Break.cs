@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Break : EmbeddedObject, IClonable<Break> {
+public class Break : EmbeddedObject, ICloneable<Break> {
 	[Description("The end of the break"), JsonProperty]
 	public double End { get; set; }
 	[Description("The start of the break"), JsonProperty]

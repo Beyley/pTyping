@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class BeatmapDifficulty : EmbeddedObject, IClonable<BeatmapDifficulty> {
+public class BeatmapDifficulty : EmbeddedObject, ICloneable<BeatmapDifficulty> {
 	[Description("How strict timing is for the song"), JsonProperty]
 	public float Strictness { get; set; } = 5;
 

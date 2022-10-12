@@ -1,5 +1,5 @@
 namespace pTyping.Shared.ObjectModel;
 
-public interface IClonable <T> {
+public interface ICloneable <T> {
 	public T Clone();
 }

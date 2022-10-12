@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class BeatmapSet : RealmObject, IClonable<BeatmapSet>, IEquatable<BeatmapSet>, ICopyable<BeatmapSet> {
+public class BeatmapSet : RealmObject, ICloneable<BeatmapSet>, IEquatable<BeatmapSet>, ICopyable<BeatmapSet> {
 	public BeatmapSet() {
 		this.Id = Guid.NewGuid();
 	}

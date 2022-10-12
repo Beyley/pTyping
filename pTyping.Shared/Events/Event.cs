@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Events;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class Event : EmbeddedObject, IClonable<Event>, IComparable<Event> {
+public class Event : EmbeddedObject, ICloneable<Event>, IComparable<Event> {
 	[Description("The end of the event"), JsonProperty]
 	public double End { get; set; }
 	[Description("The start of the event"), JsonProperty]

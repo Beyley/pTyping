@@ -5,7 +5,7 @@ using Realms;
 namespace pTyping.Shared.Scores;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class ReplayFrame : EmbeddedObject, IClonable<ReplayFrame> {
+public class ReplayFrame : EmbeddedObject, ICloneable<ReplayFrame> {
 	[JsonProperty]
 	public char   Character { get; set; }
 	[JsonProperty]

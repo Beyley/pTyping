@@ -5,7 +5,7 @@ using Realms;
 namespace pTyping.Shared.ObjectModel;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class DatabaseUser : RealmObject, IClonable<DatabaseUser>, IEquatable<DatabaseUser> {
+public class DatabaseUser : RealmObject, ICloneable<DatabaseUser>, IEquatable<DatabaseUser> {
 	[JsonProperty, Description("The online ID of the user")]
 	public long UserId { get; set; } //NOTE: the reason it is a long and not a uint is because Realm does not support unsigned integers
 

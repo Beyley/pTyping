@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class BeatmapMetadata : EmbeddedObject, IClonable<BeatmapMetadata> {
+public class BeatmapMetadata : EmbeddedObject, ICloneable<BeatmapMetadata> {
 	[JsonProperty]
 	public IList<int> BackingLanguages { get; }
 	[Ignored, Description("The languages contained within the song"), JsonIgnore]

@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class TimingPoint : EmbeddedObject, IClonable<TimingPoint> {
+public class TimingPoint : EmbeddedObject, ICloneable<TimingPoint> {
 	[Description("The exact time where the timing segment starts."), JsonProperty]
 	public double Time { get; set; }
 	[Description("The time between full beats."), JsonProperty]

@@ -6,7 +6,7 @@ using Realms;
 namespace pTyping.Shared.Beatmaps;
 
 [JsonObject(MemberSerialization.OptIn)]
-public class PathHashTuple : EmbeddedObject, IClonable<PathHashTuple> {
+public class PathHashTuple : EmbeddedObject, ICloneable<PathHashTuple> {
 	[Description("The path to the file"), JsonProperty]
 	public string Path { get; set; }
 	[Description("The hash of the file"), JsonProperty]
