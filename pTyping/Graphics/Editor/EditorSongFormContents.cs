@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Xml.Linq;
 using Eto.Forms;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Helpers;
-using pTyping.Online;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
@@ -222,12 +220,12 @@ public class EditorSongFormContents : CompositeDrawable {
 		TextDrawable mapperLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Mapper", 24);
 		y += mapperLabel.Size.Y;
 
-		this._mapperInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.Mapper);
-		y                += this._mapperInput.Size.Y;
+		this._mapperInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.Mapper.Username);
+		y                 += this._mapperInput.Size.Y;
 		
 		this._mapperInput.OnCommit += delegate(object _, string s) {
-			map.Info.Mapper = s;
-			editor.SaveNeeded = true;
+			map.Info.Mapper.Username = s;
+			editor.SaveNeeded        = true;
 		};
 		
 		//TODO: replace this with something more integrated into the editor, rather than a text input

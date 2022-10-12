@@ -25,10 +25,10 @@ public static class UTypingSongParser {
 		infoData = infoData.Replace("\r", "");
 		string[] info = infoData.Split("\n");
 
-		title                       = new AsciiUnicodeTuple(null, info[0]);
-		artist                      = new AsciiUnicodeTuple(null, info[1]);
-		beatmap.Info.Mapper         = info[2];
-		beatmap.Info.DifficultyName = new AsciiUnicodeTuple(null, info[3]);
+		title                        = new AsciiUnicodeTuple(null, info[0]);
+		artist                       = new AsciiUnicodeTuple(null, info[1]);
+		beatmap.Info.Mapper.Username = info[2];
+		beatmap.Info.DifficultyName  = new AsciiUnicodeTuple(null, info[3]);
 
 		source = "UTyping";
 

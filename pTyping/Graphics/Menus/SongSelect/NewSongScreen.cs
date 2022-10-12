@@ -10,6 +10,7 @@ using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
+using pTyping.Shared.ObjectModel;
 using File = TagLib.File;
 
 namespace pTyping.Graphics.Menus.SongSelect;
@@ -106,8 +107,10 @@ public class NewSongScreen : pScreen {
 
 		Beatmap beatmap = new Beatmap();
 
-		beatmap.Id                  = Guid.NewGuid().ToString();
-		beatmap.Info.Mapper         = this._songCreatorTextBox.Text;
+		beatmap.Id = Guid.NewGuid().ToString();
+		beatmap.Info.Mapper = new DatabaseUser {
+			Username = this._songCreatorTextBox.Text
+		};
 		beatmap.Info.DifficultyName = new AsciiUnicodeTuple(null, this._songDifficultyTextBox.Text);
 		beatmap.Metadata.BackingLanguages.Add((int)SongLanguage.Unknown);
 

@@ -633,7 +633,7 @@ public class pTypingGame : FurballGame {
 					final      = $"Listening to {set.Artist} - {set.Title}";
 					break;
 				case ScreenUserActionType.Editing:
-					final = pTypingConfig.Instance.Username == CurrentSong.Value.Info.Mapper
+					final = pTypingConfig.Instance.Username == CurrentSong.Value.Info.Mapper.Username
 						? $"Editing {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}] by {CurrentSong.Value.Info.Mapper}"
 						: $"Modding {set.Artist} - {set.Title} [{CurrentSong.Value.Info.DifficultyName}] by {CurrentSong.Value.Info.Mapper}";
 					actionType = UserActionType.Editing;

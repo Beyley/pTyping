@@ -42,7 +42,7 @@ public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, IC
 	public Beatmap() {
 		this.Info = new BeatmapInfo {
 			Description    = "",
-			Mapper         = "Unknown Creator",
+			Mapper         = new DatabaseUser("Unknown"),
 			DifficultyName = new AsciiUnicodeTuple(""),
 			PreviewTime    = 0
 		};

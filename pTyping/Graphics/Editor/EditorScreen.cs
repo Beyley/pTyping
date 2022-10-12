@@ -1050,7 +1050,7 @@ public class EditorScreen : pScreen {
 	public override string Details {
 		get {
 			BeatmapSet set = pTypingGame.CurrentSong.Value.Parent.First();
-			return pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Info.Mapper
+			return pTypingConfig.Instance.Username == pTypingGame.CurrentSong.Value.Info.Mapper.Username
 				? $"Editing {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}"
 				: $"Modding {set.Artist} - {set.Title} [{pTypingGame.CurrentSong.Value.Difficulty}] by {pTypingGame.CurrentSong.Value.Info.Mapper}";
 		}

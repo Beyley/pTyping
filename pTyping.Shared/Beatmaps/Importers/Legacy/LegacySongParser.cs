@@ -46,7 +46,9 @@ public static class LegacySongParser {
 			Id = CryptoHelper.GetMd5(File.ReadAllBytes(fileInfo.FullName)),
 			Info = {
 				Description    = legacySong.Description,
-				Mapper         = legacySong.Creator,
+				Mapper = {
+					Username = legacySong.Creator
+				},
 				DifficultyName = new AsciiUnicodeTuple(legacySong.Difficulty),
 				PreviewTime    = legacySong.PreviewPoint
 			},

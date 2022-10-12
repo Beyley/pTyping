@@ -14,7 +14,7 @@ public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, ICloneable<B
 	public AsciiUnicodeTuple DifficultyName { get; set; }
 
 	[Description("The person who created the map, aka the mapper."), JsonProperty]
-	public string Mapper { get; set; }
+	public DatabaseUser Mapper { get; set; } = new DatabaseUser("Unknown");
 
 	[Description("The time set to preview the song."), JsonProperty]
 	public double PreviewTime { get; set; }
@@ -38,5 +38,9 @@ public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, ICloneable<B
 			return true;
 		return base.Equals(other) && this.Description == other.Description && Equals(this.DifficultyName, other.DifficultyName) && this.Mapper == other.Mapper &&
 			   this.PreviewTime.Equals(other.PreviewTime);
+	}
+
+	public override bool Equals(object obj) {
+		return this.Equals(obj as BeatmapInfo);
 	}
 }
