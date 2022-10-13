@@ -2,6 +2,9 @@
 
 using System.Numerics;
 using Furball.Engine;
+using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Kettu;
+using pTyping.Engine;
 using pTyping.Graphics.Editor.Scene;
 using pTyping.UiElements;
 
@@ -10,7 +13,14 @@ namespace pTyping.Graphics.Editor;
 public partial class EditorScreen {
 	private EditorScene? _currentScene;
 
+	private RectanglePrimitiveDrawable? _sceneOutline;
+
 	private void LoadScene(EditorScene newScene) {
+		if (newScene.GetType() == this._currentScene?.GetType())
+			return;
+
+		Logger.Log($"Loading editor scene {newScene.GetType().Name}!", LoggerLevelEditorInfo.Instance);
+		
 		// Unload the current scene, if there is one
 		this.CloseScene();
 
@@ -24,7 +34,7 @@ public partial class EditorScreen {
 		this.Relayout(FurballGame.WindowWidth, FurballGame.WindowHeight);
 
 		//Position the scene to the center of the empty space
-		this._currentScene.Position = new Vector2(MARGIN_AROUND_SCENE, ToolbarDrawable.HEIGHT + MARGIN_AROUND_SCENE);
+		this._currentScene.Position = this.ScenePosition;
 
 		// Add the new scene to the editor
 		this.Manager.Add(newScene);
@@ -55,5 +65,8 @@ public partial class EditorScreen {
 
 		// Relayout the scene
 		this._currentScene?.Relayout(newWidth, newHeight);
+
+		if (this._sceneOutline != null)
+			this._sceneOutline.RectSize = this.SceneSize;
 	}
 }
