@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-using pTyping.Graphics.Editor.Scene;
+using pTyping.Graphics.Editor.Scene.LyricEditor;
+using pTyping.Graphics.Editor.Scene.NoteEditor;
 using pTyping.UiElements;
 
 namespace pTyping.Graphics.Editor;

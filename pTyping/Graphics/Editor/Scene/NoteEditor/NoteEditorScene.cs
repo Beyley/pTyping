@@ -1,7 +1,4 @@
-using System.Numerics;
-using Furball.Engine.Engine.Graphics.Drawables.Primitives;
-
-namespace pTyping.Graphics.Editor.Scene;
+namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 
 public sealed class NoteEditorScene : EditorScene {
 	public NoteEditorScene(EditorScreen editor) : base(editor) {

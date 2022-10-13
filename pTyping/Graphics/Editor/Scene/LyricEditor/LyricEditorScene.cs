@@ -1,4 +1,4 @@
-namespace pTyping.Graphics.Editor.Scene;
+namespace pTyping.Graphics.Editor.Scene.LyricEditor;
 
 public class LyricEditorScene : EditorScene {
 	public LyricEditorScene(EditorScreen editor) : base(editor) {}
