@@ -21,6 +21,7 @@ public partial class EditorScreen : pScreen {
 		//Load the default scene when you first start the editor
 		this.LoadScene(new NoteEditorScene(this));
 
+		//Add an outline for the scene
 		this.Manager.Add(this._sceneOutline = new RectanglePrimitiveDrawable(this.ScenePosition, this.SceneSize, 1, false));
 	}
 }
