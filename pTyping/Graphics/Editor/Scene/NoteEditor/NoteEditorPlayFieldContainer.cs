@@ -63,9 +63,9 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 	public void Relayout() {
 		this._outline.RectSize = this.Size;
-
+		
 		foreach (Player.Player player in this._players)
-			player.Scale = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / this.Size.X);
+			player.Scale = new Vector2(this.Size.X / FurballGame.DEFAULT_WINDOW_WIDTH);
 
 		this.RelayoutPlayers();
 	}
