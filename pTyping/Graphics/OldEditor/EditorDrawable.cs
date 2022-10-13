@@ -1,7 +1,7 @@
 using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 
-namespace pTyping.Graphics.Editor;
+namespace pTyping.Graphics.OldEditor;
 
 public class EditorDrawable : CompositeDrawable {
 	public Vector2 OverrideSize;

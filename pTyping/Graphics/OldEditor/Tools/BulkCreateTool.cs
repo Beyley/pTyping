@@ -10,7 +10,7 @@ using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
-namespace pTyping.Graphics.Editor.Tools;
+namespace pTyping.Graphics.OldEditor.Tools;
 
 public class BulkCreateTool : EditorTool {
 	public override string Name    => "Bulk Create Notes";
@@ -49,27 +49,27 @@ public class BulkCreateTool : EditorTool {
 		this.ColorLabel.SpaceAfter       = LABELAFTERDISTANCE;
 		this.Color                       = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, ITEMTEXTSIZE, Furball.Vixie.Backends.Shared.Color.Red);
 
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAddLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAdd);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.DelimiterLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Delimiter);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SpacingLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Spacing);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ColorLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Color);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAddLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricsToAdd);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.DelimiterLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Delimiter);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SpacingLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Spacing);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ColorLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.Color);
 
 		this.Update();
 	}
 
 	public override void Deinitialize() {
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricsToAddLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricsToAdd);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.DelimiterLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Delimiter);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SpacingLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Spacing);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ColorLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Color);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricsToAddLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricsToAdd);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.DelimiterLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Delimiter);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SpacingLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Spacing);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ColorLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.Color);
 
 		this._previewNotes.ForEach(x => this.DrawableManager.Children.Remove(x));
 		this._previewNotes.Clear();
@@ -89,7 +89,7 @@ public class BulkCreateTool : EditorTool {
 
 		List<HitObject> notes = this.GenerateNotes();
 		foreach (HitObject note in notes) {
-			NoteDrawable drawable = new NoteDrawable(Vector2.Zero, this.EditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
+			NoteDrawable drawable = new NoteDrawable(Vector2.Zero, this.OldEditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
 				TimeSource = pTypingGame.MusicTrackTimeSource,
 				RawTextDrawable = {
 					Text = $"{note.Text}"
@@ -120,10 +120,10 @@ public class BulkCreateTool : EditorTool {
 	private List<HitObject> GenerateNotes() {
 		string[] splitText = this.LyricsToAdd.AsTextBox().Text.Split(this.Delimiter.AsTextBox().Text);
 
-		double time = this.EditorInstance.EditorState.CurrentTime;
+		double time = this.OldEditorInstance.EditorState.CurrentTime;
 
 		try {
-			double spacing = this.EditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
+			double spacing = this.OldEditorInstance.EditorState.Song.CurrentTimingPoint(time).Tempo / double.Parse(this.Spacing.AsTextBox().Text);
 
 			List<HitObject> notes = new List<HitObject>();
 
@@ -153,9 +153,9 @@ public class BulkCreateTool : EditorTool {
 	}
 
 	public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
-		if (!this.EditorInstance.InPlayfield(args.position)) return;
+		if (!this.OldEditorInstance.InPlayfield(args.position)) return;
 
 		List<HitObject> notes = this.GenerateNotes();
-		notes.ForEach(x => this.EditorInstance.CreateNote(x, true));
+		notes.ForEach(x => this.OldEditorInstance.CreateNote(x, true));
 	}
 }

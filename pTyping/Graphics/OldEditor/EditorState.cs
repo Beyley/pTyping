@@ -7,7 +7,7 @@ using pTyping.Graphics.Player;
 using pTyping.Shared.Beatmaps;
 using pTyping.UiGenerator;
 
-namespace pTyping.Graphics.Editor;
+namespace pTyping.Graphics.OldEditor;
 
 public class EditorState {
 	public readonly List<NoteDrawable> Notes  = new List<NoteDrawable>();

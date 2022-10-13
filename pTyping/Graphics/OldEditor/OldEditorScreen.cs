@@ -24,8 +24,8 @@ using Newtonsoft.Json;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Drawables.Events;
-using pTyping.Graphics.Editor.Tools;
 using pTyping.Graphics.Menus.SongSelect;
+using pTyping.Graphics.OldEditor.Tools;
 using pTyping.Graphics.Player;
 using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
@@ -37,9 +37,9 @@ using sowelipisona;
 using Drawable = Furball.Engine.Engine.Graphics.Drawables.Drawable;
 using KeyEventArgs = Furball.Engine.Engine.Input.Events.KeyEventArgs;
 
-namespace pTyping.Graphics.Editor;
+namespace pTyping.Graphics.OldEditor;
 
-public class EditorScreen : pScreen {
+public class OldEditorScreen : pScreen {
 	private TextDrawable _currentTimeDrawable;
 
 	public  Texture             NoteTexture;

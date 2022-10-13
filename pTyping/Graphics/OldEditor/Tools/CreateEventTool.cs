@@ -8,7 +8,7 @@ using pTyping.Shared.Events;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
-namespace pTyping.Graphics.Editor.Tools;
+namespace pTyping.Graphics.OldEditor.Tools;
 
 public class CreateEventTool : EditorTool {
 	public override string Name    => "Create Event";
@@ -57,8 +57,8 @@ public class CreateEventTool : EditorTool {
 		this.LyricInputLabel.SpaceAfter = LABELAFTERDISTANCE;
 		this.LyricInput                 = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "lyric", ITEMTEXTSIZE, TEXTBOXWIDTH);
 
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SelectedEventLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SelectedEvent);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SelectedEventLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.SelectedEvent);
 
 		this.SelectedEvent.AsDropdown().SelectedItem.OnChange += this.OnSelectedEventChange;
 
@@ -70,20 +70,20 @@ public class CreateEventTool : EditorTool {
 	private void OnSelectedEventChange(object sender, KeyValuePair<object, string> keyValuePair) {
 		switch (keyValuePair.Value) {
 			case LYRIC: {
-				this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInputLabel);
-				this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInput);
+				this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInputLabel);
+				this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.LyricInput);
 				break;
 			}
 			default: {
-				this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInputLabel);
-				this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInput);
+				this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInputLabel);
+				this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInput);
 				break;
 			}
 		}
 	}
 
 	public override void OnMouseClick((MouseButton mouseButton, Vector2 position) args) {
-		if (!this.EditorInstance.InPlayfield(args.position)) return;
+		if (!this.OldEditorInstance.InPlayfield(args.position)) return;
 		if (args.mouseButton != MouseButton.Left) return;
 
 		Event @event = null;
@@ -105,7 +105,7 @@ public class CreateEventTool : EditorTool {
 			// }
 			case LYRIC: {
 				@event = new Event {
-					Start = this.EditorInstance.EditorState.MouseTime,
+					Start = this.OldEditorInstance.EditorState.MouseTime,
 					Text  = this.LyricInput.AsTextBox().Text,
 					Type  = EventType.Lyric
 				};
@@ -114,7 +114,7 @@ public class CreateEventTool : EditorTool {
 			}
 			case TYPING_CUTOFF: {
 				@event = new Event {
-					Start = this.EditorInstance.EditorState.MouseTime,
+					Start = this.OldEditorInstance.EditorState.MouseTime,
 					Type  = EventType.TypingCutoff
 				};
 
@@ -123,25 +123,25 @@ public class CreateEventTool : EditorTool {
 		}
 
 		if (@event != null)
-			this.EditorInstance.CreateEvent(@event, true);
+			this.OldEditorInstance.CreateEvent(@event, true);
 
 		base.OnMouseClick(args);
 	}
 
 	public override void OnMouseMove(Vector2 position) {
 		//Only show the create line if we are inside of the playfield, as thats the only time we are able to place notes
-		this._createLine.Visible = this.EditorInstance.InPlayfield(position);
+		this._createLine.Visible = this.OldEditorInstance.InPlayfield(position);
 
 		//Update the position of the preview line
-		if (this.EditorInstance.InPlayfield(position)) {
+		if (this.OldEditorInstance.InPlayfield(position)) {
 			this._createLine.Tweens.Clear();
 			this._createLine.Tweens.Add(
 				new VectorTween(
 					TweenType.Movement,
 					new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y - 40),
 					new Vector2(Player.Player.RECEPTICLE_POS.X, Player.Player.RECEPTICLE_POS.Y - 40),
-					(int)(this.EditorInstance.EditorState.MouseTime - this.EditorInstance.CurrentApproachTime(this.EditorInstance.EditorState.MouseTime)),
-					(int)this.EditorInstance.EditorState.MouseTime
+					(int)(this.OldEditorInstance.EditorState.MouseTime - this.OldEditorInstance.CurrentApproachTime(this.OldEditorInstance.EditorState.MouseTime)),
+					(int)this.OldEditorInstance.EditorState.MouseTime
 				)
 			);
 		}
@@ -152,10 +152,10 @@ public class CreateEventTool : EditorTool {
 	public override void Deinitialize() {
 		this.DrawableManager.Children.Remove(this._createLine);
 
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEventLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEvent);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInputLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInput);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEventLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.SelectedEvent);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInputLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.LyricInput);
 
 		this.SelectedEvent.AsDropdown().SelectedItem.OnChange -= this.OnSelectedEventChange;
 

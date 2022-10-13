@@ -11,7 +11,7 @@ using pTyping.Engine;
 using pTyping.Graphics.Player;
 using Silk.NET.Input;
 
-namespace pTyping.Graphics.Editor;
+namespace pTyping.Graphics.OldEditor;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public abstract class EditorTool : IComparable<EditorTool> {
@@ -27,8 +27,8 @@ public abstract class EditorTool : IComparable<EditorTool> {
 	[NotNull]
 	public abstract string Tooltip { get; }
 
-	protected EditorDrawable DrawableManager;
-	protected EditorScreen   EditorInstance;
+	protected EditorDrawable  DrawableManager;
+	protected OldEditorScreen OldEditorInstance;
 
 	public int CompareTo(EditorTool other) {
 		if (ReferenceEquals(this, other))
@@ -41,16 +41,16 @@ public abstract class EditorTool : IComparable<EditorTool> {
 		return string.Compare(this.Tooltip, other.Tooltip, StringComparison.Ordinal);
 	}
 
-	public void SelectTool(EditorScreen editor, ref EditorDrawable drawableManager) {
-		this.DrawableManager = drawableManager;
-		this.EditorInstance  = editor;
+	public void SelectTool(OldEditorScreen oldEditor, ref EditorDrawable drawableManager) {
+		this.DrawableManager   = drawableManager;
+		this.OldEditorInstance = oldEditor;
 
 		this.Initialize();
 
 		Logger.Log($"EditorTool {this.GetType().Name} has been initialized!", LoggerLevelEditorInfo.Instance);
 	}
 
-	public void DeselectTool(EditorScreen editor) {
+	public void DeselectTool(OldEditorScreen oldEditor) {
 		this.Deinitialize();
 
 		Logger.Log($"EditorTool {this.GetType().Name} has been deinitialized!", LoggerLevelEditorInfo.Instance);

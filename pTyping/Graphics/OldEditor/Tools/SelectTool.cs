@@ -11,7 +11,7 @@ using pTyping.Shared;
 using pTyping.UiGenerator;
 using Silk.NET.Input;
 
-namespace pTyping.Graphics.Editor.Tools;
+namespace pTyping.Graphics.OldEditor.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class SelectTool : EditorTool {
@@ -30,17 +30,17 @@ public class SelectTool : EditorTool {
 	private bool _dragging;
 
 	private GameplayDrawableTweenArgs GetTweenArgs(double time) {
-		return new(this.EditorInstance.CurrentApproachTime(time), true, true);
+		return new(this.OldEditorInstance.CurrentApproachTime(time), true, true);
 	}
 
 	public override void Initialize() {
-		foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
+		foreach (NoteDrawable note in this.OldEditorInstance.EditorState.Notes) {
 			note.OnClick     += this.OnObjectClick;
 			note.OnDragBegin += this.OnObjectDragBegin;
 			note.OnDrag      += this.OnObjectDrag;
 			note.OnDragEnd   += this.OnObjectDragEnd;
 		}
-		foreach (Drawable @event in this.EditorInstance.EditorState.Events) {
+		foreach (Drawable @event in this.OldEditorInstance.EditorState.Events) {
 			@event.OnClick     += this.OnObjectClick;
 			@event.OnDragBegin += this.OnObjectDragBegin;
 			@event.OnDrag      += this.OnObjectDrag;
@@ -64,30 +64,30 @@ public class SelectTool : EditorTool {
 			{ TypingConversions.ConversionType.StandardEsperanto, "Esperanto" }
 		}, DROPDOWNBUTTONSIZE, pTypingGame.JapaneseFont, ITEMTEXTSIZE);
 
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectTextLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectText);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColourLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColour);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectLanguageLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectLanguage);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectTextLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectText);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColourLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectColour);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectLanguageLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.RegisterElement(this.ObjectLanguage);
 
 		this.ObjectText.AsTextBox().OnFocusChange              += this.OnObjectTextCommit;
 		this.ObjectColour.AsColorPicker().Color.OnChange       += this.OnObjectColourChange;
 		this.ObjectLanguage.AsDropdown().SelectedItem.OnChange += this.OnObjectLanguageChange;
 
-		this.EditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChange;
+		this.OldEditorInstance.EditorState.SelectedObjects.CollectionChanged += this.OnSelectedObjectsChange;
 
 		base.Initialize();
 	}
 	private void OnObjectLanguageChange(object sender, KeyValuePair<object, string> e) {
-		if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
+		if (this.OldEditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-		foreach (Drawable @object in this.EditorInstance.EditorState.SelectedObjects) {
+		foreach (Drawable @object in this.OldEditorInstance.EditorState.SelectedObjects) {
 			if (@object is not NoteDrawable note)
 				continue;
 
-			note.Note.TypingConversion     = (TypingConversions.ConversionType)e.Key;
-			this.EditorInstance.SaveNeeded = true;
+			note.Note.TypingConversion        = (TypingConversions.ConversionType)e.Key;
+			this.OldEditorInstance.SaveNeeded = true;
 		}
 	}
 
@@ -126,43 +126,43 @@ public class SelectTool : EditorTool {
 	}
 
 	private void OnObjectColourChange(object sender, Color color) {
-		if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
+		if (this.OldEditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-		foreach (Drawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+		foreach (Drawable selectedObject in this.OldEditorInstance.EditorState.SelectedObjects)
 			if (selectedObject is NoteDrawable note) {
-				note.Note.Color                = color;
-				this.EditorInstance.SaveNeeded = true;
+				note.Note.Color                   = color;
+				this.OldEditorInstance.SaveNeeded = true;
 				note.Reset();
 			}
 	}
 
 	private void OnObjectTextCommit(object sender, string e) {
-		if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) return;
+		if (this.OldEditorInstance.EditorState.SelectedObjects.Count == 0) return;
 
-		foreach (Drawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+		foreach (Drawable selectedObject in this.OldEditorInstance.EditorState.SelectedObjects)
 			switch (selectedObject) {
 				case NoteDrawable note:
-					note.Note.Text                 = this.ObjectText.AsTextBox().Text;
-					this.EditorInstance.SaveNeeded = true;
+					note.Note.Text                    = this.ObjectText.AsTextBox().Text;
+					this.OldEditorInstance.SaveNeeded = true;
 
 					note.Reset();
 					break;
 				case LyricEventDrawable lyric:
-					lyric.Event.Text               = this.ObjectText.AsTextBox().Text;
-					this.EditorInstance.SaveNeeded = true;
+					lyric.Event.Text                  = this.ObjectText.AsTextBox().Text;
+					this.OldEditorInstance.SaveNeeded = true;
 					break;
 			}
 	}
 
 	private void OnSelectedObjectsChange(object sender, NotifyCollectionChangedEventArgs e) {
-		if (this.EditorInstance.EditorState.SelectedObjects.Count == 0) {
+		if (this.OldEditorInstance.EditorState.SelectedObjects.Count == 0) {
 			this.ObjectText.AsTextBox().Text              = string.Empty;
 			this.ObjectColour.AsColorPicker().Color.Value = Color.White;
 
 			return;
 		}
 
-		Drawable selectedObject = this.EditorInstance.EditorState.SelectedObjects[0];
+		Drawable selectedObject = this.OldEditorInstance.EditorState.SelectedObjects[0];
 
 		switch (selectedObject) {
 			case NoteDrawable note:
@@ -183,31 +183,31 @@ public class SelectTool : EditorTool {
 	}
 
 	public override void Deinitialize() {
-		foreach (NoteDrawable note in this.EditorInstance.EditorState.Notes) {
+		foreach (NoteDrawable note in this.OldEditorInstance.EditorState.Notes) {
 			note.OnClick     -= this.OnObjectClick;
 			note.OnDragBegin -= this.OnObjectDragBegin;
 			note.OnDrag      -= this.OnObjectDrag;
 			note.OnDragEnd   -= this.OnObjectDragEnd;
 		}
-		foreach (Drawable @event in this.EditorInstance.EditorState.Events) {
+		foreach (Drawable @event in this.OldEditorInstance.EditorState.Events) {
 			@event.OnClick     -= this.OnObjectClick;
 			@event.OnDragBegin -= this.OnObjectDragBegin;
 			@event.OnDrag      -= this.OnObjectDrag;
 			@event.OnDragEnd   -= this.OnObjectDragEnd;
 		}
 
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectTextLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectText);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColourLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColour);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectLanguageLabel);
-		this.EditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectLanguage);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectTextLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectText);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColourLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectColour);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectLanguageLabel);
+		this.OldEditorInstance.EditorState.EditorToolUiContainer.UnRegisterElement(this.ObjectLanguage);
 
 		this.ObjectText.AsTextBox().OnCommit                   -= this.OnObjectTextCommit;
 		this.ObjectColour.AsColorPicker().Color.OnChange       -= this.OnObjectColourChange;
 		this.ObjectLanguage.AsDropdown().SelectedItem.OnChange -= this.OnObjectLanguageChange;
 
-		this.EditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChange;
+		this.OldEditorInstance.EditorState.SelectedObjects.CollectionChanged -= this.OnSelectedObjectsChange;
 
 		base.Deinitialize();
 	}
@@ -216,7 +216,7 @@ public class SelectTool : EditorTool {
 		if (!FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) return;
 
 		this._dragging     = true;
-		this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
+		this._lastDragTime = this.OldEditorInstance.EditorState.MouseTime;
 	}
 
 	private void OnObjectDragEnd(object sender, MouseDragEventArgs mouseDragEventArgs) {
@@ -234,39 +234,39 @@ public class SelectTool : EditorTool {
 
 		// We disable this because we are directly setting it, so if its not equal, its not the same value
 		// ReSharper disable once CompareOfFloatsByEqualityOperator
-		if (this.EditorInstance.EditorState.MouseTime != this._lastDragTime) {
-			double timeDifference = this.EditorInstance.EditorState.MouseTime - this._lastDragTime;
+		if (this.OldEditorInstance.EditorState.MouseTime != this._lastDragTime) {
+			double timeDifference = this.OldEditorInstance.EditorState.MouseTime - this._lastDragTime;
 
-			if (this.EditorInstance.EditorState.SelectedObjects.Count == 1)
-				switch (this.EditorInstance.EditorState.SelectedObjects[0]) {
+			if (this.OldEditorInstance.EditorState.SelectedObjects.Count == 1)
+				switch (this.OldEditorInstance.EditorState.SelectedObjects[0]) {
 					case NoteDrawable noteDrawable:
-						noteDrawable.Note.Time = this.EditorInstance.EditorState.MouseTime;
+						noteDrawable.Note.Time = this.OldEditorInstance.EditorState.MouseTime;
 
-						noteDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
+						noteDrawable.CreateTweens(this.GetTweenArgs(this.OldEditorInstance.EditorState.MouseTime));
 						break;
 					case BeatLineBarEventDrawable beatLineBarEventDrawable:
-						beatLineBarEventDrawable.Event.Start = this.EditorInstance.EditorState.MouseTime;
+						beatLineBarEventDrawable.Event.Start = this.OldEditorInstance.EditorState.MouseTime;
 
-						beatLineBarEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
+						beatLineBarEventDrawable.CreateTweens(this.GetTweenArgs(this.OldEditorInstance.EditorState.MouseTime));
 						break;
 					case BeatLineBeatEventDrawable beatLineBeatEventDrawable:
-						beatLineBeatEventDrawable.Event.Start = this.EditorInstance.EditorState.MouseTime;
+						beatLineBeatEventDrawable.Event.Start = this.OldEditorInstance.EditorState.MouseTime;
 
-						beatLineBeatEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
+						beatLineBeatEventDrawable.CreateTweens(this.GetTweenArgs(this.OldEditorInstance.EditorState.MouseTime));
 						break;
 					case TypingCutoffEventDrawable typingCutoffEventDrawable:
-						typingCutoffEventDrawable.Event.Start = this.EditorInstance.EditorState.MouseTime;
+						typingCutoffEventDrawable.Event.Start = this.OldEditorInstance.EditorState.MouseTime;
 
-						typingCutoffEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
+						typingCutoffEventDrawable.CreateTweens(this.GetTweenArgs(this.OldEditorInstance.EditorState.MouseTime));
 						break;
 					case LyricEventDrawable lyricEventDrawable:
-						lyricEventDrawable.Event.Start = this.EditorInstance.EditorState.MouseTime;
+						lyricEventDrawable.Event.Start = this.OldEditorInstance.EditorState.MouseTime;
 
-						lyricEventDrawable.CreateTweens(this.GetTweenArgs(this.EditorInstance.EditorState.MouseTime));
+						lyricEventDrawable.CreateTweens(this.GetTweenArgs(this.OldEditorInstance.EditorState.MouseTime));
 						break;
 				}
 			else
-				foreach (Drawable selectedObject in this.EditorInstance.EditorState.SelectedObjects)
+				foreach (Drawable selectedObject in this.OldEditorInstance.EditorState.SelectedObjects)
 					switch (selectedObject) {
 						case NoteDrawable noteDrawable:
 							noteDrawable.Note.Time += timeDifference;
@@ -295,12 +295,12 @@ public class SelectTool : EditorTool {
 							break;
 					}
 
-			this.EditorInstance.UpdateSelectionRects(this, null);
+			this.OldEditorInstance.UpdateSelectionRects(this, null);
 
-			this.EditorInstance.SaveNeeded = true;
+			this.OldEditorInstance.SaveNeeded = true;
 		}
 
-		this._lastDragTime = this.EditorInstance.EditorState.MouseTime;
+		this._lastDragTime = this.OldEditorInstance.EditorState.MouseTime;
 	}
 
 	private void OnObjectClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
@@ -311,12 +311,12 @@ public class SelectTool : EditorTool {
 		if (sender is not Drawable drawable) return;
 
 		if (ctrlHeld) {
-			if (!this.EditorInstance.EditorState.SelectedObjects.Remove(drawable))
-				this.EditorInstance.EditorState.SelectedObjects.Add(drawable);
+			if (!this.OldEditorInstance.EditorState.SelectedObjects.Remove(drawable))
+				this.OldEditorInstance.EditorState.SelectedObjects.Add(drawable);
 		}
 		else {
-			this.EditorInstance.EditorState.SelectedObjects.Clear();
-			this.EditorInstance.EditorState.SelectedObjects.Add(drawable);
+			this.OldEditorInstance.EditorState.SelectedObjects.Clear();
+			this.OldEditorInstance.EditorState.SelectedObjects.Add(drawable);
 		}
 	}
 }

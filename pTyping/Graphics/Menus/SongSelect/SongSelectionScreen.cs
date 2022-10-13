@@ -17,7 +17,7 @@ using JetBrains.Annotations;
 using ManagedBass;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
-using pTyping.Graphics.Editor;
+using pTyping.Graphics.OldEditor;
 using pTyping.Graphics.Player;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Scores;
@@ -299,7 +299,7 @@ public class SongSelectionScreen : pScreen {
 
 	public void PlaySelectedMap() {
 		pTypingGame.MenuClickSound.PlayNew();
-		ScreenManager.ChangeScreen(this._editor ? new EditorScreen() : new PlayerScreen(this._modMenu.SelectedMods.ToArray()));
+		ScreenManager.ChangeScreen(this._editor ? new OldEditorScreen() : new PlayerScreen(this._modMenu.SelectedMods.ToArray()));
 	}
 
 	public void UpdateSelectedSong(bool fromPrevScreen = false) {

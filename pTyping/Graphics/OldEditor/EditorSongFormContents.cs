@@ -14,7 +14,7 @@ using pTyping.Shared.ObjectModel;
 using pTyping.UiElements;
 using TextDrawable = Furball.Engine.Engine.Graphics.Drawables.TextDrawable;
 
-namespace pTyping.Graphics.Editor;
+namespace pTyping.Graphics.OldEditor;
 
 public class EditorSongFormContents : CompositeDrawable {
 	private readonly Beatmap               _map;
@@ -34,7 +34,7 @@ public class EditorSongFormContents : CompositeDrawable {
 	private readonly DrawableTextBox       _previewTimeInput;
 	private readonly DrawableTextBox       _sourceInput;
 
-	public EditorSongFormContents(Beatmap map, EditorScreen editor) {
+	public EditorSongFormContents(Beatmap map, OldEditorScreen oldEditor) {
 		this._map = map;
 
 		const float x = 5;
@@ -56,7 +56,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		this._strictnessSlider.Value.Changed += (_, f) => {
 			map.Difficulty.Strictness = f;
 
-			editor.SaveNeeded = true;
+			oldEditor.SaveNeeded = true;
 		};
 
 		TextDrawable difficultyNameLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Difficulty Name", 24);
@@ -69,48 +69,48 @@ public class EditorSongFormContents : CompositeDrawable {
 
 		this._difficultyInputAscii.OnCommit += (_, s) => {
 			this._map.Info.DifficultyName.Ascii = s;
-			editor.SaveNeeded                   = true;
+			oldEditor.SaveNeeded                = true;
 		};
 
 		this._difficultyInputUnicode.OnCommit += (_, s) => {
 			this._map.Info.DifficultyName.Unicode = s;
-			editor.SaveNeeded                     = true;
+			oldEditor.SaveNeeded                  = true;
 		};
 
 		TextDrawable artistLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Artist", 24);
 		y += artistLabel.Size.Y;
 
-		this._artistInputAscii   =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Artist.Ascii ?? "");
+		this._artistInputAscii   =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, oldEditor.EditorState.Set.Artist.Ascii ?? "");
 		y                        += this._artistInputAscii.Size.Y;
-		this._artistInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Artist.Unicode);
+		this._artistInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, oldEditor.EditorState.Set.Artist.Unicode);
 		y                        += this._artistInputUnicode.Size.Y;
 
 		this._artistInputAscii.OnCommit += delegate(object _, string s) {
-			editor.EditorState.Set.Artist.Ascii = s;
-			editor.SaveNeeded                   = true;
+			oldEditor.EditorState.Set.Artist.Ascii = s;
+			oldEditor.SaveNeeded                   = true;
 		};
 
 		this._artistInputUnicode.OnCommit += delegate(object _, string s) {
-			editor.EditorState.Set.Artist.Unicode = s;
-			editor.SaveNeeded                     = true;
+			oldEditor.EditorState.Set.Artist.Unicode = s;
+			oldEditor.SaveNeeded                     = true;
 		};
 
 		TextDrawable titleLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Title (Name of song)", 24);
 		y += titleLabel.Size.Y;
 
-		this._titleInputAscii   =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Title.Ascii ?? "");
+		this._titleInputAscii   =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, oldEditor.EditorState.Set.Title.Ascii ?? "");
 		y                       += this._titleInputAscii.Size.Y;
-		this._titleInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Title.Unicode);
+		this._titleInputUnicode =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, oldEditor.EditorState.Set.Title.Unicode);
 		y                       += this._titleInputUnicode.Size.Y;
 
 		this._titleInputAscii.OnCommit += delegate(object _, string s) {
-			editor.EditorState.Set.Title.Ascii = s;
-			editor.SaveNeeded                  = true;
+			oldEditor.EditorState.Set.Title.Ascii = s;
+			oldEditor.SaveNeeded                  = true;
 		};
 
 		this._titleInputUnicode.OnCommit += delegate(object _, string s) {
-			editor.EditorState.Set.Title.Unicode = s;
-			editor.SaveNeeded                    = true;
+			oldEditor.EditorState.Set.Title.Unicode = s;
+			oldEditor.SaveNeeded                    = true;
 		};
 
 		TextDrawable timingLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Timing", 24);
@@ -122,7 +122,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		this._timingInputTime.OnCommit += delegate(object _, string s) {
 			if (float.TryParse(s, out float time)) {
 				this._map.TimingPoints[0].Time = time;
-				editor.SaveNeeded              = true;
+				oldEditor.SaveNeeded           = true;
 			}
 		};
 
@@ -132,7 +132,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		this._timingInputTempo.OnCommit += delegate(object _, string s) {
 			if (float.TryParse(s, out float tempo)) {
 				this._map.TimingPoints[0].Tempo = tempo;
-				editor.SaveNeeded               = true;
+				oldEditor.SaveNeeded            = true;
 			}
 		};
 
@@ -152,12 +152,12 @@ public class EditorSongFormContents : CompositeDrawable {
 						return;
 
 					map.Metadata.BackingLanguages.Add((int)language);
-					editor.SaveNeeded = true;
+					oldEditor.SaveNeeded = true;
 				}
 				else {
 					//If we were successful in removing the language, mark we need to save
 					if (map.Metadata.BackingLanguages.Remove((int)language))
-						editor.SaveNeeded = true;
+						oldEditor.SaveNeeded = true;
 				}
 			};
 
@@ -202,7 +202,7 @@ public class EditorSongFormContents : CompositeDrawable {
 			foreach (string tag in tags) {
 				map.Metadata.Tags.Add(tag);
 			}
-			editor.SaveNeeded = true;
+			oldEditor.SaveNeeded = true;
 		};
 		
 		TextDrawable descriptionLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Description", 24);
@@ -214,7 +214,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		
 		this._descriptionInput.OnCommit += delegate(object _, string s) {
 			map.Info.Description = s;
-			editor.SaveNeeded    = true;
+			oldEditor.SaveNeeded = true;
 		};
 		
 		TextDrawable mapperLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Mapper", 24);
@@ -225,7 +225,7 @@ public class EditorSongFormContents : CompositeDrawable {
 		
 		this._mapperInput.OnCommit += delegate(object _, string s) {
 			map.Info.Mapper.Username = s;
-			editor.SaveNeeded        = true;
+			oldEditor.SaveNeeded     = true;
 		};
 		
 		//TODO: replace this with something more integrated into the editor, rather than a text input
@@ -238,19 +238,19 @@ public class EditorSongFormContents : CompositeDrawable {
 		this._previewTimeInput.OnCommit += delegate(object _, string s) {
 			if (double.TryParse(s, out double previewTime)) {
 				map.Info.PreviewTime = previewTime;
-				editor.SaveNeeded    = true;
+				oldEditor.SaveNeeded = true;
 			}
 		};
 
 		TextDrawable sourceLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Source", 24);
 		y += sourceLabel.Size.Y;
-		
-		this._sourceInput = new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, editor.EditorState.Set.Source);
-		y                += this._sourceInput.Size.Y;
+
+		this._sourceInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, oldEditor.EditorState.Set.Source);
+		y                 += this._sourceInput.Size.Y;
 		
 		this._sourceInput.OnCommit += delegate(object _, string s) {
-			editor.EditorState.Set.Source = s;
-			editor.SaveNeeded = true;
+			oldEditor.EditorState.Set.Source = s;
+			oldEditor.SaveNeeded             = true;
 		};
 
 		this.Children.Add(strictnessLabel);
