@@ -81,7 +81,8 @@ public class Player : CompositeDrawable {
 
 	private readonly Texture _noteTexture;
 
-	public Beatmap Song;
+	public           Beatmap              Song;
+	private readonly PlayerStateArguments _arguments;
 
 	public Score Score;
 
@@ -102,7 +103,8 @@ public class Player : CompositeDrawable {
 	public event EventHandler        OnAllNotesComplete;
 
 	public Player(Beatmap song, Mod[] mods, PlayerStateArguments arguments) {
-		this.Song = song;
+		this.Song       = song;
+		this._arguments = arguments;
 
 		// this.BaseApproachTime /= song.Difficulty.GlobalApproachMultiplier;
 
@@ -184,6 +186,9 @@ public class Player : CompositeDrawable {
 			NoteDrawable noteDrawable = this.CreateNote(note);
 
 			this._notes.Add(noteDrawable);
+
+			if (this._arguments.UseEditorNoteSpawnLogic)
+				this.Children.Add(noteDrawable);
 		}
 	}
 
@@ -225,6 +230,10 @@ public class Player : CompositeDrawable {
 		this.TypeCharacter(e);
 	}
 	public void TypeCharacter(CharInputEvent e, bool checkingNext = false) {
+		//If this player is initialized to block input, forcefully don't do anything
+		if (this._arguments.DisableTyping)
+			return;
+		
 		//Ignore control chars (fuck control chars all my homies hate control chars)
 		if (char.IsControl(e.Char))
 			return;
@@ -469,36 +478,59 @@ public class Player : CompositeDrawable {
 		this.OnComboUpdate?.Invoke(this, hitColor);
 	}
 
+	private double _musicTimeLastUpdate;
 	public override void Update(double time) {
 		double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
-		#region spawn notes and bars as needed
+		if (this._arguments.UseEditorNoteSpawnLogic) {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if (this._musicTimeLastUpdate != currentTime)
+				for (int i = 0; i < this._notes.Count; i++) {
+					NoteDrawable note = this._notes[i];
 
-		for (int i = 0; i < this._notes.Count; i++) {
-			NoteDrawable note = this._notes[i];
+					note.Visible = currentTime > note.Note.Time - this.CurrentApproachTime(note.Note.Time) &&
+								   currentTime < note.Note.Time + 1000; //TODO: pick a shorter time using the note's tweens
+				}
+		}
+		else {
+			//Iterate over all notes, and spawn them if they are within the spawn range
+			for (int i = 0; i < this._notes.Count; i++) {
+				NoteDrawable note = this._notes[i];
 
-			if (note.Added) continue;
+				//If the note is already added, skip it
+				if (note.Added)
+					continue;
 
-			if (currentTime < note.Note.Time - this.CurrentApproachTime(note.Note.Time)) continue;
+				//If the current time is less than the note's time to spawn, skip it
+				if (currentTime < note.Note.Time - this.CurrentApproachTime(note.Note.Time))
+					continue;
 
-			this.Children.Add(note);
-			note.Added = true;
+				//Add the note, and mark it as added
+				this.Children.Add(note);
+				note.Added = true;
+			}
+
+			//Iterate over all events
+			for (int i = 0; i < this._events.Count; i++) {
+				//Deconstruct the event
+				(Drawable drawable, bool added) = this._events[i];
+
+				//If the event is already added, skip it
+				if (added)
+					continue;
+
+				//If the current time is less than the event's time to spawn, skip it
+				if (currentTime < drawable.Tweens[0].StartTime)
+					continue;
+
+				//Add the event, and mark it as added
+				this.Children.Add(drawable);
+				this._events[i] = new Tuple<Drawable, bool>(drawable, true);
+			}
 		}
 
-		for (int i = 0; i < this._events.Count; i++) {
-			(Drawable drawable, bool added) = this._events[i];
-
-			if (added) continue;
-
-			if (currentTime < drawable.Tweens[0].StartTime) continue;
-
-			this.Children.Add(drawable);
-			this._events[i] = new Tuple<Drawable, bool>(drawable, true);
-		}
-
-		#endregion
-
-		bool checkNoteHittability = true;
+		//If DisableHitResults, dont check, if not, check
+		bool checkNoteHittability = !this._arguments.DisableHitResults;
 
 		if (this._noteToType == this._notes.Count) {
 			this.EndScore();
@@ -539,10 +571,8 @@ public class Player : CompositeDrawable {
 			}
 		}
 
-		//TODO
-		// foreach (PlayerMod mod in this.Score.Mods)
-		// mod.Update(time);
-
+		this._musicTimeLastUpdate = currentTime;
+		
 		base.Update(time);
 	}
 
@@ -553,21 +583,27 @@ public class Player : CompositeDrawable {
 	}
 
 	public void CallMapEnd() {
+		if (this._arguments.DisableMapEnding)
+			return;
+		
 		foreach (Mod mod in this.Score.Mods)
 			mod.PreEnd(this._gameState);
 	}
 
 	public void EndScore() {
+		if (this._arguments.DisableMapEnding)
+			return;
+		
 		this.OnAllNotesComplete?.Invoke(this, EventArgs.Empty);
 	}
 
 	public void Play() {
+		if (this._arguments.DisablePlayerMusicTrackControl)
+			return;
+		
 		if (!this.IsSpectating)
 			pTypingGame.PlayMusic();
 		else
 			pTypingGame.MusicTrack.Stop();
 	}
-	// public void TypeCharacter(object sender, (IKeyboard keyboard, char character) e) {
-	// this.TypeCharacter(sender, e.character);
-	// }
 }
