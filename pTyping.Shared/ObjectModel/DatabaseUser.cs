@@ -25,7 +25,8 @@ public class DatabaseUser : RealmObject, ICloneable<DatabaseUser>, IEquatable<Da
 	public DatabaseUser Clone() {
 		return new() {
 			Username = this.Username,
-			UserId   = this.UserId
+			UserId   = this.UserId,
+			Online   = this.Online
 		};
 	}
 	public bool Equals(DatabaseUser other) {

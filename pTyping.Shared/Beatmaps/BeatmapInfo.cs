@@ -22,7 +22,7 @@ public class BeatmapInfo : EmbeddedObject, IEquatable<BeatmapInfo>, ICloneable<B
 	public BeatmapInfo Clone() {
 		BeatmapInfo info = new BeatmapInfo {
 			Description    = this.Description,
-			Mapper         = this.Mapper,
+			Mapper         = this.Mapper.Clone(),
 			DifficultyName = this.DifficultyName.Clone(),
 			PreviewTime    = this.PreviewTime
 		};

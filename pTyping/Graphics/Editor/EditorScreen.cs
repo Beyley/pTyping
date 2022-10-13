@@ -385,6 +385,9 @@ public class EditorScreen : pScreen {
 		//Create an array of video extensions 
 		string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".webm" };
 
+        //Create an array of image extensions
+        string[] imageExtensions = { ".png", ".bmp", ".jpg", ".jpeg" };
+
 		//Check if the first path is a video
 		if (videoExtensions.Any(x => paths[0].EndsWith(x))) {
 			byte[] videoBytes = File.ReadAllBytes(paths[0]);
@@ -398,6 +401,20 @@ public class EditorScreen : pScreen {
 			this.SaveNeeded = true;
 
 			pTypingGame.NotificationManager.CreatePopup("Reload the map to see the video!");
+		}
+
+        if(imageExtensions.Any(x => paths[0].EndsWith(x))) {
+			byte[] imageBytes = File.ReadAllBytes(paths[0]);
+
+			string md5 = CryptoHelper.GetMd5(imageBytes);
+			
+			pTypingGame.FileDatabase.AddFile(imageBytes).Wait();
+			
+			this.EditorState.Song.FileCollection.Background = new PathHashTuple(Path.GetFileName(paths[0]), md5);
+			
+			this.SaveNeeded = true;
+			
+			pTypingGame.NotificationManager.CreatePopup("Reload the map to see the image!");
 		}
 	}
 
