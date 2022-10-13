@@ -104,7 +104,7 @@ public class PlayerScreen : pScreen {
 
 		Mod[] mods = this._playingReplay ? this._playingScoreReplay.Mods : this._mods;
 
-		this.Player = new Player(this.Song, mods) {
+		this.Player = new Player(this.Song, mods, PlayerStateArguments.DefaultPlayer) {
 			Position     = new Vector2(0, FurballGame.DEFAULT_WINDOW_HEIGHT * 0.5f),
 			OriginType   = OriginType.LeftCenter,
 			RecordReplay = !this._playingReplay,

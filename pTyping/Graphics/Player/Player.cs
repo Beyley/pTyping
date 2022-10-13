@@ -101,7 +101,7 @@ public class Player : CompositeDrawable {
 	public event EventHandler<Color> OnComboUpdate;
 	public event EventHandler        OnAllNotesComplete;
 
-	public Player(Beatmap song, Mod[] mods) {
+	public Player(Beatmap song, Mod[] mods, PlayerStateArguments arguments) {
 		this.Song = song;
 
 		// this.BaseApproachTime /= song.Difficulty.GlobalApproachMultiplier;

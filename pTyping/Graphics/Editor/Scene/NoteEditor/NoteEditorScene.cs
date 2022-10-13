@@ -11,7 +11,7 @@ public sealed class NoteEditorScene : EditorScene {
 	public NoteEditorScene(EditorScreen editor) : base(editor) {
 		this._toolSelection = new NoteEditorToolSelectionDrawable(new Vector2(MARGIN), () => {});
 		this._playFieldContainer = new NoteEditorPlayFieldContainer(
-			new Vector2(this._toolSelection.Size.X + MARGIN * 2, MARGIN),
+			editor, new Vector2(this._toolSelection.Size.X + MARGIN * 2, MARGIN),
 			Vector2.Zero
 		);
 

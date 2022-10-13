@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using pTyping.Graphics.Editor.Scene.LyricEditor;
 using pTyping.Graphics.Editor.Scene.NoteEditor;
+using pTyping.Shared.Beatmaps;
 using pTyping.UiElements;
 
 namespace pTyping.Graphics.Editor;
 
 public partial class EditorScreen : pScreen {
+	/// <summary>
+	///     The working beatmap, aka the beatmap that is being edited
+	/// </summary>
+	public readonly Beatmap Beatmap;
+
+	public EditorScreen(Beatmap beatmap) {
+		//Clone the beatmap to not edit the original
+		this.Beatmap = beatmap.Clone();
+	}
+	
 	public override void Initialize() {
 		base.Initialize();
 

@@ -66,7 +66,7 @@ public class MenuScreen : pScreen {
 			ScreenOriginType = OriginType.BottomLeft
 		};
 
-		newEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new EditorScreen());
+		newEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new EditorScreen(pTypingGame.CurrentSong));
 
 		if (RuntimeInfo.IsDebug()) {
 			this.Manager.Add(uiEditorButton);

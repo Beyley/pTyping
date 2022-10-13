@@ -11,12 +11,12 @@ namespace pTyping.Graphics.Editor.Scene;
 ///     A scene placed within the editor
 /// </summary>
 public abstract class EditorScene : CompositeDrawable {
-	private readonly EditorScreen _editor;
-	public EditorScene(EditorScreen editor) {
-		this._editor = editor;
+	protected readonly EditorScreen Editor;
+	protected EditorScene(EditorScreen editor) {
+		this.Editor = editor;
 	}
 
-	public override Vector2 Size => this._editor.SceneSize * this.Scale;
+	public override Vector2 Size => this.Editor.SceneSize * this.Scale;
 
 	public abstract void Opening();
 	public abstract void Closing();
