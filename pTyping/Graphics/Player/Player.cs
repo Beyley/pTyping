@@ -205,7 +205,7 @@ public class Player : CompositeDrawable {
 				ColorType = TextColorType.Repeating
 			},
 			ToTypeTextDrawable = {
-				Text = $"{string.Join("\n", note.TypableRomaji.Romaji)}"
+				Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", note.TypableRomaji.Romaji)}" : ""
 			},
 			Scale      = new Vector2(0.55f),
 			Depth      = 0.5f,
@@ -379,7 +379,8 @@ public class Player : CompositeDrawable {
 	private void UpdateNoteText(NoteDrawable noteDrawable) {
 		// foreach (NoteDrawable noteDrawable in this._notes) {
 		// noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
-		noteDrawable.ToTypeTextDrawable.Text = $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}";
+		noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}"
+			: "";
 
 		for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++)
 			if (i < noteDrawable.Note.TypedText.Length)

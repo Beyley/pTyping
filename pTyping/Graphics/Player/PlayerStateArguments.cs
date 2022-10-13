@@ -1,7 +1,9 @@
 namespace pTyping.Graphics.Player;
 
 public class PlayerStateArguments {
-	public static readonly PlayerStateArguments DefaultPlayer = new PlayerStateArguments();
+	public static readonly PlayerStateArguments DefaultPlayer = new PlayerStateArguments {
+		DisplayRomaji = true
+	};
 	public static readonly PlayerStateArguments DefaultEditor = new PlayerStateArguments {
 		DisableTyping                  = true,
 		DisableHitResults              = true,
@@ -30,4 +32,5 @@ public class PlayerStateArguments {
 	///     Whether to use the editor's note spawn logic, which supports going backwards in time.
 	/// </summary>
 	public bool UseEditorNoteSpawnLogic;
+	public bool DisplayRomaji;
 }
