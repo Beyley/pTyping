@@ -12,11 +12,11 @@ public class UiElementsTestScreen : pScreen {
 		base.Initialize();
 
 		this.Manager.Add(new ButtonDrawable(new TextDrawable(Localizations.Changelog, pTypingGame.JapaneseFont, 30), new Vector2(200, 50)) {
-			Position = new Vector2(10)
+			Position = new Vector2(50)
 		});
 
 		this.Manager.Add(new ButtonDrawable(new TextDrawable(Localizations.Changelog, pTypingGame.JapaneseFont, 30), new Vector2(200, 50)) {
-			Position   = new Vector2(10, 70),
+			Position   = new Vector2(10, 110),
 			BaseColor  = new Color(0.8f, 0.3f, 0.3f),
 			HoverColor = new Color(1.2f, 0.5f, 0.5f)
 		});
@@ -27,7 +27,7 @@ public class UiElementsTestScreen : pScreen {
 			Precision = 1,
 			Value     = 5
 		}) {
-			Position = new Vector2(10, 150)
+			Position = new Vector2(10, 190)
 		});
 
 		this.Manager.Add(new SliderDrawable<float>(new BoundNumber<float> {
@@ -36,7 +36,7 @@ public class UiElementsTestScreen : pScreen {
 			Precision = 0.1f,
 			Value     = 5
 		}) {
-			Position = new Vector2(10, 190)
+			Position = new Vector2(10, 230)
 		});
 
 		this.Manager.Add(new SliderDrawable<float>(new BoundNumber<float> {
@@ -45,10 +45,10 @@ public class UiElementsTestScreen : pScreen {
 			Precision = 0.01f,
 			Value     = 5
 		}) {
-			Position = new Vector2(10, 230)
+			Position = new Vector2(10, 270)
 		});
 
-		this.Manager.Add(new ContextMenuDrawable(new Vector2(10, 300), new List<(string, Delegate)> {
+		this.Manager.Add(new ContextMenuDrawable(new Vector2(10, 340), new List<(string, Delegate)> {
 			("Option 1", new Action(delegate {
 				pTypingGame.NotificationManager.CreatePopup("Clicked Option 1");
 			})),
@@ -59,6 +59,22 @@ public class UiElementsTestScreen : pScreen {
 				pTypingGame.NotificationManager.CreatePopup("Clicked Option 3");
 			}))
 		}, pTypingGame.JapaneseFont, 24));
+
+		this.Manager.Add(new ToolbarDrawable(new Dictionary<string, Delegate> {
+			{
+				"Option 1", new Action(delegate {
+					pTypingGame.NotificationManager.CreatePopup("Clicked Option 1");
+				})
+			}, {
+				"Option 2", new Action(delegate {
+					pTypingGame.NotificationManager.CreatePopup("Clicked Option 2");
+				})
+			}, {
+				"Option 3", new Action(delegate {
+					pTypingGame.NotificationManager.CreatePopup("Clicked Option 3");
+				})
+			}
+		}, pTypingGame.JapaneseFont));
 	}
 
 	public override string               Name                 => "UI Elements Test Screen";

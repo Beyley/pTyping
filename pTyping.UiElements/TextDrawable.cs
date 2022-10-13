@@ -11,12 +11,12 @@ using Furball.Engine.Engine.Localization.Languages;
 namespace pTyping.UiElements;
 
 public class TextDrawable : Drawable {
-	private string _text;
+	private string _text = null!;
 
 	public readonly Bindable<object>     LocalizationTag;
 	public readonly Bindable<string>     Format = new Bindable<string>("{0}");
 	public readonly Bindable<FontSystem> FontSystem;
-	public          DynamicSpriteFont    Font { get; private set; }
+	public          DynamicSpriteFont    Font { get; private set; } = null!;
 	public readonly Bindable<float>      FontSize;
 
 	public override Vector2 Size => this.Font.MeasureString(this._text);
