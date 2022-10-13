@@ -48,31 +48,31 @@ public class UiElementsTestScreen : pScreen {
 			Position = new Vector2(10, 270)
 		});
 
-		this.Manager.Add(new ContextMenuDrawable(new Vector2(10, 340), new List<(string, Delegate)> {
-			("Option 1", new Action(delegate {
+		this.Manager.Add(new ContextMenuDrawable(new Vector2(10, 340), new List<(string, Action)> {
+			("Option 1", delegate {
 				pTypingGame.NotificationManager.CreatePopup("Clicked Option 1");
-			})),
-			("Option 2", new Action(delegate {
+			}),
+			("Option 2", delegate {
 				pTypingGame.NotificationManager.CreatePopup("Clicked Option 2");
-			})),
-			("This is option 3!", new Action(delegate {
+			}),
+			("This is option 3!", delegate {
 				pTypingGame.NotificationManager.CreatePopup("Clicked Option 3");
-			}))
+			})
 		}, pTypingGame.JapaneseFont, 24));
 
-		this.Manager.Add(new ToolbarDrawable(new Dictionary<string, Delegate> {
+		this.Manager.Add(new ToolbarDrawable(new Dictionary<string, Action> {
 			{
-				"Option 1", new Action(delegate {
+				"Option 1", delegate {
 					pTypingGame.NotificationManager.CreatePopup("Clicked Option 1");
-				})
+				}
 			}, {
-				"Option 2", new Action(delegate {
+				"Option 2", delegate {
 					pTypingGame.NotificationManager.CreatePopup("Clicked Option 2");
-				})
+				}
 			}, {
-				"Option 3", new Action(delegate {
+				"Option 3", delegate {
 					pTypingGame.NotificationManager.CreatePopup("Clicked Option 3");
-				})
+				}
 			}
 		}, pTypingGame.JapaneseFont));
 	}

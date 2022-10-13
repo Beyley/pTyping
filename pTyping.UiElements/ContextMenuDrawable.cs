@@ -11,8 +11,8 @@ using Furball.Vixie.Helpers.Helpers;
 namespace pTyping.UiElements;
 
 public class ContextMenuDrawable : Drawable {
-	private readonly List<(string, Delegate)> _items;
-	private readonly DynamicSpriteFont        Font;
+	private readonly List<(string, Action)> _items;
+	private readonly DynamicSpriteFont      Font;
 
 	private int _hoverIndex = -1;
 	
@@ -23,13 +23,13 @@ public class ContextMenuDrawable : Drawable {
 	private const float OUTSIDE_PADDING    = 3f;
 	private const float SIZE_BETWEEN_ITEMS = 3f;
 
-	public ContextMenuDrawable(Vector2 position, List<(string, Delegate)> items, FontSystem fontSystem, float fontSize) {
+	public ContextMenuDrawable(Vector2 position, List<(string, Action)> items, FontSystem fontSystem, float fontSize) {
 		this._items = items;
 
 		this.Font = fontSystem.GetFont(fontSize);
 
 		float x = 0;
-		foreach ((string item, Delegate _) in items) {
+		foreach ((string item, Action _) in items) {
 			Vector2 itemSize = this.Font.MeasureString(item);
 
 			if (itemSize.X > x)
@@ -83,9 +83,9 @@ public class ContextMenuDrawable : Drawable {
 		if (index < 0 || index >= this._items.Count)
 			return;
 
-		(string _, Delegate action) = this._items[index];
+		(string _, Action action) = this._items[index];
 
-		action.DynamicInvoke();
+		action.Invoke();
 	}
 
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
@@ -93,7 +93,7 @@ public class ContextMenuDrawable : Drawable {
 
 		float y = OUTSIDE_PADDING;
 		for (int i = 0; i < this._items.Count; i++) {
-			(string item, Delegate _) = this._items[i];
+			(string item, Action _) = this._items[i];
 
 			if (i == this._hoverIndex) {
 				batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(OUTSIDE_PADDING, y - SIZE_BETWEEN_ITEMS / 2f), new Vector2(this.Size.X - OUTSIDE_PADDING * 2, this.Font.LineHeight + SIZE_BETWEEN_ITEMS), new Color(255, 255, 255, 100));

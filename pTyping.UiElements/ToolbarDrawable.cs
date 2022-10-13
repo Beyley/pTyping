@@ -12,7 +12,7 @@ using Furball.Vixie.Helpers;
 namespace pTyping.UiElements;
 
 public class ToolbarDrawable : CompositeDrawable {
-	private readonly Dictionary<string, Delegate> _buttons;
+	private readonly Dictionary<string, Action> _buttons;
 
 	public const float HEIGHT      = 30f;
 	public const float MARGIN      = 5f;
@@ -29,13 +29,13 @@ public class ToolbarDrawable : CompositeDrawable {
 	private         Vector2 _size;
 	public override Vector2 Size => this._size;
 
-	public ToolbarDrawable(Dictionary<string, Delegate> buttons, FontSystem font) {
+	public ToolbarDrawable(Dictionary<string, Action> buttons, FontSystem font) {
 		_Font ??= font.GetFont(FONT_SIZE);
 
 		this._buttons = buttons;
 
 		float x = 0;
-		foreach ((string? item, Delegate? action) in this._buttons) {
+		foreach ((string item, Action action) in this._buttons) {
 			ToolbarEntryDrawable drawable = new ToolbarEntryDrawable(item, action) {
 				Position = new Vector2(x + MARGIN, MARGIN)
 			};
@@ -69,13 +69,13 @@ public class ToolbarDrawable : CompositeDrawable {
 	}
 
 	private sealed class ToolbarEntryDrawable : CompositeDrawable {
-		private readonly Delegate _action;
+		private readonly Action _action;
 
 		private readonly float _textWidth;
 
 		public override Vector2 Size => new Vector2(this._textWidth + ITEM_MARGIN * 2f, ITEM_HEIGHT);
 
-		public ToolbarEntryDrawable(string text, Delegate action) {
+		public ToolbarEntryDrawable(string text, Action action) {
 			this._action = action;
 
 			this.ChildrenInvisibleToInput = true;
@@ -103,7 +103,7 @@ public class ToolbarDrawable : CompositeDrawable {
 		}
 
 		private void ItemClick(object? sender, MouseButtonEventArgs e) {
-			this._action.DynamicInvoke();
+			this._action.Invoke();
 		}
 	}
 }

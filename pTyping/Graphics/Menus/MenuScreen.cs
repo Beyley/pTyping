@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Platform;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
+using pTyping.Graphics.Editor;
 using pTyping.Graphics.Menus.Options;
 using pTyping.Graphics.Menus.SongSelect;
 using pTyping.Graphics.UiMaker;
@@ -60,10 +61,17 @@ public class MenuScreen : pScreen {
 
 		uiTestButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new UiElementsTestScreen());
 
+		DrawableButton newEditorButton = new DrawableButton(new Vector2(uiTestButton.Position.X + uiTestButton.Size.X + 10, 10), pTypingGame.JapaneseFont, 30, "New Editor", Color.Blue, Color.White, Color.White, new Vector2(0)) {
+			OriginType       = OriginType.BottomLeft,
+			ScreenOriginType = OriginType.BottomLeft
+		};
+
+		newEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new EditorScreen());
 
 		if (RuntimeInfo.IsDebug()) {
 			this.Manager.Add(uiEditorButton);
 			this.Manager.Add(uiTestButton);
+			this.Manager.Add(newEditorButton);
 		}
 
 		#region Title
