@@ -64,7 +64,7 @@ public partial class EditorScreen {
 		this.SceneSize = new Vector2(newWidth - MARGIN_AROUND_SCENE * 2, newHeight - ToolbarDrawable.HEIGHT - MARGIN_AROUND_SCENE * 2);
 
 		// Relayout the scene
-		this._currentScene?.Relayout(newWidth, newHeight);
+		this._currentScene?.Relayout(this.SceneSize.X, this.SceneSize.Y);
 
 		if (this._sceneOutline != null)
 			this._sceneOutline.RectSize = this.SceneSize;
