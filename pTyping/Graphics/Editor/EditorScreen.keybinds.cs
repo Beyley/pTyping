@@ -17,6 +17,10 @@ public partial class EditorScreen {
 	}
 
 	private void PausePlay(FurballKeyboard keyboard) {
+		//Ignore this bind if the user is typing somewhere
+		if (FurballGame.InputManager.CharInputHandler != null)
+			return;
+		
 		if (pTypingGame.MusicTrack.PlaybackState == PlaybackState.Playing)
 			pTypingGame.MusicTrack.Pause();
 		else

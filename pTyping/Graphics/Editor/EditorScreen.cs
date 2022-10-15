@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
-using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
-using Furball.Vixie.Backends.Shared;
+using pTyping.Graphics.Editor.Scene;
 using pTyping.Graphics.Editor.Scene.LyricEditor;
 using pTyping.Graphics.Editor.Scene.NoteEditor;
 using pTyping.Shared.Beatmaps;
@@ -43,18 +41,12 @@ public partial class EditorScreen : pScreen {
 		this.Manager.Add(this._sceneOutline = new RectanglePrimitiveDrawable(this.ScenePosition, this.SceneSize, 1, false));
 
 		//Add a song progress bar to the bottom of the screen
-		this.Manager.Add(this._songProgressBar = new DrawableProgressBar(Vector2.Zero, pTypingGame.JapaneseFont, 24, new Vector2(FurballGame.WindowWidth, 30), Color.White, Color.DarkGray, Color.White) {
+		this.Manager.Add(this._songProgressBar = new SongProgressBarDrawable {
 			OriginType       = OriginType.BottomLeft,
 			ScreenOriginType = OriginType.BottomLeft
 		});
 
 		this.InitializeKeybinds();
-	}
-
-	public override void Update(double gameTime) {
-		base.Update(gameTime);
-
-		this._songProgressBar.Progress = (float)(pTypingGame.MusicTrack.CurrentPosition / pTypingGame.MusicTrack.Length);
 	}
 
 	public override void Relayout(float newWidth, float newHeight) {
