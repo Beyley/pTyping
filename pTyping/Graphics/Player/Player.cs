@@ -218,7 +218,7 @@ public class Player : CompositeDrawable {
 
 		noteDrawable.UpdateTextPositions();
 
-		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time)));
+		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), this._arguments.UseEditorNoteSpawnLogic));
 
 		return noteDrawable;
 	}
