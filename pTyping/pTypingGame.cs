@@ -18,6 +18,7 @@ using Furball.Engine.Engine.Input.Events;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
 using Furball.Vixie;
+using Furball.Vixie.WindowManagement;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using Kettu;
@@ -192,7 +193,7 @@ public class pTypingGame : FurballGame {
 				if (tags.Tag.Pictures.Length != 0) {
 					IPicture cover = tags.Tag.Pictures.FirstOrDefault(x => x.Type == PictureType.FrontCover, null);
 					if (cover != null)
-						backgroundTex = Texture.CreateTextureFromByteArray(cover.Data.Data);
+						backgroundTex = ResourceFactory.CreateTextureFromByteArray(cover.Data.Data);
 				}
 
 				tags.Dispose();
@@ -206,7 +207,7 @@ public class pTypingGame : FurballGame {
 			backgroundTex ??= DefaultBackground;
 		}
 		else {
-			backgroundTex = song.FileCollection.Background != null ? Texture.CreateTextureFromByteArray(FileDatabase.GetFile(song.FileCollection.Background.Hash))
+			backgroundTex = song.FileCollection.Background != null ? ResourceFactory.CreateTextureFromByteArray(FileDatabase.GetFile(song.FileCollection.Background.Hash))
 				: DefaultBackground;
 		}
 
@@ -391,7 +392,7 @@ public class pTypingGame : FurballGame {
 
 		OffsetManager.Initialize();
 
-		CurrentSongBackground = new TexturedDrawable(Texture.CreateWhitePixelTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
+		CurrentSongBackground = new TexturedDrawable(ResourceFactory.CreateWhitePixelTexture(), new Vector2(DEFAULT_WINDOW_WIDTH / 2f, DEFAULT_WINDOW_HEIGHT / 2f)) {
 			Depth       = 1f,
 			OriginType  = OriginType.Center,
 			Hoverable   = false,
@@ -485,8 +486,8 @@ public class pTypingGame : FurballGame {
 		};
 		this._userPanelManager.Add(this._chatDrawable);
 
-		GraphicsBackend.Current.ScreenshotTaken += this.OnScreenshotTaken;
-		CurrentSong.OnChange                    += this.OnSongChange;
+		this.WindowManager.GraphicsBackend.ScreenshotTaken += this.OnScreenshotTaken;
+		CurrentSong.OnChange                               += this.OnSongChange;
 
 		SelectNewSong();
 		PlayMusic();
@@ -508,13 +509,13 @@ public class pTypingGame : FurballGame {
 		base.RegisterKeybinds();
 
 		this._toggleUserPanel = new Keybind(pTypingKeybinds.ToggleUserPanel, "Toggle User Panel", Key.F1, this.ToggleUserPanel);
-		this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot, "Take Screenshot", Key.F2, _ => GraphicsBackend.Current.TakeScreenshot());
+		this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot, "Take Screenshot", Key.F2, _ => this.WindowManager.GraphicsBackend.TakeScreenshot());
 		this._toggleFullscreen = new Keybind(
 			pTypingKeybinds.ToggleFullscreen,
 			"Toggle Fullscreen",
 			Key.F3,
 			_ => {
-				this.ChangeScreenSize((int)this.WindowManager.WindowSize.X, (int)this.WindowManager.WindowSize.Y, !this.WindowManager.Fullscreen);
+				this.ChangeScreenSize(this.WindowManager.WindowSize.X, this.WindowManager.WindowSize.Y, !this.WindowManager.WindowState.HasFlag(WindowState.Fullscreen));
 			}
 		);
 		this._openSettings = new Keybind(pTypingKeybinds.OpenSettings, "Open Settings Menu", Key.O, this.ToggleSettingsMenu);

@@ -71,8 +71,8 @@ internal class Program {
 				writer.Flush();
 
 				writer.Close();
-		
-				game.WindowManager.Close();
+
+				game.WindowManager.CloseWindow();
 			}
 	}
 }
