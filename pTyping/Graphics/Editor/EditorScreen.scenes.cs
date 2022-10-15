@@ -55,18 +55,16 @@ public partial class EditorScreen {
 		this._currentScene = null;
 	}
 
-	public override void Relayout(float newWidth, float newHeight) {
-		base.Relayout(newWidth, newHeight);
-
+	private void RelayoutScene(float newWidth, float newHeight) {
 		if (this._currentScene == null)
 			return;
 
-		this.SceneSize = new Vector2(newWidth - MARGIN_AROUND_SCENE * 2, newHeight - ToolbarDrawable.HEIGHT - MARGIN_AROUND_SCENE * 2);
+		this.SceneSize = new Vector2(newWidth - MARGIN_AROUND_SCENE * 2, newHeight - ToolbarDrawable.HEIGHT - MARGIN_AROUND_SCENE * 2 - this._songProgressBar?.Size.Y ?? 0);
 
 		// Relayout the scene
 		this._currentScene?.Relayout(this.SceneSize.X, this.SceneSize.Y);
 
 		if (this._sceneOutline != null)
-			this._sceneOutline.RectSize = this.SceneSize;
+			this._sceneOutline.RectSize = this.SceneSize;	
 	}
 }
