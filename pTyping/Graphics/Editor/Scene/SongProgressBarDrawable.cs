@@ -8,10 +8,14 @@ namespace pTyping.Graphics.Editor.Scene;
 
 public class SongProgressBarDrawable : DrawableProgressBar {
 	public SongProgressBarDrawable() : base(Vector2.Zero, pTypingGame.JapaneseFont, 24, new Vector2(FurballGame.WindowWidth, 30), Color.White, Color.DarkGray, Color.White) {
-		this.OnDrag += this.DrawableDrag;
+		this.OnClick += this.Click;
+		this.OnDrag  += this.Drag;
+	}
+	private void Click(object sender, MouseButtonEventArgs e) {
+		this.Drag(sender, new MouseDragEventArgs(Vector2.Zero, Vector2.Zero, e.Mouse.Position, e.Button, e.Mouse));
 	}
 
-	private void DrawableDrag(object sender, MouseDragEventArgs e) {
+	private void Drag(object sender, MouseDragEventArgs e) {
 		//get relative position
 		Vector2 relativePosition = e.Position - this.RealPosition;
 
