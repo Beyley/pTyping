@@ -47,7 +47,7 @@ public class LyricDrawable : Drawable {
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
 		// batch.Draw(FurballGame.WhitePixel, args.Position, this.RealSize, new Color(255, 255, 255, 100));
 
-		const float padding = 0.1f;
+		const float padding = 0.05f;
 
 		float startFull = args.Position.X + this.RealSize.X * padding;
 		float endFull   = args.Position.X + this.RealSize.X * (1 - padding);
@@ -93,7 +93,7 @@ public class LyricDrawable : Drawable {
 			data.IndexPtr[4] = (ushort)(topRight    + data.IndexOffset);
 			data.IndexPtr[5] = (ushort)(bottomLeft  + data.IndexOffset);
 		}
-
+		
 		batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.Size.X * padding, 0), new Vector2(this.Size.X * (1f - padding * 2f), this.RealSize.Y), fullColor);
 
 		unsafe {
@@ -135,6 +135,19 @@ public class LyricDrawable : Drawable {
 			data.IndexPtr[5] = (ushort)(bottomLeft  + data.IndexOffset);
 		}
 
-		batch.DrawString(this._font, this.Event.Text, args.Position + new Vector2(2f, 2f), Color.White);
+		Vector2 size = this._font.MeasureString(this.Event.Text);
+
+		if (size.X <= fullLength) {
+			batch.DrawString(this._font, this.Event.Text, args.Position + new Vector2(2f, 2f) + new Vector2(this.Size.X * padding, 0), Color.White);
+		}
+		else {
+			Vector2 scale = new Vector2(fullLength / size.X);
+
+			Vector2 scaledSize = this._font.MeasureString(this.Event.Text, scale);
+
+			float y = args.Position.Y + this.RealSize.Y / 2f - scaledSize.Y / 2f;
+
+			batch.DrawString(this._font, this.Event.Text, new Vector2(2f + args.Position.X, y) + new Vector2(this.Size.X * padding, 0), Color.White, 0, scale);
+		}
 	}
 }
