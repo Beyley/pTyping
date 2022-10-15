@@ -47,6 +47,8 @@ public partial class EditorScreen : pScreen {
 			OriginType       = OriginType.BottomLeft,
 			ScreenOriginType = OriginType.BottomLeft
 		});
+
+		this.InitializeKeybinds();
 	}
 
 	public override void Update(double gameTime) {
@@ -62,5 +64,11 @@ public partial class EditorScreen : pScreen {
 
 		if (this._songProgressBar != null)
 			this._songProgressBar.BarSize.X = newWidth;
+	}
+
+	public override void Dispose() {
+		base.Dispose();
+
+		this.RemoveKeybinds();
 	}
 }
