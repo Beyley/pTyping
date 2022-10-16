@@ -30,7 +30,7 @@ public sealed class LyricEditorContents : CompositeDrawable {
 
 		foreach (Event @event in this._editorScreen.Beatmap.Events)
 			if (@event.Type == EventType.Lyric) {
-				LyricDrawable lyric = new LyricDrawable(@event);
+				LyricDrawable lyric = new LyricDrawable(editorScreen, @event);
 
 				//Make sure we are already off-screen when the event starts
 				lyric.Position.X = this._size.X;

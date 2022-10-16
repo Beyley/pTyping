@@ -1,25 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using Furball.Vixie.Backends.Shared.Renderers;
 using pTyping.Shared.Events;
+using pTyping.UiElements;
+using Silk.NET.Input;
 
 namespace pTyping.Graphics.Editor.Scene.LyricEditor;
 
 public class LyricDrawable : Drawable {
+	private readonly EditorScreen _editor;
+	
 	public readonly  Event             Event;
 	private          float             _width;
 	private readonly DynamicSpriteFont _font;
 
 	public override Vector2 Size => new Vector2((float)(this.Event.Length * LyricEditorContents.PIXELS_PER_MILISECOND), LyricEditorContents.HEIGHT) * this.Scale;
 
-	public LyricDrawable(Event @event) {
-		this.Event = @event;
+	public LyricDrawable(EditorScreen editor, Event @event) {
+		this._editor = editor;
+		this.Event   = @event;
 
 		if (this.Event.Type != EventType.Lyric)
 			throw new ArgumentException("The event must be a Lyric event!", nameof (@event));
@@ -27,6 +34,20 @@ public class LyricDrawable : Drawable {
 		this.TimeSource = pTypingGame.MusicTrackTimeSourceNoOffset;
 
 		this._font = pTypingGame.JapaneseFont.GetFont(LyricEditorContents.HEIGHT - 4f);
+
+		this.OnClick += this.Clicked;
+	}
+
+	private void Clicked(object sender, MouseButtonEventArgs e) {
+		if (e.Button == MouseButton.Right) {
+			ContextMenuDrawable rightClickMenu = new ContextMenuDrawable(e.Mouse.Position, new List<(string, Action)> {
+				("Delete", () => {
+					throw new NotImplementedException();
+				})
+			}, pTypingGame.JapaneseFont, 24);
+
+			this._editor.OpenContextMenu(rightClickMenu);
+		}
 	}
 
 	public override void Update(double time) {

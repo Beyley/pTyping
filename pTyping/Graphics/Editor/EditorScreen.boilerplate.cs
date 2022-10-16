@@ -7,7 +7,7 @@ public partial class EditorScreen {
 	[CanBeNull]
 	private ContextMenuDrawable _openContextMenu;
 
-	private void CloseCurrentContextMenu() {
+	public void CloseCurrentContextMenu() {
 		//Do nothing if there is no context menu open
 		if (this._openContextMenu == null)
 			return;
@@ -20,7 +20,7 @@ public partial class EditorScreen {
 	}
 
 
-	private void OpenContextMenu([NotNull] ContextMenuDrawable contextMenu) {
+	public void OpenContextMenu([NotNull] ContextMenuDrawable contextMenu) {
 		this.CloseCurrentContextMenu();
 
 		contextMenu.Depth = -10;
