@@ -38,7 +38,12 @@ public partial class EditorScreen : pScreen {
 		this.LoadScene(new NoteEditorScene(this));
 
 		//Add an outline for the scene
-		this.Manager.Add(this._sceneOutline = new RectanglePrimitiveDrawable(this.ScenePosition, this.SceneSize, 1, false));
+		this.Manager.Add(this._sceneOutline = new RectanglePrimitiveDrawable(this.ScenePosition, this.SceneSize, 1, false) {
+			Clickable   = false,
+			CoverClicks = false,
+			Hoverable   = false,
+			CoverHovers = false
+		});
 
 		//Add a song progress bar to the bottom of the screen
 		this.Manager.Add(this._songProgressBar = new SongProgressBarDrawable {

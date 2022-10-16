@@ -20,6 +20,8 @@ public sealed class LyricEditorContents : CompositeDrawable {
 	public LyricEditorContents(EditorScreen editorScreen) {
 		this._editorScreen = editorScreen;
 
+		this.InvisibleToInput = true;
+
 		this._topLine    = new LinePrimitiveDrawable(Vector2.Zero, Vector2.Zero, Color.White);
 		this._bottomLine = new LinePrimitiveDrawable(Vector2.Zero, Vector2.Zero, Color.White);
 

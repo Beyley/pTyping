@@ -149,5 +149,22 @@ public class LyricDrawable : Drawable {
 
 			batch.DrawString(this._font, this.Event.Text, new Vector2(2f + args.Position.X, y) + new Vector2(this.Size.X * padding, 0), Color.White, 0, scale);
 		}
+
+		if (this.IsHovered) {
+			const float stopperTopToLyricTop = 10f;
+
+			const float stopperWidth = 2f;
+
+			//Draw 2 stoppers on the left and right
+			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(0, -stopperTopToLyricTop), new Vector2(stopperWidth, this.RealSize.Y               + stopperTopToLyricTop * 2), Color.White);
+			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.RealSize.X, -stopperTopToLyricTop), new Vector2(stopperWidth, this.RealSize.Y + stopperTopToLyricTop * 2), Color.White);
+
+			//Draw short lines at the top and bottom of the stopper pointing inwards
+			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(0, -stopperTopToLyricTop), new Vector2(10, stopperWidth), Color.White);
+			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(0, this.RealSize.Y + stopperTopToLyricTop), new Vector2(10, stopperWidth), Color.White);
+
+			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.RealSize.X + stopperWidth, -stopperTopToLyricTop + stopperWidth), new Vector2(10, stopperWidth), Color.White, MathF.PI);
+			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.RealSize.X + stopperWidth, this.RealSize.Y       + stopperTopToLyricTop + stopperWidth), new Vector2(10, stopperWidth), Color.White, MathF.PI);
+		}
 	}
 }
