@@ -23,6 +23,8 @@ public partial class EditorScreen {
 	private void OpenContextMenu([NotNull] ContextMenuDrawable contextMenu) {
 		this.CloseCurrentContextMenu();
 
+		contextMenu.Depth = -10;
+
 		//Add the context menu
 		this.Manager.Add(contextMenu);
 

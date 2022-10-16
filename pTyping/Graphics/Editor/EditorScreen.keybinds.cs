@@ -1,5 +1,7 @@
+using System;
 using Furball.Engine;
 using Furball.Engine.Engine.Input;
+using Furball.Engine.Engine.Input.Events;
 using ManagedBass;
 using Silk.NET.Input;
 
@@ -14,6 +16,12 @@ public partial class EditorScreen {
 
 	private void InitializeKeybinds() {
 		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
+
+		FurballGame.InputManager.OnMouseScroll += this.MouseScroll;
+	}
+
+	private void MouseScroll(object sender, MouseScrollEventArgs e) {
+		this.MoveTimeByNBeats(Math.Sign(-e.ScrollAmount.Y));
 	}
 
 	private void PausePlay(FurballKeyboard keyboard) {
@@ -29,5 +37,7 @@ public partial class EditorScreen {
 
 	private void RemoveKeybinds() {
 		FurballGame.InputManager.UnregisterKeybind(this._pausePlayKeybind);
+
+		FurballGame.InputManager.OnMouseScroll -= this.MouseScroll;
 	}
 }
