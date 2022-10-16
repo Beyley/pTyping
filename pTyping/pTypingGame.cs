@@ -36,6 +36,7 @@ using pTyping.Shared.Scores;
 using Silk.NET.Input;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using sowelipisona;
 using TagLib;
 using Color = Furball.Vixie.Backends.Shared.Color;
@@ -491,6 +492,12 @@ public class pTypingGame : FurballGame {
 
 		SelectNewSong();
 		PlayMusic();
+
+		byte[] iconData = ContentManager.LoadRawAsset("ptyping-mode-icon.png");
+
+		Image<Rgba32> icon = Image.Load<Rgba32>(iconData);
+
+		this.WindowManager.SetIcon(icon);
 	}
 
 	// ReSharper disable once InconsistentNaming

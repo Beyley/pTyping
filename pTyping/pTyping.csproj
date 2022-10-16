@@ -12,7 +12,6 @@
         <DebugType>full</DebugType>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NoWarn>NU1701;NU1702</NoWarn>
-        <DefineConstants>TRACE;DEBUGWITHGL</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
