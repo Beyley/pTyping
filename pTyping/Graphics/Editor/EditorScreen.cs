@@ -54,6 +54,12 @@ public partial class EditorScreen : pScreen {
 		this.InitializeKeybinds();
 	}
 
+	public override void Update(double gameTime) {
+		base.Update(gameTime);
+
+		this._openedThisFrame = false;
+	}
+
 	public override void Relayout(float newWidth, float newHeight) {
 		base.Relayout(newWidth, newHeight);
 

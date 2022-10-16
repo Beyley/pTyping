@@ -18,6 +18,14 @@ public partial class EditorScreen {
 		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
 
 		FurballGame.InputManager.OnMouseScroll += this.MouseScroll;
+		FurballGame.InputManager.OnMouseDown   += this.MouseDown;
+	}
+
+	private void MouseDown(object sender, MouseButtonEventArgs e) {
+		if (this._openContextMenu?.IsHovered ?? true)
+			return;
+
+		this.CloseCurrentContextMenu();
 	}
 
 	private void MouseScroll(object sender, MouseScrollEventArgs e) {
@@ -39,5 +47,6 @@ public partial class EditorScreen {
 		FurballGame.InputManager.UnregisterKeybind(this._pausePlayKeybind);
 
 		FurballGame.InputManager.OnMouseScroll -= this.MouseScroll;
+		FurballGame.InputManager.OnMouseDown   -= this.MouseDown;
 	}
 }

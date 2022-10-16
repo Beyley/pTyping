@@ -74,8 +74,8 @@ public class Player : CompositeDrawable {
 		set => this._typingIndicators[this._currentTypingIndicatorIndex] = value;
 	}
 
-	private readonly List<NoteDrawable>          _notes  = new List<NoteDrawable>();
-	private readonly List<Tuple<Drawable, bool>> _events = new List<Tuple<Drawable, bool>>();
+	internal readonly List<NoteDrawable>          Notes   = new List<NoteDrawable>();
+	private readonly  List<Tuple<Drawable, bool>> _events = new List<Tuple<Drawable, bool>>();
 
 	public static readonly Vector2 RECEPTICLE_POS = new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH * 0.15f, NOTE_HEIGHT);
 
@@ -105,6 +105,8 @@ public class Player : CompositeDrawable {
 	public Player(Beatmap song, Mod[] mods, PlayerStateArguments arguments) {
 		this.Song       = song;
 		this._arguments = arguments;
+
+		this.InvisibleToInput = true;
 
 		// this.BaseApproachTime /= song.Difficulty.GlobalApproachMultiplier;
 
@@ -185,7 +187,7 @@ public class Player : CompositeDrawable {
 		foreach (HitObject note in this.Song.HitObjects) {
 			NoteDrawable noteDrawable = this.CreateNote(note);
 
-			this._notes.Add(noteDrawable);
+			this.Notes.Add(noteDrawable);
 
 			if (this._arguments.UseEditorNoteSpawnLogic)
 				this.Children.Add(noteDrawable);
@@ -251,10 +253,10 @@ public class Player : CompositeDrawable {
 		if (this.Song.AllNotesHit()) return;
 
 		//TODO: figure out why the fuck this happened
-		if (this._noteToType >= this._notes.Count) return;
+		if (this._noteToType >= this.Notes.Count) return;
 
 		//The drawable for the note we are going to check
-		NoteDrawable noteDrawable = this._notes[checkingNext ? this._noteToType + 1 : this._noteToType];
+		NoteDrawable noteDrawable = this.Notes[checkingNext ? this._noteToType + 1 : this._noteToType];
 
 		//The extracted `Note` object 
 		HitObject note = noteDrawable.Note;
@@ -283,10 +285,10 @@ public class Player : CompositeDrawable {
 				//Check if the next romaji to type is the character we typed
 				if (romaji[note.TypedRomaji.Length] == e.Char) {
 					//If we are checking the next note, and the current note is not hit,
-					if (checkingNext && !this._notes[this._noteToType].Note.IsHit) {
+					if (checkingNext && !this.Notes[this._noteToType].Note.IsHit) {
 						//Miss the current note
-						this._notes[this._noteToType].Miss();
-						this.NoteUpdate(false, this._notes[this._noteToType].Note);
+						this.Notes[this._noteToType].Miss();
+						this.NoteUpdate(false, this.Notes[this._noteToType].Note);
 
 						//Go to the next note
 						this._noteToType++;
@@ -398,7 +400,7 @@ public class Player : CompositeDrawable {
 
 		double numberHit = 0;
 		double total     = 0;
-		foreach (NoteDrawable noteDrawable in this._notes) {
+		foreach (NoteDrawable noteDrawable in this.Notes) {
 			switch (noteDrawable.Note.HitResult) {
 				case HitResult.Excellent:
 					numberHit++;
@@ -486,8 +488,8 @@ public class Player : CompositeDrawable {
 		if (this._arguments.UseEditorNoteSpawnLogic) {
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
 			if (this._musicTimeLastUpdate != currentTime)
-				for (int i = 0; i < this._notes.Count; i++) {
-					NoteDrawable note = this._notes[i];
+				for (int i = 0; i < this.Notes.Count; i++) {
+					NoteDrawable note = this.Notes[i];
 
 					note.Visible = currentTime > note.Note.Time - this.CurrentApproachTime(note.Note.Time) &&
 								   currentTime < note.Note.Time + 1000; //TODO: pick a shorter time using the note's tweens
@@ -495,8 +497,8 @@ public class Player : CompositeDrawable {
 		}
 		else {
 			//Iterate over all notes, and spawn them if they are within the spawn range
-			for (int i = 0; i < this._notes.Count; i++) {
-				NoteDrawable note = this._notes[i];
+			for (int i = 0; i < this.Notes.Count; i++) {
+				NoteDrawable note = this.Notes[i];
 
 				//If the note is already added, skip it
 				if (note.Added)
@@ -533,17 +535,17 @@ public class Player : CompositeDrawable {
 		//If DisableHitResults, dont check, if not, check
 		bool checkNoteHittability = !this._arguments.DisableHitResults;
 
-		if (this._noteToType == this._notes.Count) {
+		if (this._noteToType == this.Notes.Count) {
 			this.EndScore();
 			checkNoteHittability = false;
 		}
 
 		if (checkNoteHittability) {
-			NoteDrawable noteToType = this._notes[this._noteToType];
+			NoteDrawable noteToType = this.Notes[this._noteToType];
 
 			//Checks if the current note is not hit
-			if (!noteToType.Note.IsHit && this._noteToType < this._notes.Count - 1) {
-				NoteDrawable nextNoteToType = this._notes[this._noteToType + 1];
+			if (!noteToType.Note.IsHit && this._noteToType < this.Notes.Count - 1) {
+				NoteDrawable nextNoteToType = this.Notes[this._noteToType + 1];
 
 				//If we are within the next note
 				if (currentTime > nextNoteToType.Note.Time) {

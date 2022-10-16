@@ -8,6 +8,9 @@ public partial class EditorScreen {
 	private ContextMenuDrawable _openContextMenu;
 
 	public void CloseCurrentContextMenu() {
+		if (this._openedThisFrame)
+			return;
+		
 		//Do nothing if there is no context menu open
 		if (this._openContextMenu == null)
 			return;
@@ -19,7 +22,7 @@ public partial class EditorScreen {
 		this._openContextMenu = null;
 	}
 
-
+	private bool _openedThisFrame;
 	public void OpenContextMenu([NotNull] ContextMenuDrawable contextMenu) {
 		this.CloseCurrentContextMenu();
 
@@ -30,6 +33,8 @@ public partial class EditorScreen {
 
 		//Mark the context menu as open
 		this._openContextMenu = contextMenu;
+
+		this._openedThisFrame = true;
 	}
 
 	public override string               Name                 => "Editor";

@@ -8,8 +8,11 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
 using pTyping.Graphics.Player;
 using pTyping.Shared.Mods;
+using pTyping.UiElements;
+using Silk.NET.Input;
 
 namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 
@@ -28,8 +31,14 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this._editor      = editor;
 		this.SizeOverride = size;
 
+		this.InvisibleToInput = true;
+
 		this._outline = new RectanglePrimitiveDrawable(Vector2.Zero, this.Size, 1, false) {
-			Depth = 1
+			Depth       = 1,
+			Clickable   = false,
+			CoverClicks = false,
+			Hoverable   = false,
+			CoverHovers = false
 		};
 
 		this.Children.Add(this._outline);
@@ -45,11 +54,32 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 			OriginType = OriginType.LeftCenter
 		};
 
+		foreach (NoteDrawable noteDrawable in player.Notes)
+			this.HandleNoteCreated(noteDrawable);
+
 		this._players.Add(player);
 
 		this.Children.Add(player);
 
 		this.RelayoutPlayers();
+	}
+
+	public void HandleNoteCreated(NoteDrawable note) {
+		note.OnClick += this.NoteClick;
+	}
+
+	private void NoteClick(object sender, MouseButtonEventArgs e) {
+		NoteDrawable note = (NoteDrawable)sender;
+
+		if (e.Button == MouseButton.Right) {
+			ContextMenuDrawable rightClickMenu = new ContextMenuDrawable(e.Mouse.Position, new List<(string, Action)> {
+				("Delete", () => {
+					throw new NotImplementedException();
+				})
+			}, pTypingGame.JapaneseFont, 24);
+
+			this._editor.OpenContextMenu(rightClickMenu);
+		}
 	}
 
 	private void RelayoutPlayers() {
