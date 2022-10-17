@@ -91,28 +91,24 @@ public class NoteEditorToolSelectionDrawable : CompositeDrawable {
 		this.UpdateTickBoxes();
 	}
 
-	private void SelectToolSelected(object sender, MouseButtonEventArgs e) {
-		this.CurrentTool = new SelectTool();
+	public void SelectTool(NoteEditorTool tool) {
+		this.CurrentTool = tool;
 
 		this.UpdateTickBoxes();
 
 		this._toolChanged();
+	}
+
+	private void SelectToolSelected(object sender, MouseButtonEventArgs e) {
+		this.SelectTool(new SelectTool());
 	}
 
 	private void TypingCutoffToolSelected(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
-		this.CurrentTool = new TypingCutoffTool();
-
-		this.UpdateTickBoxes();
-
-		this._toolChanged();
+		this.SelectTool(new TypingCutoffTool());
 	}
 
 	private void NoteToolSelected(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
-		this.CurrentTool = new NoteTool();
-
-		this.UpdateTickBoxes();
-
-		this._toolChanged();
+		this.SelectTool(new NoteTool());
 	}
 
 	private void UpdateTickBoxes() {
