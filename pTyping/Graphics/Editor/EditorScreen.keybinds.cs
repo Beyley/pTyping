@@ -35,6 +35,10 @@ public partial class EditorScreen {
 	}
 
 	private void ActivateSelectTool(FurballKeyboard keyboard) {
+		//Ignore this bind if the user is typing somewhere
+		if (FurballGame.InputManager.CharInputHandler != null)
+			return;
+		
 		if (this._currentScene is not NoteEditorScene noteEditorScene)
 			return;
 
@@ -42,6 +46,10 @@ public partial class EditorScreen {
 	}
 
 	private void ActivateNoteTool(FurballKeyboard keyboard) {
+		//Ignore this bind if the user is typing somewhere
+		if (FurballGame.InputManager.CharInputHandler != null)
+			return;
+		
 		if (this._currentScene is not NoteEditorScene noteEditorScene)
 			return;
 
@@ -49,6 +57,10 @@ public partial class EditorScreen {
 	}
 
 	private void ActivateTypingCutoffTool(FurballKeyboard keyboard) {
+		//Ignore this bind if the user is typing somewhere
+		if (FurballGame.InputManager.CharInputHandler != null)
+			return;
+		
 		if (this._currentScene is not NoteEditorScene noteEditorScene)
 			return;
 
