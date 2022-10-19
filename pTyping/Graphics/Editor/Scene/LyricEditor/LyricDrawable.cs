@@ -114,8 +114,13 @@ public class LyricDrawable : Drawable {
 			data.IndexPtr[4] = (ushort)(topRight    + data.IndexOffset);
 			data.IndexPtr[5] = (ushort)(bottomLeft  + data.IndexOffset);
 		}
-		
-		batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.Size.X * padding, 0), new Vector2(this.Size.X * (1f - padding * 2f), this.RealSize.Y), fullColor);
+
+		batch.Draw(
+			FurballGame.WhitePixel,
+			args.Position + new Vector2(this.Size.X * padding, 0),
+			new Vector2(this.Size.X * (1f - padding * 2f), this.RealSize.Y),
+			fullColor
+		);
 
 		unsafe {
 			MappedData data = batch.Reserve(4, 6);
