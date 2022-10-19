@@ -51,7 +51,6 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 		this._players = new List<Player.Player>();
 
-		//TODO: support mapping multiple players
 		this.CreateNewPlayer();
 	}
 
@@ -93,7 +92,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 			Player.Player player = this._players[i];
 
 			//TODO: handle multiple players properly
-			player.Position = new Vector2(0, this.Size.Y / 2f);
+			player.Position = new Vector2(0, this.Size.Y / (this._players.Count + 1) * (i + 1));
 		}
 	}
 
