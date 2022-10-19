@@ -4,10 +4,10 @@ using pTyping.Graphics.Drawables;
 namespace pTyping.Graphics.Player;
 
 public class PlayerStateArguments {
-	public static readonly PlayerStateArguments DefaultPlayer = new PlayerStateArguments {
+	public static PlayerStateArguments DefaultPlayer => new PlayerStateArguments {
 		DisplayRomaji = true
 	};
-	public static readonly PlayerStateArguments DefaultEditor = new PlayerStateArguments {
+	public static PlayerStateArguments DefaultEditor => new PlayerStateArguments {
 		DisableTyping                  = true,
 		DisableHitResults              = true,
 		DisableMapEnding               = true,
