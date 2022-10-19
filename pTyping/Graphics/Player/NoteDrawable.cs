@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Numerics;
 using FontStashSharp;
 using Furball.Engine;
@@ -10,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
+using pTyping.Graphics.Drawables;
 using pTyping.Shared.Beatmaps.HitObjects;
 
 namespace pTyping.Graphics.Player;
@@ -26,7 +28,7 @@ public struct GameplayDrawableTweenArgs {
 	}
 }
 
-public class NoteDrawable : CompositeDrawable {
+public class NoteDrawable : SelectableCompositeDrawable {
 	public TextDrawable     RawTextDrawable;
 	public TextDrawable     ToTypeTextDrawable;
 	public TexturedDrawable NoteTexture;
@@ -39,7 +41,7 @@ public class NoteDrawable : CompositeDrawable {
 	public bool   EditorHitSoundQueued = false;
 	public double TimeDifference;
 
-	public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size) {
+	public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size, ObservableCollection<SelectableCompositeDrawable> selectedObjects) : base(selectedObjects) {
 		this.Position = position;
 		this.Texture  = texture;
 

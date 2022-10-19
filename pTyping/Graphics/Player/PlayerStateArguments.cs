@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using pTyping.Graphics.Drawables;
+
 namespace pTyping.Graphics.Player;
 
 public class PlayerStateArguments {
@@ -9,7 +12,8 @@ public class PlayerStateArguments {
 		DisableHitResults              = true,
 		DisableMapEnding               = true,
 		DisablePlayerMusicTrackControl = true,
-		UseEditorNoteSpawnLogic        = true
+		UseEditorNoteSpawnLogic        = true,
+		EnableSelection                = true
 	};
 
 	/// <summary>
@@ -33,4 +37,7 @@ public class PlayerStateArguments {
 	/// </summary>
 	public bool UseEditorNoteSpawnLogic;
 	public bool DisplayRomaji;
+	public bool EnableSelection;
+
+	public ObservableCollection<SelectableCompositeDrawable> SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
 }

@@ -89,7 +89,7 @@ public class BulkCreateTool : EditorTool {
 
 		List<HitObject> notes = this.GenerateNotes();
 		foreach (HitObject note in notes) {
-			NoteDrawable drawable = new NoteDrawable(Vector2.Zero, this.OldEditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50) {
+			NoteDrawable drawable = new NoteDrawable(Vector2.Zero, this.OldEditorInstance.NoteTexture, pTypingGame.JapaneseFont, 50, null) {
 				TimeSource = pTypingGame.MusicTrackTimeSource,
 				RawTextDrawable = {
 					Text = $"{note.Text}"
@@ -99,7 +99,11 @@ public class BulkCreateTool : EditorTool {
 				Note       = note,
 				NoteTexture = {
 					ColorOverride = new Color(255, 255, 255, 100)
-				}
+				},
+				Clickable   = false,
+				CoverClicks = false,
+				Hoverable   = false,
+				CoverHovers = false
 			};
 
 			drawable.Tweens.Add(

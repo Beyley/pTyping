@@ -196,7 +196,7 @@ public class Player : CompositeDrawable {
 
 	[Pure]
 	private NoteDrawable CreateNote(HitObject note) {
-		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50) {
+		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this._arguments.SelectedNotes) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {
 				ColorOverride = note.Color
@@ -209,10 +209,14 @@ public class Player : CompositeDrawable {
 			ToTypeTextDrawable = {
 				Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", note.TypableRomaji.Romaji)}" : ""
 			},
-			Scale      = new Vector2(0.55f),
-			Depth      = 0.5f,
-			OriginType = OriginType.Center,
-			Note       = note
+			Scale       = new Vector2(0.55f),
+			Depth       = 0.5f,
+			OriginType  = OriginType.Center,
+			Note        = note,
+			Clickable   = this._arguments.EnableSelection,
+			CoverClicks = this._arguments.EnableSelection,
+			Hoverable   = this._arguments.EnableSelection,
+			CoverHovers = this._arguments.EnableSelection
 		};
 
 		for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++)
