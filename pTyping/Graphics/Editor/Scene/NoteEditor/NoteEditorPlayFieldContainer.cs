@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Numerics;
 using Furball.Engine;
@@ -9,6 +10,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
+using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Player;
 using pTyping.Shared.Mods;
 using pTyping.UiElements;
@@ -19,6 +21,7 @@ namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	private readonly RectanglePrimitiveDrawable _outline;
 	private readonly List<Player.Player>        _players;
+	private readonly PlayerStateArguments       _arguments;
 
 	private readonly EditorScreen _editor;
 
@@ -43,6 +46,9 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 		this.Children.Add(this._outline);
 
+		this._arguments               = PlayerStateArguments.DefaultEditor;
+		this._arguments.SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
+
 		this._players = new List<Player.Player>();
 
 		//TODO: support mapping multiple players
@@ -50,7 +56,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public void CreateNewPlayer() {
-		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), PlayerStateArguments.DefaultEditor) {
+		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), this._arguments) {
 			OriginType = OriginType.LeftCenter
 		};
 
@@ -93,7 +99,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 	public void Relayout() {
 		this._outline.RectSize = this.Size;
-		
+
 		foreach (Player.Player player in this._players)
 			player.Scale = new Vector2(this.Size.X / FurballGame.DEFAULT_WINDOW_WIDTH);
 
