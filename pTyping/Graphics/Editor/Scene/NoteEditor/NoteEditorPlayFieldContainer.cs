@@ -82,6 +82,8 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 					foreach (Player.Player player in this._players)
 						player.RemoveNote(note);
 
+					this.Arguments.SelectedNotes.Remove(note);
+
 					this._editor.CloseCurrentContextMenu();
 				})
 			}, pTypingGame.JapaneseFont, 24);

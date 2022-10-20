@@ -18,8 +18,6 @@ public static class DiscordManager {
 
 	public static void Initialize() {
 		try {
-			Initialized = true;
-
 			int id = -1;
 			if (Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID") != null)
 				id = Convert.ToInt32(Environment.GetEnvironmentVariable("DISCORD_INSTANCE_ID"));
@@ -37,6 +35,8 @@ public static class DiscordManager {
 
 	private static void OnReady(object sender, ReadyMessage args) {
 		User = Client.CurrentUser;
+
+		Initialized = true;
 	}
 
 	public static void Dispose() {
@@ -57,9 +57,11 @@ public static class DiscordManager {
 
 			_Timer += deltaTime;
 
-			if (_Timer > 0.150) { // every 150ms
+			const float timerDelay = 1000;
+
+			if (_Timer > timerDelay) { // every 150ms
 				UpdatePresence();
-				_Timer = 0;
+				_Timer -= timerDelay;
 			}
 
 			// LobbyManager.FlushNetwork();
@@ -83,7 +85,7 @@ public static class DiscordManager {
 						LargeImageText = "pTyping"
 					}
 				};
-
+				
 				Client.SetPresence(presence);
 			}
 		}
