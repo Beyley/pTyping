@@ -459,6 +459,7 @@ public class pTypingGame : FurballGame {
 		ScoreDatabase.Realm.Refresh();
 
 		ImportChecker.ImportMaps();
+		ImportChecker.DeduplicateSongs();
 
 		MusicTrackScheduler = new Scheduler();
 

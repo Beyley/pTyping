@@ -14,6 +14,7 @@ using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
+using ManagedBass;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Shared.Beatmaps;
@@ -258,6 +259,10 @@ public class Player : CompositeDrawable {
 		
 		//Ignore control chars (fuck control chars all my homies hate control chars)
 		if (char.IsControl(e.Char))
+			return;
+
+		//Dont let the user type while paused
+		if (pTypingGame.MusicTrack.PlaybackState != PlaybackState.Playing)
 			return;
 
 		//If we are recording a replay or we are spectating someone, record the keypress

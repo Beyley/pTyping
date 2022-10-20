@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -43,11 +42,12 @@ public class SongSelectDrawable : CompositeDrawable {
 
 	public void UpdateDrawables() {
 		IQueryable<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>();
-
+		
 		foreach (IBeatmapSetFilter filter in this.FilterOperations)
 			sets = filter.Filter(sets);
 
-		ImmutableSortedSet<BeatmapSet> sortedSets = sets.ToList().ToImmutableSortedSet(new BeatmapSetArtistComparer());
+		List<BeatmapSet> sortedSets = sets.ToList();
+		sortedSets.Sort(new BeatmapSetArtistComparer());
 
 		this.Children.Clear();
 		this._registeredSetButtons.Clear();

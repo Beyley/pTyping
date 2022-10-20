@@ -94,7 +94,6 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		for (int i = 0; i < this._players.Count; i++) {
 			Player.Player player = this._players[i];
 
-			//TODO: handle multiple players properly
 			player.Position = new Vector2(0, this.Size.Y / (this._players.Count + 1) * (i + 1));
 		}
 	}

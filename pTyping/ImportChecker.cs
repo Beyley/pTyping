@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.Importers;
 using pTyping.Shared.Scores;
+using Realms;
 
 namespace pTyping;
 
@@ -23,6 +25,35 @@ public static class ImportChecker {
 	public static void ImportMaps() {
 		Task.Factory.StartNew(ImportMapsAndScoresRun);
 		Task.Factory.StartNew(ImportLegacyMapsRun);
+	}
+
+	public static void DeduplicateSongs() {
+		Realm realm = pTypingGame.BeatmapDatabase.Realm;
+
+		List<BeatmapSet> beatmapSets = realm.All<BeatmapSet>().ToList();
+
+		foreach (BeatmapSet set in beatmapSets) {
+			foreach (Beatmap map in set.Beatmaps) {
+				Beatmap beatmap = realm.Find<Beatmap>(map.Id);
+
+				bool breakOut = false;
+
+				List<BeatmapSet> parents = beatmap.Parent.ToList();
+				if (parents.Count > 1)
+					realm.Write(() => {
+						//Remove all but one of the elements
+						for (int i = 1; i < parents.Count; i++) {
+							BeatmapSet parent = parents[i];
+							realm.Remove(parent);
+
+							breakOut = true;
+						}
+					});
+
+				if (breakOut)
+					break;
+			}
+		}
 	}
 
 	private static void ImportMapsAndScoresRun() {
