@@ -44,7 +44,7 @@ public class NewSongScreen : pScreen {
 
 		#region Create buttons for all mp3 files in songs folder
 
-		string[] songs = Directory.GetFiles("songs", "*.mp3");
+		string[] songs = Directory.GetFiles(Path.Combine(FurballGame.DataFolder, "songs"), "*.mp3");
 
 		float y = 20f;
 		foreach (string songPath in songs) {
