@@ -4,6 +4,7 @@ using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Helpers;
+using Furball.Engine.Engine.Input.Events;
 
 namespace pTyping.Graphics.Editor.Scene;
 
@@ -30,4 +31,6 @@ public abstract class EditorScene : CompositeDrawable {
 
 		batch.ScissorPop(this);
 	}
+
+	public virtual void KeyDown(KeyEventArgs keyEventArgs) {}
 }

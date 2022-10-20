@@ -3,68 +3,31 @@ using Furball.Engine;
 using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Input.Events;
 using ManagedBass;
-using pTyping.Graphics.Editor.Scene.NoteEditor;
-using pTyping.Graphics.Editor.Scene.NoteEditor.Tools;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Editor;
 
 public partial class EditorScreen {
 	private Keybind _pausePlayKeybind;
-	private Keybind _selectToolKeybind;
-	private Keybind _noteToolKeybind;
-	private Keybind _typingCutoffToolKeybind;
+
 
 	private enum Keybinds {
-		PausePlay,
-
-		//Tools
-		SelectTool,
-		NoteTool,
-		TypingCutoffTool
+		PausePlay
 	}
 
 	private void InitializeKeybinds() {
 		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind        = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
-		FurballGame.InputManager.RegisterKeybind(this._selectToolKeybind       = new Keybind(Keybinds.SelectTool, "Select Tool", Key.Number1, this.ActivateSelectTool));
-		FurballGame.InputManager.RegisterKeybind(this._noteToolKeybind         = new Keybind(Keybinds.NoteTool, "Note Tool", Key.Number2, this.ActivateNoteTool));
-		FurballGame.InputManager.RegisterKeybind(this._typingCutoffToolKeybind = new Keybind(Keybinds.TypingCutoffTool, "Typing Cutoff Tool", Key.Number3, this.ActivateTypingCutoffTool));
-
+		
 		FurballGame.InputManager.OnMouseScroll += this.MouseScroll;
 		FurballGame.InputManager.OnMouseDown   += this.MouseDown;
+		FurballGame.InputManager.OnKeyDown     += this.KeyDown;
 	}
 
-	private void ActivateSelectTool(FurballKeyboard keyboard) {
-		//Ignore this bind if the user is typing somewhere
+	private void KeyDown(object sender, KeyEventArgs e) {
 		if (FurballGame.InputManager.CharInputHandler != null)
 			return;
-		
-		if (this._currentScene is not NoteEditorScene noteEditorScene)
-			return;
 
-		noteEditorScene.ToolSelection.SelectTool(new SelectTool());
-	}
-
-	private void ActivateNoteTool(FurballKeyboard keyboard) {
-		//Ignore this bind if the user is typing somewhere
-		if (FurballGame.InputManager.CharInputHandler != null)
-			return;
-		
-		if (this._currentScene is not NoteEditorScene noteEditorScene)
-			return;
-
-		noteEditorScene.ToolSelection.SelectTool(new NoteTool());
-	}
-
-	private void ActivateTypingCutoffTool(FurballKeyboard keyboard) {
-		//Ignore this bind if the user is typing somewhere
-		if (FurballGame.InputManager.CharInputHandler != null)
-			return;
-		
-		if (this._currentScene is not NoteEditorScene noteEditorScene)
-			return;
-
-		noteEditorScene.ToolSelection.SelectTool(new TypingCutoffTool());
+		this._currentScene?.KeyDown(e);
 	}
 
 	private void MouseDown(object sender, MouseButtonEventArgs e) {
@@ -91,9 +54,6 @@ public partial class EditorScreen {
 
 	private void RemoveKeybinds() {
 		FurballGame.InputManager.UnregisterKeybind(this._pausePlayKeybind);
-		FurballGame.InputManager.UnregisterKeybind(this._selectToolKeybind);
-		FurballGame.InputManager.UnregisterKeybind(this._noteToolKeybind);
-		FurballGame.InputManager.UnregisterKeybind(this._typingCutoffToolKeybind);
 
 		FurballGame.InputManager.OnMouseScroll -= this.MouseScroll;
 		FurballGame.InputManager.OnMouseDown   -= this.MouseDown;
