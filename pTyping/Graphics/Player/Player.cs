@@ -15,6 +15,7 @@ using Furball.Vixie.Backends.Shared;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using pTyping.Engine;
+using pTyping.Graphics.Drawables;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
@@ -227,6 +228,21 @@ public class Player : CompositeDrawable {
 		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), this._arguments.UseEditorNoteSpawnLogic));
 
 		return noteDrawable;
+	}
+
+	public void RemoveNote(SelectableCompositeDrawable selectedNote) {
+		if (!this._arguments.UseEditorNoteSpawnLogic)
+			throw new NotImplementedException("Cannot remove notes from the player when not using the editor note spawn logic");
+
+		if (selectedNote is not NoteDrawable note)
+			throw new ArgumentException("You cannot remove objects that are not notes!", nameof (selectedNote));
+
+		//Remove the note from the list of notes
+		this.Notes.Remove(note);
+		//Remove the note from the drawable
+		this.Children.Remove(selectedNote);
+		//Remove the note from the beatmap
+		this.Song.HitObjects.Remove(note.Note);
 	}
 
 	public void TypeCharacter(object sender, char e) {

@@ -1,6 +1,7 @@
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Input;
+using Furball.Engine.Engine.Input.Events;
 using pTyping.Graphics.Editor.Scene.NoteEditor.Tools;
 using Silk.NET.Input;
 
@@ -38,6 +39,11 @@ public sealed class NoteEditorScene : EditorScene {
 		FurballGame.InputManager.RegisterKeybind(this._selectToolKeybind       = new Keybind(Keybinds.SelectTool, "Select Tool", Key.Number1, this.ActivateSelectTool));
 		FurballGame.InputManager.RegisterKeybind(this._noteToolKeybind         = new Keybind(Keybinds.NoteTool, "Note Tool", Key.Number2, this.ActivateNoteTool));
 		FurballGame.InputManager.RegisterKeybind(this._typingCutoffToolKeybind = new Keybind(Keybinds.TypingCutoffTool, "Typing Cutoff Tool", Key.Number3, this.ActivateTypingCutoffTool));
+	}
+
+	public override void KeyDown(KeyEventArgs keyEventArgs) {
+		if (keyEventArgs.Key == Key.Delete)
+			this._playFieldContainer.DeleteSelected();
 	}
 
 	private void ActivateSelectTool(FurballKeyboard keyboard) {

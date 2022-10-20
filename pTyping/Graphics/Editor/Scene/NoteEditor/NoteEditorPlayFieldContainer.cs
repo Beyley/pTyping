@@ -21,7 +21,7 @@ namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	private readonly RectanglePrimitiveDrawable _outline;
 	private readonly List<Player.Player>        _players;
-	private readonly PlayerStateArguments       _arguments;
+	public readonly  PlayerStateArguments       Arguments;
 
 	private readonly EditorScreen _editor;
 
@@ -46,8 +46,8 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 		this.Children.Add(this._outline);
 
-		this._arguments               = PlayerStateArguments.DefaultEditor;
-		this._arguments.SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
+		this.Arguments               = PlayerStateArguments.DefaultEditor;
+		this.Arguments.SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
 
 		this._players = new List<Player.Player>();
 
@@ -55,7 +55,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public void CreateNewPlayer() {
-		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), this._arguments) {
+		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), this.Arguments) {
 			OriginType = OriginType.LeftCenter
 		};
 
@@ -111,5 +111,15 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		base.Draw(time, batch, args);
 
 		batch.ScissorPop(this);
+	}
+
+	public void DeleteSelected() {
+		foreach (Player.Player player in this._players) {
+			foreach (SelectableCompositeDrawable selectedNote in this.Arguments.SelectedNotes)
+				player.RemoveNote(selectedNote);
+		}
+
+		//Clear the list of selected notes, as they are now deleted
+		this.Arguments.SelectedNotes.Clear();
 	}
 }
