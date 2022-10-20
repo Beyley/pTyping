@@ -13,7 +13,7 @@ namespace pTyping.Graphics.Editor;
 
 public partial class EditorScreen : pScreen {
 	/// <summary>
-	///     The working beatmap, aka the beatmap that is being edited
+	///     The live working beatmap
 	/// </summary>
 	public readonly Beatmap Beatmap;
 
@@ -58,6 +58,8 @@ public partial class EditorScreen : pScreen {
 		base.Update(gameTime);
 
 		this._openedThisFrame = false;
+
+		this.AudioTime = pTypingGame.MusicTrack.CurrentPosition;
 	}
 
 	public override void Relayout(float newWidth, float newHeight) {

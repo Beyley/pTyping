@@ -63,7 +63,7 @@ public class Player : CompositeDrawable {
 		//TODO: support per note approach times
 	}
 
-	private readonly TexturedDrawable _recepticle;
+	public readonly TexturedDrawable Recepticle;
 
 	// private readonly LinePrimitiveDrawable _playfieldTopLine;
 	// private readonly LinePrimitiveDrawable _playfieldBottomLine;
@@ -135,12 +135,12 @@ public class Player : CompositeDrawable {
 
 		this._noteTexture = ContentManager.LoadTextureFromFileCached("note.png", ContentSource.User);
 
-		this._recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
+		this.Recepticle = new TexturedDrawable(this._noteTexture, RECEPTICLE_POS) {
 			Scale      = new Vector2(0.55f),
 			OriginType = OriginType.Center
 		};
 
-		this.Children.Add(this._recepticle);
+		this.Children.Add(this.Recepticle);
 
 		//TODO: Called before creating the notes
 		// this.Score.Mods.ForEach(mod => mod.BeforeNoteCreate(this));

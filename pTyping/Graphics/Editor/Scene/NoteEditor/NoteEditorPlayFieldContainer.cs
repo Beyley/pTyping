@@ -20,7 +20,7 @@ namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 
 public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	private readonly RectanglePrimitiveDrawable _outline;
-	private readonly List<Player.Player>        _players;
+	public readonly  List<Player.Player>        Players;
 	public readonly  PlayerStateArguments       Arguments;
 
 	private readonly EditorScreen _editor;
@@ -49,7 +49,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this.Arguments               = PlayerStateArguments.DefaultEditor;
 		this.Arguments.SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
 
-		this._players = new List<Player.Player>();
+		this.Players = new List<Player.Player>();
 
 		this.CreateNewPlayer();
 	}
@@ -62,7 +62,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		foreach (NoteDrawable noteDrawable in player.Notes)
 			this.HandleNoteCreated(noteDrawable);
 
-		this._players.Add(player);
+		this.Players.Add(player);
 
 		this.Children.Add(player);
 
@@ -79,7 +79,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		if (e.Button == MouseButton.Right) {
 			ContextMenuDrawable rightClickMenu = new ContextMenuDrawable(e.Mouse.Position, new List<(string, Action)> {
 				("Delete", () => {
-					foreach (Player.Player player in this._players)
+					foreach (Player.Player player in this.Players)
 						player.RemoveNote(note);
 
 					this.Arguments.SelectedNotes.Remove(note);
@@ -93,17 +93,17 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	private void RelayoutPlayers() {
-		for (int i = 0; i < this._players.Count; i++) {
-			Player.Player player = this._players[i];
+		for (int i = 0; i < this.Players.Count; i++) {
+			Player.Player player = this.Players[i];
 
-			player.Position = new Vector2(0, this.Size.Y / (this._players.Count + 1) * (i + 1));
+			player.Position = new Vector2(0, this.Size.Y / (this.Players.Count + 1) * (i + 1));
 		}
 	}
 
 	public void Relayout() {
 		this._outline.RectSize = this.Size;
 
-		foreach (Player.Player player in this._players)
+		foreach (Player.Player player in this.Players)
 			player.Scale = new Vector2(this.Size.X / FurballGame.DEFAULT_WINDOW_WIDTH);
 
 		this.RelayoutPlayers();
@@ -118,7 +118,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public void DeleteSelected() {
-		foreach (Player.Player player in this._players) {
+		foreach (Player.Player player in this.Players) {
 			foreach (SelectableCompositeDrawable selectedNote in this.Arguments.SelectedNotes)
 				player.RemoveNote(selectedNote);
 		}
