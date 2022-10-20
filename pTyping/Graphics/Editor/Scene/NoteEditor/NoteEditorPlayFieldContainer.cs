@@ -79,7 +79,10 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		if (e.Button == MouseButton.Right) {
 			ContextMenuDrawable rightClickMenu = new ContextMenuDrawable(e.Mouse.Position, new List<(string, Action)> {
 				("Delete", () => {
-					throw new NotImplementedException();
+					foreach (Player.Player player in this._players)
+						player.RemoveNote(note);
+
+					this._editor.CloseCurrentContextMenu();
 				})
 			}, pTypingGame.JapaneseFont, 24);
 
