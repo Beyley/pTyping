@@ -528,7 +528,7 @@ public class OldEditorScreen : pScreen {
 	}
 
 	public void CreateNote(HitObject note, bool isNew = false) {
-		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y), this.NoteTexture, pTypingGame.JapaneseFont, 50, null) {
+		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(Player.Player.NOTE_START_POS.X, Player.Player.NOTE_START_POS.Y), this.NoteTexture, pTypingGame.JapaneseFont, 50, null, PlayerStateArguments.DefaultPlayer) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {
 				ColorOverride = note.Color

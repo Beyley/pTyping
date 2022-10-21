@@ -4,5 +4,7 @@ public abstract class NoteEditorTool {
 	public bool DisplayMousePosition  = false;
 	public bool TimeSnapMousePosition = true;
 
+	public bool AllowSelectionOfNotes = false;
+
 	public double MouseTime;
 }

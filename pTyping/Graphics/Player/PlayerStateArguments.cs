@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Furball.Engine.Engine.Helpers;
 using pTyping.Graphics.Drawables;
 
 namespace pTyping.Graphics.Player;
@@ -13,7 +14,7 @@ public class PlayerStateArguments {
 		DisableMapEnding               = true,
 		DisablePlayerMusicTrackControl = true,
 		UseEditorNoteSpawnLogic        = true,
-		EnableSelection                = true
+		EnableSelection                = new Bindable<bool>(true)
 	};
 
 	/// <summary>
@@ -37,7 +38,8 @@ public class PlayerStateArguments {
 	/// </summary>
 	public bool UseEditorNoteSpawnLogic;
 	public bool DisplayRomaji;
-	public bool EnableSelection;
+
+	public Bindable<bool> EnableSelection = new Bindable<bool>(false);
 
 	public ObservableCollection<SelectableCompositeDrawable> SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
 }

@@ -12,15 +12,32 @@ using Silk.NET.Input;
 namespace pTyping.Graphics.Drawables;
 
 public class SelectableCompositeDrawable : CompositeDrawable {
-	private ObservableCollection<SelectableCompositeDrawable> _selectedList;
+	private          ObservableCollection<SelectableCompositeDrawable> _selectedList;
+	private readonly Bindable<bool>                                    _selectEnabled;
 
 	public readonly Bindable<bool> Selected = new Bindable<bool>(false);
 
-	protected SelectableCompositeDrawable(ObservableCollection<SelectableCompositeDrawable> selectedList) {
-		this._selectedList = selectedList;
+	private bool _enabled;
+
+	protected SelectableCompositeDrawable(ObservableCollection<SelectableCompositeDrawable> selectedList, Bindable<bool> selectEnabled) {
+		this._selectedList  = selectedList;
+		this._selectEnabled = selectEnabled;
 
 		this.OnClick                       += this.MouseDown;
 		FurballGame.InputManager.OnKeyDown += this.KeyDown;
+
+		selectEnabled.OnChange += this.EnableChange;
+
+		this._enabled = selectEnabled.Value;
+	}
+
+	private void EnableChange(object sender, bool e) {
+		this._enabled = e;
+
+		if (!e) {
+			this.Selected.Value = false;
+			this._selectedList.Remove(this);
+		}
 	}
 
 	private void KeyDown(object sender, KeyEventArgs e) {
@@ -43,6 +60,8 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 	public override void Dispose() {
 		this.OnClick                       -= this.MouseDown;
 		FurballGame.InputManager.OnKeyDown -= this.KeyDown;
+
+		this._selectEnabled.OnChange -= this.EnableChange;
 
 		this._selectedList?.Remove(this);
 		this._selectedList = null;
@@ -73,10 +92,12 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 				return;
 			}
 
-			this._selectedList.Add(this);
+			if (this._enabled)
+				this._selectedList.Add(this);
 		}
 
-		this.Selected.Value = true;
+		if (this._enabled)
+			this.Selected.Value = true;
 	}
 
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {

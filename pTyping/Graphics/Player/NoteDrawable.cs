@@ -41,7 +41,7 @@ public class NoteDrawable : SelectableCompositeDrawable {
 	public bool   EditorHitSoundQueued = false;
 	public double TimeDifference;
 
-	public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size, ObservableCollection<SelectableCompositeDrawable> selectedObjects) : base(selectedObjects) {
+	public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size, ObservableCollection<SelectableCompositeDrawable> selectedObjects, PlayerStateArguments args) : base(selectedObjects, args.EnableSelection) {
 		this.Position = position;
 		this.Texture  = texture;
 

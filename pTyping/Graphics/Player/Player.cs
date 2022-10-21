@@ -198,7 +198,7 @@ public class Player : CompositeDrawable {
 
 	[Pure]
 	private NoteDrawable CreateNote(HitObject note) {
-		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this._arguments.SelectedNotes) {
+		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this._arguments.SelectedNotes, this._arguments) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {
 				ColorOverride = note.Color

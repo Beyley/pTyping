@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Input.Events;
+using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Editor.Scene.NoteEditor.Tools;
 using Silk.NET.Input;
 
@@ -33,16 +34,19 @@ public sealed class NoteEditorScene : EditorScene {
 	public NoteEditorScene(EditorScreen editor) : base(editor) {
 		this._editor = editor;
 
-		this.ToolSelection = new NoteEditorToolSelectionDrawable(new Vector2(MARGIN), () => {});
+		this.ToolSelection = new NoteEditorToolSelectionDrawable(new Vector2(MARGIN), () => {
+			this._playFieldContainer.Arguments.EnableSelection.Value = this.ToolSelection.CurrentTool.AllowSelectionOfNotes;
+		});
 		this._playFieldContainer = new NoteEditorPlayFieldContainer(
 			editor, new Vector2(this.ToolSelection.Size.X + MARGIN * 2, MARGIN),
 			Vector2.Zero
 		);
 		this._mouseTimeDisplay = new TexturedDrawable(FurballGame.WhitePixel, Vector2.Zero) {
-			Visible    = false,
-			Scale      = new Vector2(1, 100),
-			TimeSource = pTypingGame.MusicTrackTimeSource,
-			OriginType = OriginType.Center
+			Visible       = false,
+			Scale         = new Vector2(1, 100),
+			TimeSource    = pTypingGame.MusicTrackTimeSource,
+			OriginType    = OriginType.Center,
+			ColorOverride = new Color(255, 255, 255, 100)
 		};
 
 		this.Children.Add(this.ToolSelection);
