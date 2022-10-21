@@ -335,7 +335,6 @@ public class TatakuOnlineManager : OnlineManager {
 			score.TatakuSerialize(writer);                   //score
 			writer.Write(new Dictionary<string, string>(0)); //game info
 			writer.Write(score.ReplayFrames.ToArray());      //replay frames
-			// writer.Write(Array.Empty<ReplayFrame>());
 			//END REPLAY
 			//SCORE MAP INFO
 			writer.Write("pTyping");
