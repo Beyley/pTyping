@@ -314,7 +314,12 @@ public class Player : CompositeDrawable {
 
 			(string hiragana, ButtonName[] buttons) = note.ButtonsToPress;
 
-			bool isCorrect = buttons.All(button => this._pressedButtons[(int)button]);
+			bool isCorrect = true;
+			foreach (ButtonName button in buttons)
+				if (!this._pressedButtons[(int)button]) {
+					isCorrect = false;
+					break;
+				}
 
 			if (isCorrect) {
 				//If we are checking the next note, and the current note is not hit,
