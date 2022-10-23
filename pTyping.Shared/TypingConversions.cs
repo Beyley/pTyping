@@ -1,3 +1,5 @@
+using Silk.NET.Input;
+
 namespace pTyping.Shared;
 
 public static class TypingConversions {
@@ -9,6 +11,41 @@ public static class TypingConversions {
 	}
 
 	public static readonly Dictionary<ConversionType, Dictionary<string, List<string>>> Conversions = new Dictionary<ConversionType, Dictionary<string, List<string>>>();
+
+	[Flags]
+	public enum FlagButton : byte {
+		A           = 1 << 0,
+		B           = 1 << 1,
+		X           = 1 << 2,
+		Y           = 1 << 3,
+		LeftBumper  = 1 << 4,
+		RightBumper = 1 << 5,
+		LeftStick   = 1 << 6,
+		RightStick  = 1 << 7
+		// DPadUp      = 1 << 8,
+		// DPadRight   = 1 << 9,
+		// DPadDown    = 1 << 10,
+		// DPadLeft    = 1 << 11
+	}
+
+	public static Dictionary<string, ButtonName[]> GetControllerBinds(Dictionary<string, List<string>> textMapping) {
+		Dictionary<string, ButtonName[]> binds = new Dictionary<string, ButtonName[]>();
+
+		for (int i = 0; i < textMapping.Count; i++)
+			unchecked {
+				FlagButton flagButton = (FlagButton)(i % 255 + 1);
+
+				//Convert the flag button to a list of ButtonNames
+				List<ButtonName> buttonNames = new List<ButtonName>();
+				foreach (FlagButton buttonCheck in Enum.GetValues(typeof(FlagButton)))
+					if (flagButton.HasFlag(buttonCheck))
+						buttonNames.Add(Enum.Parse<ButtonName>(buttonCheck.ToString()));
+
+				binds.Add(textMapping.Keys.ElementAt(i), buttonNames.ToArray());
+			}
+
+		return binds;
+	}
 
 	public static void LoadConversion() {
 		#region Standard Latin
@@ -860,7 +897,7 @@ X	×
 {rsConversion}";
 
 		#endregion
-		
+
 		ReadConversionDatabase(slConversion, ConversionType.StandardLatin);
 		ReadConversionDatabase(jpConversion, ConversionType.StandardHiragana);
 		ReadConversionDatabase(eoConversion, ConversionType.StandardEsperanto);
