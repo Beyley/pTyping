@@ -314,10 +314,7 @@ public class Player : CompositeDrawable {
 
 			(string hiragana, ButtonName[] buttons) = note.ButtonsToPress;
 
-			bool isCorrect = true;
-			foreach (ButtonName button in buttons)
-				if (!this._pressedButtons[(int)button])
-					isCorrect = false;
+			bool isCorrect = buttons.All(button => this._pressedButtons[(int)button]);
 
 			if (isCorrect) {
 				//If we are checking the next note, and the current note is not hit,
@@ -350,21 +347,21 @@ public class Player : CompositeDrawable {
 				// foreach (Mod mod in this.Score.Mods)
 				// 	mod.CharacterTyped(this._gameState, e.Char, true);
 
-				return;
 			}
+			else {
+				//If we are not on the last note of the song, we are not checking the next note, and we are after the current note,
+				if (this._noteToType != this.Song.HitObjects.Count - 1 && !checkingNext && currentTime > note.Time) {
+					//Then check the next note instead
+					this.GamepadPress(buttonName, true);
+					return;
+				}
 
-			//If we are not on the last note of the song, we are not checking the next note, and we are after the current note,
-			if (this._noteToType != this.Song.HitObjects.Count - 1 && !checkingNext && currentTime > note.Time) {
-				//Then check the next note instead
-				this.GamepadPress(buttonName, true);
-				return;
+				//TODO
+				// this.ShowTypingIndicator(e.Char, true);
+
+				// foreach (Mod mod in this.Score.Mods)
+				// mod.CharacterTyped(this._gameState, e.Char, false);
 			}
-
-			//TODO
-			// this.ShowTypingIndicator(e.Char, true);
-
-			// foreach (Mod mod in this.Score.Mods)
-			// mod.CharacterTyped(this._gameState, e.Char, false);
 		}
 
 		//Update the text on all notes to show the new Romaji paths
