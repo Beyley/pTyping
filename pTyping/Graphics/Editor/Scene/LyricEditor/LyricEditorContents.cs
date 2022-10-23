@@ -1,7 +1,10 @@
+using System.Collections.ObjectModel;
 using System.Numerics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
+using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
+using pTyping.Graphics.Drawables;
 using pTyping.Shared.Events;
 
 namespace pTyping.Graphics.Editor.Scene.LyricEditor;
@@ -14,7 +17,11 @@ public sealed class LyricEditorContents : CompositeDrawable {
 	public const float  HEIGHT                = 100f;
 	public const double PIXELS_PER_MILISECOND = 0.25;
 
-	private         Vector2 _size;
+	private Vector2 _size;
+
+	private readonly Bindable<bool>                                    _areLyricsSelectable;
+	private readonly ObservableCollection<SelectableCompositeDrawable> _selectedLyrics = new ObservableCollection<SelectableCompositeDrawable>();
+
 	public override Vector2 Size => this._size * this.Scale;
 
 	public LyricEditorContents(EditorScreen editorScreen) {
@@ -28,9 +35,10 @@ public sealed class LyricEditorContents : CompositeDrawable {
 		this.Children.Add(this._topLine);
 		this.Children.Add(this._bottomLine);
 
+		this._areLyricsSelectable = new Bindable<bool>(true);
 		foreach (Event @event in this._editorScreen.Beatmap.Events)
 			if (@event.Type == EventType.Lyric) {
-				LyricDrawable lyric = new LyricDrawable(editorScreen, @event);
+				LyricDrawable lyric = new LyricDrawable(editorScreen, @event, this._selectedLyrics, this._areLyricsSelectable);
 
 				//Make sure we are already off-screen when the event starts
 				lyric.Position.X = this._size.X;

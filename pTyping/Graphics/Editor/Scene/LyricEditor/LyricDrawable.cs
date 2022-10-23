@@ -1,21 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Numerics;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
-using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Managers;
+using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using Furball.Vixie.Backends.Shared.Renderers;
+using pTyping.Graphics.Drawables;
 using pTyping.Shared.Events;
 using pTyping.UiElements;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Editor.Scene.LyricEditor;
 
-public class LyricDrawable : Drawable {
+public class LyricDrawable : SelectableCompositeDrawable {
 	private readonly EditorScreen _editor;
 	
 	public readonly  Event             Event;
@@ -24,7 +26,7 @@ public class LyricDrawable : Drawable {
 
 	public override Vector2 Size => new Vector2((float)(this.Event.Length * LyricEditorContents.PIXELS_PER_MILISECOND), LyricEditorContents.HEIGHT) * this.Scale;
 
-	public LyricDrawable(EditorScreen editor, Event @event) {
+	public LyricDrawable(EditorScreen editor, Event @event, ObservableCollection<SelectableCompositeDrawable> selectedList, Bindable<bool> selectEnabled) : base(selectedList, selectEnabled) {
 		this._editor = editor;
 		this.Event   = @event;
 
@@ -66,8 +68,6 @@ public class LyricDrawable : Drawable {
 	}
 
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
-		// batch.Draw(FurballGame.WhitePixel, args.Position, this.RealSize, new Color(255, 255, 255, 100));
-
 		const float padding = 0.05f;
 
 		float startFull = args.Position.X + this.RealSize.X * padding;
@@ -192,5 +192,7 @@ public class LyricDrawable : Drawable {
 			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.RealSize.X + stopperWidth, -stopperTopToLyricTop + stopperWidth), new Vector2(10, stopperWidth), Color.White, MathF.PI);
 			batch.Draw(FurballGame.WhitePixel, args.Position + new Vector2(this.RealSize.X + stopperWidth, this.RealSize.Y       + stopperTopToLyricTop + stopperWidth), new Vector2(10, stopperWidth), Color.White, MathF.PI);
 		}
+
+		base.Draw(time, batch, args);
 	}
 }
