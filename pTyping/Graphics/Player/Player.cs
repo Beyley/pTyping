@@ -527,8 +527,11 @@ public class Player : CompositeDrawable {
 	private void UpdateNoteText(NoteDrawable noteDrawable) {
 		// foreach (NoteDrawable noteDrawable in this._notes) {
 		// noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
-		if (this._arguments.Controller)
-			noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.ButtonsToPress.Item2)}" : "";
+		if (this._arguments.Controller) {
+			noteDrawable.ToTypeTextDrawable.Text = "";
+
+			noteDrawable.SetButtons(noteDrawable.Note.ButtonsToPress);
+		}
 		else
 			noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}" : "";
 

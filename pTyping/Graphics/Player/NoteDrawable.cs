@@ -1,10 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Numerics;
 using FontStashSharp;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
-using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween;
@@ -13,6 +14,7 @@ using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Shared.Beatmaps.HitObjects;
+using Silk.NET.Input;
 
 namespace pTyping.Graphics.Player;
 
@@ -65,6 +67,49 @@ public class NoteDrawable : SelectableCompositeDrawable {
 		this.Children.Add(this.ToTypeTextDrawable);
 
 		this.OriginType = OriginType.Center;
+	}
+
+	private readonly List<TexturedDrawable> _buttons = new List<TexturedDrawable>();
+	public void SetButtons((string hiragana, ButtonName[]) noteButtonsToPress) {
+		foreach (TexturedDrawable button in this._buttons)
+			this.Children.Remove(button);
+
+		this._buttons.Clear();
+
+		float y = this.RawTextDrawable.Position.Y + this.RawTextDrawable.Size.Y + 10;
+		for (int i = 0; i < noteButtonsToPress.Item2.Length; i++) {
+			ButtonName button = noteButtonsToPress.Item2[i];
+			string buttonTexturePath = button switch {
+				ButtonName.A           => "ControllerIcons/Xbox One/XboxOne_A.png",
+				ButtonName.B           => "ControllerIcons/Xbox One/XboxOne_B.png",
+				ButtonName.X           => "ControllerIcons/Xbox One/XboxOne_X.png",
+				ButtonName.Y           => "ControllerIcons/Xbox One/XboxOne_Y.png",
+				ButtonName.LeftBumper  => "ControllerIcons/Xbox One/XboxOne_LB.png",
+				ButtonName.RightBumper => "ControllerIcons/Xbox One/XboxOne_RB.png",
+				ButtonName.LeftStick   => "ControllerIcons/Xbox One/XboxOne_Left_Stick_Click.png",
+				ButtonName.RightStick  => "ControllerIcons/Xbox One/XboxOne_Right_Stick_Click.png",
+				ButtonName.DPadUp      => "ControllerIcons/Xbox One/XboxOne_Dpad_Up.png",
+				ButtonName.DPadRight   => "ControllerIcons/Xbox One/XboxOne_Dpad_Right.png",
+				ButtonName.DPadDown    => "ControllerIcons/Xbox One/XboxOne_Dpad_Down.png",
+				ButtonName.DPadLeft    => "ControllerIcons/Xbox One/XboxOne_Dpad_Left.png",
+				_                      => throw new ArgumentOutOfRangeException()
+			};
+
+			bool odd = i % 2 != 0;
+
+			TexturedDrawable buttonTexture = new TexturedDrawable(ContentManager.LoadTextureFromFileCached(buttonTexturePath, ContentSource.User), Vector2.Zero);
+			buttonTexture.Position   = new Vector2(this.NoteTexture.Size.X / 2f, y);
+			buttonTexture.OriginType = odd ? OriginType.TopLeft : OriginType.TopRight;
+			buttonTexture.Scale      = new Vector2(0.7f);
+
+			if (odd)
+				y += buttonTexture.Size.Y;
+			else if (i == noteButtonsToPress.Item2.Length - 1)
+				buttonTexture.OriginType = OriginType.TopCenter;
+
+			this.Children.Add(buttonTexture);
+			this._buttons.Add(buttonTexture);
+		}
 	}
 
 	public override Vector2 Size => this.NoteTexture.Size * this.Scale;
@@ -271,31 +316,4 @@ public class NoteDrawable : SelectableCompositeDrawable {
 		this.Note.HitResult = HitResult.Poor;
 		this.Note.Complete  = true;
 	}
-
-	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
-		base.Draw(time, batch, args);
-	}
-
-	// public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
-	//     batch.SpriteBatch.Draw(
-	//     this.Texture,
-	//     args.Position ,
-	//     null,
-	//     args.Color,
-	//     args.Rotation,
-	//     Vector2.Zero,
-	//     args.Scale ,
-	//     args.Effects,
-	//     0f
-	//     );
-	//
-	//     // FIXME: this is a bit of a hack, it should definitely be done differently
-	//     args.Scale = new(1f);
-	//     // tempArgs.Position   -= this.LabelTextDrawable.Size / 2f + this.Size / 2f;
-	//     args.Position.Y += 100f;
-	//     args.Position.X 
-	//     // args.Position.X += this.RawTextDrawable.Size.X / 4f;
-	//     args.Color = new(this.RawTextDrawable.ColorOverride.R, this.RawTextDrawable.ColorOverride.G, this.RawTextDrawable.ColorOverride.B, args.Color.A);
-	//     this.RawTextDrawable.Draw(time, batch, args);
-	// }
 }
