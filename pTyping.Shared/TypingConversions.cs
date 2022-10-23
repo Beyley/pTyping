@@ -1,3 +1,4 @@
+using EnumUtilities;
 using Silk.NET.Input;
 
 namespace pTyping.Shared;
@@ -37,15 +38,25 @@ public static class TypingConversions {
 		int flag = 0;
 		for (int i = 0; i < orderedTextMapping.Count; i++)
 			unchecked {
-				FlagButton flagButton = (FlagButton)(i % (((int)FlagButton.DPadLeft << 1) - 1) + 1);
+				FlagButton flagButton = (FlagButton)(flag % (((int)FlagButton.DPadLeft << 1) - 1) + 1);
 
-				if (((flagButton & FlagButton.DPadLeft) != 0 && (flagButton & FlagButton.DPadRight) != 0)
-				 || ((flagButton & FlagButton.DPadUp)   != 0 && (flagButton & FlagButton.DPadDown)  != 0)) {
+				bool HasFlag(FlagButton flag) {
+					return EnumUtil<FlagButton>.HasFlag(flagButton, flag);
+				}
+
+				if ((HasFlag(FlagButton.DPadLeft) && HasFlag(FlagButton.DPadRight))
+				 || (HasFlag(FlagButton.DPadUp)   && HasFlag(FlagButton.DPadDown))) {
 					flag++;
 					i--;
 					continue;
 				}
-				
+
+				if (HasFlag(FlagButton.LeftStick) && (HasFlag(FlagButton.DPadLeft) || HasFlag(FlagButton.DPadRight) || HasFlag(FlagButton.DPadUp) || HasFlag(FlagButton.DPadDown)))
+					flag &= (int)~FlagButton.LeftStick;
+
+				if (HasFlag(FlagButton.RightStick) && (HasFlag(FlagButton.A) || HasFlag(FlagButton.B) || HasFlag(FlagButton.X) || HasFlag(FlagButton.Y)))
+					flag &= (int)~FlagButton.RightStick;
+
 				//Convert the flag button to a list of ButtonNames
 				List<ButtonName> buttonNames = new List<ButtonName>();
 				foreach (FlagButton buttonCheck in Enum.GetValues(typeof(FlagButton)))
