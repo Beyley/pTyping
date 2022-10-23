@@ -168,7 +168,7 @@ public class Player : CompositeDrawable {
 		foreach (Mod mod in this.Score.Mods)
 			mod.PreStart(this._gameState);
 
-		if (FurballGame.Instance.WindowManager is SilkWindowManager silk)
+		if (this._arguments.Controller && FurballGame.Instance.WindowManager is SilkWindowManager silk)
 			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
 				gamepad.ButtonDown += this.GamepadDown;
 				gamepad.ButtonUp   += this.GamepadUp;
