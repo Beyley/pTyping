@@ -116,6 +116,46 @@ public class NoteDrawable : SelectableCompositeDrawable {
 		this.ToTypeTextDrawable.Position = new Vector2(this.NoteTexture.Size.X / 2f, this.RawTextDrawable.Position.Y + 80);
 	}
 
+	public bool ButtonPress(string hiragana, double timeDifference, double rawTimeDifference, Player player) {
+		//If this is the first time a character is being typed on this note, 
+		if (this.Note.TypedRomaji.Length == 0 && this.Note.TypedText.Length == 0) {
+			//Find the correct hit result for the users time
+			if (timeDifference < player.TIMING_EXCELLENT)
+				this.Note.HitResult = HitResult.Excellent;
+			else if (timeDifference < player.TIMING_GOOD)
+				this.Note.HitResult = HitResult.Good;
+			else if (timeDifference < player.TIMING_FAIR)
+				this.Note.HitResult = HitResult.Fair;
+			else if (timeDifference < player.TIMING_POOR)
+				this.Note.HitResult = HitResult.Poor;
+
+			this.TimeDifference = rawTimeDifference;
+
+			//Rotate the hue by 150 degrees
+			Color finalColor = Helpers.RotateColor(this.Note.Color, 150);
+			//The time it will take the note to fade to its partially hit state
+			const int toFinalFadeTime = 100;
+			//Set the notes colour to the final colour TODO: figure out why this is needed
+			this.NoteTexture.ColorOverride = finalColor;
+			this.NoteTexture.Tweens.Add(
+				new ColorTween(TweenType.Color, this.NoteTexture.ColorOverride, finalColor, FurballGame.Time, FurballGame.Time + toFinalFadeTime)
+			);
+		}
+
+		//Add the hiragana to the typed section
+		this.Note.TypedText += hiragana;
+		//Give the play the appropriate 
+		player.Score.AddScore(Player.SCORE_PER_CHARACTER);
+
+		//Are we finished with the whole note?
+		if (string.Equals(this.Note.TypedText, this.Note.Text)) {
+			this.Hit();
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <summary>
 	///     Types a character
 	/// </summary>

@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.Shared.ObjectModel;
 using Realms;
+using Silk.NET.Input;
 
 namespace pTyping.Shared.Beatmaps.HitObjects;
 
@@ -43,6 +44,39 @@ public class HitObject : EmbeddedObject, ICloneable<HitObject> {
 	[Ignored]
 	public (string Hiragana, List<string> Romaji) TypableRomaji => this.GetTypableRomaji(this.TypedText);
 
+	[Ignored]
+	public (string hiragana, ButtonName[]) ButtonsToPress => this.GetButtonNames(this.TypedText);
+
+	public (string hiragana, ButtonName[]) GetButtonNames(string typed = "") {
+		if (this.IsHit)
+			return (string.Empty, Array.Empty<ButtonName>());
+
+		string       textToCheck = string.Empty;
+		ButtonName[] buttons     = null;
+
+		if (this.Text.Length - typed.Length >= 3) { //Try to get the next 3 chars
+			textToCheck = this.Text.Substring(typed.Length, 3);
+			TypingConversions.ControllerBindings[this.TypingConversion].TryGetValue(textToCheck, out buttons);
+		}
+
+		//Try to get the next 2 chars instead
+		if (buttons is null && this.Text.Length - typed.Length >= 2) {
+			textToCheck = this.Text.Substring(typed.Length, 2);
+			TypingConversions.ControllerBindings[this.TypingConversion].TryGetValue(textToCheck, out buttons);
+		}
+
+		//Try to get the next char instead
+		if (buttons is null) {
+			textToCheck = this.Text.Substring(typed.Length, 1);
+			TypingConversions.ControllerBindings[this.TypingConversion].TryGetValue(textToCheck, out buttons);
+		}
+
+		if (buttons is null)
+			throw new Exception("No buttons found for text: " + textToCheck);
+
+		return (textToCheck, buttons);
+	}
+	
 	[Pure]
 	public (string Hiragana, List<string> Romaji) GetTypableRomaji(string typed = "") {
 		if (this.IsHit)

@@ -10,7 +10,8 @@ public static class TypingConversions {
 		StandardRussian
 	}
 
-	public static readonly Dictionary<ConversionType, Dictionary<string, List<string>>> Conversions = new Dictionary<ConversionType, Dictionary<string, List<string>>>();
+	public static readonly Dictionary<ConversionType, Dictionary<string, List<string>>> Conversions        = new Dictionary<ConversionType, Dictionary<string, List<string>>>();
+	public static readonly Dictionary<ConversionType, Dictionary<string, ButtonName[]>> ControllerBindings = new Dictionary<ConversionType, Dictionary<string, ButtonName[]>>();
 
 	[Flags]
 	public enum FlagButton : byte {
@@ -46,6 +47,8 @@ public static class TypingConversions {
 
 		return binds;
 	}
+	
+	
 
 	public static void LoadConversion() {
 		#region Standard Latin
@@ -902,6 +905,9 @@ X	×
 		ReadConversionDatabase(jpConversion, ConversionType.StandardHiragana);
 		ReadConversionDatabase(eoConversion, ConversionType.StandardEsperanto);
 		ReadConversionDatabase(rsConversion, ConversionType.StandardRussian);
+
+		foreach ((ConversionType key, Dictionary<string, List<string>> value) in Conversions)
+			ControllerBindings[key] = GetControllerBinds(value);
 	}
 
 	public static void ReadConversionDatabase(string database, ConversionType type) {

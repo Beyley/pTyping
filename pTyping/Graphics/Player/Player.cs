@@ -12,6 +12,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
+using Furball.Vixie.WindowManagement;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using ManagedBass;
@@ -22,6 +23,7 @@ using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Events;
 using pTyping.Shared.Mods;
 using pTyping.Shared.Scores;
+using Silk.NET.Input;
 using sowelipisona;
 
 
@@ -110,6 +112,9 @@ public class Player : CompositeDrawable {
 
 		this.InvisibleToInput = true;
 
+		if (mods.Any(x => x is ControllerMod))
+			arguments.Controller = true;
+
 		// this.BaseApproachTime /= song.Difficulty.GlobalApproachMultiplier;
 
 		this.Score = new Score {
@@ -162,6 +167,24 @@ public class Player : CompositeDrawable {
 		//Run the pre-start code for all the mods
 		foreach (Mod mod in this.Score.Mods)
 			mod.PreStart(this._gameState);
+
+		if (FurballGame.Instance.WindowManager is SilkWindowManager silk)
+			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
+				gamepad.ButtonDown += this.GamepadDown;
+				gamepad.ButtonUp   += this.GamepadUp;
+			}
+	}
+
+	private readonly bool[] _pressedButtons = new bool[Enum.GetValues<ButtonName>().Length];
+
+	private void GamepadDown(IGamepad arg1, Button arg2) {
+		this._pressedButtons[(int)arg2.Name] = true;
+
+		this.GamepadPress(arg2.Name);
+	}
+
+	private void GamepadUp(IGamepad arg1, Button arg2) {
+		this._pressedButtons[(int)arg2.Name] = false;
 	}
 
 	private void OnVolumeChange(object sender, Value.Number f) {
@@ -228,6 +251,8 @@ public class Player : CompositeDrawable {
 
 		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), this._arguments.UseEditorNoteSpawnLogic));
 
+		this.UpdateNoteText(noteDrawable);
+		
 		return noteDrawable;
 	}
 
@@ -252,11 +277,105 @@ public class Player : CompositeDrawable {
 	public void TypeCharacter(object sender, CharInputEvent e) {
 		this.TypeCharacter(e);
 	}
+
+	public void GamepadPress(ButtonName buttonName, bool checkingNext = false) {
+		//If this player is initialized to block input, forcefully don't do anything
+		if (this._arguments.DisableTyping || !this._arguments.Controller)
+			return;
+
+		//Dont let the user type while paused
+		if (pTypingGame.MusicTrack.PlaybackState != PlaybackState.Playing)
+			return;
+
+		//If we already hit all the notes in the song, wtf are we doing here? stop hitting your keyboard you monkey
+		if (this.Song.AllNotesHit()) return;
+
+		//TODO: figure out why the fuck this happened
+		if (this._noteToType >= this.Notes.Count) return;
+
+		//The drawable for the note we are going to check
+		NoteDrawable noteDrawable = this.Notes[checkingNext ? this._noteToType + 1 : this._noteToType];
+
+		//The extracted `Note` object 
+		HitObject note = noteDrawable.Note;
+
+		// Makes sure we dont hit an already hit note, which would cause a crash currently
+		// this case *shouldnt* happen but it could so its good to check anyway
+		if (note.IsHit)
+			return;
+
+		//Get the current time of the music
+		double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
+
+		//If we are within or past the notes timing point,
+		if (currentTime > note.Time - this.TIMING_POOR) {
+			//Get the time difference between the current time and the notes exact time
+			double timeDifference = Math.Abs(currentTime - note.Time);
+
+			(string hiragana, ButtonName[] buttons) = note.ButtonsToPress;
+
+			bool isCorrect = true;
+			foreach (ButtonName button in buttons)
+				if (!this._pressedButtons[(int)button])
+					isCorrect = false;
+
+			if (isCorrect) {
+				//If we are checking the next note, and the current note is not hit,
+				if (checkingNext && !this.Notes[this._noteToType].Note.IsHit) {
+					//Miss the current note
+					this.Notes[this._noteToType].Miss();
+					this.NoteUpdate(false, this.Notes[this._noteToType].Note);
+
+					//Go to the next note
+					this._noteToType++;
+					//Say that we are now checking the next note as the primary note
+					checkingNext = false;
+				}
+
+				//If true, then we finished the note
+				if (noteDrawable.ButtonPress(hiragana, timeDifference, currentTime - note.Time, this)) {
+					//Play the hitsound
+					this.HitSoundNormal.PlayNew();
+					//Update the note saying its been typed
+					this.NoteUpdate(true, note);
+					this.OnCorrectCharTyped?.Invoke(this, noteDrawable.TimeDifference);
+
+					//Update the current note to the note after the one we are checking right now
+					this._noteToType += checkingNext ? 2 : 1;
+				}
+
+				// TODO: make this work
+				// this.ShowTypingIndicator(e.Char); 
+
+				// foreach (Mod mod in this.Score.Mods)
+				// 	mod.CharacterTyped(this._gameState, e.Char, true);
+
+				return;
+			}
+
+			//If we are not on the last note of the song, we are not checking the next note, and we are after the current note,
+			if (this._noteToType != this.Song.HitObjects.Count - 1 && !checkingNext && currentTime > note.Time) {
+				//Then check the next note instead
+				this.GamepadPress(buttonName, true);
+				return;
+			}
+
+			//TODO
+			// this.ShowTypingIndicator(e.Char, true);
+
+			// foreach (Mod mod in this.Score.Mods)
+			// mod.CharacterTyped(this._gameState, e.Char, false);
+		}
+
+		//Update the text on all notes to show the new Romaji paths
+		this.UpdateNoteText(noteDrawable);
+	}
+
 	public void TypeCharacter(CharInputEvent e, bool checkingNext = false) {
 		//If this player is initialized to block input, forcefully don't do anything
-		if (this._arguments.DisableTyping)
+		if (this._arguments.DisableTyping || this._arguments.Controller)
 			return;
-		
+
 		//Ignore control chars (fuck control chars all my homies hate control chars)
 		if (char.IsControl(e.Char))
 			return;
@@ -406,8 +525,10 @@ public class Player : CompositeDrawable {
 	private void UpdateNoteText(NoteDrawable noteDrawable) {
 		// foreach (NoteDrawable noteDrawable in this._notes) {
 		// noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
-		noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}"
-			: "";
+		if (this._arguments.Controller)
+			noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.ButtonsToPress.Item2)}" : "";
+		else
+			noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}" : "";
 
 		for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++)
 			if (i < noteDrawable.Note.TypedText.Length)
@@ -600,12 +721,18 @@ public class Player : CompositeDrawable {
 		}
 
 		this._musicTimeLastUpdate = currentTime;
-		
+
 		base.Update(time);
 	}
 
 	public override void Dispose() {
 		ConVars.Volume.OnChange -= this.OnVolumeChange;
+
+		if (FurballGame.Instance.WindowManager is SilkWindowManager silk)
+			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
+				gamepad.ButtonDown += this.GamepadDown;
+				gamepad.ButtonUp   += this.GamepadUp;
+			}
 
 		base.Dispose();
 	}
@@ -613,7 +740,7 @@ public class Player : CompositeDrawable {
 	public void CallMapEnd() {
 		if (this._arguments.DisableMapEnding)
 			return;
-		
+
 		foreach (Mod mod in this.Score.Mods)
 			mod.PreEnd(this._gameState);
 	}
@@ -621,14 +748,14 @@ public class Player : CompositeDrawable {
 	public void EndScore() {
 		if (this._arguments.DisableMapEnding)
 			return;
-		
+
 		this.OnAllNotesComplete?.Invoke(this, EventArgs.Empty);
 	}
 
 	public void Play() {
 		if (this._arguments.DisablePlayerMusicTrackControl)
 			return;
-		
+
 		if (!this.IsSpectating)
 			pTypingGame.PlayMusic();
 		else

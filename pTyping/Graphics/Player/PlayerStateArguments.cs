@@ -38,6 +38,7 @@ public class PlayerStateArguments {
 	/// </summary>
 	public bool UseEditorNoteSpawnLogic;
 	public bool DisplayRomaji;
+	public bool Controller;
 
 	public Bindable<bool> EnableSelection = new Bindable<bool>(false);
 
