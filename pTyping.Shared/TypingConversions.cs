@@ -14,7 +14,7 @@ public static class TypingConversions {
 	public static readonly Dictionary<ConversionType, Dictionary<string, ButtonName[]>> ControllerBindings = new Dictionary<ConversionType, Dictionary<string, ButtonName[]>>();
 
 	[Flags]
-	public enum FlagButton : byte {
+	public enum FlagButton {
 		A           = 1 << 0,
 		B           = 1 << 1,
 		X           = 1 << 2,
@@ -22,11 +22,11 @@ public static class TypingConversions {
 		LeftBumper  = 1 << 4,
 		RightBumper = 1 << 5,
 		LeftStick   = 1 << 6,
-		RightStick  = 1 << 7
-		// DPadUp      = 1 << 8,
-		// DPadRight   = 1 << 9,
-		// DPadDown    = 1 << 10,
-		// DPadLeft    = 1 << 11
+		RightStick  = 1 << 7,
+		DPadUp      = 1 << 8,
+		DPadRight   = 1 << 9,
+		DPadDown    = 1 << 10,
+		DPadLeft    = 1 << 11
 	}
 
 	public static Dictionary<string, ButtonName[]> GetControllerBinds(Dictionary<string, List<string>> textMapping) {
@@ -34,10 +34,18 @@ public static class TypingConversions {
 
 		List<KeyValuePair<string, List<string>>> orderedTextMapping = textMapping.OrderBy(x => x.Key.Length).ToList();
 
+		int flag = 0;
 		for (int i = 0; i < orderedTextMapping.Count; i++)
 			unchecked {
-				FlagButton flagButton = (FlagButton)(i % 255 + 1);
+				FlagButton flagButton = (FlagButton)(i % (((int)FlagButton.DPadLeft << 1) - 1) + 1);
 
+				if (((flagButton & FlagButton.DPadLeft) != 0 && (flagButton & FlagButton.DPadRight) != 0)
+				 || ((flagButton & FlagButton.DPadUp)   != 0 && (flagButton & FlagButton.DPadDown)  != 0)) {
+					flag++;
+					i--;
+					continue;
+				}
+				
 				//Convert the flag button to a list of ButtonNames
 				List<ButtonName> buttonNames = new List<ButtonName>();
 				foreach (FlagButton buttonCheck in Enum.GetValues(typeof(FlagButton)))
@@ -45,13 +53,13 @@ public static class TypingConversions {
 						buttonNames.Add(Enum.Parse<ButtonName>(buttonCheck.ToString()));
 
 				binds.Add(orderedTextMapping[i].Key, buttonNames.ToArray());
+
+				flag++;
 			}
 
 		return binds;
 	}
 	
-	
-
 	public static void LoadConversion() {
 		#region Standard Latin
 
