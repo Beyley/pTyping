@@ -202,8 +202,15 @@ public class Player : CompositeDrawable {
 		}
 	}
 
+	public void AddNote(NoteDrawable noteDrawable) {
+		this.Notes.Add(noteDrawable);
+
+		if (this.Arguments.UseEditorNoteSpawnLogic)
+			this.Children.Add(noteDrawable);
+	}
+	
 	[Pure]
-	private NoteDrawable CreateNote(HitObject note) {
+	public NoteDrawable CreateNote(HitObject note) {
 		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this.Arguments.SelectedNotes, this.Arguments) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {

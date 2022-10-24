@@ -3,6 +3,7 @@ using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens;
 using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
+using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
@@ -12,9 +13,7 @@ using Silk.NET.Input;
 namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 
 public sealed class NoteEditorScene : EditorScene {
-	private readonly EditorScreen _editor;
-
-	private readonly NoteEditorPlayFieldContainer    _playFieldContainer;
+	public readonly  NoteEditorPlayFieldContainer    PlayFieldContainer;
 	public readonly  NoteEditorToolSelectionDrawable ToolSelection;
 	private readonly TexturedDrawable                _mouseTimeDisplay;
 
@@ -32,12 +31,10 @@ public sealed class NoteEditorScene : EditorScene {
 	private const float MARGIN = 5f;
 
 	public NoteEditorScene(EditorScreen editor) : base(editor) {
-		this._editor = editor;
-
 		this.ToolSelection = new NoteEditorToolSelectionDrawable(new Vector2(MARGIN), () => {
-			this._playFieldContainer.Arguments.EnableSelection.Value = this.ToolSelection.CurrentTool.AllowSelectionOfNotes;
+			this.PlayFieldContainer!.Arguments.EnableSelection.Value = this.ToolSelection!.CurrentTool.AllowSelectionOfNotes;
 		});
-		this._playFieldContainer = new NoteEditorPlayFieldContainer(
+		this.PlayFieldContainer = new NoteEditorPlayFieldContainer(
 			editor, new Vector2(this.ToolSelection.Size.X + MARGIN * 2, MARGIN),
 			Vector2.Zero
 		);
@@ -50,15 +47,33 @@ public sealed class NoteEditorScene : EditorScene {
 		};
 
 		this.Children.Add(this.ToolSelection);
-		this.Children.Add(this._playFieldContainer);
+		this.Children.Add(this.PlayFieldContainer);
 	}
 
+	private void ContainerClick(object sender, MouseButtonEventArgs e) {
+		foreach (Player.Player player in this.PlayFieldContainer.Players)
+			if (player.RealRectangle.Contains(e.Mouse.Position.ToPointF())) {
+				this.ToolSelection.CurrentTool.OnTimelineClick(this, player, e);
+				return;
+			}
+	}
+	
 	public override void Opening() {
 		FurballGame.InputManager.RegisterKeybind(this._selectToolKeybind       = new Keybind(Keybinds.SelectTool, "Select Tool", Key.Number1, this.ActivateSelectTool));
 		FurballGame.InputManager.RegisterKeybind(this._noteToolKeybind         = new Keybind(Keybinds.NoteTool, "Note Tool", Key.Number2, this.ActivateNoteTool));
 		FurballGame.InputManager.RegisterKeybind(this._typingCutoffToolKeybind = new Keybind(Keybinds.TypingCutoffTool, "Typing Cutoff Tool", Key.Number3, this.ActivateTypingCutoffTool));
 
 		FurballGame.InputManager.OnMouseMove += this.MouseMove;
+		FurballGame.InputManager.OnMouseDown += this.ContainerClick;
+	}
+
+	public override void Closing() {
+		FurballGame.InputManager.UnregisterKeybind(this._selectToolKeybind);
+		FurballGame.InputManager.UnregisterKeybind(this._noteToolKeybind);
+		FurballGame.InputManager.UnregisterKeybind(this._typingCutoffToolKeybind);
+
+		FurballGame.InputManager.OnMouseMove -= this.MouseMove;
+		FurballGame.InputManager.OnMouseDown -= this.ContainerClick;
 	}
 
 	private void MouseMove(object sender, MouseMoveEventArgs e) {
@@ -66,7 +81,7 @@ public sealed class NoteEditorScene : EditorScene {
 			return;
 
 		bool already = false;
-		foreach (Player.Player player in this._playFieldContainer.Players) {
+		foreach (Player.Player player in this.PlayFieldContainer.Players) {
 			//If the mouse is in the playfield, dont display the time, and skip to the next player
 			if (already || !player.RealContains(e.Position)) {
 				this._mouseTimeDisplay.Visible = false;
@@ -78,7 +93,7 @@ public sealed class NoteEditorScene : EditorScene {
 			Vector2 relativePos = e.Position - player.RealPosition;
 			relativePos /= player.RealScale;
 
-			double currentTime  = this._editor.AudioTime;
+			double currentTime  = this.Editor.AudioTime;
 			double reticuleXPos = player.Recepticle.Position.X;
 			double noteStartPos = Player.Player.NOTE_START_POS.X;
 
@@ -90,7 +105,7 @@ public sealed class NoteEditorScene : EditorScene {
 			double timeAtCursor = relativeMousePosition / speed + currentTime;
 
 			if (this.ToolSelection.CurrentTool.TimeSnapMousePosition)
-				timeAtCursor = this._editor.SnapTime(timeAtCursor);
+				timeAtCursor = this.Editor.SnapTime(timeAtCursor);
 
 			this.ToolSelection.CurrentTool.MouseTime = timeAtCursor;
 
@@ -136,7 +151,7 @@ public sealed class NoteEditorScene : EditorScene {
 
 	public override void KeyDown(KeyEventArgs keyEventArgs) {
 		if (keyEventArgs.Key == Key.Delete)
-			this._playFieldContainer.DeleteSelected();
+			this.PlayFieldContainer.DeleteSelected();
 	}
 
 	private void ActivateSelectTool(FurballKeyboard keyboard) {
@@ -163,15 +178,9 @@ public sealed class NoteEditorScene : EditorScene {
 		this.ToolSelection.SelectTool(new TypingCutoffTool());
 	}
 
-	public override void Closing() {
-		FurballGame.InputManager.UnregisterKeybind(this._selectToolKeybind);
-		FurballGame.InputManager.UnregisterKeybind(this._noteToolKeybind);
-		FurballGame.InputManager.UnregisterKeybind(this._typingCutoffToolKeybind);
-	}
-
 	public override void Relayout(float newWidth, float newHeight) {
-		this._playFieldContainer.SizeOverride = new Vector2(this.Size.X - this.ToolSelection.Size.X - MARGIN * 3f, this.Size.Y - MARGIN * 2f);
+		this.PlayFieldContainer.SizeOverride = new Vector2(this.Size.X - this.ToolSelection.Size.X - MARGIN * 3f, this.Size.Y - MARGIN * 2f);
 
-		this._playFieldContainer.Relayout();
+		this.PlayFieldContainer.Relayout();
 	}
 }

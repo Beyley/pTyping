@@ -12,7 +12,7 @@ namespace pTyping.Graphics.Editor.Scene;
 ///     A scene placed within the editor
 /// </summary>
 public abstract class EditorScene : CompositeDrawable {
-	protected readonly EditorScreen Editor;
+	public readonly EditorScreen Editor;
 	protected EditorScene(EditorScreen editor) {
 		this.Editor = editor;
 	}

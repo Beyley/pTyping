@@ -9,6 +9,11 @@ namespace pTyping.Shared.Beatmaps.HitObjects;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class HitObject : EmbeddedObject, ICloneable<HitObject> {
+	public HitObject() {
+		this.Color = Furball.Vixie.Backends.Shared.Color.Red;
+		this.Text  = "";
+	}
+	
 	[Description("The time the hit object occurs at"), JsonProperty]
 	public double Time { get; set; }
 

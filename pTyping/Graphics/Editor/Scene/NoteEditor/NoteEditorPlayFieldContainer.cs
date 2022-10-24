@@ -12,6 +12,7 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Player;
+using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Mods;
 using pTyping.UiElements;
 using Silk.NET.Input;
@@ -52,8 +53,9 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this.Players = new List<Player.Player>();
 
 		this.CreateNewPlayer();
+		
 	}
-
+	
 	public void CreateNewPlayer() {
 		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), this.Arguments) {
 			OriginType = OriginType.LeftCenter
@@ -125,5 +127,22 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 		//Clear the list of selected notes, as they are now deleted
 		this.Arguments.SelectedNotes.Clear();
+	}
+
+	public string AddNote(HitObject hitObject) {
+		foreach (HitObject x in this._editor.Beatmap.HitObjects)
+			//Dont allow you to place 2 notes on the same time (with a tolerance of 10ms)
+			if (Math.Abs(x.Time - hitObject.Time) < 10)
+				return "Notes cannot overlap!";
+
+		this._editor.Beatmap.HitObjects.Add(hitObject);
+
+		foreach (Player.Player player in this.Players) {
+			NoteDrawable noteDrawable = player.CreateNote(hitObject);
+
+			player.AddNote(noteDrawable);
+		}
+
+		return "";
 	}
 }
