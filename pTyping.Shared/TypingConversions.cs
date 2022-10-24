@@ -33,10 +33,10 @@ public static class TypingConversions {
 	public static Dictionary<string, ButtonName[]> GetControllerBinds(Dictionary<string, List<string>> textMapping) {
 		Dictionary<string, ButtonName[]> binds = new Dictionary<string, ButtonName[]>();
 
-		List<KeyValuePair<string, List<string>>> orderedTextMapping = textMapping.OrderBy(x => x.Key.Length).ToList();
+		List<string> sortedKeys = textMapping.Keys.OrderBy(x => x.Length).ToList();
 
 		int flag = 0;
-		for (int i = 0; i < orderedTextMapping.Count; i++)
+		for (int i = 0; i < sortedKeys.Count; i++)
 			unchecked {
 				FlagButton flagButton = (FlagButton)(flag % (((int)FlagButton.DPadLeft << 1) - 1) + 1);
 
@@ -59,11 +59,11 @@ public static class TypingConversions {
 
 				//Convert the flag button to a list of ButtonNames
 				List<ButtonName> buttonNames = new List<ButtonName>();
-				foreach (FlagButton buttonCheck in Enum.GetValues(typeof(FlagButton)))
-					if (flagButton.HasFlag(buttonCheck))
+				foreach (FlagButton buttonCheck in EnumUtil<FlagButton>.GetValues())
+					if (EnumUtil<FlagButton>.HasFlag(flagButton, buttonCheck))
 						buttonNames.Add(Enum.Parse<ButtonName>(buttonCheck.ToString()));
 
-				binds.Add(orderedTextMapping[i].Key, buttonNames.ToArray());
+				binds.Add(sortedKeys[i], buttonNames.ToArray());
 
 				flag++;
 			}
