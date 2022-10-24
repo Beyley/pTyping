@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
+using Furball.Vixie.WindowManagement;
 using JetBrains.Annotations;
 using Kettu;
 using ManagedBass;
@@ -300,6 +301,25 @@ public class PlayerScreen : pScreen {
 
 		if (!this._playingReplay)
 			pTypingGame.OnlineManager.GameScene = this;
+
+		if (this.Player.Arguments.Controller && FurballGame.Instance.WindowManager is SilkWindowManager silk)
+			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
+				gamepad.ButtonDown += this.GamepadDown;
+				gamepad.ButtonUp   += this.GamepadUp;
+			}
+	}
+
+	private void GamepadDown(IGamepad arg1, Button arg2) {
+		if (arg2.Name == ButtonName.Start)
+			this.Pause();
+
+		this.Player.PressedButtons[(int)arg2.Name] = true;
+
+		this.Player.GamepadPress(arg2.Name);
+	}
+
+	private void GamepadUp(IGamepad arg1, Button arg2) {
+		this.Player.PressedButtons[(int)arg2.Name] = false;
 	}
 
 	public override void Relayout(float newWidth, float newHeight) {
@@ -371,6 +391,12 @@ public class PlayerScreen : pScreen {
 
 		this._video?.Dispose();
 
+		if (FurballGame.Instance.WindowManager is SilkWindowManager silk)
+			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
+				gamepad.ButtonDown += this.GamepadDown;
+				gamepad.ButtonUp   += this.GamepadUp;
+			}
+
 		base.Dispose();
 	}
 
@@ -384,16 +410,8 @@ public class PlayerScreen : pScreen {
 				return;
 			}
 			case Key.Escape: {
-				pTypingGame.PauseResumeMusic();
+				this.Pause();
 
-				switch (pTypingGame.MusicTrack.PlaybackState) {
-					case PlaybackState.Paused:
-						pTypingGame.OnlineManager.SpectatorPause(pTypingGame.MusicTrack.CurrentPosition);
-						break;
-					case PlaybackState.Playing:
-						pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
-						break;
-				}
 				break;
 			}
 			case Key.Equal: {
@@ -420,6 +438,25 @@ public class PlayerScreen : pScreen {
 
 				break;
 			}
+		}
+	}
+
+	private double _lastPause;
+	public void Pause() {
+		if (FurballGame.Time - this._lastPause < 1000)
+			return;
+
+		this._lastPause = FurballGame.Time;
+
+		pTypingGame.PauseResumeMusic();
+
+		switch (pTypingGame.MusicTrack.PlaybackState) {
+			case PlaybackState.Paused:
+				pTypingGame.OnlineManager.SpectatorPause(pTypingGame.MusicTrack.CurrentPosition);
+				break;
+			case PlaybackState.Playing:
+				pTypingGame.OnlineManager.SpectatorResume(pTypingGame.MusicTrack.CurrentPosition);
+				break;
 		}
 	}
 

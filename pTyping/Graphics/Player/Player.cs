@@ -12,7 +12,6 @@ using Furball.Engine.Engine.Graphics.Drawables.Tweens.TweenTypes.BezierPathTween
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
-using Furball.Vixie.WindowManagement;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
 using ManagedBass;
@@ -85,8 +84,8 @@ public class Player : CompositeDrawable {
 
 	private readonly Texture _noteTexture;
 
-	public           Beatmap              Song;
-	private readonly PlayerStateArguments _arguments;
+	public          Beatmap              Song;
+	public readonly PlayerStateArguments Arguments;
 
 	public Score Score;
 
@@ -107,8 +106,8 @@ public class Player : CompositeDrawable {
 	public event EventHandler        OnAllNotesComplete;
 
 	public Player(Beatmap song, Mod[] mods, PlayerStateArguments arguments) {
-		this.Song       = song;
-		this._arguments = arguments;
+		this.Song      = song;
+		this.Arguments = arguments;
 
 		this.InvisibleToInput = true;
 
@@ -167,25 +166,9 @@ public class Player : CompositeDrawable {
 		//Run the pre-start code for all the mods
 		foreach (Mod mod in this.Score.Mods)
 			mod.PreStart(this._gameState);
-
-		if (this._arguments.Controller && FurballGame.Instance.WindowManager is SilkWindowManager silk)
-			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
-				gamepad.ButtonDown += this.GamepadDown;
-				gamepad.ButtonUp   += this.GamepadUp;
-			}
 	}
 
-	private readonly bool[] _pressedButtons = new bool[Enum.GetValues<ButtonName>().Length];
-
-	private void GamepadDown(IGamepad arg1, Button arg2) {
-		this._pressedButtons[(int)arg2.Name] = true;
-
-		this.GamepadPress(arg2.Name);
-	}
-
-	private void GamepadUp(IGamepad arg1, Button arg2) {
-		this._pressedButtons[(int)arg2.Name] = false;
-	}
+	public readonly bool[] PressedButtons = new bool[Enum.GetValues<ButtonName>().Length];
 
 	private void OnVolumeChange(object sender, Value.Number f) {
 		// this.HitSoundNormal.Volume = f.Value;
@@ -214,14 +197,14 @@ public class Player : CompositeDrawable {
 
 			this.Notes.Add(noteDrawable);
 
-			if (this._arguments.UseEditorNoteSpawnLogic)
+			if (this.Arguments.UseEditorNoteSpawnLogic)
 				this.Children.Add(noteDrawable);
 		}
 	}
 
 	[Pure]
 	private NoteDrawable CreateNote(HitObject note) {
-		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this._arguments.SelectedNotes, this._arguments) {
+		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this.Arguments.SelectedNotes, this.Arguments) {
 			TimeSource = pTypingGame.MusicTrackTimeSource,
 			NoteTexture = {
 				ColorOverride = note.Color
@@ -232,16 +215,16 @@ public class Player : CompositeDrawable {
 				ColorType = TextColorType.Repeating
 			},
 			ToTypeTextDrawable = {
-				Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", note.TypableRomaji.Romaji)}" : ""
+				Text = this.Arguments.DisplayRomaji ? $"{string.Join("\n", note.TypableRomaji.Romaji)}" : ""
 			},
 			Scale       = new Vector2(0.55f),
 			Depth       = 0.5f,
 			OriginType  = OriginType.Center,
 			Note        = note,
-			Clickable   = this._arguments.EnableSelection,
-			CoverClicks = this._arguments.EnableSelection,
-			Hoverable   = this._arguments.EnableSelection,
-			CoverHovers = this._arguments.EnableSelection
+			Clickable   = this.Arguments.EnableSelection,
+			CoverClicks = this.Arguments.EnableSelection,
+			Hoverable   = this.Arguments.EnableSelection,
+			CoverHovers = this.Arguments.EnableSelection
 		};
 
 		for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++)
@@ -249,7 +232,7 @@ public class Player : CompositeDrawable {
 
 		noteDrawable.UpdateTextPositions();
 
-		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), this._arguments.UseEditorNoteSpawnLogic));
+		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), this.Arguments.UseEditorNoteSpawnLogic));
 
 		this.UpdateNoteText(noteDrawable);
 		
@@ -257,7 +240,7 @@ public class Player : CompositeDrawable {
 	}
 
 	public void RemoveNote(SelectableCompositeDrawable selectedNote) {
-		if (!this._arguments.UseEditorNoteSpawnLogic)
+		if (!this.Arguments.UseEditorNoteSpawnLogic)
 			throw new NotImplementedException("Cannot remove notes from the player when not using the editor note spawn logic");
 
 		if (selectedNote is not NoteDrawable note)
@@ -280,7 +263,7 @@ public class Player : CompositeDrawable {
 
 	public void GamepadPress(ButtonName buttonName, bool checkingNext = false) {
 		//If this player is initialized to block input, forcefully don't do anything
-		if (this._arguments.DisableTyping || !this._arguments.Controller)
+		if (this.Arguments.DisableTyping || !this.Arguments.Controller)
 			return;
 
 		//Dont let the user type while paused
@@ -316,7 +299,7 @@ public class Player : CompositeDrawable {
 
 			bool isCorrect = true;
 			foreach (ButtonName button in buttons)
-				if (!this._pressedButtons[(int)button]) {
+				if (!this.PressedButtons[(int)button]) {
 					isCorrect = false;
 					break;
 				}
@@ -375,7 +358,7 @@ public class Player : CompositeDrawable {
 
 	public void TypeCharacter(CharInputEvent e, bool checkingNext = false) {
 		//If this player is initialized to block input, forcefully don't do anything
-		if (this._arguments.DisableTyping || this._arguments.Controller)
+		if (this.Arguments.DisableTyping || this.Arguments.Controller)
 			return;
 
 		//Ignore control chars (fuck control chars all my homies hate control chars)
@@ -527,13 +510,13 @@ public class Player : CompositeDrawable {
 	private void UpdateNoteText(NoteDrawable noteDrawable) {
 		// foreach (NoteDrawable noteDrawable in this._notes) {
 		// noteDrawable.RawTextDrawable.Text    = $"{noteDrawable.Note.Text}";
-		if (this._arguments.Controller) {
+		if (this.Arguments.Controller) {
 			noteDrawable.ToTypeTextDrawable.Text = "";
 
 			noteDrawable.SetButtons(noteDrawable.Note.ButtonsToPress);
 		}
 		else
-			noteDrawable.ToTypeTextDrawable.Text = this._arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}" : "";
+			noteDrawable.ToTypeTextDrawable.Text = this.Arguments.DisplayRomaji ? $"{string.Join("\n", noteDrawable.Note.TypableRomaji.Romaji)}" : "";
 
 		for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++)
 			if (i < noteDrawable.Note.TypedText.Length)
@@ -636,7 +619,7 @@ public class Player : CompositeDrawable {
 	public override void Update(double time) {
 		double currentTime = pTypingGame.MusicTrackTimeSource.GetCurrentTime();
 
-		if (this._arguments.UseEditorNoteSpawnLogic) {
+		if (this.Arguments.UseEditorNoteSpawnLogic) {
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
 			if (this._musicTimeLastUpdate != currentTime)
 				for (int i = 0; i < this.Notes.Count; i++) {
@@ -684,7 +667,7 @@ public class Player : CompositeDrawable {
 		}
 
 		//If DisableHitResults, dont check, if not, check
-		bool checkNoteHittability = !this._arguments.DisableHitResults;
+		bool checkNoteHittability = !this.Arguments.DisableHitResults;
 
 		if (this._noteToType == this.Notes.Count) {
 			this.EndScore();
@@ -733,17 +716,11 @@ public class Player : CompositeDrawable {
 	public override void Dispose() {
 		ConVars.Volume.OnChange -= this.OnVolumeChange;
 
-		if (FurballGame.Instance.WindowManager is SilkWindowManager silk)
-			foreach (IGamepad gamepad in silk.InputContext.Gamepads) {
-				gamepad.ButtonDown += this.GamepadDown;
-				gamepad.ButtonUp   += this.GamepadUp;
-			}
-
 		base.Dispose();
 	}
 
 	public void CallMapEnd() {
-		if (this._arguments.DisableMapEnding)
+		if (this.Arguments.DisableMapEnding)
 			return;
 
 		foreach (Mod mod in this.Score.Mods)
@@ -751,14 +728,14 @@ public class Player : CompositeDrawable {
 	}
 
 	public void EndScore() {
-		if (this._arguments.DisableMapEnding)
+		if (this.Arguments.DisableMapEnding)
 			return;
 
 		this.OnAllNotesComplete?.Invoke(this, EventArgs.Empty);
 	}
 
 	public void Play() {
-		if (this._arguments.DisablePlayerMusicTrackControl)
+		if (this.Arguments.DisablePlayerMusicTrackControl)
 			return;
 
 		if (!this.IsSpectating)
