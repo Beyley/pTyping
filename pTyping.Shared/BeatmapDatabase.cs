@@ -1,5 +1,7 @@
+using Furball.Engine;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
+using pTyping.Shared.Difficulty;
 using pTyping.Shared.Events;
 using pTyping.Shared.ObjectModel;
 using Realms;
@@ -10,7 +12,7 @@ namespace pTyping.Shared;
 public class BeatmapDatabase {
 	public readonly Realm Realm;
 
-	public const ulong SCHEMA_VERSION = 3;
+	public const ulong SCHEMA_VERSION = 4;
 
 	public BeatmapDatabase(string dataFolder) {
 		RealmSchema.Builder builder = new RealmSchema.Builder {
@@ -28,7 +30,9 @@ public class BeatmapDatabase {
 			typeof(Event),
 			typeof(AsciiUnicodeTuple),
 			typeof(HitObjectColor),
-			typeof(HitObjectSettings)
+			typeof(HitObjectSettings),
+			typeof(CalculatedMapDifficulty),
+			typeof(DifficultySection)
 		};
 
 		RealmConfiguration config = new RealmConfiguration(Path.Combine(dataFolder, "songs.db")) {
@@ -38,6 +42,28 @@ public class BeatmapDatabase {
 		};
 
 		this.Realm = Realm.GetInstance(config);
+	}
+
+	public void TriggerDifficultyRecalculation(Beatmap beatmap) {
+		string id = beatmap.Id;
+
+		Task.Run(() => {
+			//Get a working copy of the beatmap
+			Beatmap working = beatmap.Clone();
+
+			//Calculate the difficulty
+			CalculatedMapDifficulty calculatedDifficulty = new DifficultyCalculator(working).Calculate();
+
+			//Get a new beatmap instance from the database
+			BeatmapDatabase beatmapDatabase = new BeatmapDatabase(FurballGame.DataFolder);
+			Beatmap         toSet           = beatmapDatabase.Realm.Find<Beatmap>(id);
+
+			//Set the beatmap instance difficulty
+			toSet.CalculatedDifficulty = calculatedDifficulty;
+
+			//Refresh the database to make sure other threads get the update
+			beatmapDatabase.Realm.RefreshAsync();
+		});
 	}
 	
 	private void Migrate(Migration migration, ulong oldSchemaVersion) {
@@ -71,6 +97,11 @@ public class BeatmapDatabase {
 					//Set the mapper to a new DatabaseUser with the old mapper's name
 					newSetBeatmap.Info.Mapper = new DatabaseUser(oldSetBeatmap.Info.Mapper);
 				}
+
+			//In version 4, we added map difficulty calculation
+			if (oldSchemaVersion < 4)
+				foreach (Beatmap newSetBeatmap in newSet.Beatmaps)
+					newSetBeatmap.CalculatedDifficulty = null;
 		}
 	}
 }

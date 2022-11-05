@@ -2,6 +2,7 @@ using System.ComponentModel;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using pTyping.Shared.Beatmaps.HitObjects;
+using pTyping.Shared.Difficulty;
 using pTyping.Shared.Events;
 using pTyping.Shared.ObjectModel;
 using Realms;
@@ -64,6 +65,12 @@ public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, IC
 	[Ignored, Description("The BPM of the first timing point of the song"), JsonIgnore]
 	public double BeatsPerMinute => this.TimingPoints[0].BeatsPerMinute;
 
+	[CanBeNull]
+	public CalculatedMapDifficulty CalculatedDifficulty {
+		get;
+		set;
+	}
+
 	public Beatmap Clone() {
 		Beatmap map = new Beatmap();
 
@@ -82,6 +89,8 @@ public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, IC
 		foreach (TimingPoint timingPoint in this.TimingPoints)
 			map.TimingPoints.Add(timingPoint.Clone());
 
+		map.CalculatedDifficulty = this.CalculatedDifficulty.Clone();
+		
 		return map;
 	}
 
@@ -103,6 +112,7 @@ public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, IC
 		beatmap.TimingPoints.Clear();
 		foreach (TimingPoint timingPoint in this.TimingPoints)
 			beatmap.TimingPoints.Add(timingPoint);
+		beatmap.CalculatedDifficulty = this.CalculatedDifficulty.Clone();
 	}
 
 	public bool AllNotesHit() {
