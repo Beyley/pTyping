@@ -279,7 +279,18 @@ public class SongSelectionScreen : pScreen {
 			_        => this._movingDirection
 		};
 
-		// if (keyEventArgs.Key == Key.F5)
+		if (keyEventArgs.Key == Key.F5) {
+			IQueryable<Beatmap> beatmaps = pTypingGame.BeatmapDatabase.Realm.All<Beatmap>();
+
+			pTypingGame.BeatmapDatabase.Realm.Write(() => {
+				foreach (Beatmap beatmap in beatmaps) {
+					beatmap.CalculatedDifficulty = null;
+					pTypingGame.BeatmapDatabase.TriggerDifficultyRecalculation(beatmap);
+				}
+			});
+
+			pTypingGame.BeatmapDatabase.Realm.Refresh();
+		}
 			// throw new NotImplementedException();
 		// SongManager.UpdateSongs();
 		// pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");

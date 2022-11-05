@@ -929,7 +929,7 @@ public class OldEditorScreen : pScreen {
 			database.Realm.Refresh();
 
 			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
-				pTypingGame.BeatmapDatabase.Realm.Refresh();
+				// pTypingGame.BeatmapDatabase.Realm.Refresh();
 				this.SaveNeeded = false;
 			});
 		}).Start();

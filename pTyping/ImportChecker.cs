@@ -147,12 +147,12 @@ public static class ImportChecker {
 		if (importedCount != 0)
 			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
 				pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Imported {importedCount} beatmap archive{(importedCount == 1 ? "" : "s")}!");
-				pTypingGame.BeatmapDatabase.Realm.Refresh();
+				// pTypingGame.BeatmapDatabase.Realm.Refresh();
 			});
 		if (importedScores != 0)
 			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
 				pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, $"Imported {importedScores} score{(importedScores == 1 ? "" : "s")}!");
-				pTypingGame.ScoreDatabase.Realm.Refresh();
+				// pTypingGame.ScoreDatabase.Realm.Refresh();
 			});
 	}
 
@@ -220,7 +220,7 @@ public static class ImportChecker {
 
 		FurballGame.GameTimeScheduler.ScheduleMethod(
 			_ => {
-				pTypingGame.BeatmapDatabase.Realm.Refresh();
+				// pTypingGame.BeatmapDatabase.Realm.Refresh();
 				pTypingGame.ScoreDatabase.Realm.Refresh();
 			}
 		);

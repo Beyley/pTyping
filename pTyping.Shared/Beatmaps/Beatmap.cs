@@ -89,8 +89,8 @@ public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, IC
 		foreach (TimingPoint timingPoint in this.TimingPoints)
 			map.TimingPoints.Add(timingPoint.Clone());
 
-		map.CalculatedDifficulty = this.CalculatedDifficulty.Clone();
-		
+		map.CalculatedDifficulty = this.CalculatedDifficulty?.Clone();
+
 		return map;
 	}
 
@@ -112,7 +112,7 @@ public class Beatmap : RealmObject, ICloneable<Beatmap>, IEquatable<Beatmap>, IC
 		beatmap.TimingPoints.Clear();
 		foreach (TimingPoint timingPoint in this.TimingPoints)
 			beatmap.TimingPoints.Add(timingPoint);
-		beatmap.CalculatedDifficulty = this.CalculatedDifficulty.Clone();
+		beatmap.CalculatedDifficulty = this.CalculatedDifficulty?.Clone();
 	}
 
 	public bool AllNotesHit() {

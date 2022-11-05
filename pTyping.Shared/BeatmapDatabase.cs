@@ -1,4 +1,5 @@
 using Furball.Engine;
+using Kettu;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Difficulty;
@@ -47,25 +48,31 @@ public class BeatmapDatabase {
 	public void TriggerDifficultyRecalculation(Beatmap beatmap) {
 		string id = beatmap.Id;
 
-		Task.Run(() => {
-			//Get a working copy of the beatmap
-			Beatmap working = beatmap.Clone();
+		//Get a working copy of the beatmap
+		Beatmap working = beatmap.Clone();
+
+		_ = Task.Factory.StartNew(() => {
+			Logger.Log($"Calculating difficulty of map {id}", LoggerLevelDifficultyCalculation.Instance);
 
 			//Calculate the difficulty
 			CalculatedMapDifficulty calculatedDifficulty = new DifficultyCalculator(working).Calculate();
+
+			Logger.Log($"Difficulty of map {id} is {calculatedDifficulty.OverallDifficulty}", LoggerLevelDifficultyCalculation.Instance);
 
 			//Get a new beatmap instance from the database
 			BeatmapDatabase beatmapDatabase = new BeatmapDatabase(FurballGame.DataFolder);
 			Beatmap         toSet           = beatmapDatabase.Realm.Find<Beatmap>(id);
 
-			//Set the beatmap instance difficulty
-			toSet.CalculatedDifficulty = calculatedDifficulty;
-
+			beatmapDatabase.Realm.Write(() => {
+				//Set the beatmap instance difficulty
+				toSet.CalculatedDifficulty = calculatedDifficulty;
+			});
+			
 			//Refresh the database to make sure other threads get the update
-			beatmapDatabase.Realm.RefreshAsync();
+			beatmapDatabase.Realm.Refresh();
 		});
 	}
-	
+
 	private void Migrate(Migration migration, ulong oldSchemaVersion) {
 		List<dynamic>          oldSets = migration.OldRealm.DynamicApi.All("BeatmapSet").ToList();
 		IQueryable<BeatmapSet> newSets = migration.NewRealm.All<BeatmapSet>();

@@ -12,7 +12,7 @@ public class DifficultyCalculator {
 
 	public CalculatedMapDifficulty Calculate() {
 		//If theres no notes, dont do anything, just return 0
-		if (this._beatmap.HitObjects.Count == 0)
+		if (this._beatmap.HitObjects.Count <= 1)
 			return new CalculatedMapDifficulty(0, Array.Empty<DifficultySection>());
 
 		//Get the first hit object

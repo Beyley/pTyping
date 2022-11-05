@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics;
@@ -25,6 +26,10 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		bool  first = true;
 		float y     = this.setTitle.Size.Y;
 		foreach (Beatmap map in set.Beatmaps) {
+			if (map.CalculatedDifficulty == null)
+				pTypingGame.BeatmapDatabase.TriggerDifficultyRecalculation(map);
+			
+			
 			DifficultyDrawable drawable = new DifficultyDrawable(map, first) {
 				OriginType = OriginType.TopLeft
 			};
@@ -63,7 +68,16 @@ public class BeatmapSetDrawable : CompositeDrawable {
 			this.Children.Add(this._difficultyName);
 
 			this.OnClick += this.OnMapClick;
+
+			map.PropertyChanged += this.MapUpdated;
+
+			this.MapUpdated(null, null);
 		}
+
+		private void MapUpdated(object sender, PropertyChangedEventArgs e) {
+			this._difficultyName.Text = $"{this.Beatmap.Info.DifficultyName} ({(this.Beatmap.CalculatedDifficulty == null ? "Calculating..." : this.Beatmap.CalculatedDifficulty.OverallDifficulty.ToString("N2"))})";
+		}
+		
 		private void OnMapClick(object sender, MouseButtonEventArgs e) {
 			pTypingGame.CurrentSong.Value = this.Beatmap;
 		}

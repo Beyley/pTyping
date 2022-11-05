@@ -10,6 +10,8 @@ using Furball.Engine.Engine.Graphics.Drawables;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.Filters;
 using pTyping.Shared.Beatmaps.Sorting;
+using Realms;
+using Realms.Sync;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
@@ -20,16 +22,47 @@ public class SongSelectDrawable : CompositeDrawable {
 
 	public Action<float> ChangeScroll;
 
+	private readonly IDisposable _beatmapChangeSubscription;
+	private readonly IDisposable _beatmapSetChangeSubscription;
+
 	public SongSelectDrawable(Vector2 pos, Action<float> changeScroll) {
 		this.ChangeScroll = changeScroll;
 		this.Position     = pos;
 
 		this.FilterOperations.CollectionChanged        += this.OnFilterOperationChange;
-		pTypingGame.BeatmapDatabase.Realm.RealmChanged += this.OnRealmUpdate;
+		// pTypingGame.BeatmapDatabase.Realm.RealmChanged += this.OnRealmUpdate;
+
+		this._beatmapChangeSubscription    = pTypingGame.BeatmapDatabase.Realm.All<Beatmap>().SubscribeForNotifications(this.BeatmapChange);
+		this._beatmapSetChangeSubscription = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>().SubscribeForNotifications(this.BeatmapSetChange);
 
 		this.UpdateDrawables();
 
 		this.InvisibleToInput = true;
+	}
+
+	public override void Dispose() {
+		this.FilterOperations.CollectionChanged -= this.OnFilterOperationChange;
+
+		this._beatmapChangeSubscription.Dispose();
+		this._beatmapSetChangeSubscription.Dispose();
+
+		base.Dispose();
+	}
+
+	private void BeatmapSetChange(IRealmCollection<BeatmapSet> sender, ChangeSet changes, Exception error) {
+		if (changes == null)
+			return;
+
+		if (changes.InsertedIndices.Length != 0 || changes.DeletedIndices.Length != 0)
+			this.UpdateDrawables();
+	}
+
+	private void BeatmapChange(IRealmCollection<Beatmap> sender, ChangeSet changes, Exception error) {
+		if (changes == null)
+			return;
+
+		if (changes.InsertedIndices.Length != 0 || changes.DeletedIndices.Length != 0)
+			this.UpdateDrawables();
 	}
 
 	private void OnRealmUpdate(object sender, EventArgs e) {
@@ -42,7 +75,7 @@ public class SongSelectDrawable : CompositeDrawable {
 
 	public void UpdateDrawables() {
 		IQueryable<BeatmapSet> sets = pTypingGame.BeatmapDatabase.Realm.All<BeatmapSet>();
-		
+
 		foreach (IBeatmapSetFilter filter in this.FilterOperations)
 			sets = filter.Filter(sets);
 

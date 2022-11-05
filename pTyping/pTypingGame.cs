@@ -164,7 +164,7 @@ public class pTypingGame : FurballGame {
 				/* */
 			}
 		}
-		
+
 		MusicTrack        = AudioEngine.CreateStream(data);
 		MusicTrack.Volume = ConVars.Volume.Value.Value;
 
@@ -322,17 +322,26 @@ public class pTypingGame : FurballGame {
 		}
 	}
 
+	private double _realmUpdateTimer;
 	protected override void Update(double deltaTime) {
 		base.Update(deltaTime);
 		DiscordManager.Update(deltaTime);
 
 		CheckMusicState();
 
-		this._musicTrackSchedulerDelta += deltaTime * 1000;
+		this._musicTrackSchedulerDelta += deltaTime;
 		if (this._musicTrackSchedulerDelta > 10) {
 			if (MusicTrack != null)
 				MusicTrackScheduler.Update((int)MusicTrack.CurrentPosition);
 			this._musicTrackSchedulerDelta = 0;
+		}
+
+		this._realmUpdateTimer += deltaTime;
+		if (this._realmUpdateTimer > 5000) {
+			_ = BeatmapDatabase.Realm.RefreshAsync();
+			_ = ScoreDatabase.Realm.RefreshAsync();
+
+			this._realmUpdateTimer = 0;
 		}
 
 		OnlineManager.Update(deltaTime);
