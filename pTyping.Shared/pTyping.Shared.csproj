@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="EnumUtilities" Version="4.0.0"/>
         <PackageReference Include="Realm" Version="10.18.0"/>
-        <PackageReference Include="SharpZipLib" Version="1.4.0"/>
+        <PackageReference Include="SharpZipLib" Version="1.4.1"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
         <PackageReference Include="TagLibSharp" Version="2.3.0"/>
     </ItemGroup>
