@@ -290,8 +290,9 @@ public static class UTypingSongParser {
 			//In version 0, names were stored in 8 bytes, after, they were stored in 16
 			byte[] nameBytes = reader.ReadBytes(version >= 1 ? NAME_LEN : OLD_NAME_LEN);
 
-			//Should this be in ShiftJIS? Not sure, using ASCII for now
-			score.Name = Encoding.ASCII.GetString(nameBytes);
+			//Should this be in ShiftJIS? Not sure, using ASCII for now,
+			//also making sure to trim \0 from the end, as theres no terminator, theres a set buffer size for names to be stored in
+			score.Name = Encoding.ASCII.GetString(nameBytes).TrimEnd('\0');
 
 			score.Score         = reader.ReadInt32();
 			score.ScoreAccuracy = reader.ReadInt32();
