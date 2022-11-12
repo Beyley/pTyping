@@ -29,7 +29,7 @@ public class SongSelectDrawable : CompositeDrawable {
 		this.ChangeScroll = changeScroll;
 		this.Position     = pos;
 
-		this.FilterOperations.CollectionChanged        += this.OnFilterOperationChange;
+		this.FilterOperations.CollectionChanged += this.OnFilterOperationChange;
 		// pTypingGame.BeatmapDatabase.Realm.RealmChanged += this.OnRealmUpdate;
 
 		this._beatmapChangeSubscription    = pTypingGame.BeatmapDatabase.Realm.All<Beatmap>().SubscribeForNotifications(this.BeatmapChange);

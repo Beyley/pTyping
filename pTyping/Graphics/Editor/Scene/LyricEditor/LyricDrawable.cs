@@ -19,7 +19,7 @@ namespace pTyping.Graphics.Editor.Scene.LyricEditor;
 
 public class LyricDrawable : SelectableCompositeDrawable {
 	private readonly EditorScreen _editor;
-	
+
 	public readonly  Event             Event;
 	private          float             _width;
 	private readonly DynamicSpriteFont _font;
@@ -70,7 +70,7 @@ public class LyricDrawable : SelectableCompositeDrawable {
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
 		if (!FurballGame.DisplayRect.IntersectsWith(this.RealRectangle))
 			return;
-		
+
 		const float padding = 0.05f;
 
 		float startFull = args.Position.X + this.RealSize.X * padding;

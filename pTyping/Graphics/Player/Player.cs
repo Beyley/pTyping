@@ -208,7 +208,7 @@ public class Player : CompositeDrawable {
 		if (this.Arguments.UseEditorNoteSpawnLogic)
 			this.Children.Add(noteDrawable);
 	}
-	
+
 	[Pure]
 	public NoteDrawable CreateNote(HitObject note) {
 		NoteDrawable noteDrawable = new NoteDrawable(new Vector2(NOTE_START_POS.X, NOTE_START_POS.Y), this._noteTexture, pTypingGame.JapaneseFont, 50, this.Arguments.SelectedNotes, this.Arguments) {
@@ -242,7 +242,7 @@ public class Player : CompositeDrawable {
 		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), this.Arguments.UseEditorNoteSpawnLogic));
 
 		this.UpdateNoteText(noteDrawable);
-		
+
 		return noteDrawable;
 	}
 
@@ -341,7 +341,6 @@ public class Player : CompositeDrawable {
 
 				// foreach (Mod mod in this.Score.Mods)
 				// 	mod.CharacterTyped(this._gameState, e.Char, true);
-
 			}
 			else {
 				//If we are not on the last note of the song, we are not checking the next note, and we are after the current note,

@@ -11,7 +11,7 @@ public class SongProgressBarDrawable : DrawableProgressBar {
 		this.OnClick += this.Click;
 		this.OnDrag  += this.Drag;
 	}
-	
+
 	private void Click(object sender, MouseButtonEventArgs e) {
 		this.Drag(sender, new MouseDragEventArgs(Vector2.Zero, Vector2.Zero, e.Mouse.Position, e.Button, e.Mouse));
 	}

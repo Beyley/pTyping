@@ -28,8 +28,8 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		foreach (Beatmap map in set.Beatmaps) {
 			if (map.CalculatedDifficulty == null)
 				pTypingGame.BeatmapDatabase.TriggerDifficultyRecalculation(map);
-			
-			
+
+
 			DifficultyDrawable drawable = new DifficultyDrawable(map, first) {
 				OriginType = OriginType.TopLeft
 			};
@@ -77,7 +77,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		private void MapUpdated(object sender, PropertyChangedEventArgs e) {
 			this._difficultyName.Text = $"{this.Beatmap.Info.DifficultyName} ({(this.Beatmap.CalculatedDifficulty == null ? "Calculating..." : this.Beatmap.CalculatedDifficulty.OverallDifficulty.ToString("N2"))})";
 		}
-		
+
 		private void OnMapClick(object sender, MouseButtonEventArgs e) {
 			pTypingGame.CurrentSong.Value = this.Beatmap;
 		}

@@ -291,7 +291,7 @@ public class SongSelectionScreen : pScreen {
 
 			pTypingGame.BeatmapDatabase.Realm.Refresh();
 		}
-			// throw new NotImplementedException();
+		// throw new NotImplementedException();
 		// SongManager.UpdateSongs();
 		// pTypingGame.NotificationManager.CreateNotification(NotificationManager.NotificationImportance.Info, "Reloaded the song list!");
 		// ScreenManager.ChangeScreen(new SongSelectionScreen(this._editor)); //TODO: implement dynamic song select

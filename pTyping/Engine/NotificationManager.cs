@@ -112,8 +112,8 @@ public class NotificationManager : DrawableManager {
 
 		foreach (Drawable drawable in this.Drawables) {
 			if (drawable is not NotificationDrawable {
-					Type: NotificationType.BottomRight
-				} notification) continue;
+				    Type: NotificationType.BottomRight
+			    } notification) continue;
 
 			notification.MoveTo(new Vector2(x, y), 100);
 

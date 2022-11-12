@@ -51,12 +51,12 @@ internal class Program {
 	[STAThread]
 	private static void Main() {
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-		
+
 		SetReleaseStream();
 		GitVersion = ReadManifestResource("pTyping.gitversion.txt");
-		
+
 		using pTypingGame game = new pTypingGame();
-		
+
 		if (RuntimeInfo.IsDebug())
 			game.Run();
 		else
@@ -66,7 +66,7 @@ internal class Program {
 			catch (Exception ex) {
 				using FileStream   stream = File.Create($"crashlog-{UnixTime.Now()}");
 				using StreamWriter writer = new StreamWriter(stream);
-		
+
 				writer.Write(ex.ToString());
 				writer.Flush();
 

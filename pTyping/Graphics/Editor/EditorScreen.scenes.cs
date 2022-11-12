@@ -20,7 +20,7 @@ public partial class EditorScreen {
 			return;
 
 		Logger.Log($"Loading editor scene {newScene.GetType().Name}!", LoggerLevelEditorInfo.Instance);
-		
+
 		// Unload the current scene, if there is one
 		this.CloseScene();
 
@@ -65,6 +65,6 @@ public partial class EditorScreen {
 		this._currentScene?.Relayout(this.SceneSize.X, this.SceneSize.Y);
 
 		if (this._sceneOutline != null)
-			this._sceneOutline.RectSize = this.SceneSize;	
+			this._sceneOutline.RectSize = this.SceneSize;
 	}
 }

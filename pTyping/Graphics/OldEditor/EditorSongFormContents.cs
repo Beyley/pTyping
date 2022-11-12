@@ -163,7 +163,7 @@ public class EditorSongFormContents : CompositeDrawable {
 
 			this.Children.Add(tickbox);
 		}
-		
+
 		this._typingConversionDropdown = new DrawableDropdown(new Vector2(x, y), pTypingGame.JapaneseFont, 20, new Vector2(250, 35), new Dictionary<object, string> {
 			{ TypingConversions.ConversionType.StandardLatin, "Standard Latin Only" },
 			{ TypingConversions.ConversionType.StandardHiragana, "Japanese/Hiragana" },
@@ -185,56 +185,56 @@ public class EditorSongFormContents : CompositeDrawable {
 				});
 			}, $"Are you sure you want to do this? This will set *all* notes to {selection.Value}!", MessageBoxButtons.YesNo);
 		};
-		
+
 		TextDrawable tagsLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Tags (comma separated)", 24);
 		y += songLanguageLabel.Size.Y;
 
-		this._tagsInput = new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, string.Join(", ", map.Metadata.Tags));
-		y += this._tagsInput.Size.Y;
-		
+		this._tagsInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, string.Join(", ", map.Metadata.Tags));
+		y               += this._tagsInput.Size.Y;
+
 		this._tagsInput.OnCommit += delegate(object _, string s) {
 			//Split the string by commas, and trim each tag
 			string[] tags = s.Split(',').Select(tag => tag.Trim()).ToArray();
 
 			map.Metadata.Tags.Clear();
-			
+
 			//Set the tags to the new tags
 			foreach (string tag in tags) {
 				map.Metadata.Tags.Add(tag);
 			}
 			oldEditor.SaveNeeded = true;
 		};
-		
+
 		TextDrawable descriptionLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Description", 24);
 		y += descriptionLabel.Size.Y;
 
 		//Multiline text box with 5 lines
 		this._descriptionInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.Description, 5);
 		y                      += this._descriptionInput.Size.Y;
-		
+
 		this._descriptionInput.OnCommit += delegate(object _, string s) {
 			map.Info.Description = s;
 			oldEditor.SaveNeeded = true;
 		};
-		
+
 		TextDrawable mapperLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Mapper", 24);
 		y += mapperLabel.Size.Y;
 
 		this._mapperInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.Mapper.Username);
 		y                 += this._mapperInput.Size.Y;
-		
+
 		this._mapperInput.OnCommit += delegate(object _, string s) {
 			map.Info.Mapper.Username = s;
 			oldEditor.SaveNeeded     = true;
 		};
-		
+
 		//TODO: replace this with something more integrated into the editor, rather than a text input
 		TextDrawable previewTimeLabel = new TextDrawable(new Vector2(x, y), pTypingGame.JapaneseFont, "Preview Time", 24);
 		y += previewTimeLabel.Size.Y;
-		
-		this._previewTimeInput = new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.PreviewTime.ToString());
-		y                     += this._previewTimeInput.Size.Y;
-		
+
+		this._previewTimeInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, map.Info.PreviewTime.ToString());
+		y                      += this._previewTimeInput.Size.Y;
+
 		this._previewTimeInput.OnCommit += delegate(object _, string s) {
 			if (double.TryParse(s, out double previewTime)) {
 				map.Info.PreviewTime = previewTime;
@@ -247,7 +247,7 @@ public class EditorSongFormContents : CompositeDrawable {
 
 		this._sourceInput =  new DrawableTextBox(new Vector2(x, y), pTypingGame.JapaneseFont, 20, 300, oldEditor.EditorState.Set.Source);
 		y                 += this._sourceInput.Size.Y;
-		
+
 		this._sourceInput.OnCommit += delegate(object _, string s) {
 			oldEditor.EditorState.Set.Source = s;
 			oldEditor.SaveNeeded             = true;
@@ -274,21 +274,20 @@ public class EditorSongFormContents : CompositeDrawable {
 
 		this.Children.Add(songLanguageLabel);
 		this.Children.Add(this._typingConversionDropdown);
-		
+
 		this.Children.Add(tagsLabel);
 		this.Children.Add(this._tagsInput);
-		
+
 		this.Children.Add(descriptionLabel);
 		this.Children.Add(this._descriptionInput);
-		
+
 		this.Children.Add(mapperLabel);
 		this.Children.Add(this._mapperInput);
-		
+
 		this.Children.Add(previewTimeLabel);
 		this.Children.Add(this._previewTimeInput);
-		
+
 		this.Children.Add(sourceLabel);
 		this.Children.Add(this._sourceInput);
 	}
 }
- 

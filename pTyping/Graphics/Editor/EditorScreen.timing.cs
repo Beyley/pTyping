@@ -6,10 +6,10 @@ namespace pTyping.Graphics.Editor;
 
 public partial class EditorScreen {
 	public double AudioTime;
-	
+
 	public TimingPoint GetTimingPointAt(double time) {
 		TimingPoint tp = this.Beatmap.TimingPoints.FirstOrDefault();
-		
+
 		foreach (TimingPoint t in this.Beatmap.TimingPoints) {
 			if (t.Time > time) break;
 			tp = t;

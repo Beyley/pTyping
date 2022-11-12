@@ -85,7 +85,7 @@ public static class DiscordManager {
 						LargeImageText = "pTyping"
 					}
 				};
-				
+
 				Client.SetPresence(presence);
 			}
 		}

@@ -85,7 +85,7 @@ public class ScoreResultsScreen : pScreen {
 
 			exporter.ExportScore(this.Score, pTypingGame.BeatmapDatabase, pTypingGame.ScoreDatabase, pTypingGame.FileDatabase);
 		};
-		
+
 		this.Manager.Add(exitButton);
 		this.Manager.Add(watchReplayButton);
 		this.Manager.Add(exportReplayButton);

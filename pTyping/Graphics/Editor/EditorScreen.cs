@@ -23,7 +23,7 @@ public partial class EditorScreen : pScreen {
 		//Clone the beatmap to not edit the original
 		this.Beatmap = beatmap.Clone();
 	}
-	
+
 	public override void Initialize() {
 		base.Initialize();
 

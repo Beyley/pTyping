@@ -385,8 +385,8 @@ public class OldEditorScreen : pScreen {
 		//Create an array of video extensions 
 		string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".webm" };
 
-        //Create an array of image extensions
-        string[] imageExtensions = { ".png", ".bmp", ".jpg", ".jpeg" };
+		//Create an array of image extensions
+		string[] imageExtensions = { ".png", ".bmp", ".jpg", ".jpeg" };
 
 		//Check if the first path is a video
 		if (videoExtensions.Any(x => paths[0].EndsWith(x))) {
@@ -403,17 +403,17 @@ public class OldEditorScreen : pScreen {
 			pTypingGame.NotificationManager.CreatePopup("Reload the map to see the video!");
 		}
 
-        if(imageExtensions.Any(x => paths[0].EndsWith(x))) {
+		if (imageExtensions.Any(x => paths[0].EndsWith(x))) {
 			byte[] imageBytes = File.ReadAllBytes(paths[0]);
 
 			string md5 = CryptoHelper.GetMd5(imageBytes);
-			
+
 			pTypingGame.FileDatabase.AddFile(imageBytes).Wait();
-			
+
 			this.EditorState.Song.FileCollection.Background = new PathHashTuple(Path.GetFileName(paths[0]), md5);
-			
+
 			this.SaveNeeded = true;
-			
+
 			pTypingGame.NotificationManager.CreatePopup("Reload the map to see the image!");
 		}
 	}
@@ -962,16 +962,16 @@ public class OldEditorScreen : pScreen {
 
 		//Get the current timing point
 		TimingPoint timingPoint = this.EditorState.Song.CurrentTimingPoint(this.EditorState.CurrentTime);
-		
+
 		//Get the time since the timing point started
 		double timeSinceTimingPoint = this.EditorState.CurrentTime - timingPoint.Time;
-		
+
 		//Get the time since the timing point started from the point of view of the last frame
 		double timeSinceTimingPointLastFrame = this._timeAtLastUpdate - timingPoint.Time;
-		
+
 		//Check how many beats have passed since the last timing point
 		double beatsSinceLastTimingPoint = Math.Floor(timeSinceTimingPoint / timingPoint.Tempo);
-		
+
 		//Check how many beats have passed since the last timing point from the point of view of the last frame
 		double beatsSinceLastTimingPointLast = Math.Floor(timeSinceTimingPointLastFrame / timingPoint.Tempo);
 
@@ -979,7 +979,7 @@ public class OldEditorScreen : pScreen {
 		if (this._metronome && beatsSinceLastTimingPoint > beatsSinceLastTimingPointLast) {
 			//Flip between metronome 1 and 2 every beat
 			this._metronomeFlipFlop = !this._metronomeFlipFlop;
-		
+
 			//Play the metronome sound
 			if (this._metronomeFlipFlop)
 				this.HitSoundMetronome1.PlayNew();

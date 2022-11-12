@@ -16,8 +16,8 @@ public partial class EditorScreen {
 	}
 
 	private void InitializeKeybinds() {
-		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind        = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
-		
+		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
+
 		FurballGame.InputManager.OnMouseScroll += this.MouseScroll;
 		FurballGame.InputManager.OnMouseDown   += this.MouseDown;
 		FurballGame.InputManager.OnKeyDown     += this.KeyDown;

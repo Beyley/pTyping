@@ -10,7 +10,7 @@ public partial class EditorScreen {
 	public void CloseCurrentContextMenu() {
 		if (this._openedThisFrame)
 			return;
-		
+
 		//Do nothing if there is no context menu open
 		if (this._openContextMenu == null)
 			return;

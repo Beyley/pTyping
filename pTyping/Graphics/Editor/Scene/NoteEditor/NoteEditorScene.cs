@@ -57,7 +57,7 @@ public sealed class NoteEditorScene : EditorScene {
 				return;
 			}
 	}
-	
+
 	public override void Opening() {
 		FurballGame.InputManager.RegisterKeybind(this._selectToolKeybind       = new Keybind(Keybinds.SelectTool, "Select Tool", Key.Number1, this.ActivateSelectTool));
 		FurballGame.InputManager.RegisterKeybind(this._noteToolKeybind         = new Keybind(Keybinds.NoteTool, "Note Tool", Key.Number2, this.ActivateNoteTool));

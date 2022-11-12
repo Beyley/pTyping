@@ -53,9 +53,8 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this.Players = new List<Player.Player>();
 
 		this.CreateNewPlayer();
-		
 	}
-	
+
 	public void CreateNewPlayer() {
 		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), this.Arguments) {
 			OriginType = OriginType.LeftCenter
