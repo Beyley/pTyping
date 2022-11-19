@@ -46,6 +46,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.UiElements", "pTypi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pTyping.ConversionTest", "pTyping.ConversionTest\pTyping.ConversionTest.csproj", "{E422C871-DE15-420E-A51C-AB10B94E9CFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMLSharp", "Furball\GMLSharp\GMLSharp\GMLSharp.csproj", "{C720044C-A9AB-498D-BD8F-8156638F693A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,6 +142,10 @@ Global
 		{E422C871-DE15-420E-A51C-AB10B94E9CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E422C871-DE15-420E-A51C-AB10B94E9CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E422C871-DE15-420E-A51C-AB10B94E9CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C720044C-A9AB-498D-BD8F-8156638F693A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C720044C-A9AB-498D-BD8F-8156638F693A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C720044C-A9AB-498D-BD8F-8156638F693A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C720044C-A9AB-498D-BD8F-8156638F693A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}
