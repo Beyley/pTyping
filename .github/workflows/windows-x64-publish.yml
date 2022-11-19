@@ -32,4 +32,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Windows x86_64
-        path: pTyping/bin/Release/net7.0/win-x64/publish/
+        path: pTyping/bin/Release/net7.0-windows/win-x64/publish/
