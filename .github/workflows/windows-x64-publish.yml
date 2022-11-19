@@ -1,0 +1,34 @@
+name: Windows x64 Publish
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: change UseImGui to false
+      run: for FILENAME in $(find -name "Directory.Build.props"); do sed -i 's/<UseImGui>true/<UseImGui>false/g' $FILENAME; done
+    - name: Restore dependencies
+      working-directory: pTyping
+      run: dotnet restore
+    - name: Build
+      working-directory: pTyping
+      run: dotnet publish -c Release -r win-x64 --self-contained
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Windows x86_64
+        path: pTyping/bin/Release/net7.0/win-x64/publish/
