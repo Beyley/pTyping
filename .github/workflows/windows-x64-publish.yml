@@ -21,6 +21,7 @@ jobs:
         dotnet-version: 7.0.x
     - name: change UseImGui to false
       run: for FILENAME in $(find -name "Directory.Build.props"); do sed -i 's/<UseImGui>true/<UseImGui>false/g' $FILENAME; done
+      shell: bash
     - name: Restore dependencies
       working-directory: pTyping
       run: dotnet restore
