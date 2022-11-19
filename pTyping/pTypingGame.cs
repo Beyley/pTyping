@@ -381,15 +381,15 @@ public class pTypingGame : FurballGame {
 	}
 
 	protected override void OnClosing() {
-		MusicTrackScheduler.Dispose(0);
+		MusicTrackScheduler?.Dispose(0);
 
-		OnlineManager.Logout();
+		OnlineManager?.Logout();
 
 		DiscordManager.Dispose();
 
 		OffsetManager.Save();
 
-		pTypingConfig.Instance.Save();
+		pTypingConfig.Instance?.Save();
 
 		base.OnClosing();
 	}
