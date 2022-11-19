@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Newtonsoft.Json;
@@ -38,5 +39,24 @@ public abstract class Mod {
 		return mods.Aggregate(1d, (d, mod) => mod.ScoreMultiplier * d);
 	}
 
-	public static readonly Type[] RegisteredMods = (from assembly in AppDomain.CurrentDomain.GetAssemblies() from type in assembly.GetTypes() where type.IsSubclassOf(typeof(Mod)) select type).ToArray();
+	private static Type[] GetAllMods() {
+		List<Type> list       = new List<Type>();
+		Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+		for (int i = 0; i < assemblies.Length; i++) {
+			try {
+				Assembly assembly = assemblies[i];
+				Type[]   types    = assembly.GetTypes();
+				for (int j = 0; j < types.Length; j++) {
+					Type type = types[j];
+					if (type.IsSubclassOf(typeof(Mod)))
+						list.Add(type);
+				}
+			}
+			catch {}
+		}
+		return list.ToArray();
+	}
+
+	public static readonly Type[] RegisteredMods = GetAllMods();
 }
