@@ -24,11 +24,11 @@ public class NoteEditorToolSelectionDrawable : CompositeDrawable {
 	private readonly UiElement _typingCutoffTool;
 	private readonly UiElement _selectTool;
 
-	private const float WIDTH            = 200;
-	private const float TITLE_BAR_HEIGHT = 30;
+	public const  float WIDTH            = 200;
+	public const  float TITLE_BAR_HEIGHT = 30;
 	private const float CONTENTS_HEIGHT  = 250 - TITLE_BAR_HEIGHT;
 
-	private const float CONTENT_MARGIN = 5f;
+	public const float CONTENT_MARGIN = 5f;
 
 	private static readonly Color TitleBarColor           = new Color(120, 120, 120);
 	private static readonly Color ContentsBackgroundColor = new Color(100, 100, 100);

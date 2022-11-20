@@ -15,6 +15,7 @@ namespace pTyping.Graphics.Editor.Scene.NoteEditor;
 public sealed class NoteEditorScene : EditorScene {
 	public readonly  NoteEditorPlayFieldContainer    PlayFieldContainer;
 	public readonly  NoteEditorToolSelectionDrawable ToolSelection;
+	public readonly  NoteEditorDetailEditorDrawable  NoteDetailEditor;
 	private readonly TexturedDrawable                _mouseTimeDisplay;
 
 	private Keybind _selectToolKeybind;
@@ -38,6 +39,7 @@ public sealed class NoteEditorScene : EditorScene {
 			editor, new Vector2(this.ToolSelection.Size.X + MARGIN * 2, MARGIN),
 			Vector2.Zero
 		);
+		this.NoteDetailEditor = new NoteEditorDetailEditorDrawable(new Vector2(MARGIN, MARGIN * 2 + this.ToolSelection.Size.Y), this.PlayFieldContainer);
 		this._mouseTimeDisplay = new TexturedDrawable(FurballGame.WhitePixel, Vector2.Zero) {
 			Visible       = false,
 			Scale         = new Vector2(1, 100),
@@ -47,6 +49,7 @@ public sealed class NoteEditorScene : EditorScene {
 		};
 
 		this.Children.Add(this.ToolSelection);
+		this.Children.Add(this.NoteDetailEditor);
 		this.Children.Add(this.PlayFieldContainer);
 	}
 
