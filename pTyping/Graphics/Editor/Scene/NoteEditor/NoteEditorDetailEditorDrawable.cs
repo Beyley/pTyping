@@ -23,6 +23,7 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 	private readonly        UiContainer                _uiContainer;
 
 	private readonly UiElement _textInput;
+	private readonly UiElement _colorPicker;
 
 	public override Vector2 Size => new Vector2(NoteEditorToolSelectionDrawable.WIDTH, NoteEditorToolSelectionDrawable.TITLE_BAR_HEIGHT + CONTENTS_HEIGHT) * this.Scale;
 
@@ -60,16 +61,41 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 		this._uiContainer          = new UiContainer(OriginType.TopLeft);
 		this._uiContainer.Position = new Vector2(NoteEditorToolSelectionDrawable.CONTENT_MARGIN, NoteEditorToolSelectionDrawable.TITLE_BAR_HEIGHT + NoteEditorToolSelectionDrawable.CONTENT_MARGIN);
 
-		this._uiContainer.RegisterElement(UiElement.CreateText(pTypingGame.JapaneseFont, "Text:", 24));
-		this._uiContainer.RegisterElement(this._textInput = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 24, this.Size.X - NoteEditorToolSelectionDrawable.CONTENT_MARGIN * 2));
+		UiElement textLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Text:", 24);
+		this._textInput = UiElement.CreateTextBox(pTypingGame.JapaneseFont, "", 24, this.Size.X - NoteEditorToolSelectionDrawable.CONTENT_MARGIN * 2);
+		UiElement colorLabel = UiElement.CreateText(pTypingGame.JapaneseFont, "Color:", 24);
+		this._colorPicker = UiElement.CreateColorPicker(pTypingGame.JapaneseFont, 24, Color.White);
+
+		textLabel.SpaceAfter  = NoteEditorToolSelectionDrawable.CONTENT_MARGIN / 2f;
+		colorLabel.SpaceAfter = NoteEditorToolSelectionDrawable.CONTENT_MARGIN / 2f;
+
+		this._uiContainer.RegisterElement(textLabel);
+		this._uiContainer.RegisterElement(this._textInput);
+
+		this._uiContainer.RegisterElement(colorLabel);
+		this._uiContainer.RegisterElement(this._colorPicker);
 
 		this.Children.Add(this._uiContainer);
 
 		this._playFieldContainer.Arguments.SelectedNotes.CollectionChanged += this.SelectedNotesChanged;
 
-		this._textInput.AsTextBox().OnCommit += this.TextCommit;
+		this._textInput.AsTextBox().OnCommit             += this.TextCommit;
+		this._colorPicker.AsColorPicker().Color.OnChange += this.ColorPicked;
 
-		SelectedNotesChanged(null, null);
+		this.SelectedNotesChanged(null, null);
+	}
+
+	private void ColorPicked(object sender, Color e) {
+		//Set the text of all selected notes
+		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes) {
+			NoteDrawable note = (NoteDrawable)selected;
+
+			note.Note.Color = e;
+			note.NoteTexture.FadeColor(e, 100);
+		}
+
+		//When the user changes a note, mark that a save is needed
+		this._playFieldContainer.Editor.SaveNeeded = true;
 	}
 
 	private void TextCommit(object sender, string e) {
@@ -86,7 +112,8 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 
 	private void SelectedNotesChanged(object _, NotifyCollectionChangedEventArgs __) {
 		//If there are 0 notes selected, then we shouldn't allow you to select the text box
-		this._textInput.AsTextBox().Clickable = this._playFieldContainer.Arguments.SelectedNotes.Count != 0;
+		this._textInput.AsTextBox().Clickable       = this._playFieldContainer.Arguments.SelectedNotes.Count != 0;
+		this._colorPicker.AsColorPicker().Clickable = this._playFieldContainer.Arguments.SelectedNotes.Count != 0;
 
 		//If the user's selection changes, release text focus, as they arent actively using it anymore,
 		//and it will be confusing if they are using shortcuts and the text changes
@@ -98,6 +125,13 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 				? ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes[0]).Note.Text
 				//Else, just blank it out
 				: "";
+
+		this._colorPicker.AsColorPicker().Color.Value =
+			this._playFieldContainer.Arguments.SelectedNotes.Count == 1
+				//If the user has selected only a single note, then we can show the text of that note
+				? ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes[0]).Note.Color
+				//Else, just blank it out
+				: Color.White;
 	}
 
 	public override void Dispose() {
