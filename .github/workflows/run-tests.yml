@@ -15,7 +15,7 @@ jobs:
         with:
           dotnet-version: 7.0.x
       - name: Run Tests
-        uses: zyborg/dotnet-tests-report@latest
+        uses: zyborg/dotnet-tests-report@v1
         with:
           # project_path: tests/My.Project.Tests
           report_name: ptyping_tests
