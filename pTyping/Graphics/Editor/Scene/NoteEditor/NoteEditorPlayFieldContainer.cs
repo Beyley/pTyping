@@ -24,7 +24,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	public readonly  List<Player.Player>        Players;
 	public readonly  PlayerStateArguments       Arguments;
 
-	private readonly EditorScreen _editor;
+	public readonly EditorScreen Editor;
 
 	public override Vector2 Size => this.SizeOverride * this.Scale;
 
@@ -32,7 +32,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 	public NoteEditorPlayFieldContainer(EditorScreen editor, Vector2 position, Vector2 size) {
 		this.Position     = position;
-		this._editor      = editor;
+		this.Editor       = editor;
 		this.SizeOverride = size;
 
 		this.InvisibleToInput = true;
@@ -56,7 +56,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public void CreateNewPlayer() {
-		Player.Player player = new Player.Player(this._editor.Beatmap, Array.Empty<Mod>(), this.Arguments) {
+		Player.Player player = new Player.Player(this.Editor.Beatmap, Array.Empty<Mod>(), this.Arguments) {
 			OriginType = OriginType.LeftCenter
 		};
 
@@ -85,11 +85,11 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 					this.Arguments.SelectedNotes.Remove(note);
 
-					this._editor.CloseCurrentContextMenu();
+					this.Editor.CloseCurrentContextMenu();
 				})
 			}, pTypingGame.JapaneseFont, 24);
 
-			this._editor.OpenContextMenu(rightClickMenu);
+			this.Editor.OpenContextMenu(rightClickMenu);
 		}
 	}
 
@@ -129,12 +129,12 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public string AddNote(HitObject hitObject) {
-		foreach (HitObject x in this._editor.Beatmap.HitObjects)
+		foreach (HitObject x in this.Editor.Beatmap.HitObjects)
 			//Dont allow you to place 2 notes on the same time (with a tolerance of 10ms)
 			if (Math.Abs(x.Time - hitObject.Time) < 10)
 				return "Notes cannot overlap!";
 
-		this._editor.Beatmap.HitObjects.Add(hitObject);
+		this.Editor.Beatmap.HitObjects.Add(hitObject);
 
 		foreach (Player.Player player in this.Players) {
 			NoteDrawable noteDrawable = player.CreateNote(hitObject);
