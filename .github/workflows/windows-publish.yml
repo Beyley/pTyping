@@ -1,4 +1,4 @@
-name: Windows x64 Publish
+name: Windows Publish
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:
@@ -25,11 +24,19 @@ jobs:
     - name: Restore dependencies
       working-directory: pTyping
       run: dotnet restore
-    - name: Build
+    - name: Build x86_64
       working-directory: pTyping
       run: dotnet publish -c Release -r win-x64 --self-contained
-    - name: Upload Artifact
+    - name: Upload x86_64 Artifact
       uses: actions/upload-artifact@v3
       with:
         name: Windows x86_64
         path: pTyping/bin/Release/net7.0-windows/win-x64/publish/
+    - name: Build x86
+      working-directory: pTyping
+      run: dotnet publish -c Release -r win-x86 --self-contained
+    - name: Upload x86 Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Windows x86
+        path: pTyping/bin/Release/net7.0-windows/win-x86/publish/
