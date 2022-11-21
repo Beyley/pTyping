@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
@@ -16,12 +17,16 @@ public partial class EditorScreen : pScreen {
 	///     The live working beatmap
 	/// </summary>
 	public readonly Beatmap Beatmap;
+	public readonly BeatmapSet BeatmapSet;
 
 	private DrawableProgressBar _songProgressBar;
 
-	public EditorScreen(Beatmap beatmap) {
+	public EditorScreen(BeatmapSet set, string beatmapId) {
 		//Clone the beatmap to not edit the original
-		this.Beatmap = beatmap.Clone();
+		this.BeatmapSet = set.Clone();
+
+		//Get the beatmap from the cloned set, rather then the original
+		this.Beatmap = this.BeatmapSet.Beatmaps.First(x => x.Id == beatmapId);
 	}
 
 	public override void Initialize() {
