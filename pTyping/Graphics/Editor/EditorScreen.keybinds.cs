@@ -9,18 +9,26 @@ namespace pTyping.Graphics.Editor;
 
 public partial class EditorScreen {
 	private Keybind _pausePlayKeybind;
-
+	private Keybind _saveKeybind;
 
 	private enum Keybinds {
-		PausePlay
+		PausePlay,
+		Save
 	}
 
 	private void InitializeKeybinds() {
 		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
+		FurballGame.InputManager.RegisterKeybind(this._saveKeybind      = new Keybind(Keybinds.Save, "Save", Key.S, this.SaveKeybind));
 
 		FurballGame.InputManager.OnMouseScroll += this.MouseScroll;
 		FurballGame.InputManager.OnMouseDown   += this.MouseDown;
 		FurballGame.InputManager.OnKeyDown     += this.KeyDown;
+	}
+
+	private void SaveKeybind(FurballKeyboard keyboard) {
+		if (keyboard.IsKeyPressed(Key.ControlLeft) || keyboard.IsKeyPressed(Key.ControlRight)) {
+			this.Save();
+		}
 	}
 
 	private void KeyDown(object sender, KeyEventArgs e) {

@@ -34,6 +34,10 @@ public partial class EditorScreen {
 
 			this._isSaving  = false;
 			this.SaveNeeded = false;
+
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+				pTypingGame.NotificationManager.CreatePopup("Saved!");
+			});
 		}, TaskCreationOptions.PreferFairness);
 	}
 }
