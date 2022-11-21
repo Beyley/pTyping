@@ -35,7 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DiscordRichPresence" Version="1.1.1.14"/>
+        <PackageReference Include="DiscordRichPresence" Version="1.1.3.18"/>
         <PackageReference Include="EeveeTools" Version="1.0.0"/>
         <PackageReference Include="hellosam.net.collections" Version="1.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1"/>
