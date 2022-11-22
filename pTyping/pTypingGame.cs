@@ -643,7 +643,7 @@ public class pTypingGame : FurballGame {
 
 		//TODO: display a custom status for no songs
 		if (CurrentSong.Value != null) {
-			BeatmapSet set = CurrentSong.Value.Parent.First();
+			BeatmapSet set = CurrentSong.Value.ParentSet;
 
 			switch (screen.OnlineUserActionType) {
 				case ScreenUserActionType.Listening:
