@@ -134,7 +134,7 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 
 		float handleX = this._currentHandleX;
 
-		MappedData mappedData = batch.Reserve(4, 6);
+		MappedData mappedData = batch.Reserve(4, 6, FurballGame.WhitePixel);
 
 		unsafe {
 			const int top    = 0;
@@ -147,9 +147,8 @@ public class SliderDrawable <T> : Drawable where T : struct, IComparable, IConve
 			mappedData.VertexPtr[left].Position   = new Vector2(args.Position.X + handleX - HANDLE_SIZE, args.Position.Y      + MIDDLE);
 			mappedData.VertexPtr[bottom].Position = new Vector2(args.Position.X           + handleX, args.Position.Y          + MIDDLE + HANDLE_SIZE);
 
-			long texId = batch.GetTextureIdForReserve(FurballGame.WhitePixel);
 			for (int i = 0; i < mappedData.VertexCount; i++) {
-				mappedData.VertexPtr[i].TexId = texId;
+				mappedData.VertexPtr[i].TexId = mappedData.TextureId;
 				mappedData.VertexPtr[i].Color = new Color(0.75f, 0.75f, 0.75f) * args.Color;
 			}
 

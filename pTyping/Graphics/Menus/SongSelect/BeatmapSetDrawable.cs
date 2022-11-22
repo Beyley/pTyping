@@ -89,7 +89,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		}
 
 		public override unsafe void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
-			MappedData mappedData = batch.Reserve(4, 6);
+			MappedData mappedData = batch.Reserve(4, 6, FurballGame.WhitePixel);
 
 			const int topLeft     = 0;
 			const int topRight    = 1;
@@ -107,9 +107,8 @@ public class BeatmapSetDrawable : CompositeDrawable {
 			};
 			mappedData.VertexPtr[bottomRight].Position = new Vector2(args.Position.X + this.RealSize.X, args.Position.Y + this.RealSize.Y);
 
-			long texId = batch.GetTextureIdForReserve(FurballGame.WhitePixel);
 			for (int i = 0; i < mappedData.VertexCount; i++)
-				mappedData.VertexPtr[i].TexId = texId;
+				mappedData.VertexPtr[i].TexId = mappedData.TextureId;
 
 			Color c = Equals(this.Beatmap, pTypingGame.CurrentSong.Value) ? new Color(200, 100, 100) : new Color(100, 100, 200);
 			mappedData.VertexPtr[topLeft].Color     = new Color(c.R, c.G, c.B, (byte)200);
@@ -145,7 +144,7 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		}
 
 		public override unsafe void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
-			MappedData mappedData = batch.Reserve(4, 6);
+			MappedData mappedData = batch.Reserve(4, 6, FurballGame.WhitePixel);
 
 			const int topLeft     = 0;
 			const int topRight    = 1;
@@ -161,9 +160,8 @@ public class BeatmapSetDrawable : CompositeDrawable {
 			};
 			mappedData.VertexPtr[bottomRight].Position = new Vector2(args.Position.X + this.RealSize.X, args.Position.Y + this.RealSize.Y);
 
-			long texId = batch.GetTextureIdForReserve(FurballGame.WhitePixel);
 			for (int i = 0; i < mappedData.VertexCount; i++)
-				mappedData.VertexPtr[i].TexId = texId;
+				mappedData.VertexPtr[i].TexId = mappedData.TextureId;
 
 			mappedData.VertexPtr[topLeft].Color     = new Color(200, 200, 200, 200);
 			mappedData.VertexPtr[bottomLeft].Color  = new Color(200, 200, 200, 200);

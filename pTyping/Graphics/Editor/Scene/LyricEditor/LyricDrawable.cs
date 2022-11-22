@@ -80,10 +80,8 @@ public class LyricDrawable : SelectableCompositeDrawable {
 
 		Color fullColor = new Color(255, 255, 255, 100);
 
-		long whitePixelTexId = batch.GetTextureIdForReserve(FurballGame.WhitePixel);
-
 		unsafe {
-			MappedData data = batch.Reserve(4, 6);
+			MappedData data = batch.Reserve(4, 6, FurballGame.WhitePixel);
 
 			const int topLeft     = 0;
 			const int topRight    = 1;
@@ -108,7 +106,7 @@ public class LyricDrawable : SelectableCompositeDrawable {
 			data.VertexPtr[bottomRight].Color = fullColor;
 
 			for (int i = 0; i < data.VertexCount; i++)
-				data.VertexPtr[i].TexId = whitePixelTexId;
+				data.VertexPtr[i].TexId = data.TextureId;
 
 			data.IndexPtr[0] = (ushort)(topLeft     + data.IndexOffset);
 			data.IndexPtr[1] = (ushort)(bottomLeft  + data.IndexOffset);
@@ -126,7 +124,7 @@ public class LyricDrawable : SelectableCompositeDrawable {
 		);
 
 		unsafe {
-			MappedData data = batch.Reserve(4, 6);
+			MappedData data = batch.Reserve(4, 6, FurballGame.WhitePixel);
 
 			const int topLeft     = 0;
 			const int topRight    = 1;
@@ -154,7 +152,7 @@ public class LyricDrawable : SelectableCompositeDrawable {
 			data.VertexPtr[bottomRight].Color = fullColor with { A = 0 };
 
 			for (int i = 0; i < data.VertexCount; i++)
-				data.VertexPtr[i].TexId = whitePixelTexId;
+				data.VertexPtr[i].TexId = data.TextureId;
 
 			data.IndexPtr[0] = (ushort)(topLeft     + data.IndexOffset);
 			data.IndexPtr[1] = (ushort)(bottomLeft  + data.IndexOffset);

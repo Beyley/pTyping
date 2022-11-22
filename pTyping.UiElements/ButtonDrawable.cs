@@ -65,7 +65,7 @@ public class ButtonDrawable : CompositeDrawable {
 	public override void Draw(double time, DrawableBatch batch, DrawableManagerArgs args) {
 		batch.ScissorPush(this, new Rectangle(this.RealPosition.ToPoint(), this.RealSize.ToSize()));
 
-		MappedData mappedData = batch.Reserve(4, 6);
+		MappedData mappedData = batch.Reserve(4, 6, FurballGame.WhitePixel);
 
 		unsafe {
 			const int topLeft     = 0;
@@ -86,9 +86,8 @@ public class ButtonDrawable : CompositeDrawable {
 			};
 			mappedData.VertexPtr[bottomRight].Position = new(args.Position.X - offset + this.RealSize.X, args.Position.Y + this.RealSize.Y);
 
-			long texId = batch.GetTextureIdForReserve(FurballGame.WhitePixel);
 			for (int i = 0; i < mappedData.VertexCount; i++)
-				mappedData.VertexPtr[i].TexId = texId;
+				mappedData.VertexPtr[i].TexId = mappedData.TextureId;
 
 			mappedData.VertexPtr[topLeft].Color     = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf * args.Color.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf * args.Color.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf * args.Color.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af * args.Color.Af));
 			mappedData.VertexPtr[bottomLeft].Color  = new Color((byte)Math.Min(255, 200 * this._colorAdd.Rf * args.Color.Rf), (byte)Math.Min(255, 200 * this._colorAdd.Gf * args.Color.Gf), (byte)Math.Min(255, 200 * this._colorAdd.Bf * args.Color.Bf), (byte)Math.Min(255, 255 * this._colorAdd.Af * args.Color.Af));
