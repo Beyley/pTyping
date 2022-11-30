@@ -97,8 +97,7 @@ public class MenuScreen : pScreen {
 
 		this._playButton = new(menuButtonsTexture, new Vector2(FurballGame.DEFAULT_WINDOW_WIDTH / 2f, y), TexturePositions.MENU_PLAY_BUTTON) {
 			OriginType = OriginType.Center,
-			Scale      = new Vector2(0.75f),
-			ToolTip    = "gordon this is a tool tip"
+			Scale      = new Vector2(0.75f)
 		};
 		this._editButton = new(
 			menuButtonsTexture,
@@ -106,8 +105,7 @@ public class MenuScreen : pScreen {
 			TexturePositions.MENU_EDIT_BUTTON
 		) {
 			OriginType = OriginType.Center,
-			Scale      = new Vector2(0.75f),
-			ToolTip    = "you can use it to get across big pits!"
+			Scale      = new Vector2(0.75f)
 		};
 		this._optionsButton = new(
 			menuButtonsTexture,
