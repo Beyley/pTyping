@@ -28,6 +28,10 @@ public class MenuScreen : pScreen {
 
 	private static string[] totdList = {
 		"Mario Teaches Typing 4",
+		"\"Typing Taiko\"",
+		"Average QWERTY fan vs average DVORAK fan",
+		"Average QWERTY fan vs average COLEMAK fan",
+		"Average QWERTY fan vs average Workman fan"
 	};
 
 	public override void Initialize() {
