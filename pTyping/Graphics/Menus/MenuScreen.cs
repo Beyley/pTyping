@@ -26,11 +26,27 @@ public class MenuScreen : pScreen {
 	private Drawable            _userCard;
 	private DrawableProgressBar _songProgressBar;
 
-	//TODO: add tip of the day: ex. 'Mario teaches typing 2'
+	private static string[] totdList = {
+		"Mario Teaches Typing 4",
+	};
 
 	public override void Initialize() {
 		base.Initialize();
 
+		#region Tip of the day
+
+		int dayIndex = DateTime.UtcNow.Day % totdList.Length;
+
+		string totdString = totdList[dayIndex];
+
+		this._totd = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, totdString, 30) {
+			OriginType = OriginType.Center
+		};
+
+		this.Manager.Add(this._totd);
+
+		#endregion
+		
 		TextDrawable gitVersionText = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion), 30) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight
@@ -233,6 +249,7 @@ public class MenuScreen : pScreen {
 		base.Relayout(newWidth, newHeight);
 
 		this._titleText.Position = new Vector2(newWidth / 2f, newHeight * 0.2f);
+		this._totd.Position = new Vector2(newWidth / 2f, newHeight * 0.825f);
 
 		this._playButton.Position.X    = newWidth / 2f;
 		this._editButton.Position.X    = newWidth / 2f;
@@ -267,6 +284,7 @@ public class MenuScreen : pScreen {
 	private TexturedDrawable _editButton;
 	private TexturedDrawable _optionsButton;
 	private TexturedDrawable _exitButton;
+	private TextDrawable     _totd;
 	public void UpdateUserCard(object sender, EventArgs e) {
 		if (this._usercardAdded)
 			return;
