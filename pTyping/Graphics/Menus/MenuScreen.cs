@@ -5,6 +5,7 @@ using Furball.Engine;
 using Furball.Engine.Engine;
 using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
+using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Graphics.Drawables.UiElements;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Engine.Engine.Platform;
@@ -39,16 +40,29 @@ public class MenuScreen : pScreen {
 
 		#region Tip of the day
 
+		//NOTE: we use UTC here to prevent it changing at different times for different people,
+		//to keep up the surprise of what one comes next
+		//although this does lead to it changing at a seemingly random time for people outside of Europe
 		int dayIndex = DateTime.UtcNow.Day % totdList.Length;
-
+		
 		string totdString = totdList[dayIndex];
-
+		
 		this._totd = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, totdString, 30) {
-			OriginType = OriginType.Center
+			OriginType = OriginType.Center,
+			Depth = 0.5f
 		};
 
+		this._totdBackground = new RectanglePrimitiveDrawable {
+			ColorOverride = new Color(50, 50, 50, 175), 
+			Filled        = true,
+			OriginType    = OriginType.Center, 
+			Thickness     = 0, 
+			Depth = 0.75f
+		};
+			
+		this.Manager.Add(this._totdBackground);
 		this.Manager.Add(this._totd);
-
+		
 		#endregion
 		
 		TextDrawable gitVersionText = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion), 30) {
@@ -255,6 +269,9 @@ public class MenuScreen : pScreen {
 		this._titleText.Position = new Vector2(newWidth / 2f, newHeight * 0.2f);
 		this._totd.Position = new Vector2(newWidth / 2f, newHeight * 0.825f);
 
+		this._totdBackground.Position = this._totd.Position;
+		this._totdBackground.RectSize = new Vector2(this._totd.Size.X + 10, this._totd.FontSize + 5);
+
 		this._playButton.Position.X    = newWidth / 2f;
 		this._editButton.Position.X    = newWidth / 2f;
 		this._optionsButton.Position.X = newWidth / 2f;
@@ -282,13 +299,14 @@ public class MenuScreen : pScreen {
 		base.Dispose();
 	}
 
-	private bool             _usercardAdded;
-	private TextDrawable     _titleText;
-	private TexturedDrawable _playButton;
-	private TexturedDrawable _editButton;
-	private TexturedDrawable _optionsButton;
-	private TexturedDrawable _exitButton;
-	private TextDrawable     _totd;
+	private bool                       _usercardAdded;
+	private TextDrawable               _titleText;
+	private TexturedDrawable           _playButton;
+	private TexturedDrawable           _editButton;
+	private TexturedDrawable           _optionsButton;
+	private TexturedDrawable           _exitButton;
+	private TextDrawable               _totd;
+	private RectanglePrimitiveDrawable _totdBackground;
 	public void UpdateUserCard(object sender, EventArgs e) {
 		if (this._usercardAdded)
 			return;
