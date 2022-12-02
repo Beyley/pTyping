@@ -35,7 +35,9 @@ public class MenuScreen : pScreen {
 		"Average QWERTY fan vs average Workman fan",
 		$"Scribe Simulator {DateTime.UtcNow.Year}",
 		"We are not legally responsible for any hand injuries",
-		"Oh, you like instrumentals? Mhm, great..."
+		"Oh, you like instrumentals? Mhm, great...",
+		"Check out the original UTyping by toslunar!",
+		"Ive hurt my hand twice playing this so far" //update this accordingly
 	};
 
 	public override void Initialize() {
