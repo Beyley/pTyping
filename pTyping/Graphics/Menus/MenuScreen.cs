@@ -32,7 +32,10 @@ public class MenuScreen : pScreen {
 		"\"Typing Taiko\"",
 		"Average QWERTY fan vs average DVORAK fan",
 		"Average QWERTY fan vs average COLEMAK fan",
-		"Average QWERTY fan vs average Workman fan"
+		"Average QWERTY fan vs average Workman fan",
+		$"Scribe Simulator {DateTime.UtcNow.Year}",
+		"We are not legally responsible for any hand injuries",
+		"Oh, you like instrumentals? Mhm, great..."
 	};
 
 	public override void Initialize() {
