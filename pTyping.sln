@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMLSharp", "Furball\GMLShar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie.Backends.WebGPU", "Furball\Furball.Vixie\Furball.Vixie.Backends.WebGPU\Furball.Vixie.Backends.WebGPU.csproj", "{63445AD6-725A-429E-B69C-F72295B56BF3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Furball.Vixie.Backends.Direct3D12", "Furball\Furball.Vixie\Furball.Vixie.Backends.Direct3D12\Furball.Vixie.Backends.Direct3D12.csproj", "{80CDA131-9A3B-401C-9C00-053771A310CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +154,10 @@ Global
 		{63445AD6-725A-429E-B69C-F72295B56BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63445AD6-725A-429E-B69C-F72295B56BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63445AD6-725A-429E-B69C-F72295B56BF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CDA131-9A3B-401C-9C00-053771A310CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80CDA131-9A3B-401C-9C00-053771A310CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80CDA131-9A3B-401C-9C00-053771A310CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80CDA131-9A3B-401C-9C00-053771A310CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A24F1F2-3417-4B6B-BB27-7FB0489B1D5E} = {84B29531-51EB-4F10-9560-E175C00B0A62}
@@ -170,5 +176,6 @@ Global
 		{494AD760-E20D-4CE2-AEE7-4FEAAD5833CD} = {84B29531-51EB-4F10-9560-E175C00B0A62}
 		{C720044C-A9AB-498D-BD8F-8156638F693A} = {84B29531-51EB-4F10-9560-E175C00B0A62}
 		{63445AD6-725A-429E-B69C-F72295B56BF3} = {84B29531-51EB-4F10-9560-E175C00B0A62}
+		{80CDA131-9A3B-401C-9C00-053771A310CF} = {84B29531-51EB-4F10-9560-E175C00B0A62}
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ using Furball.Engine.Engine.Input.Events;
 using Furball.Engine.Engine.Localization;
 using Furball.Engine.Engine.Timing;
 using Furball.Vixie;
+using Furball.Vixie.Backends.Shared.TextureEffects.Blur;
 using Furball.Vixie.WindowManagement;
 using Furball.Volpe.Evaluation;
 using JetBrains.Annotations;
@@ -66,6 +68,7 @@ public class pTypingGame : FurballGame {
 
 	public static TextDrawable     VolumeSelector;
 	public static TexturedDrawable CurrentSongBackground;
+	public static BoxBlurTextureEffect BackgroundBoxBlur;
 
 	public static OnlineManager OnlineManager;
 
@@ -179,7 +182,15 @@ public class pTypingGame : FurballGame {
 	}
 
 	private static void SetBackgroundTexture(Texture tex) {
-		CurrentSongBackground.Texture = tex;
+		long start = Stopwatch.GetTimestamp();
+		//Dispose the old one and create a new box blur texture effect with the new texture
+		BackgroundBoxBlur?.SetSourceTexture(tex);
+		BackgroundBoxBlur ??= Instance.WindowManager.GraphicsBackend.CreateBoxBlurTextureEffect(tex);
+		BackgroundBoxBlur.UpdateTexture();
+		Console.WriteLine($"Blur took {(Stopwatch.GetTimestamp() - start) / (double)Stopwatch.Frequency * 1000d}ms");
+		
+		//Set the current background to the blurred background
+		CurrentSongBackground.Texture = new Texture(BackgroundBoxBlur.Texture);
 
 		CurrentSongBackground.Scale = new Vector2(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
 	}
