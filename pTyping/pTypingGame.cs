@@ -66,9 +66,9 @@ public class pTypingGame : FurballGame {
 
 	public static readonly Bindable<Beatmap> CurrentSong = new Bindable<Beatmap>(null);
 
-	public static TextDrawable     VolumeSelector;
-	public static TexturedDrawable CurrentSongBackground;
-	public static BoxBlurTextureEffect BackgroundBoxBlur;
+	public static  TextDrawable         VolumeSelector;
+	public static  TexturedDrawable     CurrentSongBackground;
+	private static BoxBlurTextureEffect BackgroundBoxBlur;
 
 	public static OnlineManager OnlineManager;
 
@@ -186,13 +186,23 @@ public class pTypingGame : FurballGame {
 		//Dispose the old one and create a new box blur texture effect with the new texture
 		BackgroundBoxBlur?.SetSourceTexture(tex);
 		BackgroundBoxBlur ??= Instance.WindowManager.GraphicsBackend.CreateBoxBlurTextureEffect(tex);
-		BackgroundBoxBlur.UpdateTexture();
+		SetBlurParams(BackgroundBoxBlur.KernelRadius, BackgroundBoxBlur.Passes, true);
 		Console.WriteLine($"Blur took {(Stopwatch.GetTimestamp() - start) / (double)Stopwatch.Frequency * 1000d}ms");
-		
+
 		//Set the current background to the blurred background
 		CurrentSongBackground.Texture = new Texture(BackgroundBoxBlur.Texture);
 
 		CurrentSongBackground.Scale = new Vector2(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
+	}
+
+	public static void SetBlurParams(int kernelRadius, int passes, bool newTex) {
+		//Dont do anything if its already the same
+		if (!newTex && kernelRadius == BackgroundBoxBlur.KernelRadius && passes == BackgroundBoxBlur.Passes)
+			return;
+		
+		BackgroundBoxBlur.Passes       = passes;
+		BackgroundBoxBlur.KernelRadius = kernelRadius;
+		BackgroundBoxBlur.UpdateTexture();
 	}
 
 	public static void LoadBackgroundFromSong(Beatmap song) {
@@ -735,6 +745,8 @@ public class pTypingGame : FurballGame {
 		SetSongLoopState(actualScreen.LoopState);
 
 		UpdateCurrentOnlineStatus(actualScreen);
+		
+		SetBlurParams(actualScreen.BackgroundBlurKernelRadius, actualScreen.BackgroundBlurPasses, false);
 
 		if (pTypingConfig.Instance.FpsBasedOnMonitorHz) {
 			int? videoModeRefreshRate = this.WindowManager.Monitor.VideoMode.RefreshRate ?? 60;

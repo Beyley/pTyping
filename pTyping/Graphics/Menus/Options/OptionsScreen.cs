@@ -162,7 +162,9 @@ public class OptionsScreen : pScreen {
 		#endregion
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Listening;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 
 	private void OnLanguageChange(object _, KeyValuePair<object, string> keyValuePair) {
 		LocalizationManager.CurrentLanguage = (Language)keyValuePair.Key;

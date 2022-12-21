@@ -31,6 +31,9 @@ public abstract class pScreen : Screen {
 	///     The type of user action to display online
 	/// </summary>
 	public abstract ScreenUserActionType OnlineUserActionType { get; }
+	
+	public abstract int BackgroundBlurKernelRadius { get; }
+	public abstract int BackgroundBlurPasses       { get; }
 }
 
 public enum MusicLoopState {

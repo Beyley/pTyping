@@ -172,7 +172,9 @@ public class ChangelogScreen : pScreen {
 		this.Manager.Add(this._changeLogDrawable);
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Listening;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 
 	private void OnMouseScroll(object sender, MouseScrollEventArgs mouseScrollEventArgs) {
 		this.TargetScroll += mouseScrollEventArgs.ScrollAmount.Y;

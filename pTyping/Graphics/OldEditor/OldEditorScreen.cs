@@ -439,7 +439,9 @@ public class OldEditorScreen : pScreen {
 		this._video?.Seek(pTypingGame.MusicTrack.CurrentPosition);
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Editing;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Editing;
+	public override int                  BackgroundBlurKernelRadius => 0;
+	public override int                  BackgroundBlurPasses       => 0;
 
 	private static void ChangeSpeed(object _, KeyValuePair<object, string> keyValuePair) {
 		pTypingGame.MusicTrack.SetSpeed((double)keyValuePair.Key);

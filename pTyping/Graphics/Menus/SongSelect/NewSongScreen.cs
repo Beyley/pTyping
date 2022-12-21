@@ -85,7 +85,9 @@ public class NewSongScreen : pScreen {
 		#endregion
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Listening;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 
 	private void CreateSong(FileInfo musicFileInfo) {
 		if (musicFileInfo.DirectoryName is null) throw new Exception("Song directory is null? how???? wtf are you doing??????");

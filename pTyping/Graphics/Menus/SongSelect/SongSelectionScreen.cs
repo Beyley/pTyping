@@ -251,7 +251,9 @@ public class SongSelectionScreen : pScreen {
 		// pTypingGame.MusicTrack.SetSpeed(speed);
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.ChoosingSong;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.ChoosingSong;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 
 	private void ChangeLeaderboardType(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
 		LeaderboardType.Value = LeaderboardType.Value switch {

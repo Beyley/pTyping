@@ -283,7 +283,9 @@ public class MenuScreen : pScreen {
 		this._exitButton.Position.X    = newWidth / 2f;
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Listening;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 
 	private void OnProgressBarClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
 		float x = mouseButtonEventArgs.Mouse.Position.X - this._songProgressBar.RealPosition.X;

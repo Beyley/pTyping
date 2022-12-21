@@ -100,12 +100,14 @@ public class LobbyScreen : pScreen {
 				this._users.Text += "\n";
 	}
 
-	public override string               Name                 => "Lobby";
-	public override string               State                => "Partying to the music while waiting for the game to start...";
-	public override string               Details              => "";
-	public override bool                 ForceSpeedReset      => false;
-	public override float                BackgroundFadeAmount => 0.7f;
-	public override MusicLoopState       LoopState            => MusicLoopState.Loop;
-	public override ScreenType           ScreenType           => ScreenType.Menu;
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Lobbying;
+	public override string               Name                       => "Lobby";
+	public override string               State                      => "Partying to the music while waiting for the game to start...";
+	public override string               Details                    => "";
+	public override bool                 ForceSpeedReset            => false;
+	public override float                BackgroundFadeAmount       => 0.7f;
+	public override MusicLoopState       LoopState                  => MusicLoopState.Loop;
+	public override ScreenType           ScreenType                 => ScreenType.Menu;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Lobbying;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 }

@@ -642,12 +642,14 @@ public class UiMakerScreen : pScreen {
 		}
 	}
 
-	public override string               Name                 => "UiMaker";
-	public override string               State                => "Making new UI";
-	public override string               Details              => "";
-	public override bool                 ForceSpeedReset      => true;
-	public override float                BackgroundFadeAmount => 0.5f;
-	public override MusicLoopState       LoopState            => MusicLoopState.None;
-	public override ScreenType           ScreenType           => ScreenType.Menu;
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+	public override string               Name                       => "UiMaker";
+	public override string               State                      => "Making new UI";
+	public override string               Details                    => "";
+	public override bool                 ForceSpeedReset            => true;
+	public override float                BackgroundFadeAmount       => 0.5f;
+	public override MusicLoopState       LoopState                  => MusicLoopState.None;
+	public override ScreenType           ScreenType                 => ScreenType.Menu;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Listening;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 }

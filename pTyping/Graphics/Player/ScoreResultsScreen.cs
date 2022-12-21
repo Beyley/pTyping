@@ -99,7 +99,9 @@ public class ScoreResultsScreen : pScreen {
 		#endregion
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Listening;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Listening;
+	public override int                  BackgroundBlurKernelRadius => 2;
+	public override int                  BackgroundBlurPasses       => 3;
 
 	public override string Name  => "Score Results";
 	public override string State => "Looking at scores!";

@@ -37,12 +37,14 @@ public partial class EditorScreen {
 		this._openedThisFrame = true;
 	}
 
-	public override string               Name                 => "Editor";
-	public override string               State                => "Editing...";
-	public override string               Details              => "Editing a map!";
-	public override bool                 ForceSpeedReset      => true;
-	public override float                BackgroundFadeAmount => 0.5f;
-	public override MusicLoopState       LoopState            => MusicLoopState.None;
-	public override ScreenType           ScreenType           => ScreenType.Menu;
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Editing;
+	public override string               Name                       => "Editor";
+	public override string               State                      => "Editing...";
+	public override string               Details                    => "Editing a map!";
+	public override bool                 ForceSpeedReset            => true;
+	public override float                BackgroundFadeAmount       => 0.5f;
+	public override MusicLoopState       LoopState                  => MusicLoopState.None;
+	public override ScreenType           ScreenType                 => ScreenType.Menu;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Editing;
+	public override int                  BackgroundBlurKernelRadius => 0;
+	public override int                  BackgroundBlurPasses       => 0;
 }

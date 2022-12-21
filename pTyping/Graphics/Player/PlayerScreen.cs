@@ -338,7 +338,9 @@ public class PlayerScreen : pScreen {
 		this.Player.Scale = new(horiScale);
 	}
 
-	public override ScreenUserActionType OnlineUserActionType => ScreenUserActionType.Playing;
+	public override ScreenUserActionType OnlineUserActionType       => ScreenUserActionType.Playing;
+	public override int                  BackgroundBlurKernelRadius => 0;
+	public override int                  BackgroundBlurPasses       => 0;
 
 	private void OnComboUpdate(object sender, Color e) {
 		this._comboDrawable.Tweens.Add(
