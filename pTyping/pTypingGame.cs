@@ -68,6 +68,7 @@ public class pTypingGame : FurballGame {
 
 	public static  TextDrawable         VolumeSelector;
 	public static  TexturedDrawable     CurrentSongBackground;
+	private static Texture              BackgroundSourceTexture;
 	private static BoxBlurTextureEffect BackgroundBoxBlur;
 
 	public static OnlineManager OnlineManager;
@@ -182,15 +183,17 @@ public class pTypingGame : FurballGame {
 	}
 
 	private static void SetBackgroundTexture(Texture tex) {
-		long start = Stopwatch.GetTimestamp();
-		//Dispose the old one and create a new box blur texture effect with the new texture
+		BackgroundSourceTexture = tex;
+
 		BackgroundBoxBlur?.SetSourceTexture(tex);
 		BackgroundBoxBlur ??= Instance.WindowManager.GraphicsBackend.CreateBoxBlurTextureEffect(tex);
+
+		CurrentSongBackground.Texture = BackgroundBoxBlur.KernelRadius == 0 && BackgroundBoxBlur.Passes == 0 ? tex : new Texture(BackgroundBoxBlur.Texture);
+		
 		SetBlurParams(BackgroundBoxBlur.KernelRadius, BackgroundBoxBlur.Passes, true);
-		Console.WriteLine($"Blur took {(Stopwatch.GetTimestamp() - start) / (double)Stopwatch.Frequency * 1000d}ms");
 
 		//Set the current background to the blurred background
-		CurrentSongBackground.Texture = new Texture(BackgroundBoxBlur.Texture);
+		// CurrentSongBackground.Texture = new Texture(BackgroundBoxBlur.Texture);
 
 		CurrentSongBackground.Scale = new Vector2(1f / ((float)CurrentSongBackground.Texture.Height / DEFAULT_WINDOW_HEIGHT));
 	}
@@ -199,9 +202,25 @@ public class pTypingGame : FurballGame {
 		//Dont do anything if its already the same
 		if (!newTex && kernelRadius == BackgroundBoxBlur.KernelRadius && passes == BackgroundBoxBlur.Passes)
 			return;
-		
+
+		const double textureFadeTime = 1000f;
+
+		//If there are no passes, or the kernel radius is 0, then fade to the source texture (non-blurred)
+		if (passes == 0 || kernelRadius == 0) {
+			CurrentSongBackground.FadeTexture(BackgroundSourceTexture, textureFadeTime);
+			BackgroundBoxBlur.Passes       = passes;
+			BackgroundBoxBlur.KernelRadius = kernelRadius;
+			return;
+		}
+
+		//If the current song background is not the blurred one, then fade to the blurred texture
+		if (CurrentSongBackground.Texture != BackgroundBoxBlur.Texture)
+			CurrentSongBackground.FadeTexture(new Texture(BackgroundBoxBlur.Texture), textureFadeTime);
+
+		//Set the blur parameters
 		BackgroundBoxBlur.Passes       = passes;
 		BackgroundBoxBlur.KernelRadius = kernelRadius;
+		//Update the blurred texture
 		BackgroundBoxBlur.UpdateTexture();
 	}
 
@@ -745,7 +764,7 @@ public class pTypingGame : FurballGame {
 		SetSongLoopState(actualScreen.LoopState);
 
 		UpdateCurrentOnlineStatus(actualScreen);
-		
+
 		SetBlurParams(actualScreen.BackgroundBlurKernelRadius, actualScreen.BackgroundBlurPasses, false);
 
 		if (pTypingConfig.Instance.FpsBasedOnMonitorHz) {
