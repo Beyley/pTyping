@@ -232,9 +232,9 @@ public class PlayerScreen : pScreen {
 				TweenType.Color,
 				pTypingGame.CurrentSongBackground.ColorOverride,
 				new Color(
-					(float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
-					(float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
-					(float)(1f * (1f - ConVars.BackgroundDim.Value.Value))
+					(float)(1f * (1f - pTypingConfig.Instance.BackgroundDim)),
+					(float)(1f * (1f - pTypingConfig.Instance.BackgroundDim)),
+					(float)(1f * (1f - pTypingConfig.Instance.BackgroundDim))
 				),
 				pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime(),
 				pTypingGame.CurrentSongBackground.TimeSource.GetCurrentTime() + 1000
@@ -260,9 +260,9 @@ public class PlayerScreen : pScreen {
 
 				this._video.FadeColor(
 					new Color(
-						(float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
-						(float)(1f * (1f - ConVars.BackgroundDim.Value.Value)),
-						(float)(1f * (1f - ConVars.BackgroundDim.Value.Value))
+						(float)(1f * (1f - pTypingConfig.Instance.BackgroundDim)),
+						(float)(1f * (1f - pTypingConfig.Instance.BackgroundDim)),
+						(float)(1f * (1f - pTypingConfig.Instance.BackgroundDim))
 					),
 					1000
 				);

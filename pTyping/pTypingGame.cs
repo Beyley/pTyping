@@ -145,7 +145,7 @@ public class pTypingGame : FurballGame {
 
 		MusicTrack.Play();
 
-		MusicTrack.Volume = ConVars.Volume.Value.Value;
+		// MusicTrack.Volume = pTypingConfig.Instance.MasterVolume;
 	}
 
 	public static void PauseResumeMusic() {
@@ -170,7 +170,7 @@ public class pTypingGame : FurballGame {
 		}
 
 		MusicTrack        = AudioEngine.CreateStream(data);
-		MusicTrack.Volume = ConVars.Volume.Value.Value;
+		// MusicTrack.Volume = pTypingConfig.Instance.MasterVolume;
 
 		MusicTrackTimeSourceNoOffset = new AudioStreamTimeSource(MusicTrack);
 		MusicTrackTimeSource         = new OffsetTimeSource(MusicTrackTimeSourceNoOffset, 0);
@@ -260,20 +260,20 @@ public class pTypingGame : FurballGame {
 		MenuClickSound = AudioEngine.CreateSoundEffectPlayer(menuClickSoundData);
 
 		// MenuClickSound.Volume = ConVars.Volume.Value.Value;
-		AudioEngine.MusicVolume  = ConVars.Volume.Value.Value;
-		AudioEngine.SampleVolume = ConVars.Volume.Value.Value * 0.5;
+		AudioEngine.MusicVolume  = pTypingConfig.Instance.MasterVolume;
+		AudioEngine.SampleVolume = pTypingConfig.Instance.MasterVolume * 0.5;
 
-		ConVars.Volume.OnChange += delegate {
+		pTypingConfig.Instance.MasterVolumeChanged += delegate {
 			// MenuClickSound.Volume = volume.Value;
 			// MusicTrack.Volume     = ConVars.Volume.Value.Value;
 
-			AudioEngine.MusicVolume  = ConVars.Volume.Value.Value;
-			AudioEngine.SampleVolume = ConVars.Volume.Value.Value * 0.5;
+			AudioEngine.MusicVolume  = pTypingConfig.Instance.MasterVolume;
+			AudioEngine.SampleVolume = pTypingConfig.Instance.MasterVolume * 0.5;
 
 			// MenuClickSound.Volume    = ConVars.Volume.Value.Value;
 
 			if (VolumeSelector is not null)
-				VolumeSelector.Text = $"Volume: {ConVars.Volume.Value.Value * 100d:00.##}";
+				VolumeSelector.Text = $"Volume: {pTypingConfig.Instance.MasterVolume * 100d:00.##}";
 		};
 
 		DefaultBackground = ContentManager.LoadTextureFromFileCached("background.png", ContentSource.User);
@@ -323,9 +323,9 @@ public class pTypingGame : FurballGame {
 		VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 1f, 0f, Time + 2200, Time + 3200));
 
 		if (mouseScroll > 0)
-			ConVars.Volume.Value = new Value.Number(Math.Clamp(ConVars.Volume.Value.Value + 0.05d, 0d, 1d));
+			pTypingConfig.Instance.MasterVolume = Math.Clamp(pTypingConfig.Instance.MasterVolume + 0.01d, 0d, 1d);
 		else
-			ConVars.Volume.Value = new Value.Number(Math.Clamp(ConVars.Volume.Value.Value - 0.05d, 0d, 1d));
+			pTypingConfig.Instance.MasterVolume = Math.Clamp(pTypingConfig.Instance.MasterVolume - 0.01d, 0d, 1d);
 	}
 
 	public static void SelectNewSong() {
@@ -461,10 +461,6 @@ public class pTypingGame : FurballGame {
 
 		TooltipDrawable.TextDrawable.SetFont(JapaneseFont, 20);
 
-		//TODO: move these to the config (please)
-		DevConsole.VolpeEnvironment.SetVariable(ConVars.Volume);
-		DevConsole.VolpeEnvironment.SetVariable(ConVars.BackgroundDim);
-
 		//TODO: move these functions into an array and add them as an array
 		DevConsole.VolpeEnvironment.AddBuiltin(ConVars.Login);
 		DevConsole.VolpeEnvironment.AddBuiltin(ConVars.SendMessage);
@@ -481,10 +477,11 @@ public class pTypingGame : FurballGame {
 		if (pTypingConfig.Instance.Username != string.Empty)
 			OnlineManager.Login();
 
-		VolumeSelector = new TextDrawable(new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT), DefaultFont, $"Volume {ConVars.Volume.Value.Value}", 50) {
-			OriginType  = OriginType.BottomRight,
-			Clickable   = false,
-			CoverClicks = false
+		VolumeSelector = new TextDrawable(new Vector2(5), DefaultFont, $"Volume {pTypingConfig.Instance.MasterVolume}", 50) {
+			OriginType       = OriginType.BottomRight,
+			Clickable        = false,
+			CoverClicks      = false,
+			ScreenOriginType = OriginType.BottomRight
 		};
 
 		//Set the opacity to 0

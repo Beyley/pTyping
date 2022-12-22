@@ -11,8 +11,8 @@ namespace pTyping.Engine;
 
 #nullable enable
 public class ConVars {
-	public static TypedVariable<Value.Number> Volume        = new TypedVariable<Value.Number>("sl_master_volume", new Value.Number(0.05));
-	public static TypedVariable<Value.Number> BackgroundDim = new TypedVariable<Value.Number>("cl_background_dim", new Value.Number(0.5));
+	// public static TypedVariable<Value.Number> Volume        = new TypedVariable<Value.Number>("sl_master_volume", new Value.Number(0.05));
+	// public static TypedVariable<Value.Number> BackgroundDim = new TypedVariable<Value.Number>("cl_background_dim", new Value.Number(0.5));
 	// public static TypedVariable<Value.String> Username      = new("net_username", new Value.String("beyley"));
 	// public static TypedVariable<Value.String> Password      = new("net_password", new Value.String("test"));
 

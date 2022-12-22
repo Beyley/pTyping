@@ -48,7 +48,7 @@ public class OptionsScreen : pScreen {
 		#region Background Dim
 
 		TextDrawable    backgroundDimInputLabel = new TextDrawable(new Vector2(100, 150), FurballGame.DefaultFont, "Background Dim:", 30);
-		DrawableTextBox backgroundDimInput      = new DrawableTextBox(new Vector2(110 + backgroundDimInputLabel.Size.X, 150), FurballGame.DefaultFont, 30, 200, ConVars.BackgroundDim.Value.Value.ToString(CultureInfo.InvariantCulture));
+		DrawableTextBox backgroundDimInput      = new DrawableTextBox(new Vector2(110 + backgroundDimInputLabel.Size.X, 150), FurballGame.DefaultFont, 30, 200, pTypingConfig.Instance.MasterVolume.ToString(CultureInfo.InvariantCulture));
 
 		backgroundDimInput.OnCommit += this.BackgroundDimInputOnCommit;
 
@@ -171,7 +171,7 @@ public class OptionsScreen : pScreen {
 	}
 
 	private void BackgroundDimInputOnCommit(object sender, string e) {
-		ConVars.BackgroundDim.Value = new Value.Number(float.Parse(e));
+		pTypingConfig.Instance.MasterVolume = double.Parse(e);
 	}
 
 	// private void TargetFpsInputOnCommit(object sender, string e) {

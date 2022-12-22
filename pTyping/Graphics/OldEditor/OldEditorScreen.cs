@@ -371,7 +371,7 @@ public class OldEditorScreen : pScreen {
 		this.HitSoundMetronome1 = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("metronome-1.wav", ContentSource.User));
 		this.HitSoundMetronome2 = FurballGame.AudioEngine.CreateSoundEffectPlayer(ContentManager.LoadRawAsset("metronome-2.wav", ContentSource.User));
 
-		ConVars.Volume.OnChange += this.OnVolumeChange;
+		pTypingConfig.Instance.MasterVolumeChanged += this.OnVolumeChange;
 		// this.HitSoundNormal.Volume =  ConVars.Volume.Value.Value;
 
 		FurballGame.Instance.FileDrop += this.OnFileDrop;
@@ -447,7 +447,7 @@ public class OldEditorScreen : pScreen {
 		pTypingGame.MusicTrack.SetSpeed((double)keyValuePair.Key);
 	}
 
-	private void OnVolumeChange(object sender, Value.Number f) {
+	private void OnVolumeChange(object sender, double d) {
 		// this.HitSoundNormal.Volume = f.Value;
 	}
 
@@ -615,7 +615,7 @@ public class OldEditorScreen : pScreen {
 
 		this._progressBar.OnDrag -= this.ProgressBarOnInteract;
 
-		ConVars.Volume.OnChange -= this.OnVolumeChange;
+		pTypingConfig.Instance.MasterVolumeChanged -= this.OnVolumeChange;
 
 		FurballGame.Instance.FileDrop -= this.OnFileDrop;
 

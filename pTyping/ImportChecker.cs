@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Furball.Engine;
+using Furball.Engine.Engine.Platform;
 using Furball.Vixie.Helpers;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
@@ -33,26 +34,29 @@ public static class ImportChecker {
 		List<BeatmapSet> beatmapSets = realm.All<BeatmapSet>().ToList();
 
 		foreach (BeatmapSet set in beatmapSets) {
-			foreach (Beatmap map in set.Beatmaps) {
-				Beatmap beatmap = realm.Find<Beatmap>(map.Id);
+			try {
+				foreach (Beatmap map in set.Beatmaps) {
+					Beatmap beatmap = realm.Find<Beatmap>(map.Id);
 
-				bool breakOut = false;
+					bool breakOut = false;
 
-				List<BeatmapSet> parents = beatmap.Parent.ToList();
-				if (parents.Count > 1)
-					realm.Write(() => {
-						//Remove all but one of the elements
-						for (int i = 1; i < parents.Count; i++) {
-							BeatmapSet parent = parents[i];
-							realm.Remove(parent);
+					List<BeatmapSet> parents = beatmap.Parent.ToList();
+					if (parents.Count > 1)
+						realm.Write(() => {
+							//Remove all but one of the elements
+							for (int i = 1; i < parents.Count; i++) {
+								BeatmapSet parent = parents[i];
+								realm.Remove(parent);
 
-							breakOut = true;
-						}
-					});
+								breakOut = true;
+							}
+						});
 
-				if (breakOut)
-					break;
+					if (breakOut)
+						break;
+				}
 			}
+			catch {}
 		}
 	}
 
@@ -200,6 +204,9 @@ public static class ImportChecker {
 						}
 					}
 					catch (Exception ex) {
+						if (RuntimeInfo.IsDebug())
+							throw;
+
 						legacySongDir.MoveTo(Path.Combine(LegacySongFolderImportedFailed, legacySongDir.Name));
 
 						FurballGame.GameTimeScheduler.ScheduleMethod(

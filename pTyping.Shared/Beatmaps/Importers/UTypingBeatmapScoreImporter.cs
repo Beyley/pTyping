@@ -39,6 +39,6 @@ public class UTypingBeatmapScoreImporter : IBeatmapScoreImporter {
 		if (set.Beatmaps.Count == 0)
 			return;
 
-		database.Realm.Add(set);
+		database.Realm.Add(set, true);
 	}
 }

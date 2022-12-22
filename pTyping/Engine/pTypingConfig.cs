@@ -1,3 +1,4 @@
+using System;
 using Furball.Engine.Engine.Config;
 using Furball.Volpe.Evaluation;
 
@@ -24,6 +25,32 @@ public class pTypingConfig : VolpeConfig {
 		set => this.Values["video_backgrounds"] = new Value.Boolean(value);
 	}
 
+	public event EventHandler<double> MasterVolumeChanged;
+
+	public double MasterVolume {
+		get => this.Values["master_volume"].ToNumber().Value;
+		set {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if (value == this.MasterVolume) return;
+
+			this.Values["master_volume"] = new Value.Number(value);
+			this.MasterVolumeChanged?.Invoke(this, value);
+		}
+	}
+
+	public event EventHandler<double> BackgroundDimChanged;
+
+	public double BackgroundDim {
+		get => this.Values["background_dim"].ToNumber().Value;
+		set {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if (value == this.BackgroundDim) return;
+
+			this.Values["background_dim"] = new Value.Number(value);
+			this.BackgroundDimChanged?.Invoke(this, value);
+		}
+	}
+
 	public string ServerWebsocketUrl => this.Values["server_websocket_url"].ToStringValue().Value;
 	public string ServerWebUrl       => this.Values["server_web_url"].ToStringValue().Value;
 
@@ -47,6 +74,9 @@ public class pTypingConfig : VolpeConfig {
 		this.Values["letterboxing_h"] = new Value.Number(720);
 
 		this.Values["video_backgrounds"] = new Value.Boolean(true);
+
+		this.Values["master_volume"]  = new Value.Number(1d);
+		this.Values["background_dim"] = new Value.Number(0.5d);
 
 		this.Values["server_websocket_url"] = new Value.String("wss://server.tataku.ca");
 		this.Values["server_web_url"]       = new Value.String("https://scores.tataku.ca");
