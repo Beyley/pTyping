@@ -19,6 +19,8 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+    - name: Install FUSE
+      run: sudo apt-get update && sudo apt-get install fuse
     - name: change UseImGui to false
       run: for FILENAME in $(find -name "Directory.Build.props"); do sed -i 's/<UseImGui>true/<UseImGui>false/g' $FILENAME; done
     - name: Restore dependencies
