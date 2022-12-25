@@ -197,16 +197,20 @@ public class Player : CompositeDrawable {
 
 			this.Notes.Add(noteDrawable);
 
-			if (this.Arguments.UseEditorNoteSpawnLogic)
+			if (this.Arguments.UseEditorNoteSpawnLogic) {
 				this.Children.Add(noteDrawable);
+				this.SortDrawables = true;
+			}
 		}
 	}
 
 	public void AddNote(NoteDrawable noteDrawable) {
 		this.Notes.Add(noteDrawable);
 
-		if (this.Arguments.UseEditorNoteSpawnLogic)
+		if (this.Arguments.UseEditorNoteSpawnLogic) {
 			this.Children.Add(noteDrawable);
+			this.SortDrawables = true;
+		}
 	}
 
 	[Pure]
@@ -228,10 +232,10 @@ public class Player : CompositeDrawable {
 			Depth       = 0.5f,
 			OriginType  = OriginType.Center,
 			Note        = note,
-			Clickable   = this.Arguments.EnableSelection,
-			CoverClicks = this.Arguments.EnableSelection,
-			Hoverable   = this.Arguments.EnableSelection,
-			CoverHovers = this.Arguments.EnableSelection
+			Clickable   = true,
+			CoverClicks = true,
+			Hoverable   = true,
+			CoverHovers = true
 		};
 
 		for (int i = 0; i < noteDrawable.RawTextDrawable.Colors.Length; i++)
