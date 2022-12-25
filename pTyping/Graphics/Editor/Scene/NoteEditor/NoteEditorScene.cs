@@ -80,13 +80,13 @@ public sealed class NoteEditorScene : EditorScene {
 	}
 
 	private void MouseMove(object sender, MouseMoveEventArgs e) {
-		if (!this.ToolSelection.CurrentTool.DisplayMousePosition)
-			return;
+		// if (!this.ToolSelection.CurrentTool.DisplayMousePosition)
+		// return;
 
 		bool already = false;
 		foreach (Player.Player player in this.PlayFieldContainer.Players) {
 			//If the mouse is in the playfield, dont display the time, and skip to the next player
-			if (already || !player.RealContains(e.Position)) {
+			if (this.ToolSelection.CurrentTool.DisplayMousePosition && (already || !player.RealContains(e.Position))) {
 				this._mouseTimeDisplay.Visible = false;
 				player.Children.Remove(this._mouseTimeDisplay);
 				continue;
@@ -111,11 +111,13 @@ public sealed class NoteEditorScene : EditorScene {
 				timeAtCursor = this.Editor.SnapTime(timeAtCursor);
 
 			this.ToolSelection.CurrentTool.MouseTime = timeAtCursor;
+			this.PlayFieldContainer.MouseTime        = timeAtCursor;
 
 			this._mouseTimeDisplay.Visible = true;
 
 			this.UpdateMouseTimeDisplay(timeAtCursor, currentApproachTime);
-			player.Children.Add(this._mouseTimeDisplay);
+			if (this.ToolSelection.CurrentTool.DisplayMousePosition)
+				player.Children.Add(this._mouseTimeDisplay);
 
 			already = true;
 		}

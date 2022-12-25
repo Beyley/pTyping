@@ -26,6 +26,8 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 
 	public readonly EditorScreen Editor;
 
+	public double MouseTime;
+
 	public override Vector2 Size => this.SizeOverride * this.Scale;
 
 	public Vector2 SizeOverride;
@@ -71,7 +73,9 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public void HandleNoteCreated(NoteDrawable note) {
-		note.OnClick += this.NoteClick;
+		note.OnClick     += this.NoteClick;
+		note.OnDragBegin += this.NoteDragBegin;
+		note.OnDrag      += this.NoteDrag;
 	}
 
 	private void NoteClick(object sender, MouseButtonEventArgs e) {
@@ -137,11 +141,39 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this.Editor.Beatmap.HitObjects.Add(hitObject);
 
 		foreach (Player.Player player in this.Players) {
-			NoteDrawable noteDrawable = player.CreateNote(hitObject);
+			NoteDrawable note = player.CreateNote(hitObject);
 
-			player.AddNote(noteDrawable);
+			this.HandleNoteCreated(note);
+
+			player.AddNote(note);
 		}
 
 		return "";
+	}
+
+	private double                       _dragStartingMouseTime;
+	private List<(NoteDrawable, double)> _dragStartingTimes = new List<(NoteDrawable, double)>();
+	private void NoteDragBegin(object sender, MouseDragEventArgs e) {
+		this._dragStartingMouseTime = this.MouseTime;
+
+		this._dragStartingTimes.Clear();
+		foreach (SelectableCompositeDrawable selectableCompositeDrawable in this.Arguments.SelectedNotes) {
+			this._dragStartingTimes.Add(((NoteDrawable)selectableCompositeDrawable, ((NoteDrawable)selectableCompositeDrawable).Note.Time));
+		}
+	}
+
+	private void NoteDrag(object sender, MouseDragEventArgs e) {
+		//Difference between the mouse time and the time when the drag started
+		double timeDifference = this.MouseTime - this._dragStartingMouseTime;
+
+		//For each selected note, move it to the time it was at when the drag started, plus the time difference
+		for (int i = 0; i < this._dragStartingTimes.Count; i++) {
+			NoteDrawable note = this._dragStartingTimes[i].Item1;
+
+			note.Note.Time = this._dragStartingTimes[i].Item2 + timeDifference;
+
+			//Set the tweens of the note
+			note.CreateTweens(new GameplayDrawableTweenArgs(this.Players[0].CurrentApproachTime(note.Note.Time), this.Arguments.UseEditorNoteSpawnLogic));
+		}
 	}
 }

@@ -263,6 +263,9 @@ public class Player : CompositeDrawable {
 		this.Children.Remove(selectedNote);
 		//Remove the note from the beatmap
 		this.Song.HitObjects.Remove(note.Note);
+
+		selectedNote.ClearEvents();
+		selectedNote.Dispose();
 	}
 
 	public void TypeCharacter(object sender, char e) {
