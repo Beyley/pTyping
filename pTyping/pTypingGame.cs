@@ -200,7 +200,7 @@ public class pTypingGame : FurballGame {
 
 	public static void SetBlurParams(int kernelRadius, int passes, bool newTex) {
 		//Dont do anything if its already the same
-		if (!newTex && kernelRadius == BackgroundBoxBlur.KernelRadius && passes == BackgroundBoxBlur.Passes)
+		if (BackgroundBoxBlur == null || (!newTex && kernelRadius == BackgroundBoxBlur.KernelRadius && passes == BackgroundBoxBlur.Passes))
 			return;
 
 		const double textureFadeTime = 1000f;
