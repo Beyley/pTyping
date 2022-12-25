@@ -109,6 +109,8 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 			NoteDrawable note = (NoteDrawable)selected;
 
 			note.Note.TypingConversion = (TypingConversions.ConversionType)e.Key;
+
+			note.UpdateDrawables();
 		}
 
 		//When the user changes a note, mark that a save is needed
@@ -121,7 +123,8 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 			NoteDrawable note = (NoteDrawable)selected;
 
 			note.Note.Color = e;
-			note.NoteTexture.FadeColor(e, 100);
+
+			note.UpdateDrawables();
 		}
 
 		//When the user changes a note, mark that a save is needed
@@ -134,6 +137,8 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 			NoteDrawable note = (NoteDrawable)selected;
 
 			note.Note.Text = e;
+
+			note.UpdateDrawables();
 		}
 
 		//When the user changes a note, mark that a save is needed

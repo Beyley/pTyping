@@ -145,6 +145,17 @@ public class NoteDrawable : SelectableCompositeDrawable {
 		);
 	}
 
+	public void UpdateDrawables() {
+		this.RawTextDrawable.Text   = this.Note.Text;
+		this.RawTextDrawable.Colors = new FSColor[this.Note.Text.Length];
+		for (var i = 0; i < this.RawTextDrawable.Colors.Length; i++) {
+			this.RawTextDrawable.Colors[i] = FSColor.White;
+		}
+		this.ToTypeTextDrawable.Text = "";
+
+		this.NoteTexture.FadeColor(this.Note.Color, 100);
+	}
+
 	public void Reset() {
 		this.RawTextDrawable.Text    = this.Note.Text;
 		this.ToTypeTextDrawable.Text = "";
