@@ -46,7 +46,7 @@
         <PackageReference Include="ParallelExtensionsCore" Version="2.1.0"/>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0"/>
         <PackageReference Include="TagLibSharp" Version="2.3.0"/>
-        <PackageReference Include="Websocket.Client" Version="4.4.43"/>
+        <PackageReference Include="Websocket.Client" Version="4.6.1"/>
 
         <PackageReference Condition="'$(TargetFramework)' == 'net7.0-windows'" Include="Eto.Platform.Windows" Version="2.7.3"/>
     </ItemGroup>
