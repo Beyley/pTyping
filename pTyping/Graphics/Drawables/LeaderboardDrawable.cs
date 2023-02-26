@@ -29,7 +29,7 @@ public class LeaderboardDrawable : CompositeDrawable {
 		float y = 0;
 		for (int i = 0; i < this._scores.GetRange(0, Math.Min(8, scores.Count)).Count; i++) {
 			Score score = this._scores.GetRange(0, Math.Min(8, scores.Count))[i];
-			LeaderboardElementDrawable drawable = new LeaderboardElementDrawable(score, tex) {
+			LeaderboardElementDrawable drawable = new LeaderboardElementDrawable(score.Clone(), tex) {
 				Position = new Vector2(0, y)
 			};
 
@@ -37,7 +37,7 @@ public class LeaderboardDrawable : CompositeDrawable {
 			this.Children.Add(drawable);
 
 			drawable.OnClick += delegate {
-				ScreenManager.ChangeScreen(new ScoreResultsScreen(score));
+				ScreenManager.ChangeScreen(new ScoreResultsScreen(drawable.Score));
 			};
 
 			y += drawable.Size.Y + 5f;
@@ -63,6 +63,8 @@ public class LeaderboardDrawable : CompositeDrawable {
 			this.Children.Add(this._infoTextDrawable     = new TextDrawable(new Vector2(3f, this._usernameInfoDrawable.Size.Y + 8f), pTypingGame.JapaneseFont, "a", 25));
 
 			this.UpdateText();
+
+			this.RegisterForInput();
 		}
 
 		public override Vector2 Size => this._backgroundDrawable.Size * this.Scale;

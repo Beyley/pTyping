@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Furball.Engine;
 using Furball.Engine.Engine.Graphics.Drawables;
@@ -62,9 +63,9 @@ public sealed class NoteEditorScene : EditorScene {
 	}
 
 	public override void Opening() {
-		FurballGame.InputManager.RegisterKeybind(this._selectToolKeybind       = new Keybind(Keybinds.SelectTool, "Select Tool", Key.Number1, this.ActivateSelectTool));
-		FurballGame.InputManager.RegisterKeybind(this._noteToolKeybind         = new Keybind(Keybinds.NoteTool, "Note Tool", Key.Number2, this.ActivateNoteTool));
-		FurballGame.InputManager.RegisterKeybind(this._typingCutoffToolKeybind = new Keybind(Keybinds.TypingCutoffTool, "Typing Cutoff Tool", Key.Number3, this.ActivateTypingCutoffTool));
+		FurballGame.InputManager.RegisterKeybind(this._selectToolKeybind       = new Keybind(Keybinds.SelectTool, "Select Tool", Key.Number1, Array.Empty<Key>(), this.ActivateSelectTool));
+		FurballGame.InputManager.RegisterKeybind(this._noteToolKeybind         = new Keybind(Keybinds.NoteTool, "Note Tool", Key.Number2, Array.Empty<Key>(), this.ActivateNoteTool));
+		FurballGame.InputManager.RegisterKeybind(this._typingCutoffToolKeybind = new Keybind(Keybinds.TypingCutoffTool, "Typing Cutoff Tool", Key.Number3, Array.Empty<Key>(), this.ActivateTypingCutoffTool));
 
 		FurballGame.InputManager.OnMouseMove += this.MouseMove;
 		FurballGame.InputManager.OnMouseDown += this.ContainerClick;
@@ -159,7 +160,7 @@ public sealed class NoteEditorScene : EditorScene {
 			this.PlayFieldContainer.DeleteSelected();
 	}
 
-	private void ActivateSelectTool(FurballKeyboard keyboard) {
+	private void ActivateSelectTool(KeyEventArgs keyEventArgs) {
 		//Ignore this bind if the user is typing somewhere
 		if (FurballGame.InputManager.CharInputHandler != null)
 			return;
@@ -167,7 +168,7 @@ public sealed class NoteEditorScene : EditorScene {
 		this.ToolSelection.SelectTool(new SelectTool());
 	}
 
-	private void ActivateNoteTool(FurballKeyboard keyboard) {
+	private void ActivateNoteTool(KeyEventArgs keyEventArgs) {
 		//Ignore this bind if the user is typing somewhere
 		if (FurballGame.InputManager.CharInputHandler != null)
 			return;
@@ -175,7 +176,7 @@ public sealed class NoteEditorScene : EditorScene {
 		this.ToolSelection.SelectTool(new NoteTool());
 	}
 
-	private void ActivateTypingCutoffTool(FurballKeyboard keyboard) {
+	private void ActivateTypingCutoffTool(KeyEventArgs keyEventArgs) {
 		//Ignore this bind if the user is typing somewhere
 		if (FurballGame.InputManager.CharInputHandler != null)
 			return;

@@ -158,6 +158,7 @@ public class ChangelogScreen : pScreen {
 		};
 
 		this.Manager.Add(backButton);
+		backButton.RegisterForInput();
 
 		#endregion
 

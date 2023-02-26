@@ -48,6 +48,7 @@ public class LobbyScreen : pScreen {
 				Scale      = pTypingGame.BackButtonScale
 			}
 		);
+		this._backButton.RegisterForInput();
 
 		this._backButton.OnClick += delegate {
 			this._lobby.Leave();

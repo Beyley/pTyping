@@ -213,7 +213,7 @@ public class SelectTool : EditorTool {
 	}
 
 	private void OnObjectDragBegin(object sender, MouseDragEventArgs mouseDragEventArgs) {
-		if (!FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) return;
+		if (!FurballGame.InputManager.ShiftHeld) return;
 
 		this._dragging     = true;
 		this._lastDragTime = this.OldEditorInstance.EditorState.MouseTime;
@@ -225,7 +225,7 @@ public class SelectTool : EditorTool {
 
 	private double _lastDragTime;
 	private void OnObjectDrag(object sender, MouseDragEventArgs mouseDragEventArgs) {
-		if (!FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) {
+		if (!FurballGame.InputManager.ShiftHeld) {
 			this._dragging = false;
 			return;
 		}
@@ -304,9 +304,9 @@ public class SelectTool : EditorTool {
 	}
 
 	private void OnObjectClick(object sender, MouseButtonEventArgs mouseButtonEventArgs) {
-		if (FurballGame.InputManager.HeldKeys.Contains(Key.ShiftLeft)) return;
+		if (FurballGame.InputManager.ShiftHeld) return;
 
-		bool ctrlHeld = FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft) || FurballGame.InputManager.HeldKeys.Contains(Key.ControlRight);
+		bool ctrlHeld = FurballGame.InputManager.ControlHeld;
 
 		if (sender is not Drawable drawable) return;
 

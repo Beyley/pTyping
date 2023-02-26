@@ -49,27 +49,27 @@ public class MenuScreen : pScreen {
 		//to keep up the surprise of what one comes next
 		//although this does lead to it changing at a seemingly random time for people outside of Europe
 		int dayIndex = DateTime.UtcNow.Day % totdList.Length;
-		
+
 		string totdString = totdList[dayIndex];
-		
+
 		this._totd = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, totdString, 30) {
 			OriginType = OriginType.Center,
-			Depth = 0.5f
+			Depth      = 0.5f
 		};
 
 		this._totdBackground = new RectanglePrimitiveDrawable {
-			ColorOverride = new Color(50, 50, 50, 175), 
+			ColorOverride = new Color(50, 50, 50, 175),
 			Filled        = true,
-			OriginType    = OriginType.Center, 
-			Thickness     = 0, 
-			Depth = 0.75f
+			OriginType    = OriginType.Center,
+			Thickness     = 0,
+			Depth         = 0.75f
 		};
-			
+
 		this.Manager.Add(this._totdBackground);
 		this.Manager.Add(this._totd);
-		
+
 		#endregion
-		
+
 		TextDrawable gitVersionText = new TextDrawable(new Vector2(10, 10), pTypingGame.JapaneseFont, string.Format(GetLocalizedString(Localizations.MenuRevision, CurrentLanguage), Program.BuildVersion), 30) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight
@@ -188,6 +188,11 @@ public class MenuScreen : pScreen {
 		this.Manager.Add(this._optionsButton);
 		this.Manager.Add(this._exitButton);
 
+		this._playButton.RegisterForInput();
+		this._editButton.RegisterForInput();
+		this._optionsButton.RegisterForInput();
+		this._exitButton.RegisterForInput();
+
 		#endregion
 
 		#region Menu music
@@ -238,18 +243,26 @@ public class MenuScreen : pScreen {
 		};
 
 		musicNextButton.OnClick += delegate {
-			this.UpdateStats();
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+				this.UpdateStats();
 
-			pTypingGame.SelectNewSong();
-			pTypingGame.PlayMusic();
+				pTypingGame.SelectNewSong();
+				pTypingGame.PlayMusic();
+			});
 		};
 
 		this.Manager.Add(this._musicTitle);
 		this.Manager.Add(this._songProgressBar);
 
+		this._songProgressBar.RegisterForInput();
+
 		this.Manager.Add(musicPlayButton);
 		this.Manager.Add(musicPauseButton);
 		this.Manager.Add(musicNextButton);
+
+		musicPlayButton.RegisterForInput();
+		musicPauseButton.RegisterForInput();
+		musicNextButton.RegisterForInput();
 
 		#endregion
 
@@ -272,7 +285,7 @@ public class MenuScreen : pScreen {
 		base.Relayout(newWidth, newHeight);
 
 		this._titleText.Position = new Vector2(newWidth / 2f, newHeight * 0.2f);
-		this._totd.Position = new Vector2(newWidth / 2f, newHeight * 0.825f);
+		this._totd.Position      = new Vector2(newWidth / 2f, newHeight * 0.825f);
 
 		this._totdBackground.Position = this._totd.Position;
 		this._totdBackground.RectSize = new Vector2(this._totd.Size.X + 10, this._totd.FontSize + 5);

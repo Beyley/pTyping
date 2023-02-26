@@ -10,7 +10,7 @@ using Realms.Schema;
 
 namespace pTyping.Shared;
 
-public class BeatmapDatabase {
+public class BeatmapDatabase : IDisposable {
 	public readonly Realm Realm;
 
 	public const ulong SCHEMA_VERSION = 4;
@@ -110,5 +110,9 @@ public class BeatmapDatabase {
 				foreach (Beatmap newSetBeatmap in newSet.Beatmaps)
 					newSetBeatmap.CalculatedDifficulty = null;
 		}
+	}
+
+	public void Dispose() {
+		this.Realm?.Dispose();
 	}
 }

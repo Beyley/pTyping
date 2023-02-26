@@ -256,11 +256,18 @@ public class Player : CompositeDrawable {
 
 		if (selectedNote is not NoteDrawable note)
 			throw new ArgumentException("You cannot remove objects that are not notes!", nameof (selectedNote));
-
+		
 		//Remove the note from the list of notes
 		this.Notes.Remove(note);
+
+		bool taken = this.ChildrenLock.TryEnterWriteLock(1);
+		
 		//Remove the note from the drawable
 		this.Children.Remove(selectedNote);
+
+		if (taken)
+			this.ChildrenLock.ExitWriteLock();
+
 		//Remove the note from the beatmap
 		this.Song.HitObjects.Remove(note.Note);
 
@@ -476,8 +483,15 @@ public class Player : CompositeDrawable {
 	}
 
 	private void ShowTypingIndicator(char character, bool miss = false) {
-		if (this._currentTypingIndicator != null)
+		if (this._currentTypingIndicator != null) {
+			bool taken = this.ChildrenLock.TryEnterWriteLock(1);
+			
 			this.Children.Remove(this._currentTypingIndicator);
+
+			if (taken)
+				this.ChildrenLock.ExitWriteLock();
+		}
+
 
 		if (this._currentTypingIndicator == null) {
 			this._currentTypingIndicator = new TextDrawable(RECEPTICLE_POS, pTypingGame.JapaneseFont, character.ToString(), 60) {

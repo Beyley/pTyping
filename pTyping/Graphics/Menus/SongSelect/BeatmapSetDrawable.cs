@@ -72,6 +72,8 @@ public class BeatmapSetDrawable : CompositeDrawable {
 			map.PropertyChanged += this.MapUpdated;
 
 			this.MapUpdated(null, null);
+
+			this.RegisterForInput();
 		}
 
 		private void MapUpdated(object sender, PropertyChangedEventArgs e) {
@@ -79,7 +81,8 @@ public class BeatmapSetDrawable : CompositeDrawable {
 		}
 
 		private void OnMapClick(object sender, MouseButtonEventArgs e) {
-			pTypingGame.CurrentSong.Value = this.Beatmap;
+			//Defer changing it back to the main thread, as this is a Realm operation
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => pTypingGame.CurrentSong.Value = this.Beatmap);
 		}
 
 		public override void Dispose() {

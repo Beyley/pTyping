@@ -17,18 +17,18 @@ public partial class EditorScreen {
 	}
 
 	private void InitializeKeybinds() {
-		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, this.PausePlay));
-		FurballGame.InputManager.RegisterKeybind(this._saveKeybind      = new Keybind(Keybinds.Save, "Save", Key.S, this.SaveKeybind));
+		FurballGame.InputManager.RegisterKeybind(this._pausePlayKeybind = new Keybind(Keybinds.PausePlay, "Pause/Play", Key.Space, Array.Empty<Key>(), this.PausePlay));
+		FurballGame.InputManager.RegisterKeybind(this._saveKeybind = new Keybind(Keybinds.Save, "Save", Key.S, new[] {
+			Key.ControlLeft
+		}, this.SaveKeybind));
 
 		FurballGame.InputManager.OnMouseScroll += this.MouseScroll;
 		FurballGame.InputManager.OnMouseDown   += this.MouseDown;
 		FurballGame.InputManager.OnKeyDown     += this.KeyDown;
 	}
 
-	private void SaveKeybind(FurballKeyboard keyboard) {
-		if (keyboard.IsKeyPressed(Key.ControlLeft) || keyboard.IsKeyPressed(Key.ControlRight)) {
-			this.Save();
-		}
+	private void SaveKeybind(KeyEventArgs keyEventArgs) {
+		this.Save();
 	}
 
 	private void KeyDown(object sender, KeyEventArgs e) {
@@ -49,7 +49,7 @@ public partial class EditorScreen {
 		this.MoveTimeByNBeats(Math.Sign(-e.ScrollAmount.Y));
 	}
 
-	private void PausePlay(FurballKeyboard keyboard) {
+	private void PausePlay(KeyEventArgs keyEventArgs) {
 		//Ignore this bind if the user is typing somewhere
 		if (FurballGame.InputManager.CharInputHandler != null)
 			return;

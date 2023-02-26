@@ -36,6 +36,7 @@ public class OptionsScreen : pScreen {
 		};
 
 		this.Manager.Add(backButton);
+		backButton.RegisterForInput();
 
 		#endregion
 

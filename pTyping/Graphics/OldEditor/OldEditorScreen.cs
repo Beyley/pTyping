@@ -201,6 +201,7 @@ public class OldEditorScreen : pScreen {
 		this._progressBar.OnClickUp += this.ProgressBarOnInteractUp;
 
 		this.Manager.Add(this._progressBar);
+		this._progressBar.RegisterForInput();
 
 		#region Update timing points
 
@@ -290,9 +291,13 @@ public class OldEditorScreen : pScreen {
 		};
 
 		this.Manager.Add(this._playButton);
+		this._playButton.RegisterForInput();
 		this.Manager.Add(this._pauseButton);
+		this._pauseButton.RegisterForInput();
 		this.Manager.Add(this._rightButton);
+		this._rightButton.RegisterForInput();
 		this.Manager.Add(this._leftButton);
+		this._leftButton.RegisterForInput();
 
 		#endregion
 
@@ -519,6 +524,7 @@ public class OldEditorScreen : pScreen {
 
 		if (eventDrawable == null) return;
 
+		eventDrawable.RegisterForInput();
 		this.EditorDrawable.Children.Add(eventDrawable);
 		this.EditorState.Events.Add(eventDrawable);
 		if (isNew) {
@@ -545,6 +551,7 @@ public class OldEditorScreen : pScreen {
 		};
 
 		noteDrawable.CreateTweens(new GameplayDrawableTweenArgs(this.CurrentApproachTime(note.Time), true, true));
+		noteDrawable.RegisterForInput();
 
 		this.EditorDrawable.Children.Add(noteDrawable);
 		this.EditorState.Notes.Add(noteDrawable);
@@ -649,7 +656,7 @@ public class OldEditorScreen : pScreen {
 	}
 
 	public void DeleteSelectedObjects() {
-		foreach (Drawable @object in this.EditorState.SelectedObjects)
+		foreach (Drawable @object in this.EditorState.SelectedObjects) {
 			if (@object is NoteDrawable note) {
 				this.EditorDrawable.Children.Remove(note);
 				this.EditorState.Song.HitObjects.Remove(note.Note);
@@ -685,6 +692,8 @@ public class OldEditorScreen : pScreen {
 
 				this.CurrentTool?.OnEventDelete(lyricEvent);
 			}
+			@object.Dispose();
+		}
 
 		this.EditorState.SelectedObjects.Clear();
 		this.SaveNeeded = true;
@@ -812,7 +821,7 @@ public class OldEditorScreen : pScreen {
 
 				break;
 			}
-			case Key.S when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
+			case Key.S when FurballGame.InputManager.ControlHeld: {
 				// List<Event> lyrics = this.EditorState.Song.Events.Where(x => x is Event).Cast<Event>().ToList();
 				// lyrics.Sort((x, y) => (int)(x.Time - y.Time));
 				// for (int i = 1; i < lyrics.Count; i++) {
@@ -833,7 +842,7 @@ public class OldEditorScreen : pScreen {
 				this.Save();
 				break;
 			}
-			case Key.C when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
+			case Key.C when FurballGame.InputManager.ControlHeld: {
 				if (this.EditorState.SelectedObjects.Count == 0) return;
 
 				List<NoteDrawable> sortedNotes = new List<NoteDrawable>();
@@ -855,13 +864,13 @@ public class OldEditorScreen : pScreen {
 					notes.Add(note);
 				}
 
-				FurballGame.InputManager.Clipboard = JsonConvert.SerializeObject(notes);
-
+				e.Keyboard.SetClipboard(JsonConvert.SerializeObject(notes));
+				
 				break;
 			}
-			case Key.V when FurballGame.InputManager.HeldKeys.Contains(Key.ControlLeft): {
+			case Key.V when FurballGame.InputManager.ControlHeld: {
 				try {
-					List<HitObject> notes = JsonConvert.DeserializeObject<List<HitObject>>(FurballGame.InputManager.Clipboard);
+					List<HitObject> notes = JsonConvert.DeserializeObject<List<HitObject>>(e.Keyboard.GetClipboard());
 
 					foreach (HitObject note in notes) {
 						note.Time += this.EditorState.CurrentTime;
@@ -909,6 +918,7 @@ public class OldEditorScreen : pScreen {
 				ColorOverride = new Color(50, 200, 50, 100),
 				ToolTip       = $@"BPM:{60000d / timingPoint.Tempo:#.##}"
 			};
+			drawable.RegisterForInput();
 
 			this._timingPoints.Add(drawable);
 			this.Manager.Add(drawable);

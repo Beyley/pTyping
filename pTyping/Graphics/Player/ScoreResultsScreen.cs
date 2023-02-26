@@ -10,6 +10,7 @@ using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Menus.SongSelect;
+using pTyping.Shared;
 using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Scores;
 using pTyping.Shared.Scores.Exporters;
@@ -20,7 +21,7 @@ public class ScoreResultsScreen : pScreen {
 	public Score Score;
 
 	public ScoreResultsScreen(Score score) {
-		this.Score = score;
+		this.Score = score.Clone();
 	}
 
 	public override void Initialize() {
@@ -83,7 +84,10 @@ public class ScoreResultsScreen : pScreen {
 		exportReplayButton.OnClick += (_, _) => {
 			pTypingScoreExporter exporter = new pTypingScoreExporter();
 
-			exporter.ExportScore(this.Score, pTypingGame.BeatmapDatabase, pTypingGame.ScoreDatabase, pTypingGame.FileDatabase);
+			using BeatmapDatabase database = new BeatmapDatabase(FurballGame.DataFolder);
+			database.Realm.Refresh();
+
+			exporter.ExportScore(this.Score, database, pTypingGame.ScoreDatabase, pTypingGame.FileDatabase);
 		};
 
 		this.Manager.Add(exitButton);

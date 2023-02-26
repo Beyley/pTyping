@@ -82,6 +82,7 @@ public class NotificationManager : DrawableManager {
 		FurballGame.GameTimeScheduler.ScheduleMethod(
 			delegate {
 				this.Remove(drawable);
+				drawable.Dispose();
 				this.UpdateNotifications();
 			},
 			drawable.TimeSource.GetCurrentTime() + 100
@@ -99,6 +100,7 @@ public class NotificationManager : DrawableManager {
 				FurballGame.GameTimeScheduler.ScheduleMethod(
 					delegate {
 						this.Remove(drawable);
+						drawable.Dispose();
 					},
 					drawable.TimeSource.GetCurrentTime() + 100
 				);
@@ -187,11 +189,13 @@ public class NotificationManager : DrawableManager {
 				this.CoverHovers = false;
 			}
 
-			this.Depth = -1;
+			this.Depth = -5;
 
 			this.Children!.Add(this._backgroundDrawable);
 			this.Children.Add(this._outlineDrawable);
 			this.Children.Add(this._textDrawable);
+
+			this.RegisterForInput();
 		}
 	}
 }

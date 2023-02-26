@@ -104,12 +104,19 @@ public class UiContainer : CompositeDrawable {
 		if (this._elements.Remove(element)) {
 			element.InUse = false;
 			element.Drawable.Tweens.Clear();
+			element.Drawable.Dispose();
 
 			element.Visible.OnChange -= this.OnElementVisibleChange;
 		}
 	}
 
 	public override void Dispose() {
+		foreach (UiElement element in this._elements) {
+			element.Drawable.Dispose();
+		}
+
+		this._elements.Clear();
+		
 		this._elements.CollectionChanged -= this.Recalculate;
 		this.ElementOriginType.OnChange  -= this.OnOriginTypeChange;
 

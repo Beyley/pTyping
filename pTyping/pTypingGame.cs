@@ -169,7 +169,7 @@ public class pTypingGame : FurballGame {
 			}
 		}
 
-		MusicTrack        = AudioEngine.CreateStream(data);
+		MusicTrack = AudioEngine.CreateStream(data);
 		// MusicTrack.Volume = pTypingConfig.Instance.MasterVolume;
 
 		MusicTrackTimeSourceNoOffset = new AudioStreamTimeSource(MusicTrack);
@@ -189,7 +189,7 @@ public class pTypingGame : FurballGame {
 		BackgroundBoxBlur ??= Instance.WindowManager.GraphicsBackend.CreateBoxBlurTextureEffect(tex);
 
 		CurrentSongBackground.Texture = BackgroundBoxBlur.KernelRadius == 0 && BackgroundBoxBlur.Passes == 0 ? tex : new Texture(BackgroundBoxBlur.Texture);
-		
+
 		SetBlurParams(BackgroundBoxBlur.KernelRadius, BackgroundBoxBlur.Passes, true);
 
 		//Set the current background to the blurred background
@@ -488,7 +488,7 @@ public class pTypingGame : FurballGame {
 		VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, 0f, 0f, 0, 0));
 
 		InputManager.OnMouseScroll += delegate(object _, MouseScrollEventArgs eventArgs) {
-			if (InputManager.HeldKeys.Contains(Key.AltLeft))
+			if (InputManager.AltHeld)
 				ChangeGlobalVolume(eventArgs.ScrollAmount.Y);
 		};
 
@@ -562,17 +562,19 @@ public class pTypingGame : FurballGame {
 	public override void RegisterKeybinds() {
 		base.RegisterKeybinds();
 
-		this._toggleUserPanel = new Keybind(pTypingKeybinds.ToggleUserPanel, "Toggle User Panel", Key.F1, this.ToggleUserPanel);
-		this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot, "Take Screenshot", Key.F2, _ => this.WindowManager.GraphicsBackend.TakeScreenshot());
+		this._toggleUserPanel = new Keybind(pTypingKeybinds.ToggleUserPanel, "Toggle User Panel", Key.F1, Array.Empty<Key>(), this.ToggleUserPanel);
+		this._takeScreenshot  = new Keybind(pTypingKeybinds.TakeScreenshot, "Take Screenshot", Key.F2, Array.Empty<Key>(), _ => this.WindowManager.GraphicsBackend.TakeScreenshot());
 		this._toggleFullscreen = new Keybind(
 			pTypingKeybinds.ToggleFullscreen,
 			"Toggle Fullscreen",
-			Key.F3,
+			Key.F3, Array.Empty<Key>(),
 			_ => {
 				this.ChangeScreenSize(this.WindowManager.WindowSize.X, this.WindowManager.WindowSize.Y, !this.WindowManager.WindowState.HasFlag(WindowState.Fullscreen));
 			}
 		);
-		this._openSettings = new Keybind(pTypingKeybinds.OpenSettings, "Open Settings Menu", Key.O, this.ToggleSettingsMenu);
+		this._openSettings = new Keybind(pTypingKeybinds.OpenSettings, "Open Settings Menu", Key.O, new[] {
+			Key.ControlLeft
+		}, this.ToggleSettingsMenu);
 
 		InputManager.RegisterKeybind(this._takeScreenshot);
 		InputManager.RegisterKeybind(this._toggleFullscreen);
@@ -580,31 +582,32 @@ public class pTypingGame : FurballGame {
 		InputManager.RegisterKeybind(this._openSettings);
 	}
 
-	private void ToggleSettingsMenu(FurballKeyboard keyboard) {
-		this.ToggleSettingsMenu(true);
+	private void ToggleSettingsMenu(KeyEventArgs keyboard) {
+		this.ToggleSettingsMenu();
 	}
 
 	private SettingsForm _settings;
-	public void ToggleSettingsMenu(bool needControl) {
-		//If we arent holding control, ignore this keypress
-		if (!InputManager.ControlHeld && needControl) return;
-
+	public void ToggleSettingsMenu() {
 		if (this._settings == null) {
 			this._settings = new SettingsForm {
 				Visible = false,
 				Depth   = -100
 			};
-			this._settings.OnTryClose += (_, _) => this.ToggleSettingsMenu(false);
+			this._settings.OnTryClose += (_, _) => this.ToggleSettingsMenu();
 			this._settingsManager.Add(this._settings);
 		}
 
 		//If the form is already changing state, then stop it from being changed until its done
 		if (this._settings.StateChanging) return;
 
-		if (this._settings.Visible)
+		if (this._settings.Visible) {
 			this._settings.FadeOutFromOne(100);
-		else
+			this._settings.Hide();
+		}
+		else {
 			this._settings.FadeInFromZero(100);
+			this._settings.Show();
+		}
 
 		this._settings.StateChanging = true;
 		GameTimeScheduler.ScheduleMethod(
@@ -625,7 +628,7 @@ public class pTypingGame : FurballGame {
 		InputManager.UnregisterKeybind(this._openSettings);
 	}
 
-	public void ToggleUserPanel(FurballKeyboard keyboard) {
+	public void ToggleUserPanel(KeyEventArgs keyEventArgs) {
 		//If we arent logged in, ignore this press
 		if (OnlineManager.State != ConnectionState.LoggedIn) return;
 
@@ -808,7 +811,9 @@ public class pTypingGame : FurballGame {
 				if (OnlineManager.State == ConnectionState.LoggedIn) {
 					string id = OnlineManager.SendScreenshot(e);
 
-					InputManager.Clipboard = $"{pTypingConfig.Instance.ServerWebUrl}/screenshots/{id}";
+					foreach (FurballKeyboard keyboard in InputManager.Keyboards) {
+						keyboard.SetClipboard($"{pTypingConfig.Instance.ServerWebUrl}/screenshots/{id}");
+					}
 
 					ScreenshotManager.SaveScreenshot(e, true, id);
 

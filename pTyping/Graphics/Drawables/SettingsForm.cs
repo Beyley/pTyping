@@ -13,4 +13,20 @@ public class SettingsForm : DrawableForm {
 	public bool StateChanging;
 
 	public SettingsForm(OriginType startPosition = OriginType.Center) : base("Settings", new DrawableSettingsMenu(), startPosition) {}
+
+	public void Hide() {
+		this.ChildrenLock.EnterWriteLock();
+
+		this.UnregisterChildrenForInput();
+
+		this.ChildrenLock.ExitWriteLock();
+	}
+
+	public void Show() {
+		this.ChildrenLock.EnterWriteLock();
+
+		this.RegisterChildrenForInput();
+
+		this.ChildrenLock.ExitWriteLock();
+	}
 }

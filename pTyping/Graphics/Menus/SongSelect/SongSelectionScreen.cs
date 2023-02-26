@@ -83,6 +83,8 @@ public class SongSelectionScreen : pScreen {
 
 		this.Manager.Add(backButton);
 
+		backButton.RegisterForInput();
+		
 		#endregion
 
 		#region Create new song button
@@ -132,7 +134,7 @@ public class SongSelectionScreen : pScreen {
 		DrawableButton startButton = new DrawableButton(new Vector2(5), FurballGame.DefaultFont, 60, "Start!", Color.Red, Color.White, Color.White, new Vector2(0)) {
 			OriginType       = OriginType.BottomRight,
 			ScreenOriginType = OriginType.BottomRight,
-			Depth            = 0f
+			Depth            = -1f
 		};
 
 		startButton.OnClick += delegate {
