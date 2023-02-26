@@ -97,6 +97,8 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 
 			ModButtonDrawable modButton = new ModButtonDrawable(registeredMod, new(x, y), this.OnModClick, this.SelectedMods);
 
+			modButton.Depth = -10;
+			
 			this.Children.Add(modButton);
 			this._mods.Add(modButton);
 
@@ -115,7 +117,7 @@ public class ModSelectionMenuDrawable : CompositeDrawable {
 		this.Children.Add(
 			this._background = new RectanglePrimitiveDrawable(new(-2, -66), new(410, this.Size.Y + 4), 2, true) {
 				ColorOverride = new(50, 50, 50, 175),
-				Depth         = -1f
+				Depth         = 1f
 			}
 		);
 

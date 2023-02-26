@@ -43,6 +43,7 @@ public sealed class ModOptionsDrawable : CompositeDrawable {
 		float       y = 0;
 
 		//Remove all drawables from the list and update the max scroll
+		this._scrollable.Children.ForEach(drawable => drawable.Dispose());
 		this._scrollable.Children.Clear();
 		this._scrollable.RecalculateMax();
 
@@ -81,17 +82,23 @@ public sealed class ModOptionsDrawable : CompositeDrawable {
 							};
 							y += slider.Size.Y;
 
+							slider.Depth = -10;
+
 							this._scrollable.Add(slider);
+							slider.RegisterForInput();
 						}
 						else if (genericType == typeof(float)) {
-							BoundNumber<double> val = (BoundNumber<double>)value;
+							BoundNumber<float> val = (BoundNumber<float>)value;
 
-							SliderDrawable<double> slider = new SliderDrawable<double>(val) {
+							SliderDrawable<float> slider = new SliderDrawable<float>(val) {
 								Position = new Vector2(x, y)
 							};
 							y += slider.Size.Y;
 
+							slider.Depth = -10;
+
 							this._scrollable.Add(slider);
+							slider.RegisterForInput();
 						}
 					}
 			}

@@ -16,7 +16,7 @@ using pTyping.Shared.Mods;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 
-public class ModButtonDrawable : TexturedDrawable {
+public sealed class ModButtonDrawable : TexturedDrawable {
 	public readonly  Mod                  Mod;
 	private readonly Vector2              _originalPosition;
 	private readonly Action<object, bool> _actionClick;
@@ -54,6 +54,8 @@ public class ModButtonDrawable : TexturedDrawable {
 
 		this._actionClick  = onModClick;
 		this._selectedMods = selectedMods;
+
+		this.RegisterForInput();
 	}
 
 	public void Hide(bool instant = false) {
