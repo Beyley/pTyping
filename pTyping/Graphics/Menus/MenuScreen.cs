@@ -175,7 +175,7 @@ public class MenuScreen : pScreen {
 
 		this._exitButton.OnClick += delegate {
 			pTypingGame.MenuClickSound.PlayNew();
-			FurballGame.Instance.WindowManager.CloseWindow();
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => { FurballGame.Instance.WindowManager.CloseWindow(); });
 		};
 
 		this._optionsButton.OnClick += delegate {
