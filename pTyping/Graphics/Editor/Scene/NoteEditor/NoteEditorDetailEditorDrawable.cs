@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Numerics;
 using Furball.Engine;
+using Furball.Engine.Engine.Graphics;
 using Furball.Engine.Engine.Graphics.Drawables;
 using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Vixie.Backends.Shared;
