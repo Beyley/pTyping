@@ -334,7 +334,7 @@ public class pTypingGame : FurballGame {
 		BeatmapSet[] sets = BeatmapDatabase.Realm.All<BeatmapSet>().ToArray();
 
 		//If there are no maps in the set, return
-		if (!sets.Any())
+		if (sets.Length == 0)
 			return;
 
 		BeatmapSet picked = sets[Random.Next(sets.Length)];
