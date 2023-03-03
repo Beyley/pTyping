@@ -53,7 +53,9 @@ public class CreateNoteTool : EditorTool {
 
 		//Update the position of the preview line
 		if (this.OldEditorInstance.InPlayfield(position)) {
+			this._createLine.TweensLock.EnterWriteLock();
 			this._createLine.Tweens.Clear();
+			this._createLine.TweensLock.ExitWriteLock();
 			this._createLine.Tweens.Add(
 				new VectorTween(
 					TweenType.Movement,

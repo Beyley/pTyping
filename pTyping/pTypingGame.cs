@@ -316,7 +316,9 @@ public class pTypingGame : FurballGame {
 	}
 
 	public static void ChangeGlobalVolume(float mouseScroll) {
+		VolumeSelector.TweensLock.EnterWriteLock();
 		VolumeSelector.Tweens.Clear();
+		VolumeSelector.TweensLock.ExitWriteLock();
 
 		VolumeSelector.Tweens.Add(new FloatTween(TweenType.Fade, VolumeSelector.ColorOverride.A / 255f, 1f, Time, Time + 200));
 

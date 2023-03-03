@@ -177,7 +177,9 @@ Accuracy: {this.Player.Value.Accuracy * 100f:00.00}% Play Count: {this.Player.Va
 			_                      => Color.White
 		};
 
+		this._backgroundDrawable.TweensLock.EnterWriteLock();
 		this._backgroundDrawable.Tweens.Clear();
+		this._backgroundDrawable.TweensLock.ExitWriteLock();
 
 		this._backgroundDrawable.Tweens.Add(new ColorTween(TweenType.Color, this._backgroundDrawable.ColorOverride, color, FurballGame.Time, FurballGame.Time + 100));
 	}

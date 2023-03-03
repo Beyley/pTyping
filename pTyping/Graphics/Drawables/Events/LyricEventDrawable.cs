@@ -22,7 +22,9 @@ public class LyricEventDrawable : TexturedDrawable {
 	}
 
 	public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
+		this.TweensLock.EnterWriteLock();
 		this.Tweens.Clear();
+		this.TweensLock.ExitWriteLock();
 
 		Vector2 noteStartPos  = Player.Player.NOTE_START_POS;
 		Vector2 noteEndPos    = Player.Player.NOTE_END_POS;

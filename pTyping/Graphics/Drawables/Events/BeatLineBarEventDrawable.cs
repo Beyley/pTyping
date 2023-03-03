@@ -26,7 +26,9 @@ public class BeatLineBarEventDrawable : TexturedDrawable {
 	}
 
 	public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
+		this.TweensLock.EnterWriteLock();
 		this.Tweens.Clear();
+		this.TweensLock.ExitWriteLock();
 
 		Vector2 startPos      = Player.Player.NOTE_START_POS;
 		Vector2 endPos        = Player.Player.NOTE_END_POS;

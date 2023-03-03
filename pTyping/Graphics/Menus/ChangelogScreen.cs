@@ -100,12 +100,16 @@ public class ChangeLogDrawable : CompositeDrawable {
 		}
 
 		private void OnHoveredLost(object sender, EventArgs e) {
+			this._summary.TweensLock.EnterWriteLock();
 			this._summary.Tweens.Clear();
+			this._summary.TweensLock.ExitWriteLock();
 			this._summary.FadeColor(Color.White, 100);
 		}
 
 		private void OnHovered(object sender, EventArgs e) {
+			this._summary.TweensLock.EnterWriteLock();
 			this._summary.Tweens.Clear();
+			this._summary.TweensLock.ExitWriteLock();
 			this._summary.FadeColor(new Color(100, 100, 255), 100);
 		}
 

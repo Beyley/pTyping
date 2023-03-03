@@ -499,7 +499,9 @@ public class Player : CompositeDrawable {
 			};
 		}
 		else {
+			this._currentTypingIndicator.TweensLock.EnterWriteLock();
 			this._currentTypingIndicator.Tweens.Clear();
+			this._currentTypingIndicator.TweensLock.ExitWriteLock();
 			this._currentTypingIndicator.Position = RECEPTICLE_POS;
 			this._currentTypingIndicator.Text     = character.ToString();
 		}

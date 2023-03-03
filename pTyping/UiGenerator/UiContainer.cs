@@ -54,7 +54,9 @@ public class UiContainer : CompositeDrawable {
 
 			if (!element.Visible.Value) {
 				element.Drawable.Visible = false;
+				element.Drawable.TweensLock.EnterWriteLock();
 				element.Drawable.Tweens.Clear();
+				element.Drawable.TweensLock.ExitWriteLock();
 				continue;
 			}
 
@@ -104,7 +106,9 @@ public class UiContainer : CompositeDrawable {
 	public void UnRegisterElement(UiElement element) {
 		if (this._elements.Remove(element)) {
 			element.InUse = false;
+			element.Drawable.TweensLock.EnterWriteLock();
 			element.Drawable.Tweens.Clear();
+			element.Drawable.TweensLock.ExitWriteLock();
 			element.Drawable.Dispose();
 
 			element.Visible.OnChange -= this.OnElementVisibleChange;

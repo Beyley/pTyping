@@ -115,7 +115,9 @@ public class NoteDrawable : SelectableCompositeDrawable {
 	public override Vector2 Size => this.NoteTexture.Size * this.Scale;
 
 	public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
+		this.TweensLock.EnterWriteLock();
 		this.Tweens.Clear();
+		this.TweensLock.ExitWriteLock();
 
 		Vector2 noteStartPos  = Player.NOTE_START_POS;
 		Vector2 noteEndPos    = Player.NOTE_END_POS;
@@ -278,7 +280,9 @@ public class NoteDrawable : SelectableCompositeDrawable {
 		//random bool
 		bool right = FurballGame.Random.Next(-1, 2) == 1;
 
+		this.TweensLock.EnterWriteLock();
 		this.Tweens.Clear();
+		this.TweensLock.ExitWriteLock();
 
 		this.NoteTexture.Tweens.Add(
 			new ColorTween(

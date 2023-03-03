@@ -126,7 +126,9 @@ public sealed class NoteEditorScene : EditorScene {
 	}
 
 	private void UpdateMouseTimeDisplay(double mouseTime, double approachTime) {
+		this._mouseTimeDisplay.TweensLock.EnterWriteLock();
 		this._mouseTimeDisplay.Tweens.Clear();
+		this._mouseTimeDisplay.TweensLock.ExitWriteLock();
 
 		Vector2 noteStartPos  = Player.Player.NOTE_START_POS;
 		Vector2 noteEndPos    = Player.Player.NOTE_END_POS;
