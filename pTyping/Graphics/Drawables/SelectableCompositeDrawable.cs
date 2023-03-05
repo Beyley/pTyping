@@ -7,19 +7,21 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
+using pTyping.Shared;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Drawables;
 
 public class SelectableCompositeDrawable : CompositeDrawable {
-	private          ObservableCollection<SelectableCompositeDrawable> _selectedList;
-	private readonly Bindable<bool>                                    _selectEnabled;
+	private ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> _selectedList;
+
+	private readonly Bindable<bool> _selectEnabled;
 
 	public readonly Bindable<bool> Selected = new Bindable<bool>(false);
 
 	private bool _enabled;
 
-	protected SelectableCompositeDrawable(ObservableCollection<SelectableCompositeDrawable> selectedList, Bindable<bool> selectEnabled) {
+	protected SelectableCompositeDrawable(ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> selectedList, Bindable<bool> selectEnabled) {
 		this._selectedList  = selectedList;
 		this._selectEnabled = selectEnabled;
 
@@ -37,7 +39,10 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 		if (!e) {
 			this.UnregisterForInput();
 			this.Selected.Value = false;
-			this._selectedList.Remove(this);
+
+			this._selectedList.Lock.EnterWriteLock();
+			this._selectedList.Object.Remove(this);
+			this._selectedList.Lock.ExitWriteLock();
 		}
 		else {
 			this.RegisterForInput();
@@ -52,10 +57,14 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 			return;
 
 		if (this._selectedList != null) {
-			foreach (SelectableCompositeDrawable drawable in this._selectedList)
+			this._selectedList.Lock.EnterWriteLock();
+
+			foreach (SelectableCompositeDrawable drawable in this._selectedList.Object)
 				drawable.Selected.Value = false;
 
-			this._selectedList.Clear();
+			this._selectedList.Object.Clear();
+
+			this._selectedList.Lock.ExitWriteLock();
 		}
 
 		this.Selected.Value = false;
@@ -67,7 +76,9 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 
 		this._selectEnabled.OnChange -= this.EnableChange;
 
-		this._selectedList?.Remove(this);
+		this._selectedList.Lock.EnterWriteLock();
+		this._selectedList.Object.Remove(this);
+		this._selectedList.Lock.ExitWriteLock();
 		this._selectedList = null;
 
 		base.Dispose();
@@ -81,23 +92,34 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 
 		if (this._selectedList != null) {
 			if (!ctrlHeld) {
-				foreach (SelectableCompositeDrawable drawable in this._selectedList)
+				this._selectedList.Lock.EnterWriteLock();
+				foreach (SelectableCompositeDrawable drawable in this._selectedList.Object)
 					drawable.Selected.Value = false;
 
-				this._selectedList.Clear();
+				this._selectedList.Object.Clear();
+				this._selectedList.Lock.ExitWriteLock();
 			}
 
-			if (this._selectedList.Contains(this)) {
+			this._selectedList.Lock.EnterReadLock();
+			bool contains = this._selectedList.Object.Contains(this);
+			this._selectedList.Lock.ExitReadLock();
+
+			if (contains) {
 				if (ctrlHeld) {
-					this._selectedList.Remove(this);
+					this._selectedList.Lock.EnterWriteLock();
+					this._selectedList.Object.Remove(this);
+					this._selectedList.Lock.ExitWriteLock();
 					this.Selected.Value = false;
 				}
 
 				return;
 			}
 
-			if (this._enabled)
-				this._selectedList.Add(this);
+			if (this._enabled) {
+				this._selectedList.Lock.EnterReadLock();
+				this._selectedList.Object.Add(this);
+				this._selectedList.Lock.ExitReadLock();
+			}
 		}
 
 		if (this._enabled)

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Furball.Engine.Engine.Helpers;
 using pTyping.Graphics.Drawables;
+using pTyping.Shared;
 
 namespace pTyping.Graphics.Player;
 
@@ -42,5 +43,5 @@ public class PlayerStateArguments {
 
 	public Bindable<bool> EnableSelection = new Bindable<bool>(false);
 
-	public ObservableCollection<SelectableCompositeDrawable> SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
+	public ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> SelectedNotes = new ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>>(new ObservableCollection<SelectableCompositeDrawable>());
 }

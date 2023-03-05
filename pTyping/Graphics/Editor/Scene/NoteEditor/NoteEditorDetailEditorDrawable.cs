@@ -95,7 +95,7 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 
 		this.Children.Add(this._uiContainer);
 
-		this._playFieldContainer.Arguments.SelectedNotes.CollectionChanged += this.SelectedNotesChanged;
+		this._playFieldContainer.Arguments.SelectedNotes.Object.CollectionChanged += this.SelectedNotesChanged;
 
 		this._textInput.AsTextBox().OnCommit                += this.TextCommit;
 		this._colorPicker.AsColorPicker().Color.OnChange    += this.ColorPicked;
@@ -105,83 +105,98 @@ public sealed class NoteEditorDetailEditorDrawable : CompositeDrawable {
 	}
 
 	private void ConversionChanged(object sender, KeyValuePair<object, string> e) {
+		if (this._suppressEventsFromSelection)
+			return;
+
+		this._playFieldContainer.Arguments.SelectedNotes.Lock.EnterReadLock();
 		//Set the text of all selected notes
-		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes) {
+		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes.Object) {
 			NoteDrawable note = (NoteDrawable)selected;
 
 			note.Note.TypingConversion = (TypingConversions.ConversionType)e.Key;
 
 			note.UpdateDrawables();
 		}
+		this._playFieldContainer.Arguments.SelectedNotes.Lock.ExitReadLock();
 
 		//When the user changes a note, mark that a save is needed
 		this._playFieldContainer.Editor.SaveNeeded = true;
 	}
 
 	private void ColorPicked(object sender, Color e) {
+		if (this._suppressEventsFromSelection)
+			return;
+
+		this._playFieldContainer.Arguments.SelectedNotes.Lock.EnterReadLock();
 		//Set the text of all selected notes
-		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes) {
+		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes.Object) {
 			NoteDrawable note = (NoteDrawable)selected;
 
 			note.Note.Color = e;
 
 			note.UpdateDrawables();
 		}
+		this._playFieldContainer.Arguments.SelectedNotes.Lock.ExitReadLock();
 
 		//When the user changes a note, mark that a save is needed
 		this._playFieldContainer.Editor.SaveNeeded = true;
 	}
 
 	private void TextCommit(object sender, string e) {
+		this._playFieldContainer.Arguments.SelectedNotes.Lock.EnterReadLock();
 		//Set the text of all selected notes
-		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes) {
+		foreach (SelectableCompositeDrawable selected in this._playFieldContainer.Arguments.SelectedNotes.Object) {
 			NoteDrawable note = (NoteDrawable)selected;
 
 			note.Note.Text = e;
 
 			note.UpdateDrawables();
 		}
+		this._playFieldContainer.Arguments.SelectedNotes.Lock.ExitReadLock();
 
 		//When the user changes a note, mark that a save is needed
 		this._playFieldContainer.Editor.SaveNeeded = true;
 	}
 
+	private bool _suppressEventsFromSelection = false;
 	private void SelectedNotesChanged(object _, NotifyCollectionChangedEventArgs __) {
 		//If there are 0 notes selected, then we shouldn't allow you to select the text box
-		this._textInput.AsTextBox().Clickable       = this._playFieldContainer.Arguments.SelectedNotes.Count != 0;
-		this._colorPicker.AsColorPicker().Clickable = this._playFieldContainer.Arguments.SelectedNotes.Count != 0;
-		this._conversion.AsDropdown().Clickable     = this._playFieldContainer.Arguments.SelectedNotes.Count != 0;
+		this._textInput.AsTextBox().Clickable       = this._playFieldContainer.Arguments.SelectedNotes.Object.Count != 0;
+		this._colorPicker.AsColorPicker().Clickable = this._playFieldContainer.Arguments.SelectedNotes.Object.Count != 0;
+		this._conversion.AsDropdown().Clickable     = this._playFieldContainer.Arguments.SelectedNotes.Object.Count != 0;
 
 		//If the user's selection changes, release text focus, as they arent actively using it anymore,
 		//and it will be confusing if they are using shortcuts and the text changes
 		FurballGame.InputManager.ReleaseTextFocus();
 
 		this._textInput.AsTextBox().Text =
-			this._playFieldContainer.Arguments.SelectedNotes.Count == 1
+			this._playFieldContainer.Arguments.SelectedNotes.Object.Count == 1
 				//If the user has selected only a single note, then we can show the text of that note
-				? ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes[0]).Note.Text
+				? ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes.Object[0]).Note.Text
 				//Else, just blank it out
 				: "";
 
+		this._suppressEventsFromSelection = true;
 		this._colorPicker.AsColorPicker().Color.Value =
-			this._playFieldContainer.Arguments.SelectedNotes.Count == 1
-				//If the user has selected only a single note, then we can show the text of that note
-				? ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes[0]).Note.Color
+			this._playFieldContainer.Arguments.SelectedNotes.Object.Count == 1
+				//If the user has selected only a single note, then we can show the color of that note
+				? ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes.Object[0]).Note.Color
 				//Else, just blank it out
 				: Color.White;
 
 		this._conversion.AsDropdown().SelectedItem.Value =
-			this._playFieldContainer.Arguments.SelectedNotes.Count == 1
-				//If the user has selected only a single note, then we can show the text of that note
-				? this._conversion.AsDropdown().Items.First(x => (TypingConversions.ConversionType)x.Key == ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes[0]).Note.TypingConversion)
+			this._playFieldContainer.Arguments.SelectedNotes.Object.Count == 1
+				//If the user has selected only a single note, then we can show the conversion of that note
+				? this._conversion.AsDropdown().Items.First(x => (TypingConversions.ConversionType)x.Key == ((NoteDrawable)this._playFieldContainer.Arguments.SelectedNotes.Object[0]).Note.TypingConversion)
 				//Else, just blank it out
 				: this._conversion.AsDropdown().Items.First(x => (TypingConversions.ConversionType)x.Key == TypingConversions.ConversionType.StandardLatin);
+		this._suppressEventsFromSelection = false;
 	}
 
 	public override void Dispose() {
 		base.Dispose();
 
-		this._playFieldContainer.Arguments.SelectedNotes.CollectionChanged -= this.SelectedNotesChanged;
+		this._playFieldContainer.Arguments.SelectedNotes.Object.CollectionChanged -= this.SelectedNotesChanged;
 
 		this._textInput.AsTextBox().OnCommit -= this.TextCommit;
 	}

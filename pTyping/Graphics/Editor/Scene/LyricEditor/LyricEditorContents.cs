@@ -5,6 +5,7 @@ using Furball.Engine.Engine.Graphics.Drawables.Primitives;
 using Furball.Engine.Engine.Helpers;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Graphics.Drawables;
+using pTyping.Shared;
 using pTyping.Shared.Events;
 
 namespace pTyping.Graphics.Editor.Scene.LyricEditor;
@@ -19,8 +20,9 @@ public sealed class LyricEditorContents : CompositeDrawable {
 
 	private Vector2 _size;
 
-	private readonly Bindable<bool>                                    _areLyricsSelectable;
-	private readonly ObservableCollection<SelectableCompositeDrawable> _selectedLyrics = new ObservableCollection<SelectableCompositeDrawable>();
+	private readonly Bindable<bool> _areLyricsSelectable;
+
+	private readonly ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> _selectedLyrics = new ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>>(new ObservableCollection<SelectableCompositeDrawable>());
 
 	public override Vector2 Size => this._size * this.Scale;
 

@@ -11,7 +11,6 @@ using pTyping.Shared.Beatmaps;
 using pTyping.Shared.Beatmaps.Filters;
 using pTyping.Shared.Beatmaps.Sorting;
 using Realms;
-using Realms.Sync;
 
 namespace pTyping.Graphics.Menus.SongSelect;
 

@@ -11,6 +11,7 @@ using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
 using Furball.Vixie.Backends.Shared.Renderers;
 using pTyping.Graphics.Drawables;
+using pTyping.Shared;
 using pTyping.Shared.Events;
 using pTyping.UiElements;
 using Silk.NET.Input;
@@ -26,7 +27,7 @@ public class LyricDrawable : SelectableCompositeDrawable {
 
 	public override Vector2 Size => new Vector2((float)(this.Event.Length * LyricEditorContents.PIXELS_PER_MILISECOND), LyricEditorContents.HEIGHT) * this.Scale;
 
-	public LyricDrawable(EditorScreen editor, Event @event, ObservableCollection<SelectableCompositeDrawable> selectedList, Bindable<bool> selectEnabled) : base(selectedList, selectEnabled) {
+	public LyricDrawable(EditorScreen editor, Event @event, ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> selectedList, Bindable<bool> selectEnabled) : base(selectedList, selectEnabled) {
 		this._editor = editor;
 		this.Event   = @event;
 

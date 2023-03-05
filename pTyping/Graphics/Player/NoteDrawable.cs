@@ -13,6 +13,7 @@ using Furball.Vixie;
 using Furball.Vixie.Backends.Shared;
 using pTyping.Engine;
 using pTyping.Graphics.Drawables;
+using pTyping.Shared;
 using pTyping.Shared.Beatmaps.HitObjects;
 using Silk.NET.Input;
 
@@ -43,7 +44,7 @@ public class NoteDrawable : SelectableCompositeDrawable {
 	public bool   EditorHitSoundQueued = false;
 	public double TimeDifference;
 
-	public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size, ObservableCollection<SelectableCompositeDrawable> selectedObjects, PlayerStateArguments args) : base(selectedObjects, args.EnableSelection) {
+	public NoteDrawable(Vector2 position, Texture texture, FontSystem font, int size, ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> selectedObjects, PlayerStateArguments args) : base(selectedObjects, args.EnableSelection) {
 		this.Position = position;
 		this.Texture  = texture;
 
@@ -112,7 +113,7 @@ public class NoteDrawable : SelectableCompositeDrawable {
 		}
 	}
 
-	public override Vector2 Size => this.NoteTexture.Size * this.Scale;
+	public override Vector2 Size => (this.NoteTexture?.Size ?? Vector2.One) * this.Scale;
 
 	public void CreateTweens(GameplayDrawableTweenArgs tweenArgs) {
 		this.TweensLock.EnterWriteLock();

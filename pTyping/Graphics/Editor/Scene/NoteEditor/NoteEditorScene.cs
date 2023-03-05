@@ -144,15 +144,15 @@ public sealed class NoteEditorScene : EditorScene {
 				TweenType.Movement,
 				new Vector2(noteStartPos.X, noteStartPos.Y),
 				recepticlePos,
-				(int)(mouseTime - approachTime),
-				(int)mouseTime
+				mouseTime - approachTime,
+				mouseTime
 			) {
 				KeepAlive = true
 			}
 		);
 
 		this._mouseTimeDisplay.Tweens.Add(
-			new VectorTween(TweenType.Movement, recepticlePos, new Vector2(noteEndPos.X, recepticlePos.Y), (int)mouseTime, (int)(mouseTime + afterTravelTime)) {
+			new VectorTween(TweenType.Movement, recepticlePos, new Vector2(noteEndPos.X, recepticlePos.Y), mouseTime, mouseTime + afterTravelTime) {
 				KeepAlive = true
 			}
 		);

@@ -12,6 +12,7 @@ using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using pTyping.Graphics.Drawables;
 using pTyping.Graphics.Player;
+using pTyping.Shared;
 using pTyping.Shared.Beatmaps.HitObjects;
 using pTyping.Shared.Mods;
 using pTyping.UiElements;
@@ -50,7 +51,7 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this.Children.Add(this._outline);
 
 		this.Arguments               = PlayerStateArguments.DefaultEditor;
-		this.Arguments.SelectedNotes = new ObservableCollection<SelectableCompositeDrawable>();
+		this.Arguments.SelectedNotes = new ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>>(new ObservableCollection<SelectableCompositeDrawable>());
 
 		this.Players = new List<Player.Player>();
 
@@ -87,7 +88,9 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 					foreach (Player.Player player in this.Players)
 						player.RemoveNote(note);
 
-					this.Arguments.SelectedNotes.Remove(note);
+					this.Arguments.SelectedNotes.Lock.EnterWriteLock();
+					this.Arguments.SelectedNotes.Object.Remove(note);
+					this.Arguments.SelectedNotes.Lock.ExitWriteLock();
 
 					this.Editor.CloseCurrentContextMenu();
 				})
@@ -123,13 +126,15 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 	}
 
 	public void DeleteSelected() {
+		this.Arguments.SelectedNotes.Lock.EnterWriteLock();
 		foreach (Player.Player player in this.Players) {
-			foreach (SelectableCompositeDrawable selectedNote in this.Arguments.SelectedNotes)
+			foreach (SelectableCompositeDrawable selectedNote in this.Arguments.SelectedNotes.Object)
 				player.RemoveNote(selectedNote);
 		}
 
 		//Clear the list of selected notes, as they are now deleted
-		this.Arguments.SelectedNotes.Clear();
+		this.Arguments.SelectedNotes.Object.Clear();
+		this.Arguments.SelectedNotes.Lock.ExitWriteLock();
 	}
 
 	public string AddNote(HitObject hitObject) {
@@ -157,9 +162,11 @@ public sealed class NoteEditorPlayFieldContainer : CompositeDrawable {
 		this._dragStartingMouseTime = this.MouseTime;
 
 		this._dragStartingTimes.Clear();
-		foreach (SelectableCompositeDrawable selectableCompositeDrawable in this.Arguments.SelectedNotes) {
+		this.Arguments.SelectedNotes.Lock.EnterReadLock();
+		foreach (SelectableCompositeDrawable selectableCompositeDrawable in this.Arguments.SelectedNotes.Object) {
 			this._dragStartingTimes.Add(((NoteDrawable)selectableCompositeDrawable, ((NoteDrawable)selectableCompositeDrawable).Note.Time));
 		}
+		this.Arguments.SelectedNotes.Lock.ExitReadLock();
 	}
 
 	private void NoteDrag(object sender, MouseDragEventArgs e) {

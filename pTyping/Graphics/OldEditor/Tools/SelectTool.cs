@@ -9,7 +9,6 @@ using pTyping.Graphics.Drawables.Events;
 using pTyping.Graphics.Player;
 using pTyping.Shared;
 using pTyping.UiGenerator;
-using Silk.NET.Input;
 
 namespace pTyping.Graphics.OldEditor.Tools;
 
