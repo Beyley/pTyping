@@ -28,15 +28,19 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 
 		selectEnabled.OnChange += this.EnableChange;
 
-		this._enabled = selectEnabled.Value;
+		this.EnableChange(this, this._selectEnabled.Value);
 	}
 
 	private void EnableChange(object sender, bool e) {
 		this._enabled = e;
 
 		if (!e) {
+			this.UnregisterForInput();
 			this.Selected.Value = false;
 			this._selectedList.Remove(this);
+		}
+		else {
+			this.RegisterForInput();
 		}
 	}
 

@@ -105,7 +105,11 @@ public class MenuScreen : pScreen {
 			ScreenOriginType = OriginType.BottomLeft
 		};
 
-		newEditorButton.OnClick += (_, _) => ScreenManager.ChangeScreen(new EditorScreen(pTypingGame.CurrentSong.Value.ParentSet, pTypingGame.CurrentSong.Value.Id));
+		newEditorButton.OnClick += (_, _) => {
+			FurballGame.GameTimeScheduler.ScheduleMethod(_ => {
+				ScreenManager.ChangeScreen(new EditorScreen(pTypingGame.CurrentSong.Value.ParentSet, pTypingGame.CurrentSong.Value.Id));
+			});
+		};
 
 		if (RuntimeInfo.IsDebug()) {
 			this.Manager.Add(uiEditorButton);
