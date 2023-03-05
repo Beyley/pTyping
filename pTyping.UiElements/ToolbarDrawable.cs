@@ -94,6 +94,7 @@ public class ToolbarDrawable : CompositeDrawable {
 			});
 
 			this.OnClick += this.ItemClick;
+			this.RegisterForInput();
 		}
 
 		public override void Dispose() {

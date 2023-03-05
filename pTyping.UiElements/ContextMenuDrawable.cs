@@ -45,6 +45,7 @@ public class ContextMenuDrawable : Drawable {
 		
 		this.OnHover += this.HoverBegin;
 		this.OnHoverLost += this.HoverLost;
+		this.RegisterForInput();
 	}
 	
 	private void HoverBegin(object? sender, EventArgs e) {
