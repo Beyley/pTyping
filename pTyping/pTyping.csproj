@@ -39,7 +39,7 @@
         <PackageReference Include="EeveeTools" Version="1.0.0"/>
         <PackageReference Include="hellosam.net.collections" Version="1.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1"/>
-        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.125"/>
+        <PackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.126"/>
         <PackageReference Include="Kettu" Version="1.4.0"/>
         <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
