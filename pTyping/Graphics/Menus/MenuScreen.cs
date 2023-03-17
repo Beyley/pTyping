@@ -27,7 +27,7 @@ public class MenuScreen : pScreen {
 	private Drawable            _userCard;
 	private DrawableProgressBar _songProgressBar;
 
-	private static string[] totdList = {
+	private static readonly string[] TotdList = {
 		"Mario Teaches Typing 4",
 		"\"Typing Taiko\"",
 		"Average QWERTY fan vs average DVORAK fan",
@@ -37,7 +37,8 @@ public class MenuScreen : pScreen {
 		"We are not legally responsible for any hand injuries",
 		"Oh, you like instrumentals? Mhm, great...",
 		"Check out the original UTyping by toslunar!",
-		"Ive hurt my hand twice playing this so far" //update this accordingly
+		"Ive hurt my hand twice playing this so far", //update this accordingly
+		"You may need this as a backup. https://www.amazon.com/dp/B09TZWLFLY"
 	};
 
 	public override void Initialize() {
@@ -48,9 +49,9 @@ public class MenuScreen : pScreen {
 		//NOTE: we use UTC here to prevent it changing at different times for different people,
 		//to keep up the surprise of what one comes next
 		//although this does lead to it changing at a seemingly random time for people outside of Europe
-		int dayIndex = DateTime.UtcNow.Day % totdList.Length;
+		int dayIndex = DateTime.UtcNow.Day % TotdList.Length;
 
-		string totdString = totdList[dayIndex];
+		string totdString = TotdList[dayIndex];
 
 		this._totd = new TextDrawable(Vector2.Zero, pTypingGame.JapaneseFont, totdString, 30) {
 			OriginType = OriginType.Center,
