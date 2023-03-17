@@ -7,12 +7,14 @@ using Furball.Engine.Engine.Graphics.Drawables.Managers;
 using Furball.Engine.Engine.Helpers;
 using Furball.Engine.Engine.Input.Events;
 using Furball.Vixie.Backends.Shared;
+using JetBrains.Annotations;
 using pTyping.Shared;
 using Silk.NET.Input;
 
 namespace pTyping.Graphics.Drawables;
 
 public class SelectableCompositeDrawable : CompositeDrawable {
+	[CanBeNull]
 	private ReaderWriterLockedObject<ObservableCollection<SelectableCompositeDrawable>> _selectedList;
 
 	private readonly Bindable<bool> _selectEnabled;
@@ -40,9 +42,9 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 			this.UnregisterForInput();
 			this.Selected.Value = false;
 
-			this._selectedList.Lock.EnterWriteLock();
-			this._selectedList.Object.Remove(this);
-			this._selectedList.Lock.ExitWriteLock();
+			this._selectedList?.Lock.EnterWriteLock();
+			this._selectedList?.Object.Remove(this);
+			this._selectedList?.Lock.ExitWriteLock();
 		}
 		else {
 			this.RegisterForInput();
@@ -76,9 +78,9 @@ public class SelectableCompositeDrawable : CompositeDrawable {
 
 		this._selectEnabled.OnChange -= this.EnableChange;
 
-		this._selectedList.Lock.EnterWriteLock();
-		this._selectedList.Object.Remove(this);
-		this._selectedList.Lock.ExitWriteLock();
+		this._selectedList?.Lock.EnterWriteLock();
+		this._selectedList?.Object.Remove(this);
+		this._selectedList?.Lock.ExitWriteLock();
 		this._selectedList = null;
 
 		base.Dispose();
